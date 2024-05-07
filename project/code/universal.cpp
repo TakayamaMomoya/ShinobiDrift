@@ -230,8 +230,8 @@ D3DXVECTOR3 PolarCoordinates(D3DXVECTOR3 rot)
 	vec =
 	{
 		sinf(rot.x) * sinf(rot.y),
-		cosf(rot.x),
-		sinf(rot.x) * cosf(rot.y)
+		sinf(rot.x) * sinf(rot.y),
+		cosf(rot.x)
 	};
 
 	return vec;

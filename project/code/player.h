@@ -42,6 +42,7 @@ public:
 		float fFactAccele;	// 加速係数
 		float fFactAttenu;	// 減速係数
 		float fFactBrake;	// ブレーキ減速係数
+		float fAngleMaxCurve;	// カーブの最大角度
 	};
 
 	CPlayer(int nPriority = 4);	// コンストラクタ
@@ -66,6 +67,7 @@ private:
 		STATE state;	// 状態
 		float fSpeed;	// 現在の速度
 		float fSpeedDest;	// 目標速度
+		float fAngleHandle;	// ハンドルをきっている値
 	};
 
 	void Load(void);

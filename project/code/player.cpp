@@ -135,6 +135,11 @@ void CPlayer::Load(void)
 				iss >> m_param.fFactBrake;
 			}
 
+			if (key == "ANGLE_MAX_CURVE")
+			{// カーブ最大角度
+				iss >> m_param.fAngleMaxCurve;
+			}
+
 			if (file.eof())
 			{// 読み込み終了
 				break;
@@ -289,7 +294,7 @@ void CPlayer::ManageSpeed(void)
 
 	D3DXVECTOR3 pos = GetPosition();
 	D3DXVECTOR3 move = GetMove();
-	D3DXVECTOR3 vecForward = GetForward();
+	D3DXVECTOR3 rot = GetRotation();
 
 	// スロー状態を考慮した移動量の調整
 	if (pSlow != nullptr)
@@ -304,6 +309,11 @@ void CPlayer::ManageSpeed(void)
 		pos += move;
 		SetPosition(pos);
 	}
+
+	// 移動方向にハンドルきった分を追加
+	rot.y += m_info.fAngleHandle * m_param.fAngleMaxCurve;
+
+	D3DXVECTOR3 vecForward = universal::PolarCoordinates(rot);
 
 	// 現在のスピードと前方ベクトルをかけて移動量に適用
 	move = vecForward * m_info.fSpeed;

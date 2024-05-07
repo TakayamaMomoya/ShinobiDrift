@@ -27,7 +27,7 @@
 namespace
 {
 const float MOVE_SPEED = 3.0f;	// 移動スピード
-const D3DXVECTOR3 INITIAL_ROT = { D3DX_PI * -0.4f,0.0f,0.0f };	// 初期角度
+const D3DXVECTOR3 INITIAL_ROT = { D3DX_PI * 0.4f,0.0f,0.0f };	// 初期角度
 const float INITIAL_DIST = 300.0f;	// 初期の距離（視点から注視点）
 }
 #define INITIAL_ANGLE	(45.0f)	// 初期の視野角
