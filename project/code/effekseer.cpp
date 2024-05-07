@@ -155,10 +155,8 @@ void CEffekseer::Draw(void)
 		// 投影行列を設定
 		m_efkRenderer->SetProjectionMatrix(projectionMatrix);
 
+		// カメラの情報取得
 		CCamera* pCamera = CManager::GetCamera();
-
-		// デバイスの取得
-		LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
 
 		auto ViewMatrix = pCamera->GetCamera()->mtxView;
 		auto Projection = pCamera->GetCamera()->mtxProjection;
