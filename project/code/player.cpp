@@ -234,6 +234,10 @@ void CPlayer::InputMove(void)
 
 	CDebugProc::GetInstance()->Print("\nアクセル値[%f]", fAccele);
 
+	// ハンドルの操作
+	CInputManager::SAxis axis = pInputManager->GetAxis();
+	m_info.fAngleHandle = axis.axisMove.x;
+
 	// ブレーキ値の取得
 	float fBrake = pInputManager->GetBrake();
 
@@ -310,8 +314,12 @@ void CPlayer::ManageSpeed(void)
 		SetPosition(pos);
 	}
 
-	// 移動方向にハンドルきった分を追加
+	// ハンドルの回転を追加
 	rot.y += m_info.fAngleHandle * m_param.fAngleMaxCurve;
+
+	SetRotation(rot);
+
+	// 極座標が上を向いている分を補正
 	rot.x += D3DX_PI * 0.5f;
 
 	D3DXVECTOR3 vecForward = universal::PolarCoordinates(rot);
