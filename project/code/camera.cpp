@@ -22,9 +22,12 @@
 #include "meshfield.h"
 
 //*****************************************************
-// マクロ定義
+// 定数定義
 //*****************************************************
-#define MOVE_SPEED					(3.0f)						//移動スピード
+namespace
+{
+const float MOVE_SPEED = 3.0f;	// 移動スピード
+}
 #define ROLL_SPEED					(0.02f)						//回転スピード
 #define MOVE_FACT					(0.1f)						//移動係数
 #define LIMIT_HEIGHT	(50)	// 位置を制限する高さ
