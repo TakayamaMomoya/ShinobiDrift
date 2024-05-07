@@ -225,11 +225,11 @@ void CGame::Debug(void)
 
 		if (m_bStop)
 		{
-			Camera::ChangeBehavior(new CMoveControl);
+			Camera::ChangeState(new CMoveControl);
 		}
 		else
 		{
-			Camera::ChangeBehavior(new CFollowPlayer);
+			Camera::ChangeState(new CFollowPlayer);
 		}
 	}
 }

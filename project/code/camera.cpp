@@ -345,7 +345,7 @@ CCamera::Camera *CCamera::GetCamera(void)
 //====================================================
 // s“®‚ÌØ‚è‘Ö‚¦
 //====================================================
-void CCamera::ChangeBehavior(CCameraState *pBehavior)
+void CCamera::ChangeState(CCameraState *pBehavior)
 {
 	if (m_pBehavior != nullptr)
 	{
@@ -359,13 +359,13 @@ void CCamera::ChangeBehavior(CCameraState *pBehavior)
 namespace Camera
 {
 // s“®‚ÌØ‚è‘Ö‚¦
-void ChangeBehavior(CCameraState *pBehavior)
+void ChangeState(CCameraState *pBehavior)
 {
 	CCamera *pCamera = CManager::GetCamera();
 
 	if (pCamera != nullptr)
 	{
-		pCamera->ChangeBehavior(pBehavior);
+		pCamera->ChangeState(pBehavior);
 	}
 }
 }

@@ -64,7 +64,7 @@ public:
 	void SetPosRDest(D3DXVECTOR3 posRDest) { m_camera.posRDest = posRDest; }
 	void SetPosVDest(D3DXVECTOR3 posVDest) { m_camera.posVDest = posVDest; }
 	void SetEventTimer(float fTime) { m_camera.fTimeEvent = fTime; }
-	void ChangeBehavior(CCameraState *pBehavior);
+	void ChangeState(CCameraState *pBehavior);
 	void SetPosV(void);
 	void SetPosR(void);
 
@@ -76,7 +76,7 @@ private:
 namespace Camera
 {
 // çsìÆÇÃêÿÇËë÷Ç¶
-void ChangeBehavior(CCameraState *pBehavior);
+void ChangeState(CCameraState *pBehavior);
 }
 
 #endif

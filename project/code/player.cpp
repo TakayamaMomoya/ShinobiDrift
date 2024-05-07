@@ -182,7 +182,7 @@ HRESULT CPlayer::Init(void)
 	SetMotion(MOTION_WALK_FRONT);
 
 	// ƒJƒƒ‰‚Ìs“®İ’è
-	Camera::ChangeBehavior(new CFollowPlayer);
+	Camera::ChangeState(new CFollowPlayer);
 
 	// “Ç
 	Load();
