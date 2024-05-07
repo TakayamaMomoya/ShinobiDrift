@@ -69,13 +69,10 @@ void CFollowPlayer::Update(CCamera *pCamera)
 
 	pInfoCamera->posRDest = pos;
 
+	D3DXVECTOR3 vecPole = universal::PolarCoordinates(pInfoCamera->rot);
+
 	//–Ú•W‚ÌŽ‹“_Ý’è
-	pInfoCamera->posVDest =
-	{
-		pInfoCamera->posRDest.x,
-		pInfoCamera->posRDest.y + DIST_CAMERA,
-		pInfoCamera->posRDest.z - DIST_CAMERA
-	};
+	pInfoCamera->posVDest = pos + vecPole * pInfoCamera->fLength;
 
 #ifdef _DEBUG
 	CEffect3D::Create(pInfoCamera->posRDest, 20.0f, 1, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));

@@ -221,6 +221,23 @@ D3DXVECTOR3 VecToOffset(D3DXMATRIX mtx, D3DXVECTOR3 posOffset)
 }
 
 //========================================
+// 極座標の計算
+//========================================
+D3DXVECTOR3 PolarCoordinates(D3DXVECTOR3 rot)
+{
+	D3DXVECTOR3 vec;
+
+	vec =
+	{
+		sinf(rot.x) * sinf(rot.y),
+		cosf(rot.x),
+		sinf(rot.x) * cosf(rot.y)
+	};
+
+	return vec;
+}
+
+//========================================
 // オフセット設定処理
 //========================================
 void SetOffSet(D3DXMATRIX *pMtxWorldOffset, D3DXMATRIX mtxWorldOwner, D3DXVECTOR3 posOffset, D3DXVECTOR3 rot)

@@ -56,7 +56,6 @@ public:
 	void SetCamera(void);
 	void SetDist(float fDist) { m_camera.fLength = fDist; }
 	float GetDist(void) { return m_camera.fLength; }
-	void Control(void);
 	Camera *GetCamera(void);
 	void SetQuake(float fQuakeSizeH, float fQuakeSizeV, int nTime);
 	void Quake(void);

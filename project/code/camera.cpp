@@ -27,13 +27,10 @@
 namespace
 {
 const float MOVE_SPEED = 3.0f;	// 移動スピード
+const D3DXVECTOR3 INITIAL_ROT = { D3DX_PI * -0.4f,0.0f,0.0f };	// 初期角度
+const float INITIAL_DIST = 300.0f;	// 初期の距離（視点から注視点）
 }
-#define ROLL_SPEED					(0.02f)						//回転スピード
-#define MOVE_FACT					(0.1f)						//移動係数
-#define LIMIT_HEIGHT	(50)	// 位置を制限する高さ
 #define INITIAL_ANGLE	(45.0f)	// 初期の視野角
-#define ANGLE_GAME	(D3DX_PI * 0.4f)	// ゲーム中のカメラの角度
-#define RATE_CAMERA_MOVE	(1.5f)	// カメラがどれだけプレイヤーの先を見るかの倍率
 #define HEIGHT_CAMERA (20.0f)	// カメラの高さ
 
 //====================================================
@@ -43,33 +40,13 @@ HRESULT CCamera::Init(void)
 {
 	ZeroMemory(&m_camera,sizeof(Camera));
 
-	m_camera.posV = D3DXVECTOR3(-700.0f, 200.0f, 0.0f);
-	m_camera.posVOld = D3DXVECTOR3(100.0f, 30.0f, 0.0f);
-	m_camera.posR = D3DXVECTOR3(100.0f, 0.0f, 0.0f);
-	m_camera.posVDest = D3DXVECTOR3(-700.0f, 200.0f, 0.0f);
-	m_camera.posRDest = D3DXVECTOR3(100.0f, 0.0f, 0.0f);
+	// 値の初期化
+	m_camera.rot = INITIAL_ROT;
 	m_camera.vecU = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	m_camera.rot = D3DXVECTOR3(0.0f, 1.57f, 0.0f);
-	m_camera.fLength = 100.0f;
 	m_camera.fViewAngle = INITIAL_ANGLE;
+	m_camera.fLength = INITIAL_DIST;
 
-	float fLength = sqrtf
-	(//Y面での対角線
-		(m_camera.posV.x - m_camera.posR.x) * (m_camera.posV.x - m_camera.posR.x) + 
-		(m_camera.posV.z - m_camera.posR.z) * (m_camera.posV.z - m_camera.posR.z)
-	);
-
-	m_camera.fLength = sqrtf
-	(//目標までの直線距離
-		fLength * fLength + (m_camera.posV.y - m_camera.posR.y) * (m_camera.posV.y - m_camera.posR.y)
-	);
-
-	m_camera.rot.x = atan2f(fLength, m_camera.posR.y - m_camera.posV.y);
-
-	SetPosV();
-
-	m_camera.fTimeEvent = 0.0f;
-
+	// 自身のポインタをヌルにする
 	m_pBehavior = nullptr;
 
 	return S_OK;
@@ -141,79 +118,6 @@ void CCamera::MoveDist(float fFact)
 			{
 				pGame->EnableStop(false);
 			}
-		}
-	}
-}
-
-//====================================================
-// 操作処理
-//====================================================
-void CCamera::Control(void)
-{
-	// 入力取得
-	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
-	CInputMouse *pMouse = CInputMouse::GetInstance();
-
-	float fMove = MOVE_SPEED;
-
-	//マウス操作======================================================
-	if (pMouse->GetPress(CInputMouse::BUTTON_RMB) == true)
-	{//右クリック中、視点旋回
-		D3DXVECTOR3 rot;
-
-		//マウスの移動量代入
-		rot = { (float)pMouse->GetMoveIX() * ROLL_SPEED, (float)pMouse->GetMoveIY() * ROLL_SPEED, 0.0f };
-
-		D3DXVec3Normalize(&rot, &rot);
-
-		//視点の旋回
-		m_camera.rot.y += rot.x * ROLL_SPEED;
-		m_camera.rot.x -= rot.y * ROLL_SPEED;
-
-		//注視点を相対位置に設定
-		SetPosR();
-
-		if (pKeyboard->GetPress(DIK_LSHIFT) == true)
-		{//加速
-			fMove *= 3;
-		}
-
-		//視点移動===============================================
-		if (pKeyboard->GetPress(DIK_A) == true)
-		{//左移動
-			m_camera.posVDest.x += sinf(m_camera.rot.y - D3DX_PI * 0.5f) * fMove;
-			m_camera.posVDest.z += cosf(m_camera.rot.y - D3DX_PI * 0.5f) * fMove;
-			SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_D) == true)
-		{//右移動
-			m_camera.posVDest.x += sinf(m_camera.rot.y - D3DX_PI * -0.5f) * fMove;
-			m_camera.posVDest.z += cosf(m_camera.rot.y - D3DX_PI * -0.5f) * fMove;
-			SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_W) == true)
-		{//前移動
-			m_camera.posVDest.x -= sinf(m_camera.rot.x + D3DX_PI) * sinf(m_camera.rot.y) * fMove;
-			m_camera.posVDest.y += cosf(m_camera.rot.x + D3DX_PI) * MOVE_SPEED;
-			m_camera.posVDest.z -= sinf(m_camera.rot.x + D3DX_PI) * cosf(m_camera.rot.y) * fMove;
-			SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_S) == true)
-		{//後移動
-			m_camera.posVDest.x -= sinf(m_camera.rot.x) * sinf(m_camera.rot.y) * fMove;
-			m_camera.posVDest.y += cosf(m_camera.rot.x) * MOVE_SPEED;
-			m_camera.posVDest.z -= sinf(m_camera.rot.x) * cosf(m_camera.rot.y) * fMove;
-			SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_E) == true)
-		{//上昇
-			m_camera.posVDest.y += fMove;
-			SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_Q) == true)
-		{//下降
-			m_camera.posVDest.y -= fMove;
-			SetPosR();
 		}
 	}
 }
@@ -305,12 +209,6 @@ void CCamera::SetCamera(void)
 		MIN_DRAW,
 		MAX_DRAW);
 
-	/*D3DXMatrixOrthoLH(&m_camera.mtxProjection,	// 平行投影のやり方
-		720,	// 高さ
-		1280,	// 幅
-		MIN_DRAW,
-		MAX_DRAW);*/
-
 	//マトリックス設定
 	pDevice->SetTransform(D3DTS_PROJECTION,&m_camera.mtxProjection);
 
@@ -329,11 +227,9 @@ void CCamera::SetCamera(void)
 
 #ifdef _DEBUG
 	CDebugProc::GetInstance()->Print("\n視点の位置：[%f,%f,%f]", m_camera.posV.x, m_camera.posV.y, m_camera.posV.z);
-	//CDebugProc::GetInstance()->Print("\n視点の目標位置：[%f,%f,%f]", m_camera.posVDest.x, m_camera.posVDest.y, m_camera.posVDest.z);
 	CDebugProc::GetInstance()->Print("\n注視点の位置：[%f,%f,%f]", m_camera.posR.x, m_camera.posR.y, m_camera.posR.z);
-	//CDebugProc::GetInstance()->Print("\n注視点の目標位置：[%f,%f,%f]", m_camera.posRDest.x, m_camera.posRDest.y, m_camera.posRDest.z);
 	CDebugProc::GetInstance()->Print("\nカメラの向き：[%f,%f,%f]", m_camera.rot.x, m_camera.rot.y, m_camera.rot.z);
-	//CDebugProc::GetInstance()->Print("\nカメラ距離：[%f]", m_camera.fLength);
+	CDebugProc::GetInstance()->Print("\nカメラ距離：[%f]", m_camera.fLength);
 #endif
 }
 

@@ -20,6 +20,7 @@ class CCamera;
 class CCameraState
 {
 public:
+	CCameraState() {};
 	virtual void Update(CCamera *pCamera) = 0;
 
 private:
@@ -29,6 +30,7 @@ private:
 class CApperPlayer : public CCameraState
 {
 public:
+	CApperPlayer() {};
 	void Update(CCamera *pCamera) override;
 
 private:
@@ -38,6 +40,7 @@ private:
 class CFollowPlayer : public CCameraState
 {
 public:
+	CFollowPlayer() {};
 	void Update(CCamera *pCamera) override;
 
 private:
@@ -47,10 +50,10 @@ private:
 class CMoveControl : public CCameraState
 {
 public:
+	CMoveControl() {};
 	void Update(CCamera *pCamera) override;
 
 private:
-
 };
 
 
