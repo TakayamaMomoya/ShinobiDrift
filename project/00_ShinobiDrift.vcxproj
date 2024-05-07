@@ -88,8 +88,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -98,6 +97,8 @@
       <AdditionalIncludeDirectories>.\data\EFFEKSEER\Libraries\Effekseer\Include\Effekseer;.\data\EFFEKSEER\Libraries\Effekseer\Include\EffekseerRendererGL;.\data\EFFEKSEER\Libraries\Effekseer\Include\EffekseerRendererDX9;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>
       </DisableSpecificWarnings>
+      <PrecompiledHeaderFile>precompile.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>precompile.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -205,6 +206,9 @@
     <ClCompile Include="code\parts.cpp" />
     <ClCompile Include="code\pause.cpp" />
     <ClCompile Include="code\player.cpp" />
+    <ClCompile Include="code\precompile.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="code\renderer.cpp" />
     <ClCompile Include="code\result.cpp" />
     <ClCompile Include="code\resultBehavior.cpp" />
@@ -266,6 +270,7 @@
     <ClInclude Include="code\parts.h" />
     <ClInclude Include="code\pause.h" />
     <ClInclude Include="code\player.h" />
+    <ClInclude Include="code\precompile.h" />
     <ClInclude Include="code\renderer.h" />
     <ClInclude Include="code\result.h" />
     <ClInclude Include="code\resultBehavior.h" />

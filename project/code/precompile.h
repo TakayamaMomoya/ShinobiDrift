@@ -1,0 +1,23 @@
+//========================================
+//
+//プリコンパイル[precompile.h]
+//Author：森川駿弥
+//
+//========================================
+#ifndef PRECOMPILE_H__
+#define PRECOMPILE_H__
+
+//========================================
+// 事前インクルード
+//========================================
+#include"d3dx9.h"
+#define DIRECTINPUT_VERSION (0x0800)						//ビルド時の警告対処用マクロ
+#include "dinput.h"
+#include "Xinput.h"
+#include "xaudio2.h"
+#include <assert.h>
+#include <stdio.h>
+#include <iostream>
+#include <string.h>
+
+#endif // _PRECOMPILE_H_
