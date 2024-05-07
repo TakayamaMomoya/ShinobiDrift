@@ -12,7 +12,7 @@
 #include "renderer.h"
 #include "main.h"
 #include "camera.h"
-#include "cameraBehavior.h"
+#include "CameraState.h"
 #include "inputkeyboard.h"
 #include "inputmouse.h"
 #include "debugproc.h"
@@ -345,7 +345,7 @@ CCamera::Camera *CCamera::GetCamera(void)
 //====================================================
 // s“®‚ÌØ‚è‘Ö‚¦
 //====================================================
-void CCamera::ChangeBehavior(CCameraBehavior *pBehavior)
+void CCamera::ChangeBehavior(CCameraState *pBehavior)
 {
 	if (m_pBehavior != nullptr)
 	{
@@ -359,7 +359,7 @@ void CCamera::ChangeBehavior(CCameraBehavior *pBehavior)
 namespace Camera
 {
 // s“®‚ÌØ‚è‘Ö‚¦
-void ChangeBehavior(CCameraBehavior *pBehavior)
+void ChangeBehavior(CCameraState *pBehavior)
 {
 	CCamera *pCamera = CManager::GetCamera();
 

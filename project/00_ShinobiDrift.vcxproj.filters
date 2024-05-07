@@ -42,7 +42,7 @@
     <ClCompile Include="code\camera.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="code\cameraBehavior.cpp">
+    <ClCompile Include="code\cameraState.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="code\character.cpp">
@@ -218,7 +218,7 @@
     <ClInclude Include="code\camera.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="code\cameraBehavior.h">
+    <ClInclude Include="code\cameraState.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="code\character.h">

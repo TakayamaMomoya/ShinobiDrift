@@ -21,7 +21,7 @@
 #include "manager.h"
 #include "effect3D.h"
 #include "meshfield.h"
-#include "cameraBehavior.h"
+#include "CameraState.h"
 #include "particle.h"
 #include "debrisSpawner.h"
 #include "game.h"
