@@ -172,7 +172,6 @@
     <ClCompile Include="code\fade.cpp" />
     <ClCompile Include="code\fan2D.cpp" />
     <ClCompile Include="code\fan3D.cpp" />
-    <ClCompile Include="code\flower.cpp" />
     <ClCompile Include="code\game.cpp" />
     <ClCompile Include="code\inpact.cpp" />
     <ClCompile Include="code\input.cpp" />
@@ -233,7 +232,6 @@
     <ClInclude Include="code\fade.h" />
     <ClInclude Include="code\fan2D.h" />
     <ClInclude Include="code\fan3D.h" />
-    <ClInclude Include="code\flower.h" />
     <ClInclude Include="code\game.h" />
     <ClInclude Include="code\inpact.h" />
     <ClInclude Include="code\input.h" />

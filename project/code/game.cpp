@@ -33,7 +33,6 @@
 #include "meshfield.h"
 #include "cameraBehavior.h"
 #include "particle.h"
-#include "flower.h"
 
 //*****************************************************
 // É}ÉNÉçíËã`
@@ -108,8 +107,6 @@ HRESULT CGame::Init(void)
 		{0.0f,D3DX_PI,0.0f},
 		{0.0f,-D3DX_PI * 0.5f,0.0f},
 	};
-
-	CFlower::Create();
 
 	return S_OK;
 }
