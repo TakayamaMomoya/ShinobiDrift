@@ -12,7 +12,7 @@
 #include "renderer.h"
 #include "main.h"
 #include "camera.h"
-#include "cameraBehavior.h"
+#include "CameraState.h"
 #include "inputkeyboard.h"
 #include "inputmouse.h"
 #include "debugproc.h"
@@ -22,9 +22,12 @@
 #include "meshfield.h"
 
 //*****************************************************
-// マクロ定義
+// 定数定義
 //*****************************************************
-#define MOVE_SPEED					(3.0f)						//移動スピード
+namespace
+{
+const float MOVE_SPEED = 3.0f;	// 移動スピード
+}
 #define ROLL_SPEED					(0.02f)						//回転スピード
 #define MOVE_FACT					(0.1f)						//移動係数
 #define LIMIT_HEIGHT	(50)	// 位置を制限する高さ
@@ -345,7 +348,7 @@ CCamera::Camera *CCamera::GetCamera(void)
 //====================================================
 // 行動の切り替え
 //====================================================
-void CCamera::ChangeBehavior(CCameraBehavior *pBehavior)
+void CCamera::ChangeState(CCameraState *pBehavior)
 {
 	if (m_pBehavior != nullptr)
 	{
@@ -359,13 +362,13 @@ void CCamera::ChangeBehavior(CCameraBehavior *pBehavior)
 namespace Camera
 {
 // 行動の切り替え
-void ChangeBehavior(CCameraBehavior *pBehavior)
+void ChangeState(CCameraState *pBehavior)
 {
 	CCamera *pCamera = CManager::GetCamera();
 
 	if (pCamera != nullptr)
 	{
-		pCamera->ChangeBehavior(pBehavior);
+		pCamera->ChangeState(pBehavior);
 	}
 }
 }

@@ -14,6 +14,14 @@
 #include "texture.h"
 #include "model.h"
 
+//*****************************************************
+// 定数定義
+//*****************************************************
+namespace
+{
+const char* INITIAL_MODEL = "data\\MODEL\\block\\bill00.x";	// 初期モデル
+}
+
 //====================================================
 // コンストラクタ
 //====================================================
@@ -43,14 +51,11 @@ CObjectX::~CObjectX()
 //====================================================
 HRESULT CObjectX::Init(void)
 {
-	// デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
-
 	m_fScale = 1.0f;
 
 	if (m_pModel == nullptr)
 	{
-		int nIdx = CModel::Load("data\\MODEL\\block\\bill00.x");
+		int nIdx = CModel::Load((char*)INITIAL_MODEL);
 
 		// モデル読込
 		BindModel(nIdx);

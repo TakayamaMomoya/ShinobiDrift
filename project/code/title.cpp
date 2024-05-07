@@ -15,7 +15,7 @@
 #include "fade.h"
 #include "texture.h"
 #include "camera.h"
-#include "cameraBehavior.h"
+#include "CameraState.h"
 #include "renderer.h"
 #include "sound.h"
 #include "object3D.h"

@@ -11,7 +11,7 @@
 //****************************************************
 // 前方宣言
 //****************************************************
-class CCameraBehavior;
+class CCameraState;
 
 //****************************************************
 // インクルード
@@ -64,19 +64,19 @@ public:
 	void SetPosRDest(D3DXVECTOR3 posRDest) { m_camera.posRDest = posRDest; }
 	void SetPosVDest(D3DXVECTOR3 posVDest) { m_camera.posVDest = posVDest; }
 	void SetEventTimer(float fTime) { m_camera.fTimeEvent = fTime; }
-	void ChangeBehavior(CCameraBehavior *pBehavior);
+	void ChangeState(CCameraState *pBehavior);
 	void SetPosV(void);
 	void SetPosR(void);
 
 private:
 	Camera m_camera;	// 構造体の情報
-	CCameraBehavior *m_pBehavior;	// 行動のポインタ
+	CCameraState *m_pBehavior;	// 行動のポインタ
 };
 
 namespace Camera
 {
 // 行動の切り替え
-void ChangeBehavior(CCameraBehavior *pBehavior);
+void ChangeState(CCameraState *pBehavior);
 }
 
 #endif

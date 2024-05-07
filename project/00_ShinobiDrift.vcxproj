@@ -161,7 +161,7 @@
     <ClCompile Include="code\block.cpp" />
     <ClCompile Include="code\blockManager.cpp" />
     <ClCompile Include="code\camera.cpp" />
-    <ClCompile Include="code\cameraBehavior.cpp" />
+    <ClCompile Include="code\cameraState.cpp" />
     <ClCompile Include="code\character.cpp" />
     <ClCompile Include="code\collision.cpp" />
     <ClCompile Include="code\debris.cpp" />
@@ -172,7 +172,6 @@
     <ClCompile Include="code\fade.cpp" />
     <ClCompile Include="code\fan2D.cpp" />
     <ClCompile Include="code\fan3D.cpp" />
-    <ClCompile Include="code\flower.cpp" />
     <ClCompile Include="code\game.cpp" />
     <ClCompile Include="code\inpact.cpp" />
     <ClCompile Include="code\input.cpp" />
@@ -222,7 +221,7 @@
     <ClInclude Include="code\block.h" />
     <ClInclude Include="code\blockManager.h" />
     <ClInclude Include="code\camera.h" />
-    <ClInclude Include="code\cameraBehavior.h" />
+    <ClInclude Include="code\cameraState.h" />
     <ClInclude Include="code\character.h" />
     <ClInclude Include="code\collision.h" />
     <ClInclude Include="code\debris.h" />
@@ -233,7 +232,6 @@
     <ClInclude Include="code\fade.h" />
     <ClInclude Include="code\fan2D.h" />
     <ClInclude Include="code\fan3D.h" />
-    <ClInclude Include="code\flower.h" />
     <ClInclude Include="code\game.h" />
     <ClInclude Include="code\inpact.h" />
     <ClInclude Include="code\input.h" />
