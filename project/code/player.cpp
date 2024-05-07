@@ -222,6 +222,11 @@ void CPlayer::InputMove(void)
 	float fAccele = pInputManager->GetAccele();
 
 	CDebugProc::GetInstance()->Print("\nアクセル値[%f]", fAccele);
+
+	// ブレーキ値の取得
+	float fBrake = pInputManager->GetBrake();
+
+	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
 }
 
 //=====================================================
