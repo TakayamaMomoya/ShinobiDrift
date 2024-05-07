@@ -14,7 +14,6 @@
 #include "renderer.h"
 #include "manager.h"
 #include "object.h"
-#include "collision.h"
 #include "debrisSpawner.h"
 #include <stdio.h>
 
@@ -37,7 +36,6 @@ int CBlock::m_nNumAll = 0;	// 総数
 //=====================================================
 CBlock::CBlock(int nPriority)
 {
-	m_pCollisionCube = nullptr;
 	m_fLife = 0.0f;
 	m_pPrev = nullptr;
 	m_pNext = nullptr;
@@ -152,18 +150,6 @@ CBlock *CBlock::Create(int nIdxModel)
 
 		// 種類ごとのモデル読込
 		pBlock->BindModel(nIdxModel);
-
-		if (pBlock->m_pCollisionCube == nullptr)
-		{// 当たり判定生成
-			pBlock->m_pCollisionCube = CCollisionCube::Create(CCollision::TAG_BLOCK, pBlock);
-
-			if (pBlock->m_pCollisionCube != nullptr)
-			{
-				pBlock->m_pCollisionCube->SetPosition(pBlock->GetPosition());
-
-				pBlock->m_pCollisionCube->SetVtx(pBlock->GetVtxMax(), pBlock->GetVtxMin());
-			}
-		}
 	}
 
 	return pBlock;
@@ -196,24 +182,8 @@ HRESULT CBlock::Init(void)
 //=====================================================
 void CBlock::Uninit(void)
 {
-	// 当たり判定削除
-	DeleteCollision();
-
 	// 継承クラスの終了
 	CObjectX::Uninit();
-}
-
-//=====================================================
-// 当たり判定の削除
-//=====================================================
-void CBlock::DeleteCollision(void)
-{
-	if (m_pCollisionCube != nullptr)
-	{// 当たり判定の消去
-		m_pCollisionCube->Uninit();
-
-		m_pCollisionCube = nullptr;
-	}
 }
 
 //=====================================================
@@ -230,11 +200,6 @@ void CBlock::Update(void)
 //=====================================================
 void CBlock::SetPosition(D3DXVECTOR3 pos)
 {
-	if (m_pCollisionCube != nullptr)
-	{
-		m_pCollisionCube->SetPosition(pos);
-	}
-
 	CObjectX::SetPosition(pos);
 }
 
@@ -260,31 +225,5 @@ void CBlock::Hit(float fDamage)
 //=====================================================
 void CBlock::SetRotation(D3DXVECTOR3 rot)
 {
-	if (rot.y != 0)
-	{// 角度によって最大頂点、最小頂点を変える処理
-		SwapVtx();
-	}
-
 	CObjectX::SetRotation(rot);
-}
-
-//=====================================================
-// 頂点を入れ替える処理
-//=====================================================
-void CBlock::SwapVtx(void)
-{
-	D3DXVECTOR3 vtxMax = GetVtxMax();
-	D3DXVECTOR3 vtxMin = GetVtxMin();
-	D3DXVECTOR3 vtxTemp = vtxMin;
-	
-	vtxMin = { -vtxMax.z,vtxMin.y,-vtxMax.x };
-	vtxMax = { -vtxTemp.z,vtxMax.y,-vtxTemp.x };
-
-	SetVtxMax(vtxMax);
-	SetVtxMin(vtxMin);
-
-	if (m_pCollisionCube != nullptr)
-	{
-		m_pCollisionCube->SetVtx(vtxMax, vtxMin);
-	}
 }

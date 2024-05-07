@@ -13,7 +13,6 @@
 //*****************************************************
 // 前方宣言
 //*****************************************************
-class CCollisionCube;
 
 //*****************************************************
 // クラスの定義
@@ -49,13 +48,9 @@ public:
 	CBlock *GetNext(void) { return m_pNext; }
 	static int GetNumAll(void) { return m_nNumAll; }
 	void SetPosition(D3DXVECTOR3 pos);
-	void DeleteCollision(void);
 
 private:
-	void SwapVtx(void);
-
 	static int m_nNumAll;	// 総数
-	CCollisionCube *m_pCollisionCube;	// 立方体の当たり判定
 	float m_fLife;	// 体力
 	int m_nIdx;	// 種類のインデックス
 

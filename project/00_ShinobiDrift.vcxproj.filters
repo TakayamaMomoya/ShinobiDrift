@@ -204,9 +204,6 @@
     <ClCompile Include="code\number3D.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
-    <ClCompile Include="code\collision.cpp">
-      <Filter>ソース ファイル\base</Filter>
-    </ClCompile>
     <ClCompile Include="code\effekseer.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -385,9 +382,6 @@
     </ClInclude>
     <ClInclude Include="code\number3D.h">
       <Filter>ソース ファイル\UI</Filter>
-    </ClInclude>
-    <ClInclude Include="code\collision.h">
-      <Filter>ソース ファイル\base</Filter>
     </ClInclude>
     <ClInclude Include="code\effekseer.h">
       <Filter>ヘッダー ファイル</Filter>
