@@ -23,13 +23,6 @@ public:
 	{
 		BUTTON_ENTER = 0,	// エンターボタン
 		BUTTON_BACK,	// 戻るボタン
-		BUTTON_SKIP,	// スキップボタン
-		BUTTON_JUMP,	// ジャンプ
-		BUTTON_SHOT,	// 射撃
-		BUTTON_MELEE,	// 近接攻撃
-		BUTTON_GRAB,	// 掴み
-		BUTTON_DODGE,	// 回避
-		BUTTON_LOCK,	// ターゲットロック
 		BUTTON_PAUSE,	// ポーズ
 		BUTTON_AXIS_UP,	// 上方向キー
 		BUTTON_AXIS_DOWN,	// 下方向キー
@@ -58,6 +51,7 @@ public:
 	bool GetTrigger(BUTTON button) { return m_info.abTrigger[button]; }
 	bool GetPress(BUTTON button) { return m_info.abPress[button]; }
 	SAxis GetAxis(void) { return m_axis; }
+	float GetAccele(void) { return m_fAccele; }
 
 private:
 	struct SInfo
@@ -69,6 +63,7 @@ private:
 	static CInputManager *m_pInputManager;	// 自身のポインタ
 	SInfo m_info;	// 情報
 	SAxis m_axis;	// 方向の情報
+	float m_fAccele;	// アクセルの入力
 };
 
 #endif

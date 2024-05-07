@@ -217,6 +217,11 @@ void CPlayer::InputMove(void)
 	{
 		return;
 	}
+
+	// アクセル値の取得
+	float fAccele = pInputManager->GetAccele();
+
+	CDebugProc::GetInstance()->Print("\nアクセル値[%f]", fAccele);
 }
 
 //=====================================================
@@ -241,6 +246,8 @@ void CPlayer::InputCamera(void)
 	}
 
 	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+
+
 }
 
 //=====================================================

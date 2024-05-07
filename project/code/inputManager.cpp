@@ -28,6 +28,7 @@ CInputManager::CInputManager()
 {
 	ZeroMemory(&m_info, sizeof(SInfo));
 	ZeroMemory(&m_axis, sizeof(SAxis));
+	m_fAccele = 0.0f;
 }
 
 //=====================================================
@@ -142,68 +143,6 @@ void CInputManager::Update(void)
 		pMouse->GetTrigger(CInputMouse::BUTTON_RMB)
 	);
 
-	// スキップボタン
-	m_info.abPress[BUTTON_SKIP] =
-	(
-		pJoypad->GetPress(CInputJoypad::PADBUTTONS_START,0) ||
-		pKeyboard->GetPress(DIK_TAB)
-	);
-
-	// ジャンプ
-	m_info.abTrigger[BUTTON_JUMP] =
-	(
-		pJoypad->GetTrigger(CInputJoypad::PADBUTTONS_LB, 0) ||
-		pKeyboard->GetTrigger(DIK_SPACE)
-	);
-	m_info.abPress[BUTTON_JUMP] =
-	(
-		pJoypad->GetPress(CInputJoypad::PADBUTTONS_LB, 0) ||
-		pKeyboard->GetPress(DIK_SPACE)
-	);
-
-	// 射撃
-	m_info.abTrigger[BUTTON_SHOT] =
-	(
-		pJoypad->GetTriggerTB(CInputJoypad::TRIGGER_LT, 0) ||
-		pMouse->GetTrigger(CInputMouse::BUTTON_LMB) ||
-		pKeyboard->GetTrigger(DIK_RETURN)
-	);
-	m_info.abPress[BUTTON_SHOT] =
-	(
-		pJoypad->GetPressTB(CInputJoypad::TRIGGER_LT, 0) ||
-		pMouse->GetPress(CInputMouse::BUTTON_LMB) ||
-		pKeyboard->GetPress(DIK_RETURN)
-	);
-
-	// 近接攻撃
-	m_info.abTrigger[BUTTON_MELEE] =
-	(
-		pJoypad->GetTriggerTB(CInputJoypad::TRIGGER_RT, 0) ||
-		pMouse->GetTrigger(CInputMouse::BUTTON_RMB)
-	);
-
-	// 掴み
-	m_info.abTrigger[BUTTON_GRAB] =
-	(
-		pJoypad->GetTrigger(CInputJoypad::PADBUTTONS_RB, 0) ||
-		pKeyboard->GetTrigger(DIK_E)
-	);
-
-	// 回避ブースト
-	m_info.abTrigger[BUTTON_DODGE] =
-	(
-		pJoypad->GetTrigger(CInputJoypad::PADBUTTONS_X, 0) ||
-		pMouse->GetTrigger(CInputMouse::BUTTON_SIDE01) ||
-		pKeyboard->GetTrigger(DIK_LSHIFT)
-	);
-
-	// ターゲットロック
-	m_info.abTrigger[BUTTON_LOCK] =
-	(
-		pJoypad->GetTrigger(CInputJoypad::PADBUTTONS_RSTICK, 0) ||
-		pMouse->GetTrigger(CInputMouse::BUTTON_WHEEL)
-	);
-
 	// ポーズ
 	m_info.abTrigger[BUTTON_PAUSE] =
 	(
@@ -287,4 +226,12 @@ void CInputManager::Update(void)
 	m_axis.axisCamera += D3DXVECTOR3(pMouse->GetMoveIX(), pMouse->GetMoveIY(), 0.0f);
 
 	D3DXVec3Normalize(&m_axis.axisCamera, &m_axis.axisCamera);
+
+	// アクセルの操作
+	m_fAccele = pJoypad->GetTriggerR(0);
+
+	if (pKeyboard->GetPress(DIK_W))
+	{
+		m_fAccele = 1.0f;
+	}
 }

@@ -18,6 +18,7 @@
 namespace
 {
 const float LINE_TRIGGER = 100;	// トリガーボタンのトリガー判定のしきい値
+const BYTE BYTE_MAX = 255;	// バイト型の最大値
 }
 
 //*****************************************************
@@ -41,6 +42,8 @@ CInputJoypad::CInputJoypad()
 	ZeroMemory(&m_abPressTB, sizeof(m_abPressTB));
 	ZeroMemory(&m_abTrigggerLStick, sizeof(m_abTrigggerLStick));
 	ZeroMemory(&m_abTrigggerRStick, sizeof(m_abTrigggerRStick));
+	ZeroMemory(&m_abyTriggerL, sizeof(m_abyTriggerL));
+	ZeroMemory(&m_abyTriggerR, sizeof(m_abyTriggerR));
 }
 
 //====================================================
@@ -105,7 +108,6 @@ void CInputJoypad::Uninit(void)
 //====================================================
 void CInputJoypad::Update(void)
 {
-	//変数宣言
 	XINPUT_STATE aState[MAX_PLAYER];
 
 	for (int nCntPlayer = 0; nCntPlayer < MAX_PLAYER; nCntPlayer++)
@@ -134,7 +136,7 @@ void CInputJoypad::Update(void)
 			memset(&m_aVibState[nCntPlayer], 0, sizeof(PADVIB));
 			m_aVibration[nCntPlayer].wLeftMotorSpeed = 0;
 			m_aVibration[nCntPlayer].wRightMotorSpeed = 0;
-			//振動状態を伝達
+			// 振動状態を伝達
 			XInputSetState(nCntPlayer, &m_aVibration[nCntPlayer]);
 			m_aVibTimer[nCntPlayer] = 0;
 		}
@@ -144,11 +146,11 @@ void CInputJoypad::Update(void)
 		{
 			m_aVibration[nCntPlayer].wLeftMotorSpeed = 0;
 			m_aVibration[nCntPlayer].wRightMotorSpeed = 0;
-			//振動状態を伝達
+			// 振動状態を伝達
 			XInputSetState(nCntPlayer, &m_aVibration[nCntPlayer]);
 		}
 
-		//入力デバイスからデータを取得
+		// 入力デバイスからデータを取得
 		if (XInputGetState(nCntPlayer, &aState[nCntPlayer]) == ERROR_SUCCESS)
 		{
 			// スティックのトリガー判定
@@ -157,22 +159,25 @@ void CInputJoypad::Update(void)
 			// トリガーボタンの判定
 			CheckTrigger(aState[nCntPlayer], nCntPlayer);
 
-			//トリガー
+			// トリガー
 			m_aStateTrigger[nCntPlayer].Gamepad.wButtons =
 				(m_aState[nCntPlayer].Gamepad.wButtons ^ aState[nCntPlayer].Gamepad.wButtons)
 				& aState[nCntPlayer].Gamepad.wButtons;
 
-			//リリース
+			// リリース
 			m_aStateRelease[nCntPlayer].Gamepad.wButtons =
 				(m_aState[nCntPlayer].Gamepad.wButtons ^ aState[nCntPlayer].Gamepad.wButtons)
 				& m_aState[nCntPlayer].Gamepad.wButtons;			
 
-			//プレス
+			// プレス
 			m_aState[nCntPlayer] = aState[nCntPlayer];
+
+			m_abyTriggerL[nCntPlayer] = m_aState[nCntPlayer].Gamepad.bLeftTrigger;
+			m_abyTriggerR[nCntPlayer] = m_aState[nCntPlayer].Gamepad.bRightTrigger;
+
+			CDebugProc::GetInstance()->Print("\nトリガー押し具合[%f]", m_abyTriggerL[nCntPlayer]);
 		}
 	}
-
-	CDebugProc::GetInstance()->Print("\nトリガー左[%d]右[%d]",m_aState[0].Gamepad.bLeftTrigger, m_aState[0].Gamepad.bRightTrigger);
 }
 
 //====================================================
@@ -189,6 +194,30 @@ bool CInputJoypad::GetPressTB(TRIGGER trigger, int nPlayer)
 bool CInputJoypad::GetTriggerTB(TRIGGER trigger, int nPlayer)
 {
 	return m_abTriggerTB[nPlayer][trigger];
+}
+
+//====================================================
+// 左トリガーの入手
+//====================================================
+float CInputJoypad::GetTriggerL(int nPlayer)
+{
+	float fTrigger = 0.0f;
+
+	fTrigger = (float)m_abyTriggerL[nPlayer] / BYTE_MAX;
+
+	return fTrigger;
+}
+
+//====================================================
+// 右トリガーの入手
+//====================================================
+float CInputJoypad::GetTriggerR(int nPlayer)
+{
+	float fTrigger = 0.0f;
+
+	fTrigger = (float)m_abyTriggerR[nPlayer] / BYTE_MAX;
+
+	return fTrigger;
 }
 
 //====================================================
