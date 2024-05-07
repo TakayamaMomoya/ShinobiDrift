@@ -949,3 +949,20 @@ void CMotion::ResetEnableMotion(void)
 		m_abMotion[i] = true;
 	}
 }
+
+//=====================================================
+// 前方ベクトルの取得
+//=====================================================
+D3DXVECTOR3 CMotion::GetForward(void)
+{
+	D3DXVECTOR3 vecForward;
+
+	vecForward =
+	{
+		m_mtxWorld._31,
+		m_mtxWorld._32,
+		m_mtxWorld._33,
+	};
+
+	return vecForward;
+}

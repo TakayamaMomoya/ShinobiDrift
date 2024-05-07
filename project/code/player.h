@@ -60,12 +60,15 @@ private:
 	struct SInfo
 	{
 		STATE state;	// ó‘Ô
+		float fSpeed;	// Œ»İ‚Ì‘¬“x
+		float fSpeedDest;	// –Ú•W‘¬“x
 	};
 
 	void Load(void);
 	void Input(void);
 	void InputMove(void);
 	void InputCamera(void);
+	void ManageSpeed(void);
 	void ManageState(void);
 	void ManageMotion(void);
 	void Event(EVENT_INFO *pEventInfo);

@@ -25,6 +25,10 @@ namespace
 {
 const char* BODY_PATH = "data\\MOTION\\motionArms01.txt";	// 見た目のパス
 const float SPEED_MOVE = 0.3f;	// 移動速度
+const float SPEED_MAX = 30.0f;	// 最大移動速度
+const float FACT_ACCELE = 0.01f;	// 加速係数
+const float FACT_ATTENU = 0.01f;	// 減速係数
+const float FACT_BRAKE = 0.02f;	// ブレーキ係数
 }
 
 //*****************************************************
@@ -141,32 +145,9 @@ void CPlayer::Update(void)
 	// 入力
 	Input();
 
-	// 位置の反映
-	D3DXVECTOR3 pos = GetPosition();
-	D3DXVECTOR3 move = GetMove();
-	
 	// 前回の位置を保存
+	D3DXVECTOR3 pos = GetPosition();
 	SetPositionOld(pos);
-
-	CSlow *pSlow = CSlow::GetInstance();
-
-	if (pSlow != nullptr)
-	{
-		float fScale = pSlow->GetScale();
-
-		pos += move * fScale;
-		SetPosition(pos);
-	}
-	else
-	{
-		pos += move;
-		SetPosition(pos);
-	}
-
-	move.x += (0 - move.x) * 0.05f;
-	move.z += (0 - move.z) * 0.05f;
-
-	SetMove(move);
 
 	// 状態管理
 	ManageState();
@@ -221,12 +202,19 @@ void CPlayer::InputMove(void)
 	// アクセル値の取得
 	float fAccele = pInputManager->GetAccele();
 
+	m_info.fSpeedDest = fAccele * SPEED_MAX;
+
 	CDebugProc::GetInstance()->Print("\nアクセル値[%f]", fAccele);
 
 	// ブレーキ値の取得
 	float fBrake = pInputManager->GetBrake();
 
+	m_info.fSpeed += (0.0f - m_info.fSpeed) * FACT_BRAKE * fBrake;
+
 	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
+
+	// スピードの管理
+	ManageSpeed();
 }
 
 //=====================================================
@@ -253,6 +241,51 @@ void CPlayer::InputCamera(void)
 	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
 
 
+}
+
+//=====================================================
+// スピードの管理
+//=====================================================
+void CPlayer::ManageSpeed(void)
+{
+	CSlow *pSlow = CSlow::GetInstance();
+
+	// スピードの増減
+	if (m_info.fSpeedDest >= m_info.fSpeed)
+	{// 加速しているとき
+		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * FACT_ACCELE;
+
+		CDebugProc::GetInstance()->Print("\n加速中");
+	}
+	else
+	{// 減速しているとき
+		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * FACT_ATTENU;
+
+		CDebugProc::GetInstance()->Print("\n減速中");
+	}
+
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 move = GetMove();
+	D3DXVECTOR3 vecForward = GetForward();
+
+	// スロー状態を考慮した移動量の調整
+	if (pSlow != nullptr)
+	{
+		float fScale = pSlow->GetScale();
+
+		pos += move * fScale;
+		SetPosition(pos);
+	}
+	else
+	{
+		pos += move;
+		SetPosition(pos);
+	}
+
+	// 現在のスピードと前方ベクトルをかけて移動量に適用
+	move = vecForward * m_info.fSpeed;
+
+	SetMove(move);
 }
 
 //=====================================================
@@ -352,4 +385,6 @@ void CPlayer::Debug(void)
 
 	pDebugProc->Print("\nプレイヤーの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	pDebugProc->Print("\nプレイヤーの移動量[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
+	pDebugProc->Print("\n目標速度[%f]", m_info.fSpeedDest);
+	pDebugProc->Print("\n現在の速度[%f]", m_info.fSpeed);
 }
