@@ -16,19 +16,16 @@
 #include "inputManager.h"
 #include "pause.h"
 #include "debugproc.h"
-#include <stdio.h>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-const char* BODY_PATH = "data\\MOTION\\motionArms01.txt";	// 見た目のパス
-const float SPEED_MOVE = 0.3f;	// 移動速度
-const float SPEED_MAX = 30.0f;	// 最大移動速度
-const float FACT_ACCELE = 0.01f;	// 加速係数
-const float FACT_ATTENU = 0.01f;	// 減速係数
-const float FACT_BRAKE = 0.02f;	// ブレーキ係数
+const std::string PATH_PARAM = "data\\TEXT\\playerParam.txt";	// パラメーターデータのパス
 }
 
 //*****************************************************
@@ -79,14 +76,8 @@ CPlayer *CPlayer::Create(void)
 //=====================================================
 HRESULT CPlayer::Init(void)
 {
-	// モデルの設定
-	CMotion::Load((char*)BODY_PATH);
-
 	// 継承クラスの初期化
 	CMotion::Init();
-
-	// パラメーターに初期値を入れる
-	m_param.fSpeedMove = SPEED_MOVE;
 
 	SetMotion(MOTION_WALK_FRONT);
 
@@ -96,6 +87,9 @@ HRESULT CPlayer::Init(void)
 	// 読込
 	Load();
 
+	// モデルの設定
+	CMotion::Load(&m_param.aPathBody[0]);
+
 	return S_OK;
 }
 
@@ -104,25 +98,54 @@ HRESULT CPlayer::Init(void)
 //=====================================================
 void CPlayer::Load(void)
 {
-	char cTemp[256];
-	int nThruster = 0;
+	std::ifstream file(PATH_PARAM);
 
-	FILE *pFile = fopen("data\\TEXT\\playerParam.txt", "r");
-
-	if (pFile != nullptr)
+	if (file.is_open())
 	{
-		while (true)
-		{
-			// ここで読み込んだ文字によって下記のIFにかかる
-			(void)fscanf(pFile, "%s", &cTemp[0]);
+		std::string temp;
 
-			if (strcmp(cTemp, "END_SCRIPT") == 0)
-			{
+		while (std::getline(file, temp))
+		{// 読み込むものがなくなるまで読込
+			std::istringstream iss(temp);
+			std::string key;
+			iss >> key;
+
+			if (key == "BODY_PATH")
+			{// 見た目のパス
+				iss >> m_param.aPathBody;
+			}
+
+			if (key == "SPEED_MAX")
+			{// 最大速度
+				iss >> m_param.fSpeedMax;
+			}
+
+			if (key == "FACT_ACCELE")
+			{// 加速係数
+				iss >> m_param.fFactAccele;
+			}
+
+			if (key == "FACT_ATTENU")
+			{// 減速係数
+				iss >> m_param.fFactAttenu;
+			}
+
+			if (key == "FACT_BRAKE")
+			{// ブレーキ減速係数
+				iss >> m_param.fFactBrake;
+			}
+
+			if (file.eof())
+			{// 読み込み終了
 				break;
 			}
 		}
-
-		fclose(pFile);
+		
+		file.close();
+	}
+	else
+	{
+		assert(("ランキングファイルが開けませんでした", false));
 	}
 }
 
@@ -202,14 +225,14 @@ void CPlayer::InputMove(void)
 	// アクセル値の取得
 	float fAccele = pInputManager->GetAccele();
 
-	m_info.fSpeedDest = fAccele * SPEED_MAX;
+	m_info.fSpeedDest = fAccele * m_param.fSpeedMax;
 
 	CDebugProc::GetInstance()->Print("\nアクセル値[%f]", fAccele);
 
 	// ブレーキ値の取得
 	float fBrake = pInputManager->GetBrake();
 
-	m_info.fSpeed += (0.0f - m_info.fSpeed) * FACT_BRAKE * fBrake;
+	m_info.fSpeed += (0.0f - m_info.fSpeed) * m_param.fFactBrake * fBrake;
 
 	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
 
@@ -253,13 +276,13 @@ void CPlayer::ManageSpeed(void)
 	// スピードの増減
 	if (m_info.fSpeedDest >= m_info.fSpeed)
 	{// 加速しているとき
-		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * FACT_ACCELE;
+		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAccele;
 
 		CDebugProc::GetInstance()->Print("\n加速中");
 	}
 	else
 	{// 減速しているとき
-		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * FACT_ATTENU;
+		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAttenu;
 
 		CDebugProc::GetInstance()->Print("\n減速中");
 	}
