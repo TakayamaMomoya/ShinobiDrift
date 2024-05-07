@@ -99,7 +99,7 @@ void CInputJoypad::Uninit(void)
 {
 	m_pJoyPad = nullptr;
 
-	//xinput‚ð–³Œø‰»‚·‚é
+	// xinput‚ð–³Œø‰»‚·‚é
 	XInputEnable(false);
 }
 

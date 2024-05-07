@@ -52,6 +52,7 @@ public:
 	bool GetPress(BUTTON button) { return m_info.abPress[button]; }
 	SAxis GetAxis(void) { return m_axis; }
 	float GetAccele(void) { return m_fAccele; }
+	float GetBrake(void) { return m_fBreake; }
 
 private:
 	struct SInfo
@@ -64,6 +65,7 @@ private:
 	SInfo m_info;	// 情報
 	SAxis m_axis;	// 方向の情報
 	float m_fAccele;	// アクセルの入力
+	float m_fBreake;	// ブレーキの入力
 };
 
 #endif

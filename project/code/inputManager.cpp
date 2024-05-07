@@ -29,6 +29,7 @@ CInputManager::CInputManager()
 	ZeroMemory(&m_info, sizeof(SInfo));
 	ZeroMemory(&m_axis, sizeof(SAxis));
 	m_fAccele = 0.0f;
+	m_fBreake = 0.0f;
 }
 
 //=====================================================
@@ -233,5 +234,13 @@ void CInputManager::Update(void)
 	if (pKeyboard->GetPress(DIK_W))
 	{
 		m_fAccele = 1.0f;
+	}
+
+	// ƒuƒŒ[ƒL‚Ì‘€ì
+	m_fBreake = pJoypad->GetTriggerL(0);
+
+	if (pKeyboard->GetPress(DIK_S))
+	{
+		m_fBreake = 1.0f;
 	}
 }

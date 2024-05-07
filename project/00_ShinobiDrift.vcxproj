@@ -96,6 +96,7 @@
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalIncludeDirectories>.\data\EFFEKSEER\Libraries\Effekseer\Include\Effekseer;.\data\EFFEKSEER\Libraries\Effekseer\Include\EffekseerRendererGL;.\data\EFFEKSEER\Libraries\Effekseer\Include\EffekseerRendererDX9;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>;4099;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
