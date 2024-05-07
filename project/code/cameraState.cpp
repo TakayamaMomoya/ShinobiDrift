@@ -111,50 +111,53 @@ void CMoveControl::Update(CCamera *pCamera)
 		pInfoCamera->rot.y += rot.x * ROLL_SPEED;
 		pInfoCamera->rot.x -= rot.y * ROLL_SPEED;
 
-		//注視点を相対位置に設定
-		pCamera->SetPosR();
-
 		if (pKeyboard->GetPress(DIK_LSHIFT) == true)
 		{//加速
 			fMove *= 3;
 		}
 
+		D3DXVECTOR3 rotMove = pInfoCamera->rot;
+		D3DXVECTOR3 vecPole = { 0.0f,0.0f,0.0f };
+
 		//視点移動===============================================
 		if (pKeyboard->GetPress(DIK_A) == true)
 		{//左移動
-			pInfoCamera->posVDest.x += sinf(pInfoCamera->rot.y - D3DX_PI * 0.5f) * fMove;
-			pInfoCamera->posVDest.z += cosf(pInfoCamera->rot.y - D3DX_PI * 0.5f) * fMove;
-			pCamera->SetPosR();
+			rotMove.y += D3DX_PI * 0.5f;
+
+			universal::LimitRot(&rotMove.y);
+
+			vecPole += universal::PolarCoordinates(rotMove);
+			vecPole.y = 0.0f;
 		}
 		if (pKeyboard->GetPress(DIK_D) == true)
 		{//右移動
-			pInfoCamera->posVDest.x += sinf(pInfoCamera->rot.y - D3DX_PI * -0.5f) * fMove;
-			pInfoCamera->posVDest.z += cosf(pInfoCamera->rot.y - D3DX_PI * -0.5f) * fMove;
-			pCamera->SetPosR();
+			rotMove.y -= D3DX_PI * 0.5f;
+
+			universal::LimitRot(&rotMove.y);
+
+			vecPole += universal::PolarCoordinates(rotMove);
+			vecPole.y = 0.0f;
 		}
 		if (pKeyboard->GetPress(DIK_W) == true)
 		{//前移動
-			pInfoCamera->posVDest.x -= sinf(pInfoCamera->rot.x + D3DX_PI) * sinf(pInfoCamera->rot.y) * fMove;
-			pInfoCamera->posVDest.y += cosf(pInfoCamera->rot.x + D3DX_PI) * MOVE_SPEED;
-			pInfoCamera->posVDest.z -= sinf(pInfoCamera->rot.x + D3DX_PI) * cosf(pInfoCamera->rot.y) * fMove;
-			pCamera->SetPosR();
+			vecPole -= universal::PolarCoordinates(rotMove);
 		}
 		if (pKeyboard->GetPress(DIK_S) == true)
 		{//後移動
-			pInfoCamera->posVDest.x -= sinf(pInfoCamera->rot.x) * sinf(pInfoCamera->rot.y) * fMove;
-			pInfoCamera->posVDest.y += cosf(pInfoCamera->rot.x) * MOVE_SPEED;
-			pInfoCamera->posVDest.z -= sinf(pInfoCamera->rot.x) * cosf(pInfoCamera->rot.y) * fMove;
-			pCamera->SetPosR();
+			vecPole += universal::PolarCoordinates(rotMove);
 		}
+
+		pInfoCamera->posVDest += vecPole * fMove;
+
 		if (pKeyboard->GetPress(DIK_E) == true)
 		{//上昇
 			pInfoCamera->posVDest.y += fMove;
-			pCamera->SetPosR();
 		}
 		if (pKeyboard->GetPress(DIK_Q) == true)
 		{//下降
 			pInfoCamera->posVDest.y -= fMove;
-			pCamera->SetPosR();
 		}
+
+		pCamera->SetPosR();
 	}
 }

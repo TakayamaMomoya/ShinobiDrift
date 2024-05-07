@@ -312,6 +312,7 @@ void CPlayer::ManageSpeed(void)
 
 	// ˆÚ“®•ûŒü‚Éƒnƒ“ƒhƒ‹‚«‚Á‚½•ª‚ð’Ç‰Á
 	rot.y += m_info.fAngleHandle * m_param.fAngleMaxCurve;
+	rot.x += D3DX_PI * 0.5f;
 
 	D3DXVECTOR3 vecForward = universal::PolarCoordinates(rot);
 

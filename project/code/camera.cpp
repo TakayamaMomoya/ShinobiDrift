@@ -169,12 +169,9 @@ void CCamera::SetQuake(float fQuakeSizeH, float fQuakeSizeV, int nTime)
 //====================================================
 void CCamera::SetPosV(void)
 {
-	m_camera.posV =
-	{
-		m_camera.posR.x + sinf(m_camera.rot.x) * sinf(m_camera.rot.y + D3DX_PI) * m_camera.fLength,
-		m_camera.posR.y + cosf(m_camera.rot.x) * m_camera.fLength,
-		m_camera.posR.z + sinf(m_camera.rot.x) * cosf(m_camera.rot.y + D3DX_PI) * m_camera.fLength
-	};
+	D3DXVECTOR3 vecPole = universal::PolarCoordinates(m_camera.rot);
+
+	m_camera.posV = m_camera.posR + vecPole * m_camera.fLength;
 }
 
 //====================================================
@@ -182,12 +179,9 @@ void CCamera::SetPosV(void)
 //====================================================
 void CCamera::SetPosR(void)
 {
-	m_camera.posRDest =
-	{
-		m_camera.posV.x - sinf(m_camera.rot.x) * sinf(m_camera.rot.y + D3DX_PI) * m_camera.fLength,
-		m_camera.posV.y - cosf(m_camera.rot.x) * m_camera.fLength,
-		m_camera.posV.z - sinf(m_camera.rot.x) * cosf(m_camera.rot.y + D3DX_PI) * m_camera.fLength
-	};
+	D3DXVECTOR3 vecPole = universal::PolarCoordinates(m_camera.rot);
+
+	m_camera.posRDest = m_camera.posV - vecPole * m_camera.fLength;
 }
 
 //====================================================
