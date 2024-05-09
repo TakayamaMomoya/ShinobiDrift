@@ -239,25 +239,6 @@ void CMotion::Input(void)
         }
         // 選択============================================
 
-        // キーの増減============================================
-        if (pKeyboard->GetTrigger(DIK_I))
-        {// キーを増やす
-            if (m_nNumKey < motion::MAX_KEY - 1)
-            {
-                m_nNumKey++;
-                m_aMotionInfo[m_motionType].nNumKey++;
-            }
-        }
-        else if (pKeyboard->GetTrigger(DIK_K))
-        {// キーを減らす
-            if (m_nNumKey > 0)
-            {
-                m_nNumKey--;
-                m_aMotionInfo[m_motionType].nNumKey--;
-            }
-        }
-        // キーの増減============================================
-
         // フレームの増減============================================
         if (m_nKey != -1)
         {
@@ -293,6 +274,15 @@ void CMotion::Input(void)
 
         if (ImGui::TreeNode("Key"))
         {
+            // キーの増減============================================
+            if (ImGui::InputInt("NumKey", &m_nNumKey))
+            {
+                universal::LimitValueInt(&m_nNumKey, motion::MAX_KEY, 1);
+
+                m_aMotionInfo[m_motionType].nNumKey = m_nNumKey;
+            }
+            // キーの増減============================================
+
             if (ImGui::Button("CopyKey", ImVec2(80.0f, 20.0f)) && m_nKey != -1)
             {// キーコピー
                 m_keyInfoTemp = m_aMotionInfo[m_motionType].aKeyInfo[m_nKey];
