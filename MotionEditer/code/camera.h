@@ -8,7 +8,7 @@
 #ifndef _CAMERA_H_
 #define _CAMERA_H_
 
-//マクロ定義
+// マクロ定義
 #define MIN_DRAW		(10.0f)					// 描画を開始する距離
 #define MAX_DRAW		(15000.0f)				// 描画を終了する距離
 
@@ -18,16 +18,6 @@
 class CCamera
 {
 public:
-	//列挙型宣言
-	typedef enum
-	{
-		CAMERA_MODE_CHASE = 0,						//追従モード
-		CAMERA_MODE_CONTROL,						//操作モード
-		CAMERA_MODE_AUTO,							//回り込みモード
-		CAMERA_MODE_MAX
-	}CAMERA_MODE;
-
-	//構造体宣言
 	typedef struct
 	{
 		D3DXVECTOR3 posV;							//視点

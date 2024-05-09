@@ -304,8 +304,8 @@ void CMotion::Input(void)
             ImGui::TreePop();
         }
 
-        if (ImGui::TreeNode("Collision"))
-        {
+        if (ImGui::TreeNode("Event"))
+        {// イベントの設定
             for (int i = 0; i < m_aMotionInfo[m_motionType].nNumEvent; i++)
             {
                 if (m_aMotionInfo[m_motionType].pEvent == nullptr)
@@ -353,6 +353,8 @@ void CMotion::Input(void)
             {// 回転
                 // パーツのトランスフォームを一時保存
                 SetTransform(m_nIdxParts);
+
+                m_apParts[m_nIdxParts]->pParts->SetRot(rot);
             }
 
             ImGui::TreePop();
