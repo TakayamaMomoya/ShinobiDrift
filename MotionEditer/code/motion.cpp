@@ -136,7 +136,12 @@ void CMotion::Update(void)
 //=====================================================
 void CMotion::Input(void)
 {
-    // 変数宣言
+    // ブレンド用のキーにならないように設定
+    if (m_bMotion == false && m_nKey == -1)
+    {
+        m_nKey = 0;
+    }
+
     D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f };
     D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f };
 
@@ -367,13 +372,12 @@ void CMotion::Input(void)
 //=====================================================
 void CMotion::Motion(void)
 {
-
 	if (m_apParts[0] == nullptr)
 	{
 		return;
 	}
 
-	//変数宣言
+
 	int nNextKey;
 
 	// パーツのトランスフォーム
