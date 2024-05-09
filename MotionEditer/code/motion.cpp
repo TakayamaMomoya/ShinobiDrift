@@ -332,31 +332,27 @@ void CMotion::Input(void)
             SetPose();
         }
 
-
         if (ImGui::TreeNode("Parts Transform"))
         {
-            for (int i = 0; i < m_nNumParts; i++)
-            {
-                pos = m_apParts[i]->pParts->GetPosition();
-                rot = m_apParts[i]->pParts->GetRot();
+            pos = m_apParts[m_nIdxParts]->pParts->GetPosition();
+            rot = m_apParts[m_nIdxParts]->pParts->GetRot();
 
-                if (ImGui::DragFloat("pos.x", &pos.x, 0.1f, -FLT_MAX, FLT_MAX) ||
-                    ImGui::DragFloat("pos.y", &pos.y, 0.1f, -FLT_MAX, FLT_MAX) ||
-                    ImGui::DragFloat("pos.z", &pos.z, 0.1f, -FLT_MAX, FLT_MAX))
-                {// 移動
-                    // パーツのトランスフォームを一時保存
-                    SetTransform(i);
+            if (ImGui::DragFloat("pos.x", &pos.x, 0.1f, -FLT_MAX, FLT_MAX) ||
+                ImGui::DragFloat("pos.y", &pos.y, 0.1f, -FLT_MAX, FLT_MAX) ||
+                ImGui::DragFloat("pos.z", &pos.z, 0.1f, -FLT_MAX, FLT_MAX))
+            {// 移動
+                // パーツのトランスフォームを一時保存
+                SetTransform(m_nIdxParts);
 
-                    m_apParts[i]->pParts->SetPosition(pos);
-                }
+                m_apParts[m_nIdxParts]->pParts->SetPosition(pos);
+            }
 
-                if (ImGui::DragFloat("rot.x", &rot.x, 0.01f, -D3DX_PI, D3DX_PI) ||
-                    ImGui::DragFloat("rot.y", &rot.y, 0.01f, -D3DX_PI, D3DX_PI) ||
-                    ImGui::DragFloat("rot.z", &rot.z, 0.01f, -D3DX_PI, D3DX_PI))
-                {// 回転
-                    // パーツのトランスフォームを一時保存
-                    SetTransform(i);
-                }
+            if (ImGui::DragFloat("rot.x", &rot.x, 0.01f, -D3DX_PI, D3DX_PI) ||
+                ImGui::DragFloat("rot.y", &rot.y, 0.01f, -D3DX_PI, D3DX_PI) ||
+                ImGui::DragFloat("rot.z", &rot.z, 0.01f, -D3DX_PI, D3DX_PI))
+            {// 回転
+                // パーツのトランスフォームを一時保存
+                SetTransform(m_nIdxParts);
             }
 
             ImGui::TreePop();

@@ -47,6 +47,7 @@
     <ClCompile Include="code\parts.cpp" />
     <ClCompile Include="code\renderer.cpp" />
     <ClCompile Include="code\shadow.cpp" />
+    <ClCompile Include="code\skybox.cpp" />
     <ClCompile Include="code\texture.cpp" />
     <ClCompile Include="code\universal.cpp" />
   </ItemGroup>
@@ -79,6 +80,7 @@
     <ClInclude Include="code\parts.h" />
     <ClInclude Include="code\renderer.h" />
     <ClInclude Include="code\shadow.h" />
+    <ClInclude Include="code\skybox.h" />
     <ClInclude Include="code\texture.h" />
     <ClInclude Include="code\universal.h" />
   </ItemGroup>

@@ -25,6 +25,7 @@
 #include "field.h"
 #include "motion.h"
 #include "particle.h"
+#include "skybox.h"
 #include <stdio.h>
 
 //*****************************************************
@@ -139,6 +140,10 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 	// 床の生成
 	CField *pField = CField::Create();
 
+    // スカイボックスの生成
+    CSkybox::Create();
+
+    // 編集するモーションのパス読み込み
 	FILE *pFile;
 
 	char aTemp[MAX_STRING];
@@ -152,6 +157,7 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 	// モーションの生成
 	CMotion *CMotion = CMotion::Create(&aTemp[0]);
+
 
 	CParticle::Load();
 
