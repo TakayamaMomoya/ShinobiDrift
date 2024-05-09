@@ -138,9 +138,9 @@ void CGame::Update(void)
 	// ó‘ÔŠÇ—
 	ManageState();
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 	Debug();
-//#endif
+#endif
 }
 
 //=====================================================
@@ -156,9 +156,6 @@ void CGame::UpdateCamera(void)
 	}
 
 	pCamera->Update();
-	pCamera->Quake();
-
-	pCamera->MoveDist(0.3f);
 }
 
 //=====================================================

@@ -136,7 +136,7 @@ void CMotion::Update(void)
 //=====================================================
 void CMotion::Input(void)
 {
-    // ブレンド用のキーにならないように設定
+    // ブレンド用のキーにならないように補正
     if (m_bMotion == false && m_nKey == -1)
     {
         m_nKey = 0;

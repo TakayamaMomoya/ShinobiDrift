@@ -21,11 +21,10 @@
 //*****************************************************
 namespace
 {
-const float DIST_CYLINDER = 1000.0f;
-const float DIST_LOOK = 1500.0f;
-const float MOVE_SPEED = 3.0f;						//移動スピード
-const float ROLL_SPEED = 0.02f;						//回転スピード
+const float MOVE_SPEED = 3.0f;	//移動スピード
+const float ROLL_SPEED = 0.02f;	//回転スピード
 const float DIST_CAMERA = 400.0f;	// カメラの距離
+const float FACT_CORRECT_POS = 0.2f;	// 位置補正係数
 }
 
 //=====================================================
@@ -73,6 +72,8 @@ void CFollowPlayer::Update(CCamera *pCamera)
 
 	//目標の視点設定
 	pInfoCamera->posVDest = pos + vecPole * pInfoCamera->fLength;
+
+	pCamera->MoveDist(FACT_CORRECT_POS);
 
 #ifdef _DEBUG
 	CEffect3D::Create(pInfoCamera->posRDest, 20.0f, 1, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
@@ -160,4 +161,6 @@ void CMoveControl::Update(CCamera *pCamera)
 
 		pCamera->SetPosR();
 	}
+
+	pCamera->MoveDist(FACT_CORRECT_POS);
 }

@@ -69,6 +69,8 @@ void CCamera::Update(void)
 	{
 		m_pBehavior->Update(this);
 	}
+
+	Quake();	// カメラ揺れ
 }
 
 //====================================================
@@ -76,50 +78,9 @@ void CCamera::Update(void)
 //====================================================
 void CCamera::MoveDist(float fFact)
 {
-	// メッシュフィールドとの当たり判定
-	CMeshField *pMesh = CMeshField::GetInstance();
-
-	if(pMesh)
-	{
-		float fHeight = pMesh->GetHeight(m_camera.posVDest, nullptr);
-
-		fHeight += HEIGHT_CAMERA;
-
-		if (fHeight > m_camera.posVDest.y)
-		{
-			// 位置補正
-			m_camera.posVDest.y = fHeight;
-		}
-	}
-
 	// 目標位置に補正
 	m_camera.posV += (m_camera.posVDest - m_camera.posV) * fFact;
 	m_camera.posR += (m_camera.posRDest - m_camera.posR) * fFact;
-	
-	// カウンターの変更
-	if (m_camera.fTimeEvent > 0.0f)
-	{
-		float fDeltaTime = CManager::GetDeltaTime();
-
-		m_camera.fTimeEvent -= fDeltaTime;
-
-		if (m_camera.fTimeEvent <= 0.0f)
-		{
-			// 初期値に戻す
-			m_camera.fTimeEvent = 0.0f;
-
-			m_camera.posVDest = D3DXVECTOR3(0.0f, 1050.0f, -590.0f);
-			m_camera.posRDest = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
-			// ゲームを動かす
-			CGame *pGame = CGame::GetInstance();
-
-			if (pGame != nullptr)
-			{
-				pGame->EnableStop(false);
-			}
-		}
-	}
 }
 
 //====================================================
