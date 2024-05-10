@@ -16,8 +16,6 @@
 #include "inputManager.h"
 #include "pause.h"
 #include "debugproc.h"
-#include <fstream>
-#include <sstream>
 #include <string>
 
 //*****************************************************

@@ -11,7 +11,6 @@
 #include "object.h"
 #include "camera.h"
 #include "manager.h"
-#include "collision.h"
 #include "renderer.h"
 
 //*****************************************************
