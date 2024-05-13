@@ -31,6 +31,8 @@ namespace
 {
 const D3DXVECTOR3 POSV_ABOVE = { 0.0f,20000.0f,0.0f };	// 上空視点の視点位置
 const D3DXVECTOR3 POSR_ABOVE = { 0.0f,0.0f,1.0f };	// 上空視点の注視点位置
+const float SPEED_MOVE_ABOVE = 20.0f;	// 上空視点時の移動速度
+const float SPEED_ZOOM_ABOVE = 10.0f;	// ズーム速度
 }
 
 //====================================================
@@ -133,83 +135,85 @@ void CCamera::Control(void)
 
 	float fMove = MOVE_SPEED;
 
-	//マウス操作======================================================
-	if (pMouse->GetPress(CInputMouse::BUTTON_RMB) == true)
-	{//右クリック中、視点旋回
-		D3DXVECTOR3 rot;
-
-		//マウスの移動量代入
-		rot = { (float)pMouse->GetMoveIX() * ROLL_SPEED, (float)pMouse->GetMoveIY() * ROLL_SPEED, 0.0f };
-
-		D3DXVec3Normalize(&rot, &rot);
-
-		//視点の旋回
-		m_camera.rot.y += rot.x * ROLL_SPEED;
-		m_camera.rot.x -= rot.y * ROLL_SPEED;
-
-		//注視点を相対位置に設定
-		SetPosR();
-
-		if (pKeyboard->GetPress(DIK_LSHIFT) == true)
-		{//加速
-			fMove *= 7;
-		}
-
-		//視点移動===============================================
-		if (pKeyboard->GetPress(DIK_A) == true)
-		{//左移動
-			m_camera.posVDest.x += sinf(m_camera.rot.y - D3DX_PI * 0.5f) * fMove;
-			m_camera.posVDest.z += cosf(m_camera.rot.y - D3DX_PI * 0.5f) * fMove;
-			SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_D) == true)
-		{//右移動
-			m_camera.posVDest.x += sinf(m_camera.rot.y - D3DX_PI * -0.5f) * fMove;
-			m_camera.posVDest.z += cosf(m_camera.rot.y - D3DX_PI * -0.5f) * fMove;
-			SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_W) == true)
-		{//前移動
-			m_camera.posVDest.x -= sinf(m_camera.rot.x + D3DX_PI) * sinf(m_camera.rot.y) * fMove;
-			m_camera.posVDest.y += cosf(m_camera.rot.x + D3DX_PI) * MOVE_SPEED;
-			m_camera.posVDest.z -= sinf(m_camera.rot.x + D3DX_PI) * cosf(m_camera.rot.y) * fMove;
-			SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_S) == true)
-		{//後移動
-			m_camera.posVDest.x -= sinf(m_camera.rot.x) * sinf(m_camera.rot.y) * fMove;
-			m_camera.posVDest.y += cosf(m_camera.rot.x) * MOVE_SPEED;
-			m_camera.posVDest.z -= sinf(m_camera.rot.x) * cosf(m_camera.rot.y) * fMove;
-			SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_E) == true)
-		{//上昇
-			m_camera.posVDest.y += fMove;
-			SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_Q) == true)
-		{//下降
-			m_camera.posVDest.y -= fMove;
-			SetPosR();
-		}
-	}
-
-	if (ImGui::TreeNode("PosAbove"))
-	{
-		ImGui::DragFloat("POS.X", &m_posAbove.x, 10.0f, -FLT_MAX, FLT_MAX);
-		ImGui::DragFloat("POS.Y", &m_posAbove.y, 10.0f, -FLT_MAX, FLT_MAX);
-		ImGui::DragFloat("POS.Z", &m_posAbove.z, 10.0f, -FLT_MAX, FLT_MAX);
-
-		ImGui::TreePop();
-	}
-
 	if (pKeyboard->GetPress(DIK_F))
-	{
+	{// 上空視点時
 		m_camera.posV = m_posAbove;
-		m_camera.posR = POSR_ABOVE;
+		m_camera.posR = { m_posAbove.x,0.0f,m_posAbove.z + 1.0f };
+
+		if (pMouse->GetPress(CInputMouse::BUTTON_RMB))
+		{// 右クリック中、移動可能
+			m_posAbove.x -= pMouse->GetMoveIX() * SPEED_MOVE_ABOVE;
+			m_posAbove.z += pMouse->GetMoveIY() * SPEED_MOVE_ABOVE;
+		}
+
+		m_posAbove.y += pMouse->GetMoveIZ() * SPEED_ZOOM_ABOVE;
+
+		CDebugProc::GetInstance()->Print("\nマウス奥：[%f]", pMouse->GetMoveIZ());
+
+		universal::LimitValue(&m_posAbove.y, FLT_MAX, 1000.0f);
 	}
 	else
-	{
+	{// 通常操作
+		if (pMouse->GetPress(CInputMouse::BUTTON_RMB) == true)
+		{//右クリック中、移動可能
+			D3DXVECTOR3 rot;
+
+			//マウスの移動量代入
+			rot = { (float)pMouse->GetMoveIX() * ROLL_SPEED, (float)pMouse->GetMoveIY() * ROLL_SPEED, 0.0f };
+
+			D3DXVec3Normalize(&rot, &rot);
+
+			//視点の旋回
+			m_camera.rot.y += rot.x * ROLL_SPEED;
+			m_camera.rot.x -= rot.y * ROLL_SPEED;
+
+			//注視点を相対位置に設定
+			SetPosR();
+
+			if (pKeyboard->GetPress(DIK_LSHIFT) == true)
+			{//加速
+				fMove *= 7;
+			}
+
+			//視点移動===============================================
+			if (pKeyboard->GetPress(DIK_A) == true)
+			{//左移動
+				m_camera.posVDest.x += sinf(m_camera.rot.y - D3DX_PI * 0.5f) * fMove;
+				m_camera.posVDest.z += cosf(m_camera.rot.y - D3DX_PI * 0.5f) * fMove;
+				SetPosR();
+			}
+			if (pKeyboard->GetPress(DIK_D) == true)
+			{//右移動
+				m_camera.posVDest.x += sinf(m_camera.rot.y - D3DX_PI * -0.5f) * fMove;
+				m_camera.posVDest.z += cosf(m_camera.rot.y - D3DX_PI * -0.5f) * fMove;
+				SetPosR();
+			}
+			if (pKeyboard->GetPress(DIK_W) == true)
+			{//前移動
+				m_camera.posVDest.x -= sinf(m_camera.rot.x + D3DX_PI) * sinf(m_camera.rot.y) * fMove;
+				m_camera.posVDest.y += cosf(m_camera.rot.x + D3DX_PI) * MOVE_SPEED;
+				m_camera.posVDest.z -= sinf(m_camera.rot.x + D3DX_PI) * cosf(m_camera.rot.y) * fMove;
+				SetPosR();
+			}
+			if (pKeyboard->GetPress(DIK_S) == true)
+			{//後移動
+				m_camera.posVDest.x -= sinf(m_camera.rot.x) * sinf(m_camera.rot.y) * fMove;
+				m_camera.posVDest.y += cosf(m_camera.rot.x) * MOVE_SPEED;
+				m_camera.posVDest.z -= sinf(m_camera.rot.x) * cosf(m_camera.rot.y) * fMove;
+				SetPosR();
+			}
+			if (pKeyboard->GetPress(DIK_E) == true)
+			{//上昇
+				m_camera.posVDest.y += fMove;
+				SetPosR();
+			}
+			if (pKeyboard->GetPress(DIK_Q) == true)
+			{//下降
+				m_camera.posVDest.y -= fMove;
+				SetPosR();
+			}
+		}
+
 		MoveDist(0.5f);
 	}
 
@@ -339,6 +343,7 @@ void CCamera::SetCamera(void)
 	CDebugProc::GetInstance()->Print("\n視点の目標位置：[%f,%f,%f]", m_camera.posVDest.x, m_camera.posVDest.y, m_camera.posVDest.z);
 	CDebugProc::GetInstance()->Print("\n注視点の位置：[%f,%f,%f]", m_camera.posR.x, m_camera.posR.y, m_camera.posR.z);
 	CDebugProc::GetInstance()->Print("\n注視点の目標位置：[%f,%f,%f]", m_camera.posRDest.x, m_camera.posRDest.y, m_camera.posRDest.z);
+	CDebugProc::GetInstance()->Print("\n上空の視点位置：[%f,%f,%f]", m_posAbove.x, m_posAbove.y, m_posAbove.z);
 	CDebugProc::GetInstance()->Print("\nカメラの向き：[%f,%f,%f]", m_camera.rot.x, m_camera.rot.y, m_camera.rot.z);
 	CDebugProc::GetInstance()->Print("\nカメラ距離：[%f]", m_camera.fLength);
 #endif

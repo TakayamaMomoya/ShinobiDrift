@@ -169,7 +169,7 @@ float CInputMouse::GetMoveIY(void)
 //=====================================================
 LONG CInputMouse::GetMoveIZ(void)
 {
-	return m_mouseState.lZ / LONG_MAX;
+	return m_mouseState.lZ;
 }
 
 //=====================================================
