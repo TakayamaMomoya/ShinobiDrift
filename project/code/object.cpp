@@ -12,6 +12,7 @@
 #include "camera.h"
 #include "manager.h"
 #include "renderer.h"
+#include "effekseer.h"
 
 //*****************************************************
 // 静的メンバ変数宣言
@@ -401,6 +402,12 @@ void CObject::DrawAll(void)
 		}
 	}
 
+	if (CManager::GetMyEffekseer() != nullptr)
+	{
+		CManager::GetMyEffekseer()->Update();
+		CManager::GetMyEffekseer()->Draw();
+	}
+	
 	for (int nCntPri = 0; nCntPri < NUM_PRIORITY; nCntPri++)
 	{
 		// 先頭オブジェクトを代入

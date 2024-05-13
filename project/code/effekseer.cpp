@@ -1,6 +1,6 @@
 //===========================================================
 //
-// モデルのエフェクト[effekseer.cpp]
+// 私のエフェクシア[effekseer.cpp]
 // Author 大原怜将
 //
 //===========================================================
@@ -23,9 +23,9 @@
 const char* CEffekseer::m_apEfkName[CEffekseer::TYPE_MAX] =
 {
 	"",                               // なんもない
-	"Effect\\orbit.efkefc",           // 軌跡
- 	"Effect\\impact.efkefc",          // 衝撃波
-	"Effect\\hit.efkefc",             // ヒット
+	"data\\EFFEKSEER\\Effect\\orbit.efkefc",           // 軌跡
+ 	"data\\EFFEKSEER\\Effect\\impact.efkefc",          // 衝撃波
+	"data\\EFFEKSEER\\Effect\\hit.efkefc",             // ヒット
 };
 
 //===========================================================
@@ -158,7 +158,10 @@ void CEffekseer::Draw(void)
 		// カメラの情報取得
 		CCamera* pCamera = CManager::GetCamera();
 
+		// ビューマトリックス
 		auto ViewMatrix = pCamera->GetCamera()->mtxView;
+
+		// プロジェクションマトリックス
 		auto Projection = pCamera->GetCamera()->mtxProjection;
 
 		for (int i = 0; i < 4; i++)

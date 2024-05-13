@@ -28,12 +28,14 @@
 #include "inputManager.h"
 #include "block.h"
 #include "debrisSpawner.h"
+#include "effekseer.h"
 
 //*****************************************************
 // 静的メンバ変数宣言
 //*****************************************************
 CCamera *CManager::m_pCamera = nullptr;	// カメラのポインタ
 CLight *CManager::m_pLight = nullptr;	// ライトのポインタ
+CEffekseer* CManager::m_pMyEffekseer = nullptr;  // エフェクシアのポインタ
 CScene *CManager::m_pScene = nullptr;	// シーンへのポインタ
 CScene::MODE CManager::m_mode = CScene::MODE_GAME;	// 現在のモード
 int CManager::m_nScore = 0;	// スコア保存用
@@ -98,6 +100,16 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 				return E_FAIL;
 			}
 		}
+	}
+
+	if (m_pMyEffekseer == nullptr)
+	{// エフェクシア生成
+
+		m_pMyEffekseer = new CEffekseer;
+
+		// 初期化
+		m_pMyEffekseer->Init();
+		m_pMyEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_IMPACT], ::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
 	}
 
 	// テクスチャ管理の生成

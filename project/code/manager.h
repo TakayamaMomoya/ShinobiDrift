@@ -23,6 +23,7 @@ class CCamera;
 class CLight;
 class CTexture;
 class CFade;
+class CEffekseer;
 
 //*****************************************************
 // クラスの定義
@@ -39,6 +40,7 @@ public:
 	void Draw();
 	static CCamera *GetCamera(void) { return m_pCamera; }
 	static CLight *GetLight(void) { return m_pLight; }
+	static CEffekseer* GetMyEffekseer(void) { return m_pMyEffekseer; }
 	static void SetMode(CScene::MODE mode);
 	static CScene::MODE GetMode(void) { return m_mode; }
 	static void SetScore(int nScore) { m_nScore = nScore; }
@@ -49,6 +51,7 @@ public:
 private:
 	static CCamera *m_pCamera;	// カメラのポインタ
 	static CLight *m_pLight;	// ライトのポインタ
+	static CEffekseer *m_pMyEffekseer;  // エフェクシアのポインタ
 	static CScene *m_pScene;	// 現在のシーン
 	static CScene::MODE m_mode;	// 現在のモード
 	static int m_nScore;	// スコア
