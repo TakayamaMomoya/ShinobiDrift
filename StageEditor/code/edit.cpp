@@ -15,8 +15,6 @@
 #include "manager.h"
 #include "debugproc.h"
 #include "block.h"
-#include "enemy.h"
-#include "enemyManager.h"
 #include "blockManager.h"
 #include <assert.h>
 

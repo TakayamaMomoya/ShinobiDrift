@@ -16,7 +16,6 @@
 #include "inputmouse.h"
 #include "debugproc.h"
 #include "game.h"
-#include "player.h"
 
 //*****************************************************
 // マクロ定義
@@ -195,26 +194,7 @@ void CCamera::Control(void)
 //====================================================
 void CCamera::FollowPlayer(void)
 {
-	CPlayer *pPlayer = CPlayer::GetInstance();
 
-	if (pPlayer == nullptr)
-	{
-		return;
-	}
-
-	D3DXVECTOR3 pos = pPlayer->GetPosition();
-
-	pos.y += 150.0f;
-
-	m_camera.posRDest = pos;
-
-	//目標の視点設定
-	m_camera.posVDest =
-	{
-		m_camera.posRDest.x - sinf(m_camera.rot.x) * sinf(m_camera.rot.y - D3DX_PI * 0.02f) * m_camera.fLength,
-		m_camera.posRDest.y + cosf(m_camera.rot.x) * m_camera.fLength,
-		m_camera.posRDest.z - sinf(m_camera.rot.x) * cosf(m_camera.rot.y - D3DX_PI * 0.02f) * m_camera.fLength
-	};
 }
 
 //====================================================

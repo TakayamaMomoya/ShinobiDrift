@@ -12,8 +12,6 @@
 #include "manager.h"
 #include "renderer.h"
 #include "game.h"
-#include "player.h"
-#include "enemy.h"
 #include "debugproc.h"
 #include "universal.h"
 #include "texture.h"

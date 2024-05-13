@@ -23,15 +23,12 @@
 #include "object3D.h"
 #include "texture.h"
 #include "skybox.h"
-#include "enemyManager.h"
 #include "edit.h"
 #include "block.h"
 #include "renderer.h"
 #include "animEffect3D.h"
 #include "pause.h"
-#include "player.h"
 #include "slow.h"
-#include "checkPointManager.h"
 #include "blockManager.h"
 
 //*****************************************************
@@ -80,21 +77,13 @@ HRESULT CGame::Init(void)
 	}
 
 	// スカイボックスの生成
-	//CSkybox::Create();
-
-	// 敵マネージャーの生成
-	CEnemyManager *pEnemyManager = CEnemyManager::Create();
+	CSkybox::Create();
 
 	// ３Dアニメーション管理の生成
 	CAnimEffect3D::Create();
 
 	// サウンドインスタンスの取得
 	CSound* pSound = CSound::GetInstance();
-
-	if (pSound != nullptr)
-	{
-		//pSound->Play(pSound->LABEL_BGM_GAME);
-	}
 
 	// ブロック管理の生成
 	CBlockManager::Create();
@@ -105,19 +94,8 @@ HRESULT CGame::Init(void)
 	// フォグをかける
 	CRenderer *pRenderer = CRenderer::GetInstance();
 
-	if (pRenderer != nullptr)
-	{
-		//pRenderer->EnableFog(true);
-	}
-
-	// プレイヤーの生成
-	CPlayer::Create();
-
 	// スロー管理の生成
 	CSlow::Create();
-
-	// チェックポイント管理の生成
-	CCheckPointManager::Create();
 
 	return S_OK;
 }
