@@ -18,7 +18,7 @@
 #include "game.h"
 
 //*****************************************************
-// マクロ定義
+// 定数定義
 //*****************************************************
 #define MOVE_SPEED					(3.0f)						//移動スピード
 #define ROLL_SPEED					(0.02f)						//回転スピード
@@ -27,6 +27,11 @@
 #define INITIAL_ANGLE	(45.0f)	// 初期の視野角
 #define ANGLE_GAME	(D3DX_PI * 0.4f)	// ゲーム中のカメラの角度
 #define RATE_CAMERA_MOVE	(1.5f)	// カメラがどれだけプレイヤーの先を見るかの倍率
+namespace
+{
+const D3DXVECTOR3 POSV_ABOVE = { 0.0f,20000.0f,0.0f };	// 上空視点の視点位置
+const D3DXVECTOR3 POSR_ABOVE = { 0.0f,0.0f,1.0f };	// 上空視点の注視点位置
+}
 
 //====================================================
 // 初期化処理
@@ -44,6 +49,7 @@ HRESULT CCamera::Init(void)
 	m_camera.rot = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	m_camera.fLength = 100.0f;
 	m_camera.fViewAngle = INITIAL_ANGLE;
+	m_posAbove = POSV_ABOVE;
 
 	float fLength = sqrtf
 	(//Y面での対角線
@@ -146,7 +152,7 @@ void CCamera::Control(void)
 
 		if (pKeyboard->GetPress(DIK_LSHIFT) == true)
 		{//加速
-			fMove *= 3;
+			fMove *= 7;
 		}
 
 		//視点移動===============================================
@@ -187,6 +193,28 @@ void CCamera::Control(void)
 			SetPosR();
 		}
 	}
+
+	if (ImGui::TreeNode("PosAbove"))
+	{
+		ImGui::DragFloat("POS.X", &m_posAbove.x, 10.0f, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat("POS.Y", &m_posAbove.y, 10.0f, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat("POS.Z", &m_posAbove.z, 10.0f, -FLT_MAX, FLT_MAX);
+
+		ImGui::TreePop();
+	}
+
+	if (pKeyboard->GetPress(DIK_F))
+	{
+		m_camera.posV = m_posAbove;
+		m_camera.posR = POSR_ABOVE;
+	}
+	else
+	{
+		MoveDist(0.5f);
+	}
+
+	universal::LimitRot(&m_camera.rot.x);
+	universal::LimitRot(&m_camera.rot.y);
 }
 
 //====================================================
