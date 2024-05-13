@@ -59,7 +59,7 @@ HRESULT CGame::Init(void)
 	m_pGame = this;
 
 	m_state = STATE_NORMAL;
-	m_bStop = false;
+	m_bStop = true;
 
 	// UIマネージャーの追加
 	CUIManager::Create();
@@ -180,17 +180,9 @@ void CGame::UpdateCamera(void)
 		return;
 	}
 
-	if (m_bStop == false)
-	{
-		pCamera->FollowPlayer();
-	}
-	else
-	{
 		// 操作
 		pCamera->Control();
-	}
 
-	pCamera->MoveDist(0.1f);
 }
 
 //=====================================================
@@ -249,11 +241,6 @@ void CGame::Debug(void)
 	if (pKeyboard == nullptr)
 	{
 		return;
-	}
-
-	if (pKeyboard->GetTrigger(DIK_F))
-	{
-		m_bStop = m_bStop ? false : true;
 	}
 }
 

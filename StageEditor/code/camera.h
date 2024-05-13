@@ -60,6 +60,7 @@ private:
 	void SetPosV(void);
 	void SetPosR(void);
 
+	D3DXVECTOR3 m_posAbove;	// ã‹ó‹“_‚ÌˆÊ’u
 	Camera m_camera;	// \‘¢‘Ì‚Ìî•ñ
 };
 
