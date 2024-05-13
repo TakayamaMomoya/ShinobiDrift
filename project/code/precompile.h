@@ -10,6 +10,7 @@
 //========================================
 // 事前インクルード
 //========================================
+#include <windows.h>
 #include"d3dx9.h"
 #define DIRECTINPUT_VERSION (0x0800)						//ビルド時の警告対処用マクロ
 #include "dinput.h"
@@ -18,6 +19,8 @@
 #include <assert.h>
 #include <stdio.h>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string.h>
 
 #endif // _PRECOMPILE_H_

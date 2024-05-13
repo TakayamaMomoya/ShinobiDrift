@@ -16,8 +16,6 @@
 #include "inputManager.h"
 #include "pause.h"
 #include "debugproc.h"
-#include <fstream>
-#include <sstream>
 #include <string>
 
 //*****************************************************
@@ -26,6 +24,7 @@
 namespace
 {
 const std::string PATH_PARAM = "data\\TEXT\\playerParam.txt";	// パラメーターデータのパス
+const float fNotrot = 1.0f;	// 回転しないようにする速度
 }
 
 //*****************************************************
@@ -271,8 +270,6 @@ void CPlayer::InputCamera(void)
 	}
 
 	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
-
-
 }
 
 //=====================================================
@@ -314,8 +311,10 @@ void CPlayer::ManageSpeed(void)
 		SetPosition(pos);
 	}
 
-	// ハンドルの回転を追加
-	rot.y += m_info.fAngleHandle * m_param.fAngleMaxCurve;
+	if (m_info.fSpeed >= fNotrot)
+	{// ハンドルの回転を追加
+		rot.y += m_info.fAngleHandle * m_param.fAngleMaxCurve;
+	}
 
 	SetRotation(rot);
 

@@ -12,8 +12,8 @@ SCRIPT
 BODY_PATH data\\MOTION\\motionArms01.txt	# 見た目のモーションパス
 SPEED_MAX 30.0 # 最大速度
 FACT_ACCELE 0.01 # 加速係数
-FACT_ATTENU 0.01 # 減速係数
+FACT_ATTENU 0.02 # 減速係数
 FACT_BRAKE 0.02 # ブレーキの減衰係数
-ANGLE_MAX_CURVE 0.01	# カーブの最大角度
+ANGLE_MAX_CURVE 0.02	# カーブの最大角度
 
 END_SCRIPT
