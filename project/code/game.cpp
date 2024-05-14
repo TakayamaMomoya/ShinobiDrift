@@ -33,6 +33,7 @@
 #include "meshfield.h"
 #include "CameraState.h"
 #include "particle.h"
+#include "timer.h"
 
 //*****************************************************
 // マクロ定義
@@ -92,6 +93,9 @@ HRESULT CGame::Init(void)
 
 	// メッシュフィールド生成
 	CMeshField::Create();
+
+	// タイマー生成
+	CTimer::Create();
 
 	return S_OK;
 }
