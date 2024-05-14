@@ -84,6 +84,9 @@ HRESULT CGame::Init(void)
 		pRenderer->EnableFog(true);
 	}
 
+	// 
+	CBlockManager::Create();
+
 	// ƒvƒŒƒCƒ„[‚Ì¶¬
 	CPlayer::Create();
 

@@ -14,9 +14,12 @@
 #include "camera.h"
 #include "slow.h"
 #include "inputManager.h"
+#include "inputjoypad.h"
 #include "pause.h"
 #include "debugproc.h"
 #include <string>
+#include "blockManager.h"
+#include "effect3D.h"
 
 //*****************************************************
 // 定数定義
@@ -202,6 +205,12 @@ void CPlayer::Input(void)
 	// カメラ操作
 	InputCamera();
 
+	InputWire();
+
+	// スピードの管理
+	ManageSpeed();
+
+
 	CInputManager *pInputManager = CInputManager::GetInstance();
 
 	if (pInputManager != nullptr)
@@ -244,8 +253,6 @@ void CPlayer::InputMove(void)
 
 	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
 
-	// スピードの管理
-	ManageSpeed();
 }
 
 //=====================================================
@@ -270,6 +277,109 @@ void CPlayer::InputCamera(void)
 	}
 
 	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+}
+
+//=====================================================
+// ワイヤーの操作
+//=====================================================
+void CPlayer::InputWire(void)
+{
+	CInputJoypad *pJoypad = CInputJoypad::GetInstance();
+
+	if (pJoypad == nullptr)
+		return;
+
+	D3DXVECTOR2 vecStickR =
+	{
+		pJoypad->GetJoyStickRX(0),
+		pJoypad->GetJoyStickRY(0)
+	};
+
+	float fAngleInput = atan2f(vecStickR.x, vecStickR.y);
+
+	universal::LimitRot(&fAngleInput);
+
+	CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+	// ブロックのチェック
+	CBlock *pBlock = pBlockManager->GetHead();
+	D3DXVECTOR3 posPlayer = GetPosition();
+	D3DXVECTOR3 rotCamera = CManager::GetCamera()->GetCamera()->rot;
+
+	float fAngle = fAngleInput + rotCamera.y + D3DX_PI;
+	universal::LimitRot(&fAngle);
+
+
+
+#ifdef _DEBUG
+	D3DXVECTOR3 pole = universal::PolarCoordinates(D3DXVECTOR3(GetRotation().x + D3DX_PI * 0.5f , fAngle, 0.0f));
+
+	D3DXVECTOR3 posEffect = GetPosition() + pole * 500.0f;
+
+	CEffect3D::Create(posEffect, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+#endif
+
+	CDebugProc::GetInstance()->Print("\nロックオン方向[%f]", fAngle);
+
+	CBlock *pBlockGrab = nullptr;
+	float fAngleMin = D3DX_PI;
+
+
+	float fLength = sqrtf(vecStickR.x * vecStickR.x + vecStickR.y * vecStickR.y);
+
+	if (m_info.pBlock != nullptr)
+	{
+		m_info.pBlock->EnableCurrent(true);
+	}
+
+	//if (pJoypad->GetPress(CInputJoypad::PADBUTTONS_LB, 0))
+	if (fLength > 0.5f)
+	{// 操作している判定
+		if (m_info.pBlock != nullptr)
+		{
+			D3DXVECTOR3 posPlayer = GetPosition();
+
+			universal::LimitDistSphereInSide(1000.0f, &posPlayer, m_info.pBlock->GetPosition());
+
+			SetPosition(posPlayer);
+		}
+	}
+	else
+	{
+		while (pBlock != nullptr)
+		{
+			// 次のアドレスを保存
+			CBlock *pBlockNext = pBlock->GetNext();
+
+			D3DXVECTOR3 posBlock = pBlock->GetPosition();
+			D3DXVECTOR3 vecDiff = posBlock - posPlayer;
+			float fAngleDiff = atan2f(vecDiff.x, vecDiff.z);
+			float fDiff = fAngle - fAngleDiff;
+
+			universal::LimitRot(&fDiff);
+
+			CDebugProc::GetInstance()->Print("\n目標の差分[%f]", fAngleDiff);
+			CDebugProc::GetInstance()->Print("\n角度の差分[%f]", fDiff);
+
+			pBlock->EnableCurrent(false);
+
+			if (fDiff * fDiff < fAngleMin * fAngleMin)
+			{
+				pBlockGrab = pBlock;
+
+				fAngleMin = fDiff;
+			}
+
+			// 次のアドレスを代入
+			pBlock = pBlockNext;
+		}
+
+		if (pBlockGrab != nullptr)
+		{
+			m_info.pBlock = pBlockGrab;
+		}
+	}
+
 }
 
 //=====================================================
@@ -314,6 +424,7 @@ void CPlayer::ManageSpeed(void)
 	if (m_info.fSpeed >= fNotrot)
 	{// ハンドルの回転を追加
 		rot.y += m_info.fAngleHandle * m_param.fAngleMaxCurve;
+		universal::LimitRot(&rot.y);
 	}
 
 	SetRotation(rot);

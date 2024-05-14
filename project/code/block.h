@@ -48,11 +48,14 @@ public:
 	CBlock *GetNext(void) { return m_pNext; }
 	static int GetNumAll(void) { return m_nNumAll; }
 	void SetPosition(D3DXVECTOR3 pos);
+	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }
 
 private:
 	static int m_nNumAll;	// 総数
 	float m_fLife;	// 体力
 	int m_nIdx;	// 種類のインデックス
+	bool m_bGrab;	// 掴めるかどうか
+	bool m_bCurrent;	// 選択されているかどうか
 
 	CBlock *m_pPrev;	// 前のアドレス
 	CBlock *m_pNext;	// 次のアドレス

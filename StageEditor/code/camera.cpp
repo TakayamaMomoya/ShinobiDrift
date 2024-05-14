@@ -154,61 +154,61 @@ void CCamera::Control(void)
 	}
 	else
 	{// 通常操作
-		if (pMouse->GetPress(CInputMouse::BUTTON_RMB) == true)
-		{//右クリック中、移動可能
+		if (pMouse->GetPress(CInputMouse::BUTTON_RMB))
+		{// 右クリック中、移動可能
 			D3DXVECTOR3 rot;
 
-			//マウスの移動量代入
+			// マウスの移動量代入
 			rot = { (float)pMouse->GetMoveIX() * ROLL_SPEED, (float)pMouse->GetMoveIY() * ROLL_SPEED, 0.0f };
 
 			D3DXVec3Normalize(&rot, &rot);
 
-			//視点の旋回
+			// 視点の旋回
 			m_camera.rot.y += rot.x * ROLL_SPEED;
 			m_camera.rot.x -= rot.y * ROLL_SPEED;
 
-			//注視点を相対位置に設定
+			// 注視点を相対位置に設定
 			SetPosR();
 
 			if (pKeyboard->GetPress(DIK_LSHIFT) == true)
-			{//加速
+			{// 加速
 				fMove *= 7;
 			}
 
-			//視点移動===============================================
+			// 視点移動===============================================
 			if (pKeyboard->GetPress(DIK_A) == true)
-			{//左移動
+			{// 左移動
 				m_camera.posVDest.x += sinf(m_camera.rot.y - D3DX_PI * 0.5f) * fMove;
 				m_camera.posVDest.z += cosf(m_camera.rot.y - D3DX_PI * 0.5f) * fMove;
 				SetPosR();
 			}
 			if (pKeyboard->GetPress(DIK_D) == true)
-			{//右移動
+			{// 右移動
 				m_camera.posVDest.x += sinf(m_camera.rot.y - D3DX_PI * -0.5f) * fMove;
 				m_camera.posVDest.z += cosf(m_camera.rot.y - D3DX_PI * -0.5f) * fMove;
 				SetPosR();
 			}
 			if (pKeyboard->GetPress(DIK_W) == true)
-			{//前移動
+			{// 前移動
 				m_camera.posVDest.x -= sinf(m_camera.rot.x + D3DX_PI) * sinf(m_camera.rot.y) * fMove;
 				m_camera.posVDest.y += cosf(m_camera.rot.x + D3DX_PI) * MOVE_SPEED;
 				m_camera.posVDest.z -= sinf(m_camera.rot.x + D3DX_PI) * cosf(m_camera.rot.y) * fMove;
 				SetPosR();
 			}
 			if (pKeyboard->GetPress(DIK_S) == true)
-			{//後移動
+			{// 後移動
 				m_camera.posVDest.x -= sinf(m_camera.rot.x) * sinf(m_camera.rot.y) * fMove;
 				m_camera.posVDest.y += cosf(m_camera.rot.x) * MOVE_SPEED;
 				m_camera.posVDest.z -= sinf(m_camera.rot.x) * cosf(m_camera.rot.y) * fMove;
 				SetPosR();
 			}
 			if (pKeyboard->GetPress(DIK_E) == true)
-			{//上昇
+			{// 上昇
 				m_camera.posVDest.y += fMove;
 				SetPosR();
 			}
 			if (pKeyboard->GetPress(DIK_Q) == true)
-			{//下降
+			{// 下降
 				m_camera.posVDest.y -= fMove;
 				SetPosR();
 			}
@@ -234,13 +234,13 @@ void CCamera::FollowPlayer(void)
 //====================================================
 void CCamera::Quake(void)
 {
-	//画面振動
+	// 画面振動
 	if (m_camera.nTimerQuake > 0)
 	{
-		//時間を減らす
+		// 時間を減らす
 		m_camera.nTimerQuake--;
 
-		//視点注視点を動かしてカメラを揺らす
+		// 視点注視点を動かしてカメラを揺らす
 		m_camera.posV.x += (float)(rand() % 201 - 100) * m_camera.fQuakeSizeH * sinf(m_camera.rot.y);
 		m_camera.posV.y += (float)(rand() % 101 - 50) * m_camera.fQuakeSizeV;
 		m_camera.posV.z += (float)(rand() % 201 - 100) * m_camera.fQuakeSizeH * cosf(m_camera.rot.y);
@@ -249,7 +249,7 @@ void CCamera::Quake(void)
 		m_camera.posR.y += (float)(rand() % 101 - 50) * m_camera.fQuakeSizeV;
 		m_camera.posR.z += (float)(rand() % 201 - 100) * m_camera.fQuakeSizeH * cosf(m_camera.rot.y);
 
-		//徐々に揺れのサイズを小さくする
+		// 徐々に揺れのサイズを小さくする
 		m_camera.fQuakeSizeH += (0.0f - m_camera.fQuakeSizeH) * 0.03f;
 		m_camera.fQuakeSizeV += (0.0f - m_camera.fQuakeSizeV) * 0.03f;
 	}
@@ -262,10 +262,10 @@ void CCamera::SetQuake(float fQuakeSizeH, float fQuakeSizeV, int nTime)
 {
 	if (fQuakeSizeH > 0.0f && fQuakeSizeV > 0.0f)
 	{
-		//揺れる時間代入
+		// 揺れる時間代入
 		m_camera.nTimerQuake = nTime;
 
-		//揺れの大きさ代入
+		// 揺れの大きさ代入
 		m_camera.fQuakeSizeH = fQuakeSizeH;
 		m_camera.fQuakeSizeV = fQuakeSizeV;
 	}
@@ -305,37 +305,31 @@ void CCamera::SetCamera(void)
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
 
-	//プロジェクションマトリックス==================================================
-	//プロジェクションマトリックス初期化
+	// プロジェクションマトリックス==================================================
+	// プロジェクションマトリックス初期化
 	D3DXMatrixIdentity(&m_camera.mtxProjection);
 
-	//プロジェクションマトリックス作成
+	// プロジェクションマトリックス作成
 	D3DXMatrixPerspectiveFovLH(&m_camera.mtxProjection,
 		D3DXToRadian(m_camera.fViewAngle),
 		(float)SCREEN_WIDTH / (float)SCREEN_HEIGHT,
 		MIN_DRAW,
 		MAX_DRAW);
 
-	/*D3DXMatrixOrthoLH(&m_camera.mtxProjection,	// 平行投影のやり方
-		720,	// 高さ
-		1280,	// 幅
-		MIN_DRAW,
-		MAX_DRAW);*/
-
-	//マトリックス設定
+	// マトリックス設定
 	pDevice->SetTransform(D3DTS_PROJECTION,&m_camera.mtxProjection);
 
-	//ビューマトリックス============================================================
-	//ビューマトリックス初期化
+	// ビューマトリックス============================================================
+	// ビューマトリックス初期化
 	D3DXMatrixIdentity(&m_camera.mtxView);
 
-	//ビューマトリックス作成
+	// ビューマトリックス作成
 	D3DXMatrixLookAtLH(&m_camera.mtxView,
 		&m_camera.posV,
 		&m_camera.posR,
 		&m_camera.vecU);
 
-	//ビューマトリックス設定
+	// ビューマトリックス設定
 	pDevice->SetTransform(D3DTS_VIEW, &m_camera.mtxView);
 
 #ifdef _DEBUG

@@ -66,6 +66,10 @@ void CFollowPlayer::Update(CCamera *pCamera)
 
 	D3DXVECTOR3 pos = pPlayer->GetMtxPos(2);
 
+	pInfoCamera->rot.y = pPlayer->GetRotation().y + D3DX_PI;
+
+	universal::LimitRot(&pInfoCamera->rot.y);
+
 	pInfoCamera->posRDest = pos;
 
 	D3DXVECTOR3 vecPole = universal::PolarCoordinates(pInfoCamera->rot);

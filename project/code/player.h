@@ -16,6 +16,7 @@
 //*****************************************************
 // 前方宣言
 //*****************************************************
+class CBlock;
 
 //*****************************************************
 // クラスの定義
@@ -68,12 +69,14 @@ private:
 		float fSpeed;	// 現在の速度
 		float fSpeedDest;	// 目標速度
 		float fAngleHandle;	// ハンドルをきっている値
+		CBlock *pBlock;	// 掴んでいるブロック
 	};
 
 	void Load(void);
 	void Input(void);
 	void InputMove(void);
 	void InputCamera(void);
+	void InputWire(void);
 	void ManageSpeed(void);
 	void ManageState(void);
 	void ManageMotion(void);
