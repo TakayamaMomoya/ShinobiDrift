@@ -210,6 +210,9 @@
     <ClCompile Include="code\precompile.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
+    <ClCompile Include="code\timer.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\block.h">
@@ -388,6 +391,9 @@
     </ClInclude>
     <ClInclude Include="code\precompile.h">
       <Filter>ソース ファイル\base</Filter>
+    </ClInclude>
+    <ClInclude Include="code\timer.h">
+      <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

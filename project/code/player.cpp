@@ -27,7 +27,7 @@
 namespace
 {
 const std::string PATH_PARAM = "data\\TEXT\\playerParam.txt";	// パラメーターデータのパス
-const float fNotrot = 1.0f;	// 回転しないようにする速度
+const float NOTROTATE = 1.0f;		// 回転しないようにする値
 }
 
 //*****************************************************
@@ -387,7 +387,7 @@ void CPlayer::InputWire(void)
 //=====================================================
 void CPlayer::ManageSpeed(void)
 {
-	CSlow *pSlow = CSlow::GetInstance();
+	CSlow* pSlow = CSlow::GetInstance();
 
 	// スピードの増減
 	if (m_info.fSpeedDest >= m_info.fSpeed)
@@ -421,7 +421,7 @@ void CPlayer::ManageSpeed(void)
 		SetPosition(pos);
 	}
 
-	if (m_info.fSpeed >= fNotrot)
+	if (m_info.fSpeed >= NOTROTATE)
 	{// ハンドルの回転を追加
 		rot.y += m_info.fAngleHandle * m_param.fAngleMaxCurve;
 		universal::LimitRot(&rot.y);
