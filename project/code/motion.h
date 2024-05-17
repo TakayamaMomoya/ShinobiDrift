@@ -120,6 +120,7 @@ public:
 	virtual void Event(EVENT_INFO *pEventInfo) {};
 	void EnableMotion(int nIdx, bool bMotion);
 	void ResetEnableMotion(void);
+	D3DXVECTOR3 GetForward(void);
 
 private:
 	Parts *m_apParts[MAX_PARTS];	// パーツの構造体

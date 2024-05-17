@@ -14,7 +14,7 @@
 #include "slow.h"
 #include "manager.h"
 #include "camera.h"
-#include "cameraBehavior.h"
+#include "CameraState.h"
 #include "UIManager.h"
 #include "UI.h"
 #include "meshfield.h"

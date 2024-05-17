@@ -31,8 +31,9 @@
 #include "slow.h"
 #include "blockManager.h"
 #include "meshfield.h"
-#include "cameraBehavior.h"
+#include "CameraState.h"
 #include "particle.h"
+#include "timer.h"
 
 //*****************************************************
 // マクロ定義
@@ -84,6 +85,9 @@ HRESULT CGame::Init(void)
 		pRenderer->EnableFog(true);
 	}
 
+	// 
+	CBlockManager::Create();
+
 	// プレイヤーの生成
 	CPlayer::Create();
 
@@ -93,20 +97,8 @@ HRESULT CGame::Init(void)
 	// メッシュフィールド生成
 	CMeshField::Create();
 
-	D3DXVECTOR3 aPos[4] =
-	{
-		{0.0f,0.0f,15000.0f},
-		{22000.0f,0.0f,0.0f},
-		{0.0f,0.0f,-15000.0f},
-		{-7000.0f,0.0f,0.0f},
-	};
-	D3DXVECTOR3 aRot[4] =
-	{
-		{0.0f,0.0f,0.0f},
-		{0.0f,D3DX_PI * 0.5f,0.0f},
-		{0.0f,D3DX_PI,0.0f},
-		{0.0f,-D3DX_PI * 0.5f,0.0f},
-	};
+	// タイマー生成
+	CTimer::Create();
 
 	return S_OK;
 }
@@ -153,9 +145,9 @@ void CGame::Update(void)
 	// 状態管理
 	ManageState();
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 	Debug();
-//#endif
+#endif
 }
 
 //=====================================================
@@ -171,9 +163,6 @@ void CGame::UpdateCamera(void)
 	}
 
 	pCamera->Update();
-	pCamera->Quake();
-
-	pCamera->MoveDist(0.3f);
 }
 
 //=====================================================
@@ -240,11 +229,11 @@ void CGame::Debug(void)
 
 		if (m_bStop)
 		{
-			Camera::ChangeBehavior(new CMoveControl);
+			Camera::ChangeState(new CMoveControl);
 		}
 		else
 		{
-			Camera::ChangeBehavior(new CFollowPlayer);
+			Camera::ChangeState(new CFollowPlayer);
 		}
 	}
 }

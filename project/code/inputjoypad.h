@@ -84,6 +84,8 @@ public:
 	float GetJoyStickRY(int nPlayer);
 	bool GetLStickTrigger(DIRECTION direction, int nPlayer);
 	bool GetRStickTrigger(DIRECTION direction,int nPlayer);
+	float GetTriggerL(int nPlayer);
+	float GetTriggerR(int nPlayer);
 	D3DXVECTOR3 GetVecStickL(void);
 	void Vibration(int nPlayer, PADVIB state, float fVib, int nTime);
 	static CInputJoypad *GetInstance(void) { return m_pJoyPad; }
@@ -104,6 +106,8 @@ private:
 	bool m_abTrigggerRStick[MAX_PLAYER][DIRECTION_MAX];	// スティックのトリガー判定
 	bool m_abTriggerTB[MAX_PLAYER][TRIGGER_MAX];	// トリガーの判定
 	bool m_abPressTB[MAX_PLAYER][TRIGGER_MAX];	// プレスの判定
+	BYTE m_abyTriggerL[MAX_PLAYER];	// 左トリガー
+	BYTE m_abyTriggerR[MAX_PLAYER];	// 右トリガー
 
 	static CInputJoypad *m_pJoyPad;	// 自身のポインタ
 };

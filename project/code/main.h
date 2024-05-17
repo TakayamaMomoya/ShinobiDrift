@@ -10,12 +10,6 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include <windows.h>
-#include"d3dx9.h"
-#define DIRECTINPUT_VERSION (0x0800)						//ビルド時の警告対処用マクロ
-#include "dinput.h"
-#include "xaudio2.h"
-#include <assert.h>
 #include "universal.h"
 
 //*****************************************************
@@ -27,6 +21,20 @@
 #pragma comment(lib,"winmm.lib")
 #pragma comment(lib,"dinput8.lib")
 
+#ifndef _DEBUG
+#pragma comment(lib, "Effekseer.lib")
+#else
+#pragma comment(lib, "Effekseerd.lib")
+#endif
+#include <Effekseer.h>
+
+#ifndef _DEBUG
+#pragma comment(lib, "EffekseerRendererDX9.lib")
+#else
+#pragma comment(lib, "EffekseerRendererDX9d.lib")
+#endif
+#include <EffekseerRendererDX9.h>
+
 //*****************************************************
 //マクロ定義
 //*****************************************************
@@ -36,12 +44,14 @@
 #define FVF_VERTEX_2D			(D3DFVF_XYZRHW | D3DFVF_DIFFUSE | D3DFVF_TEX1)		// 頂点フォーマット設定
 #define FVF_VERTEX_3D			(D3DFVF_XYZ | D3DFVF_NORMAL | D3DFVF_DIFFUSE | D3DFVF_TEX1)		//頂点フォーマット設定
 #define NUM_PLAYER (4)	// プレイヤーの最大数
+#define MAX_STRING (256)	// 文字数の最大
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
+
 }
 
 //*****************************************************

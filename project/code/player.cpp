@@ -8,73 +8,26 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "main.h"
 #include "player.h"
-#include "collision.h"
-#include "motion.h"
-#include "inputManager.h"
-#include "inputkeyboard.h"
-#include "debugproc.h"
-#include "universal.h"
-#include "slow.h"
-#include "camera.h"
 #include "manager.h"
-#include "effect3D.h"
-#include "meshfield.h"
-#include "cameraBehavior.h"
-#include "particle.h"
-#include "debrisSpawner.h"
-#include "game.h"
-#include "animEffect3D.h"
-#include "anim3D.h"
+#include "cameraState.h"
+#include "camera.h"
+#include "slow.h"
+#include "inputManager.h"
+#include "inputjoypad.h"
 #include "pause.h"
-#include "inpact.h"
-#include "sound.h"
-#include "UIManager.h"
-#include "orbit.h"
+#include "debugproc.h"
+#include <string>
+#include "blockManager.h"
+#include "effect3D.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-const char* BODY_PATH = "data\\MOTION\\motionArms01.txt";	// 見た目のパス
-const float INITIAL_BOOST = 200.0f;	// ブースト残量の初期値
-const float REGEN_BOOST = 2.5f;	// ブースト回復量
-const float GRAVITY = 0.50f;	// 重力
-const float SPEED_ROLL_CAMERA = 0.03f;	// カメラ回転速度
-const float SPEED_BULLET = 200.0f;	// 弾速
-const float POW_JUMP = 20.0f;	// ジャンプ力
-const float POW_STAMP = 30.0f;	// 踏みつけの推進力
-const float SPEED_STAMP = 70.0f;	// 踏みつけ水平推進力
-const float SPEED_MOVE = 1.6f;	// 移動速度
-const float FACT_MOVE = 0.04f;	// 移動の減衰係数
-const float SPEED_ASSAULT = 7.0f;	// 突進の移動速度
-const float POW_ADDMELEE = 70.0f;	// 追撃の推進力
-const float SPEED_DODGE = 100.0f;	// 回避推進力
-const float POW_GRAB = 50.0f;	// 掴みの推進力
-const float RADIUS_GRAB = 500.0f;	// 掴みの判定
-const float POW_THROW = 200.0f;	// 投げの力
-const float LENGTH_LOCKON = 5000.0f;	// ロックオンの長さ
-const float ANGLE_LOCKON = D3DX_PI * 0.2f;	// ロックオンの角度
-const float MELEE_DIST = 500.0f;	// 格闘に移る距離
-const float MIN_ANGLE_CAMERA = D3DX_PI * 0.1f;	// カメラの下を見る制限
-const float MAX_ANGLE_CAMERA = D3DX_PI * 0.9f;	// カメラの上を見る制限
-const float DAMAGE_BULLET = 1.0f;	// 弾の威力
-const float DECREASE_PARAM = 2.0f;	// パラメータ全回復にかかる時間
-const D3DXVECTOR3 POS_PARAM[CPlayer::PARAM_MAX] =
-{// パラメータ表示の位置
-	{SCREEN_WIDTH * 0.5f - 370.0f,SCREEN_HEIGHT * 0.5f - 100.0f,0.0f},// 銃
-	{SCREEN_WIDTH * 0.5f + 370.0f,SCREEN_HEIGHT * 0.5f - 100.0f,0.0f},// 近接
-	{SCREEN_WIDTH * 0.5f + 370.0f,SCREEN_HEIGHT * 0.5f + 100.0f,0.0f},// 掴み
-};
-const char* PATH_PARAM[CPlayer::PARAM_MAX] =
-{// パラメータUIのテクスチャパス
-	"data\\TEXTURE\\UI\\frame00.png",
-	"data\\TEXTURE\\UI\\frame01.png",
-	"data\\TEXTURE\\UI\\frame02.png",
-};
-const int RAND_SHOT = 60;	// 射撃精度のランダム幅
+const std::string PATH_PARAM = "data\\TEXT\\playerParam.txt";	// パラメーターデータのパス
+const float NOTROTATE = 1.0f;		// 回転しないようにする値
 }
 
 //*****************************************************
@@ -125,67 +78,19 @@ CPlayer *CPlayer::Create(void)
 //=====================================================
 HRESULT CPlayer::Init(void)
 {
-	// モデルの設定
-	CMotion::Load((char*)BODY_PATH);
-
 	// 継承クラスの初期化
 	CMotion::Init();
-
-	m_info.rotDest = D3DXVECTOR3(0.0f, 1.57f, 0.0f);
-	SetRotation(D3DXVECTOR3(0.0f, -1.57f, 0.0f));
-
-	// 当たり判定の生成
-	if (m_info.pCollisionSphere == nullptr)
-	{
-		m_info.pCollisionSphere = CCollisionSphere::Create(CCollision::TAG_PLAYER, CCollision::TYPE_SPHERE, this);
-
-		if (m_info.pCollisionSphere != nullptr)
-		{
-			m_info.pCollisionSphere->SetRadius(50.0f);
-		}
-	}
-
-	if (m_info.pClsnAttack == nullptr)
-	{// 球の当たり判定生成
-		m_info.pClsnAttack = CCollisionSphere::Create(CCollision::TAG_NONE, CCollision::TYPE_SPHERE, this);
-
-		if (m_info.pClsnAttack != nullptr)
-		{// 情報の設定
-			m_info.pClsnAttack->SetPosition(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-			m_info.pClsnAttack->SetRadius(0.0f);
-		}
-	}
-
-	if (m_info.pCollisionCube == nullptr)
-	{// 当たり判定生成
-		m_info.pCollisionCube = CCollisionCube::Create(CCollision::TAG_PLAYER, this);
-
-		if (m_info.pCollisionCube != nullptr)
-		{
-			D3DXVECTOR3 vtxMax = { 20.0f,100.0f,20.0f };
-			D3DXVECTOR3 vtxMin = { -20.0f,0.0f,-20.0f };
-
-			m_info.pCollisionCube->SetPosition(GetPosition());
-
-			m_info.pCollisionCube->SetVtx(vtxMax, vtxMin);
-		}
-	}
-
-	// パラメーターに初期値を入れる
-	m_param.fInitialLife = 300.0f;
-	m_info.fLife = m_param.fInitialLife;
-	m_param.fSpeedMove = SPEED_MOVE;
-	m_param.fInitialBoost = INITIAL_BOOST;
-	m_info.state = STATE_NORMAL;
-	m_info.bLand = true;
 
 	SetMotion(MOTION_WALK_FRONT);
 
 	// カメラの行動設定
-	Camera::ChangeBehavior(new CFollowPlayer);
+	Camera::ChangeState(new CFollowPlayer);
 
 	// 読込
 	Load();
+
+	// モデルの設定
+	CMotion::Load(&m_param.aPathBody[0]);
 
 	return S_OK;
 }
@@ -195,25 +100,59 @@ HRESULT CPlayer::Init(void)
 //=====================================================
 void CPlayer::Load(void)
 {
-	char cTemp[256];
-	int nThruster = 0;
+	std::ifstream file(PATH_PARAM);
 
-	FILE *pFile = fopen("data\\TEXT\\playerParam.txt", "r");
-
-	if (pFile != nullptr)
+	if (file.is_open())
 	{
-		while (true)
-		{
-			// ここで読み込んだ文字によって下記のIFにかかる
-			(void)fscanf(pFile, "%s", &cTemp[0]);
+		std::string temp;
 
-			if (strcmp(cTemp, "END_SCRIPT") == 0)
-			{
+		while (std::getline(file, temp))
+		{// 読み込むものがなくなるまで読込
+			std::istringstream iss(temp);
+			std::string key;
+			iss >> key;
+
+			if (key == "BODY_PATH")
+			{// 見た目のパス
+				iss >> m_param.aPathBody;
+			}
+
+			if (key == "SPEED_MAX")
+			{// 最大速度
+				iss >> m_param.fSpeedMax;
+			}
+
+			if (key == "FACT_ACCELE")
+			{// 加速係数
+				iss >> m_param.fFactAccele;
+			}
+
+			if (key == "FACT_ATTENU")
+			{// 減速係数
+				iss >> m_param.fFactAttenu;
+			}
+
+			if (key == "FACT_BRAKE")
+			{// ブレーキ減速係数
+				iss >> m_param.fFactBrake;
+			}
+
+			if (key == "ANGLE_MAX_CURVE")
+			{// カーブ最大角度
+				iss >> m_param.fAngleMaxCurve;
+			}
+
+			if (file.eof())
+			{// 読み込み終了
 				break;
 			}
 		}
-
-		fclose(pFile);
+		
+		file.close();
+	}
+	else
+	{
+		assert(("ランキングファイルが開けませんでした", false));
 	}
 }
 
@@ -224,10 +163,6 @@ void CPlayer::Uninit(void)
 {
 	m_pPlayer = nullptr;
 
-	Object::DeleteObject((CObject**)&m_info.pCollisionSphere);
-	Object::DeleteObject((CObject**)&m_info.pCollisionCube);
-	Object::DeleteObject((CObject**)&m_info.pClsnAttack);
-
 	// 継承クラスの終了
 	CMotion::Uninit();
 }
@@ -237,44 +172,12 @@ void CPlayer::Uninit(void)
 //=====================================================
 void CPlayer::Update(void)
 {
-	CSlow *pSlow = CSlow::GetInstance();
+	// 入力
+	Input();
 
-	if (m_info.state != CPlayer::STATE::STATE_DEATH)
-	{
-		// 入力
-		Input();
-
-		// プレイヤーの回転
-		Rotation();
-	}
-
-	// 位置の反映
-	D3DXVECTOR3 pos = GetPosition();
-	D3DXVECTOR3 move = GetMove();
-	
 	// 前回の位置を保存
+	D3DXVECTOR3 pos = GetPosition();
 	SetPositionOld(pos);
-
-	if (pSlow != nullptr)
-	{
-		float fScale = pSlow->GetScale();
-
-		pos += move * fScale;
-		SetPosition(pos);
-	}
-	else
-	{
-		pos += move;
-		SetPosition(pos);
-	}
-
-	move.x += (0 - move.x) * 0.05f;
-	move.z += (0 - move.z) * 0.05f;
-
-	SetMove(move);
-
-	// 当たり判定の管理
-	ManageCollision();
 
 	// 状態管理
 	ManageState();
@@ -302,19 +205,19 @@ void CPlayer::Input(void)
 	// カメラ操作
 	InputCamera();
 
-	// 攻撃操作
-	InputAttack();
+	InputWire();
 
-	if (CManager::GetMode() == CScene::MODE_GAME)
+	// スピードの管理
+	ManageSpeed();
+
+
+	CInputManager *pInputManager = CInputManager::GetInstance();
+
+	if (pInputManager != nullptr)
 	{
-		CInputManager *pInputManager = CInputManager::GetInstance();
-
-		if (pInputManager != nullptr)
+		if (pInputManager->GetTrigger(CInputManager::BUTTON_PAUSE))
 		{
-			if (pInputManager->GetTrigger(CInputManager::BUTTON_PAUSE))
-			{
-				CPause::Create();
-			}
+			CPause::Create();
 		}
 	}
 }
@@ -332,104 +235,24 @@ void CPlayer::InputMove(void)
 		return;
 	}
 
-	// カメラ取得
-	CCamera *pCamera = CManager::GetCamera();
+	// アクセル値の取得
+	float fAccele = pInputManager->GetAccele();
 
-	if (pCamera == nullptr)
-	{
-		return;
-	}
+	m_info.fSpeedDest = fAccele * m_param.fSpeedMax;
 
-	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+	CDebugProc::GetInstance()->Print("\nアクセル値[%f]", fAccele);
 
-	// 目標方向の設定
+	// ハンドルの操作
 	CInputManager::SAxis axis = pInputManager->GetAxis();
-	D3DXVECTOR3 axisMove = axis.axisMove;
+	m_info.fAngleHandle = axis.axisMove.x;
 
-	float fLengthAxis = D3DXVec3Length(&axisMove);
+	// ブレーキ値の取得
+	float fBrake = pInputManager->GetBrake();
 
-	int nMotion = GetMotion();
+	m_info.fSpeed += (0.0f - m_info.fSpeed) * m_param.fFactBrake * fBrake;
 
-	if (fLengthAxis >= 0.3f)
-	{// 通常移動時の目標向き設定
-		m_info.rotDest.y = atan2f(axisMove.x, axisMove.z);
+	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
 
-		CDebugProc *pDebugProc = CDebugProc::GetInstance();
-
-		pDebugProc->Print("\n通常移動");
-	}
-
-	D3DXVECTOR3 vecMove = { 0.0f,0.0f,0.0f };
-	D3DXVECTOR3 rot = GetRotation();
-
-	if (m_fragMotion.bMove && fLengthAxis <= 0.3f)
-	{// 急停止フラグ
-		m_fragMotion.bStop = true;
-	}
-
-	fLengthAxis *= SPEED_MOVE;
-
-	vecMove -= {sinf(rot.y) * fLengthAxis, 0.0f, cosf(rot.y) * fLengthAxis};
-
-	// 移動速度の設定
-	D3DXVECTOR3 move = GetMove();
-
-	D3DXVec3Normalize(&vecMove, &vecMove);
-	vecMove *= m_param.fSpeedMove;
-
-	if (pSlow != nullptr)
-	{
-		float fScale = pSlow->GetScale();
-
-		vecMove *= fScale;
-	}
-
-	if (m_info.bLand)
-	{
-		if (pInputManager->GetTrigger(CInputManager::BUTTON_JUMP))
-		{// ジャンプ操作
-			m_fragMotion.bJump = true;
-			m_fragMotion.bMove = false;
-
-			Sound::Play(CSound::LABEL_SE_BOOST00);
-		};
-	}
-
-	float fAngleInput = atan2f(axisMove.x, axisMove.z);
-
-	move += vecMove;
-
-	SetMove(move);
-
-#ifdef _DEBUG
-	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
-
-	if (pKeyboard != nullptr)
-	{
-		if (pKeyboard->GetTrigger(DIK_RETURN))
-		{// スローにする
-			if (pSlow != nullptr)
-			{
-				pSlow->SetScale(0.25f);
-			}
-		}
-
-		if (pKeyboard->GetRelease(DIK_RETURN))
-		{// スロー解除
-			CSlow *pSlow = CSlow::GetInstance();
-
-			if (pSlow != nullptr)
-			{
-				pSlow->SetScale(1.0f);
-			}
-		}
-
-		if (pKeyboard->GetTrigger(DIK_O))
-		{// 可動パーツリセット
-			ResetEnableMotion();
-		}
-	}
-#endif
 }
 
 //=====================================================
@@ -454,76 +277,167 @@ void CPlayer::InputCamera(void)
 	}
 
 	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
-	
-	// 方向入力の取得
-	CInputManager::SAxis axis = pInputManager->GetAxis();
-	D3DXVECTOR3 axisCamera = axis.axisCamera;
-
-	// カメラの回転
-	pInfoCamera->rot.x += axisCamera.y * SPEED_ROLL_CAMERA;
-	pInfoCamera->rot.y += axisCamera.x * SPEED_ROLL_CAMERA;
-
-	universal::LimitValue(&pInfoCamera->rot.x, MAX_ANGLE_CAMERA, MIN_ANGLE_CAMERA);
-
-	universal::LimitRot(&pInfoCamera->rot.x);
-	universal::LimitRot(&pInfoCamera->rot.y);
 }
 
 //=====================================================
-// 攻撃の入力
+// ワイヤーの操作
 //=====================================================
-void CPlayer::InputAttack(void)
+void CPlayer::InputWire(void)
 {
-	CInputManager *pInputManager = CInputManager::GetInstance();
-	int nMotion = GetMotion();
+	CInputJoypad *pJoypad = CInputJoypad::GetInstance();
 
-	if (pInputManager == nullptr)
-	{
+	if (pJoypad == nullptr)
 		return;
-	}
-}
 
-//=====================================================
-// プレイヤーの回転
-//=====================================================
-void CPlayer::Rotation(void)
-{
-	// 移動方向の取得
-	D3DXVECTOR3 move = GetMove();
-
-	float fAngleMove = atan2f(-move.x, -move.z);
-	float fLenghtMove = sqrtf(move.x * move.x + move.z * move.z);
-
-	int nMotion = GetMotion();
-
-	if (fLenghtMove >= 6.0f)
+	D3DXVECTOR2 vecStickR =
 	{
-		// 向きの補正
-		D3DXVECTOR3 rot = GetRotation();
+		pJoypad->GetJoyStickRX(0),
+		pJoypad->GetJoyStickRY(0)
+	};
 
-		SetRotation(rot);
+	float fAngleInput = atan2f(vecStickR.x, vecStickR.y);
 
-		if (m_info.bLand)
+	universal::LimitRot(&fAngleInput);
+
+	CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+	// ブロックのチェック
+	CBlock *pBlock = pBlockManager->GetHead();
+	D3DXVECTOR3 posPlayer = GetPosition();
+	D3DXVECTOR3 rotCamera = CManager::GetCamera()->GetCamera()->rot;
+
+	float fAngle = fAngleInput + rotCamera.y + D3DX_PI;
+	universal::LimitRot(&fAngle);
+
+
+
+#ifdef _DEBUG
+	D3DXVECTOR3 pole = universal::PolarCoordinates(D3DXVECTOR3(GetRotation().x + D3DX_PI * 0.5f , fAngle, 0.0f));
+
+	D3DXVECTOR3 posEffect = GetPosition() + pole * 500.0f;
+
+	CEffect3D::Create(posEffect, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+#endif
+
+	CDebugProc::GetInstance()->Print("\nロックオン方向[%f]", fAngle);
+
+	CBlock *pBlockGrab = nullptr;
+	float fAngleMin = D3DX_PI;
+
+
+	float fLength = sqrtf(vecStickR.x * vecStickR.x + vecStickR.y * vecStickR.y);
+
+	if (m_info.pBlock != nullptr)
+	{
+		m_info.pBlock->EnableCurrent(true);
+	}
+
+	//if (pJoypad->GetPress(CInputJoypad::PADBUTTONS_LB, 0))
+	if (fLength > 0.5f)
+	{// 操作している判定
+		if (m_info.pBlock != nullptr)
 		{
-			m_fragMotion.bMove = true;
+			D3DXVECTOR3 posPlayer = GetPosition();
+
+			universal::LimitDistSphereInSide(1000.0f, &posPlayer, m_info.pBlock->GetPosition());
+
+			SetPosition(posPlayer);
 		}
 	}
 	else
 	{
-		m_fragMotion.bMove = false;
+		while (pBlock != nullptr)
+		{
+			// 次のアドレスを保存
+			CBlock *pBlockNext = pBlock->GetNext();
+
+			D3DXVECTOR3 posBlock = pBlock->GetPosition();
+			D3DXVECTOR3 vecDiff = posBlock - posPlayer;
+			float fAngleDiff = atan2f(vecDiff.x, vecDiff.z);
+			float fDiff = fAngle - fAngleDiff;
+
+			universal::LimitRot(&fDiff);
+
+			CDebugProc::GetInstance()->Print("\n目標の差分[%f]", fAngleDiff);
+			CDebugProc::GetInstance()->Print("\n角度の差分[%f]", fDiff);
+
+			pBlock->EnableCurrent(false);
+
+			if (fDiff * fDiff < fAngleMin * fAngleMin)
+			{
+				pBlockGrab = pBlock;
+
+				fAngleMin = fDiff;
+			}
+
+			// 次のアドレスを代入
+			pBlock = pBlockNext;
+		}
+
+		if (pBlockGrab != nullptr)
+		{
+			m_info.pBlock = pBlockGrab;
+		}
 	}
 
-	m_info.rotDest.x = 0.0f;
+}
 
-	// 向きの補正
+//=====================================================
+// スピードの管理
+//=====================================================
+void CPlayer::ManageSpeed(void)
+{
+	CSlow* pSlow = CSlow::GetInstance();
+
+	// スピードの増減
+	if (m_info.fSpeedDest >= m_info.fSpeed)
+	{// 加速しているとき
+		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAccele;
+
+		CDebugProc::GetInstance()->Print("\n加速中");
+	}
+	else
+	{// 減速しているとき
+		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAttenu;
+
+		CDebugProc::GetInstance()->Print("\n減速中");
+	}
+
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 move = GetMove();
 	D3DXVECTOR3 rot = GetRotation();
 
-	float fFact = 0.1f;
+	// スロー状態を考慮した移動量の調整
+	if (pSlow != nullptr)
+	{
+		float fScale = pSlow->GetScale();
 
-	universal::FactingRot(&rot.y, m_info.rotDest.y + D3DX_PI, fFact);
-	universal::FactingRot(&rot.x, m_info.rotDest.x, fFact);
+		pos += move * fScale;
+		SetPosition(pos);
+	}
+	else
+	{
+		pos += move;
+		SetPosition(pos);
+	}
+
+	if (m_info.fSpeed >= NOTROTATE)
+	{// ハンドルの回転を追加
+		rot.y += m_info.fAngleHandle * m_param.fAngleMaxCurve;
+		universal::LimitRot(&rot.y);
+	}
 
 	SetRotation(rot);
+
+	// 極座標が上を向いている分を補正
+	rot.x += D3DX_PI * 0.5f;
+
+	D3DXVECTOR3 vecForward = universal::PolarCoordinates(rot);
+
+	// 現在のスピードと前方ベクトルをかけて移動量に適用
+	move = vecForward * m_info.fSpeed;
+
+	SetMove(move);
 }
 
 //=====================================================
@@ -537,90 +451,8 @@ void CPlayer::ManageState(void)
 	{// 通常状態
 
 	}
-		break;
-	case STATE_DAMAGE:
-	{// ダメージ状態
-
-	}
-		break;
-	case STATE_DEATH:
-	{// 死亡状態
-
-	}
-		break;
 	default:
 		break;
-	}
-}
-
-//=====================================================
-// 当たり判定管理
-//=====================================================
-void CPlayer::ManageCollision(void)
-{
-	// 当たり判定の追従
-	if (m_info.pCollisionSphere != nullptr)
-	{
-		bool bLandMesh = false;
-		bool bLandBlock = false;
-		int nMotion = GetMotion();
-
-		D3DXVECTOR3 pos = GetPosition();
-		D3DXVECTOR3 posWaist = GetMtxPos(0);
-		D3DXVECTOR3 move = GetMove();
-
-		// 敵との接触判定
-		m_info.pCollisionSphere->SetPosition(posWaist + move);
-
-		if (m_info.pCollisionCube != nullptr)
-		{
-			pos = GetPosition();
-			D3DXVECTOR3 posCollision = m_info.pCollisionCube->GetPosition();
-
-			// 判定の追従
-			m_info.pCollisionCube->SetPositionOld(posCollision);
-			m_info.pCollisionCube->SetPosition(pos);
-
-			// ブロックとの押し出し判定
-			bLandBlock = m_info.pCollisionCube->CubeCollision(CCollision::TAG_BLOCK, &move);
-
-			// メッシュフィールドとの当たり判定
-			pos = GetPosition();
-			D3DXVECTOR3 posOld = GetPositionOld();
-
-			CMeshField *pMesh = CMeshField::GetInstance();
-
-			if (pMesh != nullptr)
-			{
-				float fHeight = pMesh->GetHeight(pos,&move);
-
-				if (pos.y <= fHeight)
-				{
-					pos.y = fHeight;
-					move.y = 0.0f;
-
-					SetPosition(pos);
-
-					bool bFinish = IsFinish();
-
-					bLandMesh = true;
-				}
-			}
-
-			SetMove(move);
-		}
-
-		m_info.pCollisionSphere->PushCollision(&pos, CCollision::TAG::TAG_FLOWER);
-
-		if (pos.y > 4000.0f)
-		{
-			pos.y = 4000.0f;
-		}
-
-		SetPosition(pos);
-
-		m_info.bLand = bLandMesh || bLandBlock;
-		m_fragMotion.bAir = !m_info.bLand;
 	}
 }
 
@@ -649,42 +481,6 @@ void CPlayer::ManageMotion(void)
 }
 
 //=====================================================
-// 前方に移動量を加える
-//=====================================================
-void CPlayer::AddMoveForward(float fSpeed)
-{
-	D3DXVECTOR3 move = GetMove();
-	D3DXVECTOR3 vecMove = { 0.0f,0.0f,0.0f };
-	D3DXVECTOR3 rot = GetRotation();
-
-	vecMove =
-	{
-		sinf(rot.x - D3DX_PI * 0.5f) * sinf(rot.y) * fSpeed,
-		cosf(rot.x - D3DX_PI * 0.5f) * fSpeed,
-		sinf(rot.x - D3DX_PI * 0.5f) * cosf(rot.y) * fSpeed
-	};
-
-	move += vecMove;
-
-	SetMove(move);
-}
-
-//=====================================================
-// 上に移動量を加える
-//=====================================================
-void CPlayer::AddMoveUp(float fSpeed)
-{
-	D3DXVECTOR3 move = GetMove();
-	D3DXVECTOR3 vecMove = { 0.0f,0.0f,0.0f };
-
-	vecMove.y += fSpeed;
-
-	move += vecMove;
-
-	SetMove(move);
-}
-
-//=====================================================
 // イベントの管理
 //=====================================================
 void CPlayer::Event(EVENT_INFO *pEventInfo)
@@ -708,9 +504,6 @@ void CPlayer::Draw(void)
 {
 	// 継承クラスの描画
 	CMotion::Draw();
-
-	// デバッグ表示
-	Debug();
 }
 
 //=====================================================
@@ -719,41 +512,6 @@ void CPlayer::Draw(void)
 void CPlayer::Hit(float fDamage)
 {
 
-}
-
-//=====================================================
-// 死亡処理
-//=====================================================
-void CPlayer::Death(void)
-{
-	CSound *pSound = CSound::GetInstance();
-
-	if (pSound != nullptr)
-	{
-		pSound->Stop(CSound::LABEL_SE_WARNING00);
-	}
-
-	Sound::Play(CSound::LABEL_SE_EXPLOSION01);
-
-	D3DXVECTOR3 pos = GetMtxPos(0);
-
-	// エフェクト発生
-	CAnimEffect3D *pAnimManager = CAnimEffect3D::GetInstance();
-
-	if (pAnimManager != nullptr)
-	{
-		CAnim3D *pAnim = pAnimManager->CreateEffect(pos, CAnimEffect3D::TYPE_EXPLOSION);
-
-		if (pAnim != nullptr)
-		{
-			pAnim->SetSize(600.0f, 600.0f);
-		}
-	}
-
-	// 破片生成
-	CDebrisSpawner::Create(pos, CDebrisSpawner::TYPE::TYPE_DEATH);
-	
-	Uninit();
 }
 
 //=====================================================
@@ -776,21 +534,6 @@ void CPlayer::Debug(void)
 
 	pDebugProc->Print("\nプレイヤーの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	pDebugProc->Print("\nプレイヤーの移動量[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
-	pDebugProc->Print("\n体力[%f]", m_info.fLife);
-	for (int i = 0; i < PARAM_MAX; i++)
-
-	int nMotion = GetMotion();
-
-	pDebugProc->Print("\n着地[%d]", m_info.bLand);
-	pDebugProc->Print("\n空中[%d]", m_fragMotion.bAir);
-
-	CInputKeyboard *pKey = CInputKeyboard::GetInstance();
-
-	if (pKey != nullptr)
-	{
-		if (pKey->GetTrigger(DIK_O))
-		{
-			m_info.fLife = 1.0f;
-		}
-	}
+	pDebugProc->Print("\n目標速度[%f]", m_info.fSpeedDest);
+	pDebugProc->Print("\n現在の速度[%f]", m_info.fSpeed);
 }

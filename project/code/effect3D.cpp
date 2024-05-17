@@ -51,6 +51,7 @@ HRESULT CEffect3D::Init(void)
 	CObject3D::Init();
 
 	SetMode(CObject3D::MODE_BILLBOARD);
+	EnableZtest(true);
 
 	return S_OK;
 }
@@ -160,10 +161,6 @@ void CEffect3D::Draw(void)
 		pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	}
 
-	//Zテストを無効化
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-
 	// アルファテストの無効化
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);
@@ -179,15 +176,10 @@ void CEffect3D::Draw(void)
 		SetVtx();
 	}
 
-	// 継承クラスの描画
 	CObject3D::Draw();
 
 	// ライティングを無効化
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-
-	//Zテストを有効にする
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
 	if (m_bAdd)
 	{

@@ -13,7 +13,6 @@
 #include "debugproc.h"
 #include "object.h"
 #include <stdio.h>
-#include "collision.h"
 #include "fade.h"
 #include "block.h"
 
