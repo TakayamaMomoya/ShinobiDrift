@@ -30,14 +30,18 @@ public:
 	~CTimer();	//	デストラクタ
 
 	//敵生成
-	static CTimer* Create(void);
+	static CTimer* Create();
 
-	HRESULT Init(void);
-	void Uninit(void);
-	void Update(void);
+	HRESULT Init();
+	void Uninit();
+	void Update();
+	void Set();
+	void Sub(int nTime) { m_nSeconds -= nTime; }
 
 private:
 	//メンバ変数
+	int m_nSeconds;		// 現在の時間
+	int m_nCntSeconds;	// カウント加算
 	CNumber* m_pNumber;	// ナンバーのポインタ
 };
 #endif
