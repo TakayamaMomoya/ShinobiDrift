@@ -17,6 +17,7 @@
 // 前方宣言
 //*****************************************************
 class CBlock;
+class CObject3D;
 
 //*****************************************************
 // クラスの定義
@@ -57,6 +58,7 @@ public:
 	void Draw(void);
 	void Hit(float fDamage);
 	SParam GetParam(void) { return m_param; }
+	CBlock *GetBlock(void) { return m_info.pBlock; }
 
 private:
 	struct SFragMotion
@@ -69,7 +71,14 @@ private:
 		float fSpeed;	// 現在の速度
 		float fSpeedDest;	// 目標速度
 		float fAngleHandle;	// ハンドルをきっている値
+		float fTimerFlip;	// ドリフトカウンター
+		int nCntFlip;	// 弾きカウンター
 		CBlock *pBlock;	// 掴んでいるブロック
+		CObject3D *pRoap;
+		float fCntAngle;	// アングルのカウンター
+		bool bGrabOld;
+		float fLengthDrift;
+		float fTimerDriftChange;
 	};
 
 	void Load(void);
@@ -77,6 +86,7 @@ private:
 	void InputMove(void);
 	void InputCamera(void);
 	void InputWire(void);
+	void LimitDrift(float fLength);
 	void ManageSpeed(void);
 	void ManageState(void);
 	void ManageMotion(void);

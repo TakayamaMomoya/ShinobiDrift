@@ -49,8 +49,10 @@ public:
 	static int GetNumAll(void) { return m_nNumAll; }
 	void SetPosition(D3DXVECTOR3 pos);
 	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }
+	bool CanGrab(D3DXVECTOR3 pos);
 
 private:
+
 	static int m_nNumAll;	// 総数
 	float m_fLife;	// 体力
 	int m_nIdx;	// 種類のインデックス

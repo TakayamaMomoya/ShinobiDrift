@@ -42,6 +42,7 @@ public:
 		D3DXVECTOR3 rot;	// 向き
 		float fViewAngle;	// 視野角
 		float fLength;	// 視点から注視点までの距離
+		float fRoll;	// ロール回転量
 		D3DXMATRIX mtxProjection;	// プロジェクションマトリックス
 		D3DXMATRIX mtxView;	// ビューマトリックス
 		int nTimerQuake;	// 振動のタイマー
@@ -66,6 +67,8 @@ public:
 	void ChangeState(CCameraState *pBehavior);
 	void SetPosV(void);
 	void SetPosR(void);
+	float GetRoll(void) { return m_camera.fRoll; }
+	void SetRoll(float fRoll) { m_camera.fRoll = fRoll; }
 
 private:
 	Camera m_camera;	// 構造体の情報
@@ -76,6 +79,9 @@ namespace Camera
 {
 // 行動の切り替え
 void ChangeState(CCameraState *pBehavior);
+
+// ロールの調整
+void ControlRoll(float fDist, float fFact);
 }
 
 #endif

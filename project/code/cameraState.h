@@ -40,10 +40,12 @@ private:
 class CFollowPlayer : public CCameraState
 {
 public:
-	CFollowPlayer() {};
+	CFollowPlayer() : m_fTimerPosR(0.0f) {};
 	void Update(CCamera *pCamera) override;
 
 private:
+	float m_fTimerPosR;
+	D3DXVECTOR3 m_rotROld;
 };
 
 // ëÄçÏ

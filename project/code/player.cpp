@@ -20,6 +20,7 @@
 #include <string>
 #include "blockManager.h"
 #include "effect3D.h"
+#include "object3D.h"
 
 //*****************************************************
 // 定数定義
@@ -28,6 +29,8 @@ namespace
 {
 const std::string PATH_PARAM = "data\\TEXT\\playerParam.txt";	// パラメーターデータのパス
 const float NOTROTATE = 1.0f;		// 回転しないようにする値
+const float DIST_LIMIT = 3000.0f;	// ワイヤー制限距離
+const float LINE_CORRECT_DRIFT = 40.0f;	// ドリフト補正のしきい値
 }
 
 //*****************************************************
@@ -91,6 +94,10 @@ HRESULT CPlayer::Init(void)
 
 	// モデルの設定
 	CMotion::Load(&m_param.aPathBody[0]);
+
+	m_info.pRoap = CObject3D::Create(GetPosition());
+
+	m_info.fLengthDrift = 1500.0f;
 
 	return S_OK;
 }
@@ -242,9 +249,12 @@ void CPlayer::InputMove(void)
 
 	CDebugProc::GetInstance()->Print("\nアクセル値[%f]", fAccele);
 
-	// ハンドルの操作
-	CInputManager::SAxis axis = pInputManager->GetAxis();
-	m_info.fAngleHandle = axis.axisMove.x;
+	if (m_info.pBlock == nullptr)
+	{
+		// ハンドルの操作
+		CInputManager::SAxis axis = pInputManager->GetAxis();
+		m_info.fAngleHandle = axis.axisMove.x;
+	}
 
 	// ブレーキ値の取得
 	float fBrake = pInputManager->GetBrake();
@@ -252,7 +262,6 @@ void CPlayer::InputMove(void)
 	m_info.fSpeed += (0.0f - m_info.fSpeed) * m_param.fFactBrake * fBrake;
 
 	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
-
 }
 
 //=====================================================
@@ -309,8 +318,6 @@ void CPlayer::InputWire(void)
 	float fAngle = fAngleInput + rotCamera.y + D3DX_PI;
 	universal::LimitRot(&fAngle);
 
-
-
 #ifdef _DEBUG
 	D3DXVECTOR3 pole = universal::PolarCoordinates(D3DXVECTOR3(GetRotation().x + D3DX_PI * 0.5f , fAngle, 0.0f));
 
@@ -333,53 +340,238 @@ void CPlayer::InputWire(void)
 	}
 
 	//if (pJoypad->GetPress(CInputJoypad::PADBUTTONS_LB, 0))
-	if (fLength > 0.5f)
-	{// 操作している判定
-		if (m_info.pBlock != nullptr)
-		{
+	if (m_info.pBlock != nullptr)
+	{
+		//if (fLength > 0.5f)
+		{// 操作している判定
 			D3DXVECTOR3 posPlayer = GetPosition();
+			D3DXVECTOR3 posBlock = m_info.pBlock->GetPosition();
+			D3DXVECTOR3 vecDiff = posBlock - posPlayer;
 
-			universal::LimitDistSphereInSide(1000.0f, &posPlayer, m_info.pBlock->GetPosition());
+			universal::VecConvertLength(&vecDiff, 20.0f);
 
-			SetPosition(posPlayer);
+			D3DXVECTOR3 move = GetMove();
+			D3DXVECTOR3 rot = GetRotation();
+
+			move += vecDiff;
+
+			SetMove(move);
+
+			float fAngleDiff = atan2f(vecDiff.x, vecDiff.z);
+			float fDiff = rot.y - fAngleDiff;
+
+			universal::LimitRot(&fDiff);
+
+			if (m_info.fTimerDriftChange > 0.0f)
+			{
+				m_info.fTimerDriftChange -= CManager::GetDeltaTime();
+
+				if (pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_DOWN, 0) ||
+					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_LEFT, 0) ||
+					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_UP, 0) ||
+					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_RIGHT, 0))
+				{// 弾いた瞬間
+					m_info.fTimerFlip = 0.8f;
+
+					m_info.nCntFlip++;
+
+					float fDiffInput = fAngle - fAngleDiff;
+
+					if(fDiffInput * fDiffInput < D3DX_PI * 0.4f * D3DX_PI * 0.4f)
+						m_info.fLengthDrift = 25.0f;
+				}
+				else
+				{
+					if (m_info.fTimerFlip > 0.0f)
+					{// 弾きタイマー減算
+						m_info.fTimerFlip -= CManager::GetDeltaTime();
+					}
+					else
+					{// 猶予時間が過ぎると弾きカウンターリセット
+						if (fLength <= 0.5f)
+						{// 何も掴んでいなければリセット
+							m_info.nCntFlip = 0;
+						}
+					}
+				}
+			}
+
+			//if (m_info.nCntFlip >= 1)
+			{
+				D3DXVECTOR3 rotDest = rot;
+
+				if (fDiff > 0.0f)
+				{
+					rotDest.y = fAngleDiff + D3DX_PI * 0.5f;
+
+					// カメラロール
+					//Camera::ControlRoll(0.3f, 0.04f);
+				}
+				else
+				{
+					rotDest.y = fAngleDiff - D3DX_PI * 0.5f;
+
+					// カメラロール
+					//Camera::ControlRoll(-0.3f, 0.04f);
+				}
+
+				universal::LimitRot(&rotDest.y);
+
+				universal::FactingRot(&rot.y, rotDest.y, 0.1f);
+
+				SetRotation(rot);
+
+				bool bGrab = m_info.pBlock->CanGrab(posPlayer);
+
+				if (!m_info.bGrabOld && bGrab)
+				{
+					m_info.nCntFlip = 0;
+					m_info.fCntAngle = 0.0f;
+
+					m_info.pBlock = nullptr;
+
+					m_info.fLengthDrift = 1500.0f;
+				}
+
+				m_info.bGrabOld = bGrab;
+
+				if (m_info.fLengthDrift <= 50.0f)
+				{
+					CEffect3D::Create(GetPosition(), 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+				}
+				else
+				{
+					CEffect3D::Create(GetPosition(), 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));
+				}
+
+				// ドリフトの補正
+				LimitDrift(m_info.fLengthDrift);
+			}
+			//else
+			{
+				//m_info.fAngleHandle *= 1.9f;
+
+				//CEffect3D::Create(GetPosition(), 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));
+			}
+
+			if (m_info.pRoap != nullptr)
+			{
+				LPDIRECT3DVERTEXBUFFER9 pVtxBuff = m_info.pRoap->GetVtxBuff();
+
+				//頂点情報のポインタ
+				VERTEX_3D *pVtx;
+
+				//頂点バッファをロックし、頂点情報へのポインタを取得
+				pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+				//頂点座標の設定
+				float fHeight = 100.0f;
+
+				D3DXVECTOR3 vec = { vecDiff.z, 0.0f, -vecDiff.x };
+
+				D3DXVec3Normalize(&vec, &vec);
+
+				pVtx[0].pos = D3DXVECTOR3(posBlock.x - vec.x * 20.0f, fHeight, posBlock.z);
+				pVtx[1].pos = D3DXVECTOR3(posBlock.x + vec.x * 20.0f, fHeight, posBlock.z);
+				pVtx[2].pos = D3DXVECTOR3(posPlayer.x - vec.x * 20.0f, fHeight, posPlayer.z);
+				pVtx[3].pos = D3DXVECTOR3(posPlayer.x + vec.x * 20.0f, fHeight, posPlayer.z);
+
+				//頂点バッファをアンロック
+				pVtxBuff->Unlock();
+			}
+
 		}
 	}
 	else
 	{
-		while (pBlock != nullptr)
+		// カメラのロール値をまっすぐに戻す
+		Camera::ControlRoll(0.0f, 0.1f);
+
+		//if (m_info.nCntFlip == 0)
 		{
-			// 次のアドレスを保存
-			CBlock *pBlockNext = pBlock->GetNext();
-
-			D3DXVECTOR3 posBlock = pBlock->GetPosition();
-			D3DXVECTOR3 vecDiff = posBlock - posPlayer;
-			float fAngleDiff = atan2f(vecDiff.x, vecDiff.z);
-			float fDiff = fAngle - fAngleDiff;
-
-			universal::LimitRot(&fDiff);
-
-			CDebugProc::GetInstance()->Print("\n目標の差分[%f]", fAngleDiff);
-			CDebugProc::GetInstance()->Print("\n角度の差分[%f]", fDiff);
-
-			pBlock->EnableCurrent(false);
-
-			if (fDiff * fDiff < fAngleMin * fAngleMin)
+			while (pBlock != nullptr)
 			{
-				pBlockGrab = pBlock;
+				// 次のアドレスを保存
+				CBlock *pBlockNext = pBlock->GetNext();
 
-				fAngleMin = fDiff;
+				D3DXVECTOR3 posBlock = pBlock->GetPosition();
+				D3DXVECTOR3 vecDiff = posBlock - posPlayer;
+				float fAngleDiff = atan2f(vecDiff.x, vecDiff.z);
+				float fDiff = fAngle - fAngleDiff;
+
+				universal::LimitRot(&fDiff);
+
+				pBlock->EnableCurrent(false);
+
+				if (fDiff * fDiff < fAngleMin * fAngleMin)
+				{
+					float fLengthDiff = sqrtf(vecDiff.x * vecDiff.x + vecDiff.z * vecDiff.z);
+
+					if (/*pBlock->CanGrab(posPlayer) && */fLengthDiff <= DIST_LIMIT)
+					{
+						pBlockGrab = pBlock;
+
+						fAngleMin = fDiff;
+					}
+				}
+
+				// 次のアドレスを代入
+				pBlock = pBlockNext;
 			}
 
-			// 次のアドレスを代入
-			pBlock = pBlockNext;
-		}
+			if (pBlockGrab != nullptr)
+			{
+				if (pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_DOWN, 0) ||
+					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_LEFT, 0) ||
+					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_UP, 0) ||
+					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_RIGHT, 0))
+				{// 弾いた瞬間
+					m_info.pBlock = pBlockGrab;
 
-		if (pBlockGrab != nullptr)
-		{
-			m_info.pBlock = pBlockGrab;
+					m_info.fTimerDriftChange = 0.7f;
+				}
+			}
 		}
 	}
 
+}
+
+//=====================================================
+// ドリフトの補正
+//=====================================================
+void CPlayer::LimitDrift(float fLength)
+{
+	if (m_info.pBlock == nullptr)
+		return;
+
+	D3DXVECTOR3 posPlayer = GetPosition();
+	D3DXVECTOR3 posBlock = m_info.pBlock->GetPosition();
+	D3DXVECTOR3 vecDiff = posPlayer - posBlock;
+
+	vecDiff.y = 0.0f;
+
+	float fLengthDiff = sqrtf(vecDiff.x * vecDiff.x + vecDiff.z * vecDiff.z);
+
+	if (fLengthDiff < DIST_LIMIT - LINE_CORRECT_DRIFT)
+	{
+		//m_info.fAngleHandle = 0.2f;
+
+		/*universal::VecConvertLength(&vecDiff, fLength);
+
+		D3DXVECTOR3 posDest = posBlock + vecDiff;
+
+		universal::MoveToDest(&posPlayer, posDest, 0.1f);
+
+		SetPosition(posPlayer);*/
+	}
+	/*else if(fLengthDiff >= fLength + LINE_CORRECT_DRIFT)
+	{
+		m_info.fAngleHandle = 0.2f;
+	}
+	else
+	{
+		m_info.fAngleHandle = 0.0f;
+	}*/
 }
 
 //=====================================================
@@ -534,6 +726,9 @@ void CPlayer::Debug(void)
 
 	pDebugProc->Print("\nプレイヤーの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	pDebugProc->Print("\nプレイヤーの移動量[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
+	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);
 	pDebugProc->Print("\n目標速度[%f]", m_info.fSpeedDest);
 	pDebugProc->Print("\n現在の速度[%f]", m_info.fSpeed);
+	pDebugProc->Print("\n弾きカウンター[%d]", m_info.nCntFlip);
+	pDebugProc->Print("\n角度カウンター[%f]", m_info.fCntAngle);
 }
