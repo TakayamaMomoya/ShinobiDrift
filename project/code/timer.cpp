@@ -9,6 +9,8 @@
 // インクルード
 //*****************************************************
 #include "timer.h"
+#include "manager.h"
+#include "debugproc.h"
 
 //*****************************************************
 // 定数定義
@@ -30,6 +32,9 @@ namespace
 //=====================================================
 CTimer::CTimer(int nPriority)
 {
+	m_nSeconds = 0;		// 現在の時間
+	m_nCntSeconds = 0;	// カウント加算
+	m_pNumber = nullptr;	// ナンバーのポインタ
 }
 
 //=====================================================
@@ -58,6 +63,8 @@ CTimer* CTimer::Create(void)
 //=====================================================
 HRESULT CTimer::Init(void)
 {
+	m_nSeconds = VALUE;
+
 	// 生成
 	m_pNumber = CNumber::Create(PLACE, VALUE);
 
@@ -86,4 +93,45 @@ void CTimer::Uninit(void)
 //=====================================================
 void CTimer::Update(void)
 {
+	// デルタタイム取得
+	float fDeltaTime = CManager::GetDeltaTime();
+
+	// カウンター加算
+	m_nCntSeconds++;
+
+	if (m_nCntSeconds > 60)
+	{
+		m_nCntSeconds = 0;
+
+		if (m_nSeconds >= 1)
+		{
+			m_nSeconds--;
+		}
+	}
+
+	// 秒の計算
+	int nSecond = m_nSeconds % VALUE;
+
+	if (m_pNumber != nullptr)
+	{// 秒表示の制御
+		m_pNumber->SetValue(nSecond, PLACE);
+	}
+
+	if (m_nSeconds <= 0)
+	{
+		m_nSeconds = 0;
+	}
+}
+
+//=====================================================
+// 設定
+//=====================================================
+void CTimer::Set()
+{
+	int nSeconds = m_nSeconds % 60;
+
+	if (m_pNumber != nullptr)
+	{
+		m_pNumber->SetValue(nSeconds, PLACE);
+	}
 }
