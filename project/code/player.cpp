@@ -99,6 +99,8 @@ HRESULT CPlayer::Init(void)
 
 	m_info.fLengthDrift = 1500.0f;
 
+	m_info.bGrabOld = true;
+
 	return S_OK;
 }
 
@@ -326,7 +328,6 @@ void CPlayer::InputWire(void)
 	CEffect3D::Create(posEffect, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 #endif
 
-	CDebugProc::GetInstance()->Print("\nロックオン方向[%f]", fAngle);
 
 	CBlock *pBlockGrab = nullptr;
 	float fAngleMin = D3DX_PI;
@@ -388,7 +389,7 @@ void CPlayer::InputWire(void)
 					}
 					else
 					{// 猶予時間が過ぎると弾きカウンターリセット
-						if (fLength <= 0.5f)
+						//if (fLength <= 0.5f)
 						{// 何も掴んでいなければリセット
 							m_info.nCntFlip = 0;
 						}
@@ -534,6 +535,8 @@ void CPlayer::InputWire(void)
 		}
 	}
 
+	CDebugProc::GetInstance()->Print("\n掴んでるブロックはある？[%d]", m_info.pBlock != nullptr);
+	CDebugProc::GetInstance()->Print("\nロックオン方向[%f]", fAngle);
 }
 
 //=====================================================
