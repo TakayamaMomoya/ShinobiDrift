@@ -1,6 +1,6 @@
 //*****************************************************
 //
-// エディターの処理[edit.h]
+// ブロックエディターの処理[editBlock.h]
 // Author:髙山桃也
 //
 //*****************************************************
@@ -10,6 +10,7 @@
 //*****************************************************
 #include "main.h"
 #include "block.h"
+#include "edit.h"
 
 //*****************************************************
 // 前方宣言
@@ -19,24 +20,28 @@ class CObjectX;
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CEdit
+class CEditBlock : public CEdit
 {
 public:
-	CEdit();	// コンストラクタ
-	~CEdit();	// デストラクタ
+	CEditBlock();	// コンストラクタ
+	~CEditBlock();	// デストラクタ
 
-	static CEdit *Create(void);
+	static CEditBlock *Create(void);
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
-	D3DXVECTOR3 GetPosition(void) { return m_pos; }
-	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
-	D3DXVECTOR3 GetRotation(void) { return m_rot; }
-	void SetRotation(D3DXVECTOR3 rot) { m_rot = rot; }
-	static CEdit *GetInstatnce(void) { return m_pEdit; }
+	static CEditBlock *GetInstatnce(void) { return m_pEdit; }
 
 private:
+	void LoopCursor(void);
+	void CreateBlock(D3DXVECTOR3 pos);
+	CBlock *CheckDelete(void);
+
 	D3DXVECTOR3 m_pos;	// 位置
 	D3DXVECTOR3 m_rot;	// 向き
-	static CEdit *m_pEdit;	// 自身のポインタ
+	CObjectX *m_pObjectCursor;	// カーソルのオブジェクトXへのポインタ
+	int m_nIdxObject;
+	char m_aPath[256];
+	CBlock::TYPE m_type;
+	static CEditBlock *m_pEdit;	// 自身のポインタ
 };

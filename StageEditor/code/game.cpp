@@ -23,7 +23,7 @@
 #include "object3D.h"
 #include "texture.h"
 #include "skybox.h"
-#include "edit.h"
+#include "editBlock.h"
 #include "block.h"
 #include "renderer.h"
 #include "animEffect3D.h"
@@ -89,7 +89,7 @@ HRESULT CGame::Init(void)
 	CBlockManager::Create();
 
 	// エディットの生成
-	CEdit::Create();
+	CEditBlock::Create();
 
 	// フォグをかける
 	CRenderer *pRenderer = CRenderer::GetInstance();
@@ -142,7 +142,7 @@ void CGame::Update(void)
 		CObject::UpdateNotStop();
 
 		// エディットの更新
-		CEdit* pEdit = CEdit::GetInstatnce();
+		CEditBlock* pEdit = CEditBlock::GetInstatnce();
 
 		if (pEdit != nullptr)
 		{
