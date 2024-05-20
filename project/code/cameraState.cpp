@@ -116,7 +116,7 @@ void CFollowPlayer::Update(CCamera *pCamera)
 		//pInfoCamera->posV = pInfoCamera->posVDest;
 		//pInfoCamera->posR = pInfoCamera->posRDest;
 
-		pInfoCamera->posR.y = 200.0f;
+		                                                                                                                                                //pInfoCamera->posR.y = 200.0f;
 	}
 	else
 	{

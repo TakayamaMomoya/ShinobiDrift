@@ -406,14 +406,14 @@ void CPlayer::InputWire(void)
 					rotDest.y = fAngleDiff + D3DX_PI * 0.5f;
 
 					// カメラロール
-					//Camera::ControlRoll(0.3f, 0.04f);
+					Camera::ControlRoll(0.3f, 0.04f);
 				}
 				else
 				{
 					rotDest.y = fAngleDiff - D3DX_PI * 0.5f;
 
 					// カメラロール
-					//Camera::ControlRoll(-0.3f, 0.04f);
+					Camera::ControlRoll(-0.3f, 0.04f);
 				}
 
 				universal::LimitRot(&rotDest.y);
