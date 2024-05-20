@@ -87,10 +87,7 @@ HRESULT CGame::Init(void)
 
 	// ブロック管理の生成
 	CBlockManager::Create();
-
-	// エディットの生成
-	CEditBlock::Create();
-
+	
 	// フォグをかける
 	CRenderer *pRenderer = CRenderer::GetInstance();
 
@@ -140,14 +137,6 @@ void CGame::Update(void)
 	{
 		// 停止しないオブジェクトの更新
 		CObject::UpdateNotStop();
-
-		// エディットの更新
-		CEditBlock* pEdit = CEditBlock::GetInstatnce();
-
-		if (pEdit != nullptr)
-		{
-			pEdit->Update();
-		}
 
 		CPause *pPause = CPause::GetInstance();
 

@@ -1,6 +1,6 @@
 //*****************************************************
 //
-// ブロックエディターの処理[editBlock.h]
+// メッシュエディターの処理[editMesh.h]
 // Author:髙山桃也
 //
 //*****************************************************
@@ -15,33 +15,21 @@
 //*****************************************************
 // 前方宣言
 //*****************************************************
-class CObjectX;
+class CObject3D;
 
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CEditBlock : public CEdit
+class CEditMesh : public CEdit
 {
 public:
-	CEditBlock();	// コンストラクタ
-	~CEditBlock();	// デストラクタ
+	CEditMesh();
+	~CEditMesh();
 
-	static CEditBlock *Create(void);
-	HRESULT Init(void);
-	void Uninit(void);
-	void Update(void);
-	static CEditBlock *GetInstatnce(void) { return m_pEdit; }
+	HRESULT Init(void) override;
+	void Uninit(void) override;
+	void Update(void) override;
 
 private:
-	void LoopCursor(void);
-	void CreateBlock(D3DXVECTOR3 pos);
-	CBlock *CheckDelete(void);
-
-	D3DXVECTOR3 m_pos;	// 位置
-	D3DXVECTOR3 m_rot;	// 向き
-	CObjectX *m_pObjectCursor;	// カーソルのオブジェクトXへのポインタ
-	int m_nIdxObject;
-	char m_aPath[256];
-	CBlock::TYPE m_type;
-	static CEditBlock *m_pEdit;	// 自身のポインタ
+	CObject3D *m_pMesh;	// メッシュのポインタ
 };

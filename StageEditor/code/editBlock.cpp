@@ -24,11 +24,6 @@
 #define SPEED_MOVE	(1.0f)	// 移動速度
 #define SPEED_ROTATION	(0.01f)	// 回転
 
-//*****************************************************
-// 静的メンバ変数宣言
-//*****************************************************
-CEditBlock *CEditBlock::m_pEdit = nullptr;	// 自身のポインタ
-
 //=====================================================
 // コンストラクタ
 //=====================================================
@@ -47,22 +42,6 @@ CEditBlock::CEditBlock()
 CEditBlock::~CEditBlock()
 {
 
-}
-
-//=====================================================
-// 生成処理
-//=====================================================
-CEditBlock *CEditBlock::Create(void)
-{
-	if (m_pEdit == nullptr)
-	{// インスタンス生成
-		m_pEdit = new CEditBlock;
-
-		// 初期化処理
-		m_pEdit->Init();
-	}
-
-	return m_pEdit;
 }
 
 //=====================================================
@@ -109,8 +88,6 @@ void CEditBlock::Uninit(void)
 		m_pObjectCursor->Uninit();
 		m_pObjectCursor = nullptr;
 	}
-
-	m_pEdit = nullptr;
 
 	CEdit::Uninit();
 }

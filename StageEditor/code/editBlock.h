@@ -26,11 +26,9 @@ public:
 	CEditBlock();	// コンストラクタ
 	~CEditBlock();	// デストラクタ
 
-	static CEditBlock *Create(void);
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
-	static CEditBlock *GetInstatnce(void) { return m_pEdit; }
 
 private:
 	void LoopCursor(void);
@@ -43,5 +41,4 @@ private:
 	int m_nIdxObject;
 	char m_aPath[256];
 	CBlock::TYPE m_type;
-	static CEditBlock *m_pEdit;	// 自身のポインタ
 };
