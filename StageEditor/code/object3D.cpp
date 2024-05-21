@@ -114,6 +114,21 @@ LPDIRECT3DVERTEXBUFFER9 CObject3D::CreateVtxBuff(int nNum)
 		&m_pVtxBuff,
 		nullptr);
 
+	//頂点情報のポインタ
+	VERTEX_3D *pVtx;
+
+	//頂点バッファをロックし、頂点情報へのポインタを取得
+	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int i = 0; i < nNum; i++)
+	{// 情報の初期化
+		pVtx[i].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
+		pVtx[i].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+
+	//頂点バッファをアンロック
+	m_pVtxBuff->Unlock();
+
 	return m_pVtxBuff;
 }
 

@@ -11,6 +11,7 @@
 #include "meshRoad.h"
 #include "renderer.h"
 #include "texture.h"
+#include "effect3D.h"
 
 //*****************************************************
 // 定数定義
@@ -20,6 +21,7 @@ namespace
 const UINT NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
 const float WIDTH_DEFAULT = 200.0f;	// デフォルトの幅
 const float LENGTH_DEFAULT = 200.0f;	// デフォルトの長さ
+const int NUM_VTX_IN_EDGE = 2;	// 一辺にある頂点数
 }
 
 //*****************************************************
@@ -75,52 +77,10 @@ HRESULT CMeshRoad::Init(void)
 	// リストの初期化
 	m_listEdge.clear();
 
-	SInfoEdge info;
+	m_nNumVtx = 4;
 
-	info.pos = { 0.0f,0.0f,0.0f };
-	m_listEdge.push_back(info);
-	
-	info.pos = { 100.0f,0.0f,500.0f };
-	m_listEdge.push_back(info);
-
-	// 頂点の生成
-	m_nNumVtx = m_listEdge.size() * 2;
-	CreateVtxBuff(m_nNumVtx);
-
-	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
-
-	// 頂点情報のポインタ
-	VERTEX_3D *pVtx;
-
-	// 頂点バッファをロックし、頂点情報へのポインタを取得
-	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-	// 頂点座標の設定
-	pVtx[0].pos = D3DXVECTOR3(-WIDTH_DEFAULT, 0.0f, LENGTH_DEFAULT);
-	pVtx[1].pos = D3DXVECTOR3(WIDTH_DEFAULT, 0.0f, LENGTH_DEFAULT);
-	pVtx[2].pos = D3DXVECTOR3(-WIDTH_DEFAULT, 0.0f, -LENGTH_DEFAULT);
-	pVtx[3].pos = D3DXVECTOR3(WIDTH_DEFAULT, 0.0f, -LENGTH_DEFAULT);
-
-	// 法線ベクトルの設定
-	pVtx[0].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[1].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[2].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	pVtx[3].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-
-	// 頂点カラーの設定
-	pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[2].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-	pVtx[3].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
-
-	// テクスチャ座標
-	pVtx[0].tex = D3DXVECTOR2(0.0f, 0.0f);
-	pVtx[1].tex = D3DXVECTOR2(1.0f, 0.0f);
-	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
-	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
-
-	// 頂点バッファをアンロック
-	pVtxBuff->Unlock();
+	AddEdge(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f, true);
+	AddEdge(D3DXVECTOR3(100.0f, 0.0f, 500.0f), 0.0f, true);
 
 	return S_OK;
 }
@@ -192,4 +152,56 @@ void CMeshRoad::Draw(void)
 
 	// 描画
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, m_nNumVtx - 2);
+}
+
+//=====================================================
+// 辺の追加
+//=====================================================
+void CMeshRoad::AddEdge(D3DXVECTOR3 pos, float fRot, bool bReCreateVtx)
+{
+	// リストに情報を追加
+	SInfoEdge info;
+	info.pos = pos;
+	info.fRot = fRot;
+
+	m_listEdge.push_back(info);
+
+	if(bReCreateVtx)	// 辺に応じた頂点の再生成
+		CreateVtxBuffEdge();
+}
+
+//=====================================================
+// 辺に応じた頂点の生成
+//=====================================================
+void CMeshRoad::CreateVtxBuffEdge(void)
+{
+	// 頂点の生成
+	m_nNumVtx = m_listEdge.size() * NUM_VTX_IN_EDGE;
+	CreateVtxBuff(m_nNumVtx);
+
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
+	VERTEX_3D *pVtx;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点位置を辺に合わせる
+	int nCntEdge = 0;
+	for (const auto& edge : m_listEdge)
+	{
+		int nIdx = nCntEdge * NUM_VTX_IN_EDGE;	// 頂点の番号計算
+
+		// 頂点位置の計算
+		D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, edge.fRot, 0.0f));
+		CEffect3D::Create(edge.pos + vecPole * WIDTH_DEFAULT, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+		CEffect3D::Create(edge.pos - vecPole * WIDTH_DEFAULT, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
+		pVtx[nIdx].pos = edge.pos + vecPole * WIDTH_DEFAULT;
+		pVtx[nIdx + 1].pos = edge.pos - vecPole * WIDTH_DEFAULT;
+
+		nCntEdge++;
+	}
+
+	// 頂点バッファをアンロック
+	pVtxBuff->Unlock();
 }

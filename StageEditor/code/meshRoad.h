@@ -30,6 +30,8 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
+	void AddEdge(D3DXVECTOR3 pos, float fRot,bool bReCreateVtx = false);
+	void CreateVtxBuffEdge(void);	// エッジ数に応じて頂点を生成する
 
 private:
 	struct SInfoEdge
