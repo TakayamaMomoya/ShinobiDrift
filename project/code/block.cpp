@@ -15,8 +15,8 @@
 #include "manager.h"
 #include "object.h"
 #include "debrisSpawner.h"
-#include <stdio.h>
 #include "effect3D.h"
+#include "debugproc.h"
 
 //*****************************************************
 // 定数定義
@@ -25,6 +25,7 @@ namespace
 {
 	const float SPEED_MOVE(1.0f);	// 移動速度
 	const char* MAP_FILE = "data\\MAP\\map01.bin";	// マップのファイルパス
+	const float RADIUS_DRIFT_DEFAULT = 1000.0f;	// ドリフト半径のデフォルト値
 }
 
 //*****************************************************
@@ -201,6 +202,31 @@ void CBlock::Update(void)
 	{
 		CEffect3D::Create(GetPosition(),200.0f,5,D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
 	}
+}
+
+//=====================================================
+// 掴めるかの判定
+//=====================================================
+bool CBlock::CanGrab(D3DXVECTOR3 pos)
+{
+	bool bCanGrab = true;
+
+	// 判定の設置
+	D3DXMATRIX mtxVec;
+	D3DXMATRIX mtx = *GetMatrix();
+	universal::SetOffSet(&mtxVec, mtx, D3DXVECTOR3(200.0f, 0.0f, 0.0f));
+
+	D3DXVECTOR3 posMtx = { mtxVec._41,mtxVec._42 ,mtxVec._43 };
+
+#ifdef _DEBUG
+	CEffect3D::Create(posMtx, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+#endif
+
+	bCanGrab = universal::IsCross(pos, GetPosition(), posMtx, nullptr);
+
+	CDebugProc::GetInstance()->Print("\n掴める[%d]", bCanGrab);
+
+	return bCanGrab;
 }
 
 //=====================================================

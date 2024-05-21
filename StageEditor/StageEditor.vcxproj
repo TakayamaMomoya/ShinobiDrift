@@ -94,7 +94,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <DisableSpecificWarnings>;26812;</DisableSpecificWarnings>
     </ClCompile>
     <Link>
@@ -169,6 +169,8 @@
     <ClCompile Include="code\collision.cpp" />
     <ClCompile Include="code\debugproc.cpp" />
     <ClCompile Include="code\edit.cpp" />
+    <ClCompile Include="code\editBlock.cpp" />
+    <ClCompile Include="code\editMesh.cpp" />
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
     <ClCompile Include="code\fade.cpp" />
@@ -190,6 +192,7 @@
     <ClCompile Include="code\main.cpp" />
     <ClCompile Include="code\manager.cpp" />
     <ClCompile Include="code\meshcylinder.cpp" />
+    <ClCompile Include="code\meshRoad.cpp" />
     <ClCompile Include="code\model.cpp" />
     <ClCompile Include="code\motion.cpp" />
     <ClCompile Include="code\number.cpp" />
@@ -232,6 +235,8 @@
     <ClInclude Include="code\collision.h" />
     <ClInclude Include="code\debugproc.h" />
     <ClInclude Include="code\edit.h" />
+    <ClInclude Include="code\editBlock.h" />
+    <ClInclude Include="code\editMesh.h" />
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
     <ClInclude Include="code\fade.h" />
@@ -254,6 +259,7 @@
     <ClInclude Include="code\main.h" />
     <ClInclude Include="code\manager.h" />
     <ClInclude Include="code\meshcylinder.h" />
+    <ClInclude Include="code\meshRoad.h" />
     <ClInclude Include="code\model.h" />
     <ClInclude Include="code\motion.h" />
     <ClInclude Include="code\number.h" />

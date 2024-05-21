@@ -15,6 +15,8 @@
 #include "inputmouse.h"
 #include "inputkeyboard.h"
 #include "debugproc.h"
+#include "block.h"
+#include "manager.h"
 
 //*****************************************************
 // 定数定義
@@ -64,20 +66,79 @@ void CFollowPlayer::Update(CCamera *pCamera)
 		return;
 	}
 
+	pInfoCamera->fLength = 2500.0f;
+
 	D3DXVECTOR3 pos = pPlayer->GetMtxPos(2);
 
-	pInfoCamera->rot.y = pPlayer->GetRotation().y + D3DX_PI;
+	// 注視点の設定
+	CBlock *pBlock = pPlayer->GetBlock();
 
-	universal::LimitRot(&pInfoCamera->rot.y);
+	if (pBlock != nullptr)
+	{// ブロックを掴んでいる場合、中間に視点を向ける
+		D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+		D3DXVECTOR3 rotPlayer = pPlayer->GetRotation();
+		D3DXVECTOR3 posBlock = pBlock->GetPosition();
+		D3DXVECTOR3 vecDiff = posBlock - posPlayer;
+		
+		// 視点の設定
+		float fAngleDiff = atan2f(vecDiff.x, vecDiff.z);
+		float fDiff = rotPlayer.y - fAngleDiff;
+		universal::LimitRot(&fDiff);
 
-	pInfoCamera->posRDest = pos;
+		universal::FactingRot(&pInfoCamera->rot.y, fAngleDiff + D3DX_PI, 0.04f);
 
-	D3DXVECTOR3 vecPole = universal::PolarCoordinates(pInfoCamera->rot);
+		D3DXVECTOR3 vecPole = universal::PolarCoordinates(pInfoCamera->rot);
 
-	//目標の視点設定
-	pInfoCamera->posVDest = pos + vecPole * pInfoCamera->fLength;
+#ifdef _DEBUG
+		CEffect3D::Create(pPlayer->GetMtxPos(2) + vecPole * 500.0f, 20.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
+#endif
+		// 追従時の視点からラープ(視点)
+		D3DXVECTOR3 vecPoleOld = universal::PolarCoordinates(m_rotROld);
+		D3DXVECTOR3 posOld = pPlayer->GetMtxPos(2) + vecPoleOld * pInfoCamera->fLength;
+		D3DXVECTOR3 posDest = pPlayer->GetMtxPos(2) + vecPole * pInfoCamera->fLength;
 
-	pCamera->MoveDist(FACT_CORRECT_POS);
+		m_fTimerPosR += CManager::GetDeltaTime();
+
+		float fTime = m_fTimerPosR / 1.0f;
+		universal::LimitValue(&fTime, 1.0f, 0.0f);
+
+		//pInfoCamera->posVDest = universal::Lerp(posOld, posDest, fTime);
+		pInfoCamera->posVDest = pos + vecPole * pInfoCamera->fLength;
+
+		// 注視点の設定
+		D3DXVECTOR3 posOldR = pPlayer->GetMtxPos(2);
+		D3DXVECTOR3 posDestR = posPlayer + vecDiff * 0.3f;
+		pInfoCamera->posRDest = universal::Lerp(posOldR, posDestR, fTime);
+
+		// 目標位置に補正
+		pInfoCamera->posV += (pInfoCamera->posVDest - pInfoCamera->posV) * 0.2f;
+		pInfoCamera->posR += (pInfoCamera->posRDest - pInfoCamera->posR) * 0.3f;
+		//pInfoCamera->posV = pInfoCamera->posVDest;
+		//pInfoCamera->posR = pInfoCamera->posRDest;
+
+		                                                                                                                                                //pInfoCamera->posR.y = 200.0f;
+	}
+	else
+	{
+		m_fTimerPosR = 0.0f;
+
+		universal::FactingRot(&pInfoCamera->rot.y, pPlayer->GetRotation().y + D3DX_PI, 0.1f);
+
+		universal::LimitRot(&pInfoCamera->rot.y);
+
+		pInfoCamera->posRDest = pos;
+
+		//目標の視点設定
+		D3DXVECTOR3 vecPole = universal::PolarCoordinates(pInfoCamera->rot);
+		pInfoCamera->posVDest = pos + vecPole * pInfoCamera->fLength;
+
+		pCamera->MoveDist(FACT_CORRECT_POS);
+
+		m_rotROld = pInfoCamera->rot;
+	}
+
+	// 視点の位置をプレイヤー中心の球に補正
+	//universal::LimitDistSphereInSide(pInfoCamera->fLength, &pInfoCamera->posV, pPlayer->GetMtxPos(2));
 
 #ifdef _DEBUG
 	CEffect3D::Create(pInfoCamera->posRDest, 20.0f, 1, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));

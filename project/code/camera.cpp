@@ -70,7 +70,7 @@ void CCamera::Update(void)
 		m_pBehavior->Update(this);
 	}
 
-	Quake();	// カメラ揺れ
+	//Quake();	// カメラ揺れ
 }
 
 //====================================================
@@ -177,6 +177,14 @@ void CCamera::SetCamera(void)
 		&m_camera.posR,
 		&m_camera.vecU);
 
+	//カメラのロール用
+	// Z軸を中心に回転する行列を計算
+	D3DXVECTOR3 rotationAxis(0.0f, 0.0f, 1.0f);
+	D3DXMATRIX rotationMatrix;
+	D3DXMatrixRotationAxis(&rotationMatrix, &rotationAxis, m_camera.fRoll);
+
+	m_camera.mtxView *= rotationMatrix;
+
 	//ビューマトリックス設定
 	pDevice->SetTransform(D3DTS_VIEW, &m_camera.mtxView);
 
@@ -221,5 +229,18 @@ void ChangeState(CCameraState *pBehavior)
 	{
 		pCamera->ChangeState(pBehavior);
 	}
+}
+
+// ロール値の調整
+void ControlRoll(float fDist, float fFact)
+{
+	CCamera *pCamera = CManager::GetCamera();
+
+	if (pCamera == nullptr)
+		return;
+
+	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+
+	pInfoCamera->fRoll += (fDist - pInfoCamera->fRoll) * fFact;
 }
 }

@@ -1,6 +1,6 @@
 //*****************************************************
 //
-// エディターの処理[edit.cpp]
+// ブロックエディターの処理[editBlock.cpp]
 // Author:髙山桃也
 //
 //*****************************************************
@@ -8,21 +8,23 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "edit.h"
+#include "editMesh.h"
+#include "inputkeyboard.h"
+#include "inputmouse.h"
+#include "effect3D.h"
 
 //=====================================================
 // コンストラクタ
 //=====================================================
-CEdit::CEdit()
+CEditMesh::CEditMesh()
 {
-	m_pos = { 0.0f,0.0f,0.0f };
-	m_rot = { 0.0f,0.0f,0.0f };
+	m_pMesh = nullptr;
 }
 
 //=====================================================
 // デストラクタ
 //=====================================================
-CEdit::~CEdit()
+CEditMesh::~CEditMesh()
 {
 
 }
@@ -30,23 +32,36 @@ CEdit::~CEdit()
 //=====================================================
 // 初期化処理
 //=====================================================
-HRESULT CEdit::Init(void)
+HRESULT CEditMesh::Init(void)
 {
+	CEdit::Init();
+
 	return S_OK;
 }
 
 //=====================================================
 // 終了処理
 //=====================================================
-void CEdit::Uninit(void)
+void CEditMesh::Uninit(void)
 {
-	delete this;
+	CEdit::Uninit();
 }
 
 //=====================================================
 // 更新処理
 //=====================================================
-void CEdit::Update(void)
+void CEditMesh::Update(void)
 {
+	// 情報取得
+	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+	CInputMouse* pMouse = CInputMouse::GetInstance();
 
+	CEdit::Update();
+
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
+
+	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(0.0f, rot.y, 0.0f));
+
+	CEffect3D::Create(pos + vecPole, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 }

@@ -34,6 +34,7 @@
 #include "CameraState.h"
 #include "particle.h"
 #include "timer.h"
+#include "meter.h"
 
 //*****************************************************
 // マクロ定義
@@ -99,6 +100,9 @@ HRESULT CGame::Init(void)
 
 	// タイマー生成
 	CTimer::Create();
+
+	// メーター生成
+	CMeter::Create();
 
 	return S_OK;
 }

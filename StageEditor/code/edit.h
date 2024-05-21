@@ -5,52 +5,34 @@
 //
 //*****************************************************
 
+#ifndef _EDIT_H_
+#define _EDIT_H_
+
 //*****************************************************
 // インクルード
 //*****************************************************
 #include "main.h"
-#include "block.h"
-
-//*****************************************************
-// 前方宣言
-//*****************************************************
-class CObjectX;
 
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CEdit : public CObject
+class CEdit
 {
 public:
 	CEdit();	// コンストラクタ
 	~CEdit();	// デストラクタ
 
-	static CEdit *Create(void);
-	HRESULT Init(void);
-	void Uninit(void);
-	void Update(void);
-	static CEdit *GetInstatnce(void) { return m_pEdit; }
+	virtual HRESULT Init(void);
+	virtual void Uninit(void);
+	virtual void Update(void);
+	D3DXVECTOR3 GetPosition(void) { return m_pos; }
+	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
+	D3DXVECTOR3 GetRotation(void) { return m_rot; }
+	void SetRotation(D3DXVECTOR3 rot) { m_rot = rot; }
 
 private:
-	enum MODE
-	{
-		MODE_CREATE_BLOCK = 0,	// ブロック生成
-		MODE_DELTE_BLOCK,	// ブロック削除
-		MODE_CREATE_GIMICK,	// ギミック生成
-		MODE_DELTE_GIMICK,	// ギミック削除
-		MODE_MAX
-	};
-
-	void LoopCursor(void);
-	void CreateBlock(D3DXVECTOR3 pos);
-	CBlock *CheckDelete(void);
-
 	D3DXVECTOR3 m_pos;	// 位置
 	D3DXVECTOR3 m_rot;	// 向き
-	MODE m_mode;	// モード
-	CObjectX *m_pObjectCursor;	// カーソルのオブジェクトXへのポインタ
-	int m_nIdxObject;
-	char m_aPath[256];
-	CBlock::TYPE m_type;
-	static CEdit *m_pEdit;	// 自身のポインタ
 };
+
+#endif

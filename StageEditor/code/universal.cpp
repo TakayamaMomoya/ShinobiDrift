@@ -73,6 +73,171 @@ void LimitSpeed(D3DXVECTOR3 *pVec, float fSpeedMax)
 }
 
 //========================================
+// 矩形内の位置制限
+//========================================
+void LimitPosInSq(float fWidth, float fHeight, D3DXVECTOR3 *pPos)
+{
+	if (pPos == nullptr)
+		return;
+	
+	LimitValue(&pPos->x, fWidth, -fWidth);
+	LimitValue(&pPos->z, fHeight, -fHeight);
+}
+
+//========================================
+// 円柱の距離制限
+//========================================
+float LimitDistCylinder(float fLength, D3DXVECTOR3 *pPos, D3DXVECTOR3 posTarget)
+{
+	if (pPos == nullptr)
+		return 0.0f;
+
+	posTarget.y = pPos->y;
+
+	D3DXVECTOR3 vecDiff = posTarget - *pPos;
+
+	float fDistDiff = D3DXVec3Length(&vecDiff);
+
+	if (fLength >= fDistDiff)
+	{
+		fDistDiff = fLength;
+
+		D3DXVec3Normalize(&vecDiff, &vecDiff);
+
+		vecDiff *= fLength;
+
+		*pPos = posTarget - vecDiff;
+	}
+
+	return fDistDiff;
+}
+
+//========================================
+// 球の距離制限（内側）
+//========================================
+float LimitDistSphereInSide(float fLength, D3DXVECTOR3 *pPos, D3DXVECTOR3 posTarget)
+{
+	if (pPos == nullptr)
+		return 0.0f;
+
+	D3DXVECTOR3 vecDiff = posTarget - *pPos;
+
+	float fDistDiff = D3DXVec3Length(&vecDiff);
+
+	if (fLength <= fDistDiff)
+	{
+		fDistDiff = fLength;
+
+		D3DXVec3Normalize(&vecDiff, &vecDiff);
+
+		vecDiff *= fLength;
+
+		*pPos = posTarget - vecDiff;
+	}
+
+	return fDistDiff;
+}
+
+//========================================
+// ホーミング
+//========================================
+void Horming(D3DXVECTOR3 pos, D3DXVECTOR3 posTarget, float fSpeedChase, D3DXVECTOR3 *pMove)
+{
+	if (pMove == nullptr)
+		return;
+
+	D3DXVECTOR3 vecDiff = posTarget - pos;
+
+	VecConvertLength(&vecDiff, fSpeedChase);
+
+	*pMove += vecDiff;
+}
+
+//========================================
+// ベクトルを長さで補正する処理
+//========================================
+void VecConvertLength(D3DXVECTOR3 *pVec, float fLength)
+{
+	D3DXVec3Normalize(pVec, pVec);
+
+	*pVec *= fLength;
+}
+
+//========================================
+// 反対の相対座標を出す処理
+//========================================
+D3DXVECTOR3 RelativeInversPos(D3DXVECTOR3 pos, D3DXVECTOR3 posCenter, float fRate)
+{
+	D3DXVECTOR3 posInvers = { 0.0f,0.0f,0.0f };
+
+	D3DXVECTOR3 vecDiff = posCenter - pos;
+
+	vecDiff *= fRate;
+
+	posInvers = posCenter + vecDiff;
+
+	return posInvers;
+}
+
+//========================================
+// 目標位置に向かう処理
+//========================================
+void MoveToDest(D3DXVECTOR3 *pPos, D3DXVECTOR3 posTarget, float fFact)
+{
+	if (pPos == nullptr)
+		return;
+
+	D3DXVECTOR3 vecDiff = posTarget - *pPos;
+
+	*pPos += vecDiff * fFact;
+}
+
+//========================================
+// オフセットへのベクトル
+//========================================
+D3DXVECTOR3 VecToOffset(D3DXMATRIX mtx, D3DXVECTOR3 posOffset)
+{
+	D3DXVECTOR3 pos =
+	{
+		mtx._41,
+		mtx._42,
+		mtx._43,
+	};
+
+	D3DXMATRIX mtxOffset;
+
+	SetOffSet(&mtxOffset, mtx, posOffset);
+
+	D3DXVECTOR3 offset =
+	{
+		mtxOffset._41,
+		mtxOffset._42,
+		mtxOffset._43,
+	};
+
+	D3DXVECTOR3 vecDiff = offset - pos;
+
+	return vecDiff;
+}
+
+//========================================
+// 極座標の計算
+//========================================
+D3DXVECTOR3 PolarCoordinates(D3DXVECTOR3 rot)
+{
+	D3DXVECTOR3 vec;
+
+	vec =
+	{
+		sinf(rot.x) * sinf(rot.y),
+		cosf(rot.x),
+		sinf(rot.x) * cosf(rot.y),
+	};
+
+	return vec;
+}
+
+//========================================
 // オフセット設定処理
 //========================================
 void SetOffSet(D3DXMATRIX *pMtxWorldOffset, D3DXMATRIX mtxWorldOwner, D3DXVECTOR3 posOffset, D3DXVECTOR3 rot)
@@ -124,6 +289,25 @@ void FactingRot(float *pfRot, float fRotDest, float rotateFact)
 }
 
 //========================================
+// 目標方向を向く処理
+//========================================
+void FactingRotTarget(D3DXVECTOR3 *pRot, D3DXVECTOR3 posOwn, D3DXVECTOR3 posTarget, float fFact)
+{
+	if (pRot == nullptr)
+	{
+		return;
+	}
+
+	// 差分角度の取得
+	D3DXVECTOR3 vecDiff = posTarget - posOwn;
+
+	D3DXVECTOR3 rotDest = VecToRot(vecDiff);
+
+	FactingRot(&pRot->x, rotDest.x, fFact);
+	FactingRot(&pRot->y, rotDest.y, fFact);
+}
+
+//========================================
 // 距離の比較
 //========================================
 D3DXVECTOR3 VecToRot(D3DXVECTOR3 vec)
@@ -163,6 +347,29 @@ bool DistCmp(D3DXVECTOR3 posOwn, D3DXVECTOR3 posTarget, float fLengthMax, float 
 }
 
 //========================================
+// 距離の比較平面
+//========================================
+bool DistCmpFlat(D3DXVECTOR3 posOwn, D3DXVECTOR3 posTarget, float fLengthMax, float *fDiff)
+{
+	D3DXVECTOR3 vecDiff = posTarget - posOwn;
+	float fLength = sqrtf(vecDiff.x * vecDiff.x + vecDiff.z * vecDiff.z);
+
+	if (fLength < fLengthMax)
+	{
+		if (fDiff != nullptr)
+		{
+			*fDiff = fLength;
+		}
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+//========================================
 // 外積の計算
 //========================================
 float CrossProduct(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2)
@@ -185,11 +392,9 @@ bool IsCross(D3DXVECTOR3 posTarget, D3DXVECTOR3 vecSorce, D3DXVECTOR3 vecDest, f
 	{
 		if (pRate != nullptr)
 		{
-			D3DXVECTOR3 vecToPos = posTarget - vecSorce;
-
 			// 割合を算出
 			float fAreaMax = (vecDest.z * move.x) - (vecDest.x * move.z);
-			float fArea = (vecToPos.z * move.x) - (vecToPos.x * move.z);
+			fArea = (vecToPos.z * move.x) - (vecToPos.x * move.z);
 
 			*pRate = fArea / fAreaMax;
 		}
@@ -390,5 +595,37 @@ int RandRange(int nMax, int nMin)
 	int nRand = rand() % nRange + nMin;
 
 	return nRand;
+}
+
+//========================================
+// RGBをD3DXCOLORに変換する処理
+//========================================
+D3DXCOLOR ConvertRGB(BYTE r, BYTE g, BYTE b, BYTE a)
+{
+	D3DXCOLOR col;
+
+	col =
+	{
+		(float)r / 255.0f,
+		(float)g / 255.0f,
+		(float)b / 255.0f,
+		(float)a / 255.0f,
+	};
+
+	return col;
+}
+
+//========================================
+// 3D座標の線形補完
+//========================================
+D3DXVECTOR3 Lerp(D3DXVECTOR3 start, D3DXVECTOR3 end, float fTime)
+{
+	D3DXVECTOR3 pos = start;
+
+	D3DXVECTOR3 vecDiff = end - start;
+
+	pos += vecDiff * fTime;
+
+	return pos;
 }
 }	// namespace universal

@@ -51,7 +51,9 @@ public:
 	void SetTex(D3DXVECTOR2 rd, D3DXVECTOR2 lu);
 	void SetVtx(void);
 	void SetMode(MODE mode);
+	LPDIRECT3DVERTEXBUFFER9 CreateVtxBuff(int nNum);
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBuff(void) { return m_pVtxBuff; }
+	D3DXMATRIX *GetMatrix(void) { return &m_mtxWorld; }
 
 private:
 	void SetVtxNormal(void);

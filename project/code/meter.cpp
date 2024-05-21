@@ -8,7 +8,7 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "timer.h"
+#include "meter.h"
 #include "manager.h"
 #include "debugproc.h"
 
@@ -17,62 +17,65 @@
 //*****************************************************
 namespace
 {
-	const int VALUE = 120;			// 値
+	const int VALUE = 240;			// 値
 	const int PLACE = 3;			// 桁数
 	const float WIDTH = SCREEN_WIDTH * 0.5f;		// 幅
 	const float HEIGHT = SCREEN_HEIGHT * 0.5f;		// 高さ
 }
 
-//*****************************************************
-// 静的メンバ変数宣言
-//*****************************************************
-
 //=====================================================
 // 優先順位を決めるコンストラクタ
 //=====================================================
-CTimer::CTimer(int nPriority)
+CMeter::CMeter(int nPriority)
 {
-	m_nSeconds = 0;		// 現在の時間
-	m_nCntSeconds = 0;	// カウント加算
+	m_nMeter = 0;		// 現在のメーター値
+	m_nCntMeter = 0;	// メーター加算
 	m_pNumber = nullptr;	// ナンバーのポインタ
+	m_pPlayer = nullptr;	// プレイヤーのポインタ
 }
 
 //=====================================================
 // デストラクタ
 //=====================================================
-CTimer::~CTimer()
+CMeter::~CMeter()
 {
 }
 
 //=====================================================
 // 生成処理
 //=====================================================
-CTimer* CTimer::Create(void)
+CMeter* CMeter::Create(void)
 {
 	// インスタンス生成
-	CTimer* pTimer = new CTimer;
+	CMeter* pMeter = new CMeter;
 
 	// 初期化
-	pTimer->Init();
+	pMeter->Init();
 
-	return pTimer;
+	return pMeter;
 }
 
 //=====================================================
 // 初期化処理
 //=====================================================
-HRESULT CTimer::Init(void)
+HRESULT CMeter::Init(void)
 {
-	m_nSeconds = VALUE;
+	// プレイヤーの情報取得
+	m_pPlayer = CPlayer::GetInstance();
+
+	m_nMeter = m_pPlayer->GetParam().fSpeedMax;;
 
 	// 生成
-	m_pNumber = CNumber::Create(PLACE, VALUE);
+	m_pNumber = CNumber::Create(PLACE, (int)m_nMeter);
 
 	// 位置設定
-	m_pNumber->SetPosition(D3DXVECTOR3(WIDTH, 75.0f, 0.0f));
+	m_pNumber->SetPosition(D3DXVECTOR3(1000, 600.0f, 0.0f));
 
 	// サイズ調整
 	m_pNumber->SetSizeAll(35.0f, 35.0f);
+
+	// 色設定
+	m_pNumber->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 	return S_OK;
 }
@@ -80,7 +83,7 @@ HRESULT CTimer::Init(void)
 //=====================================================
 // 終了処理
 //=====================================================
-void CTimer::Uninit(void)
+void CMeter::Uninit(void)
 {
 	m_pNumber = nullptr;
 
@@ -91,34 +94,66 @@ void CTimer::Uninit(void)
 //=====================================================
 // 更新処理
 //=====================================================
-void CTimer::Update(void)
+void CMeter::Update(void)
 {
 	// デルタタイム取得
 	float fDeltaTime = CManager::GetDeltaTime();
 
 	// カウンター加算
-	m_nCntSeconds++;
-
-	if (m_nCntSeconds > 60)
-	{
-		m_nCntSeconds = 0;
-
-		if (m_nSeconds >= 1)
-		{
-			m_nSeconds--;
-		}
-	}
-
-	// 秒の計算
-	int nSecond = m_nSeconds % VALUE;
-
-	if (m_pNumber != nullptr)
-	{// 秒表示の制御
-		m_pNumber->SetValue(nSecond, PLACE);
-	}
-
-	if (m_nSeconds <= 0)
-	{
-		m_nSeconds = 0;
-	}
+	m_nCntMeter++;
 }
+
+////=====================================================
+//// 加速時のメーター
+////=====================================================
+//void CMeter::Acceleration()
+//{
+//	// 速度取得
+//	float fSpeed = m_pPlayer->GetParam().fSpeedMax;
+//
+//	// カウンター加算
+//	m_nCntMeter++;
+//
+//	if (m_nCntMeter > fSpeed)
+//	{// 最高速度超えないように
+//		m_nCntMeter = fSpeed;
+//
+//		if (m_nMeter >= 1)
+//		{// メーター加算
+//			m_nMeter++;
+//		}
+//	}
+//}
+//
+////=====================================================
+//// 減速時のメーター
+////=====================================================
+//void CMeter::Deceleration()
+//{
+//	// カウンター加算
+//	m_nCntMeter++;
+//
+//	if (m_nCntMeter > 60)
+//	{
+//		m_nCntMeter = 0;
+//
+//		if (m_nMeter >= 1)
+//		{
+//			m_nMeter--;
+//		}
+//	}
+//
+//	// 秒の計算
+//	int nSecond = m_nMeter % VALUE;
+//
+//	if (m_pNumber != nullptr)
+//	{// 秒表示の制御
+//		m_pNumber->SetValue(nSecond, PLACE);
+//	}
+//
+//	if (m_nMeter <= 0)
+//	{
+//		m_nCntMeter = 0;
+//	}
+//
+//}

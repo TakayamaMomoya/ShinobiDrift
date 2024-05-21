@@ -23,13 +23,15 @@
 #include "object3D.h"
 #include "texture.h"
 #include "skybox.h"
-#include "edit.h"
+#include "editBlock.h"
 #include "block.h"
 #include "renderer.h"
 #include "animEffect3D.h"
 #include "pause.h"
 #include "slow.h"
 #include "blockManager.h"
+#include "meshRoad.h"
+#include "editMesh.h"
 
 //*****************************************************
 // マクロ定義
@@ -49,6 +51,7 @@ CGame::CGame()
 {
 	m_nCntState = 0;
 	m_bStop = false;
+	m_pEdit = nullptr;
 }
 
 //=====================================================
@@ -65,16 +68,16 @@ HRESULT CGame::Init(void)
 	CUIManager::Create();
 
 	// 床の生成
-	CObject3D *pObjectOut = CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	//CObject3D *pObjectOut = CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-	if (pObjectOut != nullptr)
-	{
-		int nIdx = CTexture::GetInstance()->Regist("data\\TEXTURE\\BG\\field00.jpg");
-		pObjectOut->SetPosition(D3DXVECTOR3(0.0f, -5.0f, 0.0f));
-		pObjectOut->SetIdxTexture(nIdx);
-		pObjectOut->SetTex(D3DXVECTOR2(100.0f, 100.0f), D3DXVECTOR2(0.0f, 0.0f));
-		pObjectOut->SetSize(50000.0f, 50000.0f);
-	}
+	//if (pObjectOut != nullptr)
+	//{
+	//	int nIdx = CTexture::GetInstance()->Regist("data\\TEXTURE\\BG\\field00.jpg");
+	//	pObjectOut->SetPosition(D3DXVECTOR3(0.0f, -5.0f, 0.0f));
+	//	pObjectOut->SetIdxTexture(nIdx);
+	//	pObjectOut->SetTex(D3DXVECTOR2(100.0f, 100.0f), D3DXVECTOR2(0.0f, 0.0f));
+	//	pObjectOut->SetSize(50000.0f, 50000.0f);
+	//}
 
 	// スカイボックスの生成
 	CSkybox::Create();
@@ -87,15 +90,17 @@ HRESULT CGame::Init(void)
 
 	// ブロック管理の生成
 	CBlockManager::Create();
-
-	// エディットの生成
-	CEdit::Create();
-
+	
 	// フォグをかける
 	CRenderer *pRenderer = CRenderer::GetInstance();
 
 	// スロー管理の生成
 	CSlow::Create();
+
+	// メッシュロードの生成
+	CMeshRoad::Create();
+
+	m_pEdit = new CEditMesh;
 
 	return S_OK;
 }
@@ -105,6 +110,8 @@ HRESULT CGame::Init(void)
 //=====================================================
 void CGame::Uninit(void)
 {
+	m_pEdit->Uninit();
+
 	// オブジェクト全棄
 	CObject::ReleaseAll();
 
@@ -119,6 +126,8 @@ void CGame::Update(void)
 	CFade *pFade = CFade::GetInstance();
 	CInputManager *pInputManager = CInputManager::GetInstance();
 	CSound* pSound = CSound::GetInstance();
+
+	m_pEdit->Update();
 
 	if (m_bStop == false)
 	{
@@ -140,14 +149,6 @@ void CGame::Update(void)
 	{
 		// 停止しないオブジェクトの更新
 		CObject::UpdateNotStop();
-
-		// エディットの更新
-		CEdit* pEdit = CEdit::GetInstatnce();
-
-		if (pEdit != nullptr)
-		{
-			pEdit->Update();
-		}
 
 		CPause *pPause = CPause::GetInstance();
 
