@@ -147,9 +147,6 @@ void CMeshRoad::Draw(void)
 	LPDIRECT3DTEXTURE9 pTexture = CTexture::GetInstance()->GetAddress(nIdxTexture);
 	pDevice->SetTexture(0, pTexture);
 
-	// ƒJƒŠƒ“ƒO‚ð–³Œø‰»
-	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-
 	// •`‰æ
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, m_nNumVtx - 2);
 }

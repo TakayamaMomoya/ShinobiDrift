@@ -14,7 +14,6 @@
     <ClCompile Include="code\debugproc.cpp" />
     <ClCompile Include="code\edit.cpp" />
     <ClCompile Include="code\editBlock.cpp" />
-    <ClCompile Include="code\editMesh.cpp" />
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
     <ClCompile Include="code\fade.cpp" />
@@ -31,7 +30,6 @@
     <ClCompile Include="code\main.cpp" />
     <ClCompile Include="code\manager.cpp" />
     <ClCompile Include="code\meshcylinder.cpp" />
-    <ClCompile Include="code\meshRoad.cpp" />
     <ClCompile Include="code\model.cpp" />
     <ClCompile Include="code\motion.cpp" />
     <ClCompile Include="code\number.cpp" />
@@ -77,6 +75,12 @@
     <ClCompile Include="code\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="code\editMesh.cpp">
+      <Filter>meshedit</Filter>
+    </ClCompile>
+    <ClCompile Include="code\meshRoad.cpp">
+      <Filter>meshedit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\anim3D.h" />
@@ -92,7 +96,6 @@
     <ClInclude Include="code\debugproc.h" />
     <ClInclude Include="code\edit.h" />
     <ClInclude Include="code\editBlock.h" />
-    <ClInclude Include="code\editMesh.h" />
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
     <ClInclude Include="code\fade.h" />
@@ -109,7 +112,6 @@
     <ClInclude Include="code\main.h" />
     <ClInclude Include="code\manager.h" />
     <ClInclude Include="code\meshcylinder.h" />
-    <ClInclude Include="code\meshRoad.h" />
     <ClInclude Include="code\model.h" />
     <ClInclude Include="code\motion.h" />
     <ClInclude Include="code\number.h" />
@@ -164,6 +166,12 @@
     <ClInclude Include="code\imstb_truetype.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="code\editMesh.h">
+      <Filter>meshedit</Filter>
+    </ClInclude>
+    <ClInclude Include="code\meshRoad.h">
+      <Filter>meshedit</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="code\backends\imgui_impl_metal.mm">
@@ -176,6 +184,9 @@
   <ItemGroup>
     <Filter Include="imgui">
       <UniqueIdentifier>{f24f61e7-2075-40bc-ab45-1203a8e10fb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="meshedit">
+      <UniqueIdentifier>{a2340846-e4d2-4988-9fcd-01e63101ab70}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

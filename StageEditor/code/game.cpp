@@ -101,6 +101,7 @@ HRESULT CGame::Init(void)
 	CMeshRoad::Create();
 
 	m_pEdit = new CEditMesh;
+	m_pEdit->Init();
 
 	return S_OK;
 }
@@ -129,10 +130,11 @@ void CGame::Update(void)
 
 	m_pEdit->Update();
 
+	// シーンの更新
+	CScene::Update();
+
 	if (m_bStop == false)
 	{
-		// シーンの更新
-		CScene::Update();
 
 		// カーソルを中心に固定
 		SetCursorPos((int)(SCREEN_WIDTH * 0.5f), (int)(SCREEN_HEIGHT * 0.5f));
