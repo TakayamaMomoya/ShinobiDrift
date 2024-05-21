@@ -33,6 +33,9 @@ public:
 	void AddEdge(D3DXVECTOR3 pos, float fRot,bool bReCreateVtx = false);
 	void CreateVtxBuffEdge(void);	// エッジ数に応じて頂点を生成する
 
+	void Save(void);	// エディターのみ。ゲームでは消してね
+	void Load(void);	// エディターのみ。ゲームでは消してね
+
 private:
 	struct SInfoEdge
 	{// 辺に必要な情報

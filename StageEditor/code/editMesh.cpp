@@ -51,7 +51,7 @@ HRESULT CEditMesh::Init(void)
 	// マニピュレータの生成
 	m_pManipulator = CObjectX::Create();
 
-	// モデル番号の設定
+	// モデルの割り当て
 	int nIdx = CModel::Load("data\\MODEL\\block\\manipulator.x");
 	m_pManipulator->BindModel(nIdx);
 
@@ -148,5 +148,13 @@ void CEditMesh::Update(void)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		pMesh->AddEdge(pos, rot.y - D3DX_PI * 0.5f,true);
+	}
+
+	if (ImGui::Button("Save", ImVec2(100, 50)))
+	{
+		CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+		if (pMesh != nullptr)
+			pMesh->Save();
 	}
 }

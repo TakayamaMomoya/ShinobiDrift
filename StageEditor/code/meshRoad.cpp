@@ -12,6 +12,7 @@
 #include "renderer.h"
 #include "texture.h"
 #include "effect3D.h"
+#include <fstream>
 
 //*****************************************************
 // 定数定義
@@ -201,4 +202,44 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 
 	// 頂点バッファをアンロック
 	pVtxBuff->Unlock();
+}
+
+//=====================================================
+// 保存処理
+//=====================================================
+void CMeshRoad::Save(void)
+{
+	// ファイルを開く
+	std::ofstream outputFile("test.bin", std::ios::binary);
+
+	if (!outputFile.is_open())
+		assert(("メッシュロードのファイルを開けませんでした", false));
+
+	float fData = 5.0f;
+
+	outputFile.write(reinterpret_cast<const char*>(&fData), sizeof(fData));
+
+	outputFile.close();
+
+	Load();
+}
+
+//=====================================================
+// 読み込み処理
+//=====================================================
+void CMeshRoad::Load(void)
+{
+	// ファイルを開く
+	std::ifstream inputFile("test.bin", std::ios::binary);
+
+	if (!inputFile.is_open())
+		assert(("メッシュロードのファイルを開けませんでした", false));
+
+	float fData = 0.0f;
+
+	// floatデータを読み込む
+	inputFile.read(reinterpret_cast<char*>(&fData), sizeof(fData));
+
+	// ファイルを閉じる
+	inputFile.close();
 }
