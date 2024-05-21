@@ -30,6 +30,7 @@
 #include "pause.h"
 #include "slow.h"
 #include "blockManager.h"
+#include "meshRoad.h"
 
 //*****************************************************
 // マクロ定義
@@ -65,16 +66,16 @@ HRESULT CGame::Init(void)
 	CUIManager::Create();
 
 	// 床の生成
-	CObject3D *pObjectOut = CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	//CObject3D *pObjectOut = CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-	if (pObjectOut != nullptr)
-	{
-		int nIdx = CTexture::GetInstance()->Regist("data\\TEXTURE\\BG\\field00.jpg");
-		pObjectOut->SetPosition(D3DXVECTOR3(0.0f, -5.0f, 0.0f));
-		pObjectOut->SetIdxTexture(nIdx);
-		pObjectOut->SetTex(D3DXVECTOR2(100.0f, 100.0f), D3DXVECTOR2(0.0f, 0.0f));
-		pObjectOut->SetSize(50000.0f, 50000.0f);
-	}
+	//if (pObjectOut != nullptr)
+	//{
+	//	int nIdx = CTexture::GetInstance()->Regist("data\\TEXTURE\\BG\\field00.jpg");
+	//	pObjectOut->SetPosition(D3DXVECTOR3(0.0f, -5.0f, 0.0f));
+	//	pObjectOut->SetIdxTexture(nIdx);
+	//	pObjectOut->SetTex(D3DXVECTOR2(100.0f, 100.0f), D3DXVECTOR2(0.0f, 0.0f));
+	//	pObjectOut->SetSize(50000.0f, 50000.0f);
+	//}
 
 	// スカイボックスの生成
 	CSkybox::Create();
@@ -93,6 +94,9 @@ HRESULT CGame::Init(void)
 
 	// スロー管理の生成
 	CSlow::Create();
+
+	// メッシュロードの生成
+	CMeshRoad::Create();
 
 	return S_OK;
 }

@@ -87,10 +87,34 @@ HRESULT CObject3D::Init(void)
 	pVtx[2].tex = D3DXVECTOR2(0.0f, 1.0f);
 	pVtx[3].tex = D3DXVECTOR2(1.0f, 1.0f);
 
-	//頂点バッファをアンロック
+	// 頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
 
 	return S_OK;
+}
+
+//=====================================================
+// 頂点バッファ生成
+//=====================================================
+LPDIRECT3DVERTEXBUFFER9 CObject3D::CreateVtxBuff(int nNum)
+{
+	if (m_pVtxBuff != nullptr)
+	{
+		m_pVtxBuff->Release();
+		m_pVtxBuff = nullptr;
+	}
+
+	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
+
+	// 頂点バッファの生成
+	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * nNum,
+		D3DUSAGE_WRITEONLY,
+		FVF_VERTEX_3D,
+		D3DPOOL_MANAGED,
+		&m_pVtxBuff,
+		nullptr);
+
+	return m_pVtxBuff;
 }
 
 //=====================================================
