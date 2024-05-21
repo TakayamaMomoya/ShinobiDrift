@@ -13,7 +13,7 @@
 //*****************************************************
 #include "main.h"
 #include "object3D.h"
-#include <list>
+#include <vector>
 
 //*****************************************************
 // ƒNƒ‰ƒX‚Ì’è‹`
@@ -45,7 +45,7 @@ private:
 	};
 
 	UINT m_nNumVtx;
-	std::list<SInfoEdge> m_listEdge;
+	std::vector<SInfoEdge> m_listEdge;
 	static CMeshRoad *m_pMeshRoad;
 };
 

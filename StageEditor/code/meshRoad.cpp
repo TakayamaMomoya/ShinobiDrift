@@ -23,6 +23,7 @@ const UINT NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
 const float WIDTH_DEFAULT = 200.0f;	// デフォルトの幅
 const float LENGTH_DEFAULT = 200.0f;	// デフォルトの長さ
 const int NUM_VTX_IN_EDGE = 2;	// 一辺にある頂点数
+const char PATH_SAVE[] = "data\\MAP\\road00.bin";	// 保存ファイルのパス
 }
 
 //*****************************************************
@@ -78,10 +79,8 @@ HRESULT CMeshRoad::Init(void)
 	// リストの初期化
 	m_listEdge.clear();
 
-	m_nNumVtx = 4;
-
-	AddEdge(D3DXVECTOR3(0.0f, 0.0f, 0.0f), 0.0f, true);
-	AddEdge(D3DXVECTOR3(100.0f, 0.0f, 500.0f), 0.0f, true);
+	// 読み込み処理
+	Load();
 
 	return S_OK;
 }
@@ -210,18 +209,19 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 void CMeshRoad::Save(void)
 {
 	// ファイルを開く
-	std::ofstream outputFile("test.bin", std::ios::binary);
+	std::ofstream outputFile(PATH_SAVE, std::ios::binary);
 
 	if (!outputFile.is_open())
 		assert(("メッシュロードのファイルを開けませんでした", false));
+	
+	// 情報数保存
+	size_t size = m_listEdge.size();
+	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
-	float fData = 5.0f;
-
-	outputFile.write(reinterpret_cast<const char*>(&fData), sizeof(fData));
+	// リストの情報保存
+	outputFile.write(reinterpret_cast<const char*>(m_listEdge.data()), sizeof(SInfoEdge) * size);
 
 	outputFile.close();
-
-	Load();
 }
 
 //=====================================================
@@ -229,17 +229,23 @@ void CMeshRoad::Save(void)
 //=====================================================
 void CMeshRoad::Load(void)
 {
+	m_listEdge.clear();
+
 	// ファイルを開く
-	std::ifstream inputFile("test.bin", std::ios::binary);
+	std::ifstream inputFile(PATH_SAVE, std::ios::binary);
 
 	if (!inputFile.is_open())
 		assert(("メッシュロードのファイルを開けませんでした", false));
 
-	float fData = 0.0f;
+	// データ数読み込み
+	size_t size;
+	inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+	m_listEdge.resize(size);
 
-	// floatデータを読み込む
-	inputFile.read(reinterpret_cast<char*>(&fData), sizeof(fData));
+	// 辺データ読み込み
+	inputFile.read(reinterpret_cast<char*>(m_listEdge.data()), sizeof(SInfoEdge) * size);
 
-	// ファイルを閉じる
 	inputFile.close();
+
+	CreateVtxBuffEdge();
 }
