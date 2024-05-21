@@ -11,6 +11,7 @@
 #include "editMesh.h"
 #include "inputkeyboard.h"
 #include "inputmouse.h"
+#include "effect3D.h"
 
 //=====================================================
 // コンストラクタ
@@ -56,4 +57,11 @@ void CEditMesh::Update(void)
 	CInputMouse* pMouse = CInputMouse::GetInstance();
 
 	CEdit::Update();
+
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
+
+	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(0.0f, rot.y, 0.0f));
+
+	CEffect3D::Create(pos + vecPole, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 }

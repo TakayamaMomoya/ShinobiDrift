@@ -31,6 +31,7 @@
 #include "slow.h"
 #include "blockManager.h"
 #include "meshRoad.h"
+#include "editMesh.h"
 
 //*****************************************************
 // マクロ定義
@@ -50,6 +51,7 @@ CGame::CGame()
 {
 	m_nCntState = 0;
 	m_bStop = false;
+	m_pEdit = nullptr;
 }
 
 //=====================================================
@@ -98,6 +100,8 @@ HRESULT CGame::Init(void)
 	// メッシュロードの生成
 	CMeshRoad::Create();
 
+	m_pEdit = new CEditMesh;
+
 	return S_OK;
 }
 
@@ -106,6 +110,8 @@ HRESULT CGame::Init(void)
 //=====================================================
 void CGame::Uninit(void)
 {
+	m_pEdit->Uninit();
+
 	// オブジェクト全棄
 	CObject::ReleaseAll();
 
@@ -120,6 +126,8 @@ void CGame::Update(void)
 	CFade *pFade = CFade::GetInstance();
 	CInputManager *pInputManager = CInputManager::GetInstance();
 	CSound* pSound = CSound::GetInstance();
+
+	m_pEdit->Update();
 
 	if (m_bStop == false)
 	{
