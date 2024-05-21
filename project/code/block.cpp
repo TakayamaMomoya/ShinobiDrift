@@ -15,9 +15,8 @@
 #include "manager.h"
 #include "object.h"
 #include "debrisSpawner.h"
-#include <stdio.h>
 #include "effect3D.h"
-#include "debugproc.h"]
+#include "debugproc.h"
 
 //*****************************************************
 // ’è”’è‹`
