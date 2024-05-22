@@ -12,7 +12,6 @@
 #include "renderer.h"
 #include "universal.h"
 #include "debugproc.h"
-#include <stdio.h>
 
 namespace universal
 {

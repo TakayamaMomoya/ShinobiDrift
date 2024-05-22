@@ -18,9 +18,6 @@
 #include "texture.h"
 #include "camera.h"
 #include "manager.h"
-#include <fstream>
-#include <sstream>
-#include <string>
 
 //*****************************************************
 // ’è”’è‹`

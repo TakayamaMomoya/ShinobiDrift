@@ -12,7 +12,6 @@
 #include "manager.h"
 #include "inputkeyboard.h"
 #include "object.h"
-#include <time.h>
 
 //*****************************************************
 // ƒ}ƒNƒ’è‹`

@@ -22,5 +22,10 @@
 #include <fstream>
 #include <sstream>
 #include <string.h>
+#include <time.h>
+#include <string>
+#include <list>
+#include <locale>
+#include <codecvt>
 
 #endif // _PRECOMPILE_H_
