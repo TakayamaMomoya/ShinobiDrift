@@ -56,6 +56,8 @@ HRESULT CEditMesh::Init(void)
 	int nIdx = CModel::Load("data\\MODEL\\block\\manipulator.x");
 	m_pManipulator->BindModel(nIdx);
 
+	ChangeState(new CStateEditMeshCreateMesh);
+
 	return S_OK;
 }
 
@@ -72,14 +74,43 @@ void CEditMesh::Uninit(void)
 //=====================================================
 void CEditMesh::Update(void)
 {
-	// 情報取得
+	CEdit::Update();
+
+	// マニピュレーターのトランスフォーム更新
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
+
+	m_pManipulator->SetPosition(pos);
+	m_pManipulator->SetRot(rot);
+
+	if (m_pState != nullptr)	// ステイトの更新
+		m_pState->Update(this);
+}
+
+//=====================================================
+// ステイトの変更
+//=====================================================
+void CEditMesh::ChangeState(CStateEditMesh *pState)
+{
+	if (m_pState != nullptr)
+	{
+		delete m_pState;
+		m_pState = nullptr;
+	}
+
+	m_pState = pState;
+}
+
+//****************************************************************************************
+// メッシュの生成
+//****************************************************************************************
+void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
+{
 	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
 	CInputMouse* pMouse = CInputMouse::GetInstance();
 
-	CEdit::Update();
-
-	D3DXVECTOR3 pos = GetPosition();
-	D3DXVECTOR3 rot = GetRotation();
+	D3DXVECTOR3 pos = pEdit->GetPosition();
+	D3DXVECTOR3 rot = pEdit->GetRotation();
 
 	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, rot.y - D3DX_PI * 0.5f, 0.0f));
 
@@ -137,11 +168,8 @@ void CEditMesh::Update(void)
 			rot.y -= SPEED_ROLL;
 		}
 
-		SetRotation(rot);
-		SetPosition(pos);
-
-		m_pManipulator->SetPosition(pos);
-		m_pManipulator->SetRot(rot);
+		pEdit->SetRotation(rot);
+		pEdit->SetPosition(pos);
 	}
 
 	D3DXVECTOR3 posD = pos + vecPole * 200.0f;
@@ -153,7 +181,7 @@ void CEditMesh::Update(void)
 	{// メッシュの追加
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
-		pMesh->AddEdge(pos, rot.y - D3DX_PI * 0.5f,true);
+		pMesh->AddEdge(pos, rot.y - D3DX_PI * 0.5f, true);
 
 		D3DXVECTOR3 pos = pos + vecPole * 200.0f;
 		CDebugProc::GetInstance()->Print("オフセット[%f,%f,%f]", pos.x, pos.y, pos.z);
