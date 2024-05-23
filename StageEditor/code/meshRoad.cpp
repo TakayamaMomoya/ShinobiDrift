@@ -24,6 +24,7 @@ const float WIDTH_DEFAULT = 200.0f;	// デフォルトの幅
 const float LENGTH_DEFAULT = 200.0f;	// デフォルトの長さ
 const int NUM_VTX_IN_EDGE = 2;	// 一辺にある頂点数
 const char PATH_SAVE[] = "data\\MAP\\road00.bin";	// 保存ファイルのパス
+const char* PATH_TEXTURE = "data\\TEXTURE\\MATERIAL\\road.jpg";	// テクスチャパス
 }
 
 //*****************************************************
@@ -78,6 +79,10 @@ HRESULT CMeshRoad::Init(void)
 {
 	// リストの初期化
 	m_listEdge.clear();
+
+	// テクスチャ読み込み
+	int nIdx = Texture::GetIdx(PATH_TEXTURE);
+	SetIdxTexture(nIdx);
 
 	// 読み込み処理
 	Load();
@@ -144,7 +149,7 @@ void CMeshRoad::Draw(void)
 
 	// テクスチャ設定
 	int nIdxTexture = GetIdxTexture();
-	LPDIRECT3DTEXTURE9 pTexture = CTexture::GetInstance()->GetAddress(nIdxTexture);
+	LPDIRECT3DTEXTURE9 pTexture = Texture::GetTexture(nIdxTexture);
 	pDevice->SetTexture(0, pTexture);
 
 	// 描画
@@ -198,6 +203,18 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 		if (nCntEdge != 0)
 		{// 最初の辺以外を設定する
 			SetNormal(pVtx, nIdx);
+		}
+
+		// テクスチャ座標の設定
+		if (nCntEdge % 2 == 0)
+		{// 偶数のとき
+			pVtx[nIdx].tex = { 0.0f,0.0f };
+			pVtx[nIdx + 1].tex = { 1.0f,0.0f };
+		}
+		else
+		{// 奇数の時
+			pVtx[nIdx].tex = { 0.0f,1.0f };
+			pVtx[nIdx + 1].tex = { 1.0f,1.0f };
 		}
 
 		nCntEdge++;
