@@ -44,6 +44,8 @@ private:
 		SInfoEdge() : pos({ 0.0f,0.0f,0.0f }), fRot(0.0f) {}
 	};
 
+	void SetNormal(VERTEX_3D *pVtx,int nIdx);	// ñ@ê¸ÇÃê›íË
+
 	UINT m_nNumVtx;
 	std::vector<SInfoEdge> m_listEdge;
 	static CMeshRoad *m_pMeshRoad;

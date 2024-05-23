@@ -190,17 +190,55 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 
 		// 頂点位置の計算
 		D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, edge.fRot, 0.0f));
-		CEffect3D::Create(edge.pos + vecPole * WIDTH_DEFAULT, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-		CEffect3D::Create(edge.pos - vecPole * WIDTH_DEFAULT, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 		pVtx[nIdx].pos = edge.pos + vecPole * WIDTH_DEFAULT;
 		pVtx[nIdx + 1].pos = edge.pos - vecPole * WIDTH_DEFAULT;
 
+		// 法線の計算
+		if (nCntEdge != 0)
+		{// 最初の辺以外を設定する
+			SetNormal(pVtx, nIdx);
+		}
+
 		nCntEdge++;
 	}
 
+	// 最初の辺と二番目の辺の法線を合わせる
+	pVtx[0].nor = pVtx[NUM_VTX_IN_EDGE].nor;
+	pVtx[1].nor = pVtx[NUM_VTX_IN_EDGE + 1].nor;
+
 	// 頂点バッファをアンロック
 	pVtxBuff->Unlock();
+}
+
+//=====================================================
+// 法線の設定
+//=====================================================
+void CMeshRoad::SetNormal(VERTEX_3D *pVtx, int nIdx)
+{
+	if (pVtx == nullptr)
+		return;
+
+	int nIdxOld = nIdx - NUM_VTX_IN_EDGE;	// ひとつ前の辺の頂点番号
+
+	// 頂点位置
+	D3DXVECTOR3 vtxLu = pVtx[nIdxOld].pos;
+	D3DXVECTOR3 vtxRu = pVtx[nIdx].pos;
+	D3DXVECTOR3 vtxRd = pVtx[nIdx + 1].pos;
+
+	// 頂点どうしの差分ベクトルから辺を算出
+	D3DXVECTOR3 edge1 = vtxLu - vtxRu;
+	D3DXVECTOR3 edge2 = vtxRd - vtxRu;
+
+	// 二辺の外積から法線を算出
+	D3DXVECTOR3 nor;
+	D3DXVec3Cross(&nor, &edge1, &edge2);
+
+	D3DXVec3Normalize(&nor, &nor);	// 法線を正規化
+
+	// 法線を適用
+	pVtx[nIdx].nor = nor;
+	pVtx[nIdx + 1].nor = nor;
 }
 
 //=====================================================

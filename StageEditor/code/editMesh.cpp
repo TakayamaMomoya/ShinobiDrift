@@ -148,6 +148,9 @@ void CEditMesh::Update(void)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		pMesh->AddEdge(pos, rot.y - D3DX_PI * 0.5f,true);
+
+		CEffect3D::Create(pos + vecPole * 200.0f, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+		CEffect3D::Create(pos - vecPole * 200.0f, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 
 	if (ImGui::Button("Save", ImVec2(100, 50)))
