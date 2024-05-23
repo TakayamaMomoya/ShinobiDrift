@@ -14,6 +14,7 @@
 #include "effect3D.h"
 #include "meshRoad.h"
 #include "objectX.h"
+#include "debugproc.h"
 
 //*****************************************************
 // 定数定義
@@ -143,12 +144,21 @@ void CEditMesh::Update(void)
 		m_pManipulator->SetRot(rot);
 	}
 
+	D3DXVECTOR3 posD = pos + vecPole * 200.0f;
+	CDebugProc::GetInstance()->Print("オフセット[%f,%f,%f]", posD.x, posD.y, posD.z);
+	posD = pos - vecPole * 200.0f;
+	CDebugProc::GetInstance()->Print("オフセット[%f,%f,%f]", posD.x, posD.y, posD.z);
+
 	if (pKeyboard->GetTrigger(DIK_SPACE))
 	{// メッシュの追加
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		pMesh->AddEdge(pos, rot.y - D3DX_PI * 0.5f,true);
 
+		D3DXVECTOR3 pos = pos + vecPole * 200.0f;
+		CDebugProc::GetInstance()->Print("オフセット[%f,%f,%f]", pos.x, pos.y, pos.z);
+		pos = pos - vecPole * 200.0f;
+		CDebugProc::GetInstance()->Print("オフセット[%f,%f,%f]", pos.x, pos.y, pos.z);
 		CEffect3D::Create(pos + vecPole * 200.0f, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 		CEffect3D::Create(pos - vecPole * 200.0f, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 	}

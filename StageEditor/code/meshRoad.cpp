@@ -25,6 +25,7 @@ const float LENGTH_DEFAULT = 200.0f;	// デフォルトの長さ
 const int NUM_VTX_IN_EDGE = 2;	// 一辺にある頂点数
 const char PATH_SAVE[] = "data\\MAP\\road00.bin";	// 保存ファイルのパス
 const char* PATH_TEXTURE = "data\\TEXTURE\\MATERIAL\\road.jpg";	// テクスチャパス
+const float DIST_DEFAULT = 200.0f;	// デフォルトの辺間の距離
 }
 
 //*****************************************************
@@ -187,6 +188,13 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
+	// 最初のテクスチャ座標設定
+	pVtx[0].tex = { 0.0f,0.0f };
+	pVtx[1].tex = { 1.0f,0.0f };
+
+	float fRateUp = 0.0f;
+	float fRateDown = 0.0f;
+
 	// 頂点位置を辺に合わせる
 	int nCntEdge = 0;
 	for (const auto& edge : m_listEdge)
@@ -206,15 +214,31 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 		}
 
 		// テクスチャ座標の設定
-		if (nCntEdge % 2 == 0)
-		{// 偶数のとき
-			pVtx[nIdx].tex = { 0.0f,0.0f };
-			pVtx[nIdx + 1].tex = { 1.0f,0.0f };
+		if (nCntEdge > 0)
+		{// 最初の辺以外はテクスチャ座標を足していく
+			// デフォルトの距離をもとに前回の辺からどのくらい離れているか計算
+			int nIdxOld = nIdx - NUM_VTX_IN_EDGE;	// ひとつ前の辺の頂点番号
+
+			// 頂点位置
+			D3DXVECTOR3 vtxLu = pVtx[nIdxOld].pos;
+			D3DXVECTOR3 vtxLd = pVtx[nIdxOld + 1].pos;
+			D3DXVECTOR3 vtxRu = pVtx[nIdx].pos;
+			D3DXVECTOR3 vtxRd = pVtx[nIdx + 1].pos;
+
+			// 上下の辺の長さを計算
+			D3DXVECTOR3 vecDiffUp = vtxLu - vtxRu;
+			D3DXVECTOR3 vecDiffDown = vtxLd - vtxRd;
+			float fDistUp = D3DXVec3Length(&vecDiffUp);
+			float fDistDown = D3DXVec3Length(&vecDiffDown);
+
+			fRateUp += fDistUp / DIST_DEFAULT;
+			fRateDown += fDistDown / DIST_DEFAULT;
+
+			pVtx[nIdx].tex = { 0.0f,fRateUp };
+			pVtx[nIdx + 1].tex = { 1.0f,fRateDown };
 		}
 		else
 		{// 奇数の時
-			pVtx[nIdx].tex = { 0.0f,1.0f };
-			pVtx[nIdx + 1].tex = { 1.0f,1.0f };
 		}
 
 		nCntEdge++;
