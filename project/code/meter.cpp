@@ -18,10 +18,15 @@
 namespace
 {
 	const int VALUE = 240;			// 値
-	const int PLACE = 3;			// 桁数
+	const int PLACE = 2;			// 桁数
 	const float WIDTH = SCREEN_WIDTH * 0.5f;		// 幅
 	const float HEIGHT = SCREEN_HEIGHT * 0.5f;		// 高さ
 }
+
+//=====================================================
+// 静的メンバ変数
+//=====================================================
+CMeter* CMeter::m_pMeter = nullptr;
 
 //=====================================================
 // 優先順位を決めるコンストラクタ
@@ -46,13 +51,17 @@ CMeter::~CMeter()
 //=====================================================
 CMeter* CMeter::Create(void)
 {
-	// インスタンス生成
-	CMeter* pMeter = new CMeter;
+	if (m_pMeter == nullptr)
+	{// インスタンス生成
+		m_pMeter = new CMeter;
 
-	// 初期化
-	pMeter->Init();
+		if (m_pMeter != nullptr)
+		{// 初期化
+			m_pMeter->Init();
+		}
+	}
 
-	return pMeter;
+	return m_pMeter;
 }
 
 //=====================================================
@@ -88,6 +97,8 @@ void CMeter::Uninit(void)
 {
 	m_pNumber = nullptr;
 
+	m_pMeter = nullptr;
+
 	// 自身の破棄
 	Release();
 }
@@ -99,8 +110,6 @@ void CMeter::Update(void)
 {
 	// デルタタイム取得
 	float fDeltaTime = CManager::GetDeltaTime();
-
-	Acceleration();
 }
 
 //=====================================================
@@ -111,25 +120,19 @@ void CMeter::Acceleration()
 	// 速度取得
 	float fSpeed = m_pPlayer->GetParam().fSpeedMax;
 
-	// カウンター加算
-	m_nCntMeter++;
+	m_nMeter++;
 
-	if (m_nCntMeter > 60)
-	{
-		m_nCntMeter = 0;
-
-		if (m_nMeter >= 1)
-		{// メーター加算
-			m_nMeter++;
-		}
+	if (m_nMeter >= fSpeed)
+	{// プレイヤーパラメーターの速度を超えないように
+		m_nMeter = fSpeed;
 	}
 
 	// 秒の計算
-	int nSecond = m_nMeter % VALUE;
+	int Meter = m_nMeter % VALUE;
 
 	if (m_pNumber != nullptr)
 	{// 秒表示の制御
-		m_pNumber->SetValue(nSecond, PLACE);
+		m_pNumber->SetValue(Meter, PLACE);
 	}
 
 	if (m_nMeter <= 0)
@@ -155,7 +158,7 @@ void CMeter::Deceleration()
 
 		if (m_nMeter >= 1)
 		{// メーター減算
-			m_nMeter--;
+			m_nMeter++;
 		}
 	}
 
