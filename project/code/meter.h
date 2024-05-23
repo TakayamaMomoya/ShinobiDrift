@@ -38,11 +38,14 @@ public:
 	void Acceleration();
 	void Deceleration();
 
+	CMeter* GetInstance() { return m_pMeter; }
+
 private:
 	//メンバ変数
-	float m_nMeter;		// 現在のメーター値
+	int m_nMeter;		// 現在のメーター値
 	int m_nCntMeter;	// カウント加算
 	CNumber* m_pNumber;	// ナンバーのポインタ
 	CPlayer* m_pPlayer;	// プレイヤーのポインタ
+	CMeter* m_pMeter;	// 自身のポインタ
 };
 #endif

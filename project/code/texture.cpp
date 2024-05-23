@@ -11,7 +11,6 @@
 #include "texture.h"
 #include "manager.h"
 #include "renderer.h"
-#include <string.h>
 
 //*****************************************************
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾

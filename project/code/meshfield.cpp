@@ -17,7 +17,6 @@
 #include "player.h"
 #include "debugproc.h"
 #include "game.h"
-#include <stdio.h>
 #include "effect3D.h"
 #include "texture.h"
 

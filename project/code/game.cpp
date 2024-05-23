@@ -18,7 +18,6 @@
 #include "sound.h"
 #include "scene.h"
 #include "debugproc.h"
-#include <stdio.h>
 #include "UIManager.h"
 #include "object3D.h"
 #include "texture.h"

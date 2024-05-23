@@ -4,14 +4,9 @@
 // Author ‘åŒ´—å«
 //
 //===========================================================
-#include <stdio.h>
-#include <string>
-#include <windows.h>
 
 #include <iostream>
 #include <string>
-#include <locale>
-#include <codecvt>
 
 #include "main.h"
 #include "manager.h"
