@@ -238,6 +238,32 @@ D3DXVECTOR3 PolarCoordinates(D3DXVECTOR3 rot)
 }
 
 //========================================
+// 放物線のyを求める
+//========================================
+float ParabolaY(float x, float a)
+{
+	float y = 0.0f;
+
+	y = a * x * x;
+
+	return y;
+}
+
+//========================================
+// 放物線のxを求める
+//========================================
+float ParabolaX(float y, float a)
+{
+	float x = 0.0f;
+
+	x = (y / a);
+
+	x = sqrtf(x);
+
+	return x;
+}
+
+//========================================
 // オフセット設定処理
 //========================================
 void SetOffSet(D3DXMATRIX *pMtxWorldOffset, D3DXMATRIX mtxWorldOwner, D3DXVECTOR3 posOffset, D3DXVECTOR3 rot)
