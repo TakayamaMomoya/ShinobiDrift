@@ -88,6 +88,8 @@ HRESULT CMeshRoad::Init(void)
 	// “Ç‚Ýž‚Ýˆ—
 	Load();
 
+	m_it = m_listEdge.begin();
+
 	return S_OK;
 }
 
@@ -155,6 +157,26 @@ void CMeshRoad::Draw(void)
 
 	// •`‰æ
 	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, m_nNumVtx - 2);
+}
+
+//=====================================================
+// •Ó‚Ì‘I‘ð
+//=====================================================
+std::vector<CMeshRoad::SInfoEdge>::iterator CMeshRoad::SelectEdge(void)
+{
+	if (ImGui::Button("NextEdge", ImVec2(70, 30)))
+	{
+		if(m_it != m_listEdge.end() && std::next(m_it) != m_listEdge.end())
+			std::advance(m_it, 1);
+	}
+
+	if (ImGui::Button("PrevEdge", ImVec2(70, 30)))
+	{
+		if (m_it != m_listEdge.begin())
+			std::advance(m_it, -1);
+	}
+
+	return m_it;
 }
 
 //=====================================================

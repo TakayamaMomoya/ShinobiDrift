@@ -56,7 +56,7 @@ HRESULT CEditMesh::Init(void)
 	int nIdx = CModel::Load("data\\MODEL\\block\\manipulator.x");
 	m_pManipulator->BindModel(nIdx);
 
-	ChangeState(new CStateEditMeshCreateMesh);
+	ChangeState(new CStateEditMeshCurve);
 
 	return S_OK;
 }
@@ -198,4 +198,17 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 		if (pMesh != nullptr)
 			pMesh->Save();
 	}
+}
+
+//****************************************************************************************
+// ÉJÅ[ÉuÇÃí≤êﬂ
+//****************************************************************************************
+void CStateEditMeshCurve::Update(CEditMesh *pEdit)
+{
+	std::vector<CMeshRoad::SInfoEdge>::iterator it = CMeshRoad::GetInstance()->SelectEdge();
+
+	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, it->fRot, 0.0f));
+
+	CEffect3D::Create(it->pos + vecPole * 200.0f, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	CEffect3D::Create(it->pos - vecPole * 200.0f, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 }
