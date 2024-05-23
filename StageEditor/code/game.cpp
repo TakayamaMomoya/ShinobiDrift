@@ -30,6 +30,8 @@
 #include "pause.h"
 #include "slow.h"
 #include "blockManager.h"
+#include "meshRoad.h"
+#include "editMesh.h"
 
 //*****************************************************
 // マクロ定義
@@ -49,6 +51,7 @@ CGame::CGame()
 {
 	m_nCntState = 0;
 	m_bStop = false;
+	m_pEdit = nullptr;
 }
 
 //=====================================================
@@ -65,16 +68,16 @@ HRESULT CGame::Init(void)
 	CUIManager::Create();
 
 	// 床の生成
-	CObject3D *pObjectOut = CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	//CObject3D *pObjectOut = CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-	if (pObjectOut != nullptr)
-	{
-		int nIdx = CTexture::GetInstance()->Regist("data\\TEXTURE\\BG\\field00.jpg");
-		pObjectOut->SetPosition(D3DXVECTOR3(0.0f, -5.0f, 0.0f));
-		pObjectOut->SetIdxTexture(nIdx);
-		pObjectOut->SetTex(D3DXVECTOR2(100.0f, 100.0f), D3DXVECTOR2(0.0f, 0.0f));
-		pObjectOut->SetSize(50000.0f, 50000.0f);
-	}
+	//if (pObjectOut != nullptr)
+	//{
+	//	int nIdx = CTexture::GetInstance()->Regist("data\\TEXTURE\\BG\\field00.jpg");
+	//	pObjectOut->SetPosition(D3DXVECTOR3(0.0f, -5.0f, 0.0f));
+	//	pObjectOut->SetIdxTexture(nIdx);
+	//	pObjectOut->SetTex(D3DXVECTOR2(100.0f, 100.0f), D3DXVECTOR2(0.0f, 0.0f));
+	//	pObjectOut->SetSize(50000.0f, 50000.0f);
+	//}
 
 	// スカイボックスの生成
 	CSkybox::Create();
@@ -94,6 +97,12 @@ HRESULT CGame::Init(void)
 	// スロー管理の生成
 	CSlow::Create();
 
+	// メッシュロードの生成
+	CMeshRoad::Create();
+
+	m_pEdit = new CEditMesh;
+	m_pEdit->Init();
+
 	return S_OK;
 }
 
@@ -102,6 +111,8 @@ HRESULT CGame::Init(void)
 //=====================================================
 void CGame::Uninit(void)
 {
+	m_pEdit->Uninit();
+
 	// オブジェクト全棄
 	CObject::ReleaseAll();
 
@@ -117,10 +128,13 @@ void CGame::Update(void)
 	CInputManager *pInputManager = CInputManager::GetInstance();
 	CSound* pSound = CSound::GetInstance();
 
+	m_pEdit->Update();
+
+	// シーンの更新
+	CScene::Update();
+
 	if (m_bStop == false)
 	{
-		// シーンの更新
-		CScene::Update();
 
 		// カーソルを中心に固定
 		SetCursorPos((int)(SCREEN_WIDTH * 0.5f), (int)(SCREEN_HEIGHT * 0.5f));

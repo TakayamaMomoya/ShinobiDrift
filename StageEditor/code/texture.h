@@ -44,4 +44,10 @@ private:
 	static CTexture *m_pTexture;	// 自身のポインタ
 };
 
+namespace Texture
+{
+int GetIdx(const char *pPath);	// テクスチャ番号の取得
+LPDIRECT3DTEXTURE9 GetTexture(int nIdx);	// テクスチャの取得
+}
+
 #endif

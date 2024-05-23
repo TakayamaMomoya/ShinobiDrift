@@ -2,10 +2,10 @@ Metasequoia Document
 Format Text Ver 1.0
 
 Scene {
-	pos -7381.4023 1202.7959 100000.0000
+	pos -1646.2451 -4715.0103 100000.0000
 	lookat 0.0000 0.0000 0.0000
-	head 0.0664
-	pich 0.9608
+	head 0.1564
+	pich 1.5708
 	bank -0.0200
 	ortho 0
 	zoom2 0.0750
@@ -19,7 +19,7 @@ Scene {
 }
 Material 2 {
 	"lambert15SG" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("arms_01.png")
-	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Pictures\É`Å[ÉÄêßçÏ\451026.jpg") proj_type(1) proj_pos(583.476 0.000 0.000) proj_scale(15561.620 100.000 100.000) proj_angle(0.000 0.000 0.000)
+	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Pictures\team\451026.jpg") proj_type(1) proj_pos(583.476 0.000 0.000) proj_scale(15561.620 100.000 100.000) proj_angle(0.000 0.000 0.000)
 }
 Object "obj2" {
 	visible 15

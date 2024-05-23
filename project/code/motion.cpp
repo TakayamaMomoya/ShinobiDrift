@@ -10,7 +10,6 @@
 //*****************************************************
 #include "motion.h"
 #include "model.h"
-#include <stdio.h>
 #include "manager.h"
 #include "renderer.h"
 #include "debugproc.h"

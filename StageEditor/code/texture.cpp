@@ -171,3 +171,26 @@ LPDIRECT3DTEXTURE9 CTexture::GetAddress(int nIdx)
 		return m_apTexture[nIdx];
 	}
 }
+
+namespace Texture
+{
+int GetIdx(const char *pPath)
+{// テクスチャ番号取得
+	CTexture *pTexture = CTexture::GetInstance();
+
+	if (pTexture == nullptr)
+		return -1;
+
+	return pTexture->Regist(pPath);
+}
+
+LPDIRECT3DTEXTURE9 GetTexture(int nIdx)
+{// テクスチャ取得
+	CTexture *pTexture = CTexture::GetInstance();
+
+	if (pTexture == nullptr)
+		return nullptr;
+
+	return pTexture->GetAddress(nIdx);
+}
+}

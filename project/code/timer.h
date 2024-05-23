@@ -1,6 +1,6 @@
 //*****************************************************
 //
-//タイムの処理[timer.h]
+// タイムの処理[timer.h]
 // Author:森川駿弥
 //
 //*****************************************************
@@ -25,17 +25,15 @@
 class CTimer : public CObject
 {
 public:
-	// メンバ関数
-	CTimer(int nPriority = 7);
-	~CTimer();	//	デストラクタ
+	CTimer(int nPriority = 7);	// コンストラクタ
+	~CTimer();	// デストラクタ
 
-	//敵生成
-	static CTimer* Create();
+	// メンバ関数
+	static CTimer* Create();	// 生成
 
 	HRESULT Init();
 	void Uninit();
 	void Update();
-	void Set();
 	void Sub(int nTime) { m_nSeconds -= nTime; }
 
 private:

@@ -13,7 +13,6 @@
 #include "renderer.h"
 #include "manager.h"
 #include "object.h"
-#include <stdio.h>
 
 //*****************************************************
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾

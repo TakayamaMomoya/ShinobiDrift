@@ -12,7 +12,6 @@
 #include "manager.h"
 #include "renderer.h"
 #include "texture.h"
-#include <stdio.h>
 
 //*****************************************************
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾

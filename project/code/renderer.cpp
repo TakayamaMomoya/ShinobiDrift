@@ -12,7 +12,6 @@
 #include "manager.h"
 #include "debugproc.h"
 #include "object.h"
-#include <stdio.h>
 #include "fade.h"
 #include "block.h"
 
