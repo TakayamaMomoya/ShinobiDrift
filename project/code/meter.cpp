@@ -17,10 +17,8 @@
 //*****************************************************
 namespace
 {
-	const int VALUE = 240;			// 値
-	const int PLACE = 2;			// 桁数
-	const float WIDTH = SCREEN_WIDTH * 0.5f;		// 幅
-	const float HEIGHT = SCREEN_HEIGHT * 0.5f;		// 高さ
+	const int SECOND = 70;		// メーターの表示値
+	const int PLACE = 2;		// 桁数
 }
 
 //=====================================================
@@ -33,7 +31,7 @@ CMeter* CMeter::m_pMeter = nullptr;
 //=====================================================
 CMeter::CMeter(int nPriority)
 {
-	m_nMeter = 0;			// 現在のメーター値
+	m_NowMeter = 0;			// 現在のメーター値
 	m_nCntMeter = 0;		// メーター加算
 	m_pNumber = nullptr;	// ナンバーのポインタ
 	m_pPlayer = nullptr;	// プレイヤーのポインタ
@@ -73,7 +71,7 @@ HRESULT CMeter::Init(void)
 	m_pPlayer = CPlayer::GetInstance();
 
 	// 速度
-	m_nMeter = 0;
+	m_NowMeter = 0;
 
 	// 生成
 	m_pNumber = CNumber::Create(PLACE, 0);
@@ -108,8 +106,8 @@ void CMeter::Uninit(void)
 //=====================================================
 void CMeter::Update(void)
 {
-	// デルタタイム取得
-	float fDeltaTime = CManager::GetDeltaTime();
+	// メーター値の加算
+	Acceleration();
 }
 
 //=====================================================
@@ -117,61 +115,30 @@ void CMeter::Update(void)
 //=====================================================
 void CMeter::Acceleration()
 {
+	// デルタタイム取得
+	float fDeltaTime = CManager::GetDeltaTime();
+
 	// 速度取得
-	float fSpeed = m_pPlayer->GetParam().fSpeedMax;
+	float fSpeed = m_pPlayer->GetSpeed();
+	float fMaxSpeed = m_pPlayer->GetParam().fSpeedMax;
 
-	m_nMeter++;
+	m_NowMeter = fSpeed;
 
-	if (m_nMeter >= fSpeed)
+	if (m_NowMeter >= fMaxSpeed)
 	{// プレイヤーパラメーターの速度を超えないように
-		m_nMeter = fSpeed;
+		m_NowMeter = fMaxSpeed;
 	}
 
-	// 秒の計算
-	int Meter = m_nMeter % VALUE;
+	// メーター値の計算
+	int Meter = m_NowMeter % SECOND;
 
 	if (m_pNumber != nullptr)
 	{// 秒表示の制御
 		m_pNumber->SetValue(Meter, PLACE);
 	}
 
-	if (m_nMeter <= 0)
-	{
-		m_nMeter = 0;
-	}
-}
-
-//=====================================================
-// 減速時処理
-//=====================================================
-void CMeter::Deceleration()
-{
-	// 速度取得
-	float fSpeed = m_pPlayer->GetParam().fSpeedMax;
-
-	// カウンター加算
-	m_nCntMeter++;
-
-	if (m_nCntMeter > 60)
-	{
-		m_nCntMeter = 0;
-
-		if (m_nMeter >= 1)
-		{// メーター減算
-			m_nMeter++;
-		}
-	}
-
-	// 秒の計算
-	int nSecond = m_nMeter % VALUE;
-
-	if (m_pNumber != nullptr)
-	{// 秒表示の制御
-		m_pNumber->SetValue(nSecond, PLACE);
-	}
-
-	if (m_nMeter <= 0)
-	{
-		m_nMeter = 0;
+	if (m_NowMeter <= 0)
+	{// マイナスの値にいかないように
+		m_NowMeter = 0;
 	}
 }
