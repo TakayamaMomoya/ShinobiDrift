@@ -36,19 +36,19 @@ public:
 	void Uninit();
 	void Update();
 	void Acceleration();
-	void Deceleration();
 
 	// メーターの取得
-	int GetMeter() { return m_nMeter; }
+	int GetMeter() { return m_NowMeter; }
 
 	static CMeter* GetInstance() { return m_pMeter; }
 
 private:
 	//メンバ変数
-	int m_nMeter;		// 現在のメーター値
+	int m_NowMeter;		// 現在のメーター値
 	int m_nCntMeter;	// カウント加算
 	CNumber* m_pNumber;	// ナンバーのポインタ
 	CPlayer* m_pPlayer;	// プレイヤーのポインタ
 	static CMeter* m_pMeter;	// 自身のポインタ
 };
+
 #endif
