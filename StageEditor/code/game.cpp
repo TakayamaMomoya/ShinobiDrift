@@ -32,6 +32,7 @@
 #include "blockManager.h"
 #include "meshRoad.h"
 #include "editMesh.h"
+#include "effect3D.h"
 
 //*****************************************************
 // マクロ定義
@@ -135,7 +136,6 @@ void CGame::Update(void)
 
 	if (m_bStop == false)
 	{
-
 		// カーソルを中心に固定
 		SetCursorPos((int)(SCREEN_WIDTH * 0.5f), (int)(SCREEN_HEIGHT * 0.5f));
 
@@ -166,9 +166,9 @@ void CGame::Update(void)
 	// 状態管理
 	ManageState();
 
-//#ifdef _DEBUG
+#ifdef _DEBUG
 	Debug();
-//#endif
+#endif
 }
 
 //=====================================================

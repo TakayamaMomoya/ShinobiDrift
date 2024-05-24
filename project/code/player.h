@@ -59,6 +59,7 @@ public:
 	void Hit(float fDamage);
 	SParam GetParam(void) { return m_param; }
 	CBlock *GetBlock(void) { return m_info.pBlock; }
+	float GetSpeed() { return m_info.fSpeed; }
 
 private:
 	struct SFragMotion

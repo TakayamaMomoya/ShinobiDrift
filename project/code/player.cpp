@@ -315,6 +315,7 @@ void CPlayer::InputWire(void)
 	// ブロックのチェック
 	CBlock *pBlock = pBlockManager->GetHead();
 	D3DXVECTOR3 posPlayer = GetPosition();
+	D3DXVECTOR3 rotPlayer = GetRotation();
 	D3DXVECTOR3 rotCamera = CManager::GetCamera()->GetCamera()->rot;
 
 	float fAngle = fAngleInput + rotCamera.y + D3DX_PI;
@@ -332,7 +333,6 @@ void CPlayer::InputWire(void)
 	CBlock *pBlockGrab = nullptr;
 	float fAngleMin = D3DX_PI;
 
-
 	float fLength = sqrtf(vecStickR.x * vecStickR.x + vecStickR.y * vecStickR.y);
 
 	if (m_info.pBlock != nullptr)
@@ -348,6 +348,7 @@ void CPlayer::InputWire(void)
 			D3DXVECTOR3 posPlayer = GetPosition();
 			D3DXVECTOR3 posBlock = m_info.pBlock->GetPosition();
 			D3DXVECTOR3 vecDiff = posBlock - posPlayer;
+			float vecLength = D3DXVec3Length(&(posBlock - posPlayer));
 
 			universal::VecConvertLength(&vecDiff, 20.0f);
 
@@ -379,7 +380,7 @@ void CPlayer::InputWire(void)
 					float fDiffInput = fAngle - fAngleDiff;
 
 					if(fDiffInput * fDiffInput < D3DX_PI * 0.4f * D3DX_PI * 0.4f)
-						m_info.fLengthDrift = 25.0f;
+						m_info.fLengthDrift = vecLength;
 				}
 				else
 				{
@@ -389,7 +390,7 @@ void CPlayer::InputWire(void)
 					}
 					else
 					{// 猶予時間が過ぎると弾きカウンターリセット
-						//if (fLength <= 0.5f)
+						if (fLength <= 0.5f)
 						{// 何も掴んでいなければリセット
 							m_info.nCntFlip = 0;
 						}
@@ -425,7 +426,8 @@ void CPlayer::InputWire(void)
 				bool bGrab = m_info.pBlock->CanGrab(posPlayer);
 
 				if (!m_info.bGrabOld && bGrab)
-				{
+				//if (fLength <= 0.5f)
+				{// 操作している判定
 					m_info.nCntFlip = 0;
 					m_info.fCntAngle = 0.0f;
 
@@ -496,17 +498,19 @@ void CPlayer::InputWire(void)
 				CBlock *pBlockNext = pBlock->GetNext();
 
 				D3DXVECTOR3 posBlock = pBlock->GetPosition();
-				D3DXVECTOR3 vecDiff = posBlock - posPlayer;
-				float fAngleDiff = atan2f(vecDiff.x, vecDiff.z);
-				float fDiff = fAngle - fAngleDiff;
+				D3DXVECTOR3 posCamera = CManager::GetCamera()->GetCamera()->posV;
+				D3DXVECTOR3 vecCameraDiff = posPlayer - posCamera;
+				D3DXVECTOR3 vecBlockDiff = posBlock - posPlayer;
+				float fAngleDiff = atan2f(vecBlockDiff.x, vecBlockDiff.z) - rotPlayer.y;
+				float fDiff = fabs(fAngleInput - fAngleDiff);
 
 				universal::LimitRot(&fDiff);
-
+				universal::LimitRot(&fAngleDiff);
 				pBlock->EnableCurrent(false);
 
-				if (fDiff * fDiff < fAngleMin * fAngleMin)
+				if (fDiff < D3DX_PI * 0.5f && fDiff > -D3DX_PI * 0.5f)
 				{
-					float fLengthDiff = sqrtf(vecDiff.x * vecDiff.x + vecDiff.z * vecDiff.z);
+					float fLengthDiff = sqrtf(vecBlockDiff.x * vecBlockDiff.x + vecBlockDiff.z * vecBlockDiff.z);
 
 					if (/*pBlock->CanGrab(posPlayer) && */fLengthDiff <= DIST_LIMIT)
 					{
@@ -536,7 +540,7 @@ void CPlayer::InputWire(void)
 	}
 
 	CDebugProc::GetInstance()->Print("\n掴んでるブロックはある？[%d]", m_info.pBlock != nullptr);
-	CDebugProc::GetInstance()->Print("\nロックオン方向[%f]", fAngle);
+	CDebugProc::GetInstance()->Print("\nロックオン方向[%f]", fAngleInput);
 }
 
 //=====================================================
