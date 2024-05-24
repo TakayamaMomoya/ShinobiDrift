@@ -303,36 +303,44 @@ void CStateEditMeshCurve::SetCurve(void)
 
 	ptrdiff_t distance = std::distance(m_itStart, m_itEnd);	// イテレーター同士の距離
 
-	int nCntEdge = 1;
-	for (auto it = m_itStart; it != m_itEnd - 1; it++)
+	for (auto it = m_itStart; it != m_itEnd + 1; it++)
+	{
+		it->pos;
+
+		CEffect3D::Create(it->pos, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));	// 曲がった先のエフェクト
+
+	}
+
+	int nCntEdge = 0;
+	for (auto it = m_itStart; it != m_itEnd + 1; it++)
 	{// 最初の辺から最後の辺の間をチェック
 		ptrdiff_t distanceCurrent = std::distance(it, m_itEnd);
 		float fRate = (float)nCntEdge / (distance);
 		fRate -= 0.5f;
 
 		D3DXVECTOR3 posEdge = posMid + vecDiff * fRate;	// 辺予測位置の整列
-
+		
 		// 放物線の計算
 		float fLength = universal::ParabolaY(fRate, -m_fAngleCurve);
 		D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, it->fRot, 0.0f)) * fLength;
 		posEdge += vecPole;
 
 		// ずらす分の放物線の計算
-		fRate = 1.0f / (distance);
+		fRate = 0.0f / (distance);
 		fRate -= 0.5f;
 		fLength = universal::ParabolaY(fRate, -m_fAngleCurve);
 		posEdge -= universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, it->fRot, 0.0f)) * fLength;
 
 		CEffect3D::Create(posEdge, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));	// 曲がった先のエフェクト
 
-		// 辺の決定
+		// 辺の位置適用
 		CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
 		
 		if (pKeyboard->GetTrigger(DIK_RETURN))
 		{
 			it->pos = posEdge;
 
-			
+			pMeshRoad->CreateVtxBuffEdge();
 		}
 
 		nCntEdge++;
