@@ -32,6 +32,7 @@ CEditMesh::CEditMesh()
 {
 	m_pMesh = nullptr;
 	m_pManipulator = nullptr;
+	m_pState = nullptr;
 }
 
 //=====================================================
@@ -56,7 +57,7 @@ HRESULT CEditMesh::Init(void)
 	int nIdx = CModel::Load("data\\MODEL\\block\\manipulator.x");
 	m_pManipulator->BindModel(nIdx);
 
-	ChangeState(new CStateEditMeshCurve);
+	ChangeState(new CStateEditMeshCreateMesh);
 
 	return S_OK;
 }
@@ -85,6 +86,18 @@ void CEditMesh::Update(void)
 
 	if (m_pState != nullptr)	// ステイトの更新
 		m_pState->Update(this);
+
+	// ステイトによるモードの切り替え
+	ImGui::Text("ModeSelect");
+
+	if (ImGui::Button("CreateEdge", ImVec2(70, 30)))	// メッシュ生成
+		ChangeState(new CStateEditMeshCreateMesh);
+
+	if (ImGui::Button("Curve", ImVec2(70, 30)))	// カーブの調節
+		ChangeState(new CStateEditMeshCurve);
+
+	if (ImGui::Button("DeleteEdge", ImVec2(70, 30)))	// 辺の削除
+		ChangeState(new CStateEditMeshDeleteEdge);
 }
 
 //=====================================================
@@ -203,7 +216,103 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 //****************************************************************************************
 // カーブの調節
 //****************************************************************************************
+CStateEditMeshCurve::CStateEditMeshCurve() : m_bStart(false), m_bEnd(false), m_fAngleCurve(0.0f)
+{
+	CMeshRoad *pMeshRoad = MeshRoad::GetInstance();
+	pMeshRoad->ResetIterator();
+}
+
 void CStateEditMeshCurve::Update(CEditMesh *pEdit)
+{
+	// 辺の選択
+	std::vector<CMeshRoad::SInfoEdge>::iterator it = CMeshRoad::GetInstance()->SelectEdge();
+
+	// 選択している辺の上にエフェクトを出す
+	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, it->fRot, 0.0f));
+	CEffect3D::Create(it->pos + vecPole * 200.0f, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	CEffect3D::Create(it->pos - vecPole * 200.0f, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
+	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+
+	if (pKeyboard == nullptr)
+		return;
+
+	if (pKeyboard->GetTrigger(DIK_SPACE))
+	{// 辺の選択
+		SetEdge(it);
+	}
+
+	if (pKeyboard->GetTrigger(DIK_R))
+	{// 選択辺の削除
+		m_bStart = false;
+		m_bEnd = false;
+	}
+
+	// 選択した辺にエフェクトを出す
+	if (m_bStart)
+	{
+		D3DXVECTOR3 pos = m_itStart->pos + vecPole * 200.0f;
+		pos.y += 100.0f;
+		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+
+	if (m_bEnd)
+	{
+		D3DXVECTOR3 pos = m_itEnd->pos + vecPole * 200.0f;
+		pos.y += 100.0f;
+		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	}
+
+	if (m_bStart && m_bEnd)
+	{// カーブの強さの調節
+		SetCurve();
+	}
+}
+
+void CStateEditMeshCurve::SetEdge(std::vector<CMeshRoad::SInfoEdge>::iterator it)
+{// 最初と最後の辺の設定
+	if (!m_bStart)
+	{// 最初の辺設定
+		m_itStart = it;
+		m_bStart = true;
+	}
+	else if (!m_bEnd)
+	{// 最後の辺を設定
+		m_itEnd = it;
+		m_bEnd = true;
+	}
+}
+
+void CStateEditMeshCurve::SetCurve(void)
+{// カーブの調整
+	ImGui::DragFloat("AngleCurve", &m_fAngleCurve, 1.0f, 0.0f, FLT_MAX);
+
+	// 辺をカーブに沿って設定
+	D3DXVECTOR3 posStart = m_itStart->pos;
+	D3DXVECTOR3 posEnd = m_itEnd->pos;
+	D3DXVECTOR3 posMid = posStart + (posEnd - posStart) * 0.5f;
+
+	//CEffect3D::Create(posMid, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f));	// 中心座標のエフェクト
+
+	CMeshRoad *pMeshRoad = MeshRoad::GetInstance();
+	std::vector<CMeshRoad::SInfoEdge> *pList = pMeshRoad->GetList();
+
+	ptrdiff_t distance = std::distance(m_itStart, m_itEnd);	// イテレーター同士の距離
+
+	for (auto it = m_itStart + 1; it != m_itEnd; it++)
+	{
+		it->pos;
+
+		CEffect3D::Create(it->pos, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));	// 中心座標のエフェクト
+	}
+}
+
+//****************************************************************************************
+// 辺の削除
+//****************************************************************************************
+void CStateEditMeshDeleteEdge::Update(CEditMesh *pEdit)
 {
 	std::vector<CMeshRoad::SInfoEdge>::iterator it = CMeshRoad::GetInstance()->SelectEdge();
 
@@ -211,4 +320,11 @@ void CStateEditMeshCurve::Update(CEditMesh *pEdit)
 
 	CEffect3D::Create(it->pos + vecPole * 200.0f, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 	CEffect3D::Create(it->pos - vecPole * 200.0f, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
+	if (ImGui::Button("Delete", ImVec2(100, 50)))
+	{
+		CMeshRoad::GetInstance()->DeleteEdge(it);
+
+		return;
+	}
 }
