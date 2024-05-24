@@ -183,8 +183,8 @@ void CGame::UpdateCamera(void)
 		return;
 	}
 
-		// ‘€ì
-		pCamera->Control();
+	// ‘€ì
+	pCamera->Control();
 
 }
 
