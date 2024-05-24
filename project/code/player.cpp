@@ -350,10 +350,13 @@ void CPlayer::InputWire(void)
 			D3DXVECTOR3 vecDiff = posBlock - posPlayer;
 			float vecLength = D3DXVec3Length(&(posBlock - posPlayer));
 
-			universal::VecConvertLength(&vecDiff, 20.0f);
-
 			D3DXVECTOR3 move = GetMove();
 			D3DXVECTOR3 rot = GetRotation();
+
+			D3DXVECTOR3 vecDiffNormal = vecDiff;
+			D3DXVec3Normalize(&vecDiffNormal, &vecDiff);
+
+			universal::VecConvertLength(&vecDiff, fabs(D3DXVec3Dot(&move, &vecDiffNormal)));
 
 			move += vecDiff;
 
@@ -379,8 +382,8 @@ void CPlayer::InputWire(void)
 
 					float fDiffInput = fAngle - fAngleDiff;
 
-					if(fDiffInput * fDiffInput < D3DX_PI * 0.4f * D3DX_PI * 0.4f)
-						m_info.fLengthDrift = vecLength;
+					//if(fDiffInput * fDiffInput < D3DX_PI * 0.4f * D3DX_PI * 0.4f)
+						//m_info.fLengthDrift = vecLength;
 				}
 				else
 				{
@@ -402,19 +405,22 @@ void CPlayer::InputWire(void)
 			{
 				D3DXVECTOR3 rotDest = rot;
 
-				if (fDiff > 0.0f)
+				//if (vecLength > m_info.fLengthDrift)
 				{
-					rotDest.y = fAngleDiff + D3DX_PI * 0.5f;
+					if (fDiff > 0.0f)
+					{
+						rotDest.y = fAngleDiff + D3DX_PI * 0.4f;
 
-					// カメラロール
-					Camera::ControlRoll(0.3f, 0.04f);
-				}
-				else
-				{
-					rotDest.y = fAngleDiff - D3DX_PI * 0.5f;
+						// カメラロール
+						Camera::ControlRoll(0.3f, 0.04f);
+					}
+					else
+					{
+						rotDest.y = fAngleDiff - D3DX_PI * 0.4f;
 
-					// カメラロール
-					Camera::ControlRoll(-0.3f, 0.04f);
+						// カメラロール
+						Camera::ControlRoll(-0.3f, 0.04f);
+					}
 				}
 
 				universal::LimitRot(&rotDest.y);
@@ -433,7 +439,7 @@ void CPlayer::InputWire(void)
 
 					m_info.pBlock = nullptr;
 
-					m_info.fLengthDrift = 1500.0f;
+					m_info.fLengthDrift = 0.0f;
 				}
 
 				m_info.bGrabOld = bGrab;
@@ -498,14 +504,11 @@ void CPlayer::InputWire(void)
 				CBlock *pBlockNext = pBlock->GetNext();
 
 				D3DXVECTOR3 posBlock = pBlock->GetPosition();
-				D3DXVECTOR3 posCamera = CManager::GetCamera()->GetCamera()->posV;
-				D3DXVECTOR3 vecCameraDiff = posPlayer - posCamera;
 				D3DXVECTOR3 vecBlockDiff = posBlock - posPlayer;
 				float fAngleDiff = atan2f(vecBlockDiff.x, vecBlockDiff.z) - rotPlayer.y;
 				float fDiff = fabs(fAngleInput - fAngleDiff);
 
 				universal::LimitRot(&fDiff);
-				universal::LimitRot(&fAngleDiff);
 				pBlock->EnableCurrent(false);
 
 				if (fDiff < D3DX_PI * 0.5f && fDiff > -D3DX_PI * 0.5f)
@@ -517,6 +520,8 @@ void CPlayer::InputWire(void)
 						pBlockGrab = pBlock;
 
 						fAngleMin = fDiff;
+
+						m_info.fLengthDrift = fLengthDiff;
 					}
 				}
 
