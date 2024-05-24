@@ -62,10 +62,20 @@ public:
 class CStateEditMeshCurve : public CStateEditMesh
 {// カーブの調節
 public:
-	CStateEditMeshCurve() {};
+	CStateEditMeshCurve();
 	virtual ~CStateEditMeshCurve() {};
 
 	void Update(CEditMesh *pEdit) override;
+
+private:
+	void SetEdge(std::vector<CMeshRoad::SInfoEdge>::iterator it);
+	void SetCurve(void);
+
+	std::vector<CMeshRoad::SInfoEdge>::iterator m_itStart;	// カーブの開始イテレイター
+	bool m_bStart;	// 最初の辺を設置したかどうか
+	std::vector<CMeshRoad::SInfoEdge>::iterator m_itEnd;	// カーブの終了イテレイター
+	bool m_bEnd;	// 最後の辺を設置したかどうか
+	float m_fAngleCurve;	// カーブの角度
 };
 
 class CStateEditMeshDeleteEdge : public CStateEditMesh

@@ -169,7 +169,6 @@ std::vector<CMeshRoad::SInfoEdge>::iterator CMeshRoad::SelectEdge(void)
 		if(m_it != m_listEdge.end() && std::next(m_it) != m_listEdge.end())
 			std::advance(m_it, 1);
 	}
-
 	if (ImGui::Button("PrevEdge", ImVec2(70, 30)))
 	{
 		if (m_it != m_listEdge.begin())
@@ -177,6 +176,26 @@ std::vector<CMeshRoad::SInfoEdge>::iterator CMeshRoad::SelectEdge(void)
 	}
 
 	return m_it;
+}
+
+//=====================================================
+// 辺の削除
+//=====================================================
+void CMeshRoad::DeleteEdge(std::vector<CMeshRoad::SInfoEdge>::iterator it)
+{
+	m_listEdge.erase(it);
+
+	CreateVtxBuffEdge();
+
+	m_it = m_listEdge.begin();
+}
+
+//=====================================================
+// イテレーターのリセット
+//=====================================================
+void CMeshRoad::ResetIterator(void)
+{
+	m_it = m_listEdge.begin();
 }
 
 //=====================================================
@@ -349,4 +368,17 @@ void CMeshRoad::Load(void)
 	inputFile.close();
 
 	CreateVtxBuffEdge();
+}
+
+namespace MeshRoad
+{
+CMeshRoad *GetInstance(void)
+{
+	CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
+
+	if (pMeshRoad == nullptr)
+		assert("meshroadがないよ～～", false);
+
+	return pMeshRoad;
+}
 }

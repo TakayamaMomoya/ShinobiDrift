@@ -44,7 +44,9 @@ public:
 	void Load(void);	// エディターのみ。ゲームでは消してね
 
 	std::vector<CMeshRoad::SInfoEdge>::iterator SelectEdge(void);
-	std::vector<SInfoEdge> GetList(void) { return m_listEdge; }
+	std::vector<SInfoEdge> *GetList(void) { return &m_listEdge; }
+	void DeleteEdge(std::vector<CMeshRoad::SInfoEdge>::iterator it);
+	void ResetIterator(void);
 
 private:
 	void SetNormal(VERTEX_3D *pVtx,int nIdx);	// 法線の設定
@@ -54,5 +56,10 @@ private:
 	std::vector<SInfoEdge>::iterator m_it;
 	static CMeshRoad *m_pMeshRoad;
 };
+
+namespace MeshRoad
+{
+CMeshRoad *GetInstance(void);
+}
 
 #endif
