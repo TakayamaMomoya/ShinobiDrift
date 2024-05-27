@@ -382,8 +382,7 @@ void CPlayer::InputWire(void)
 
 					float fDiffInput = fAngle - fAngleDiff;
 
-					//if(fDiffInput * fDiffInput < D3DX_PI * 0.4f * D3DX_PI * 0.4f)
-						//m_info.fLengthDrift = vecLength;
+					m_info.fAngleDrift = 0.29f;
 				}
 				else
 				{
@@ -409,14 +408,14 @@ void CPlayer::InputWire(void)
 				{
 					if (fDiff > 0.0f)
 					{
-						rotDest.y = fAngleDiff + D3DX_PI * 0.4f;
+						rotDest.y = fAngleDiff + D3DX_PI * m_info.fAngleDrift;
 
 						// カメラロール
 						Camera::ControlRoll(0.3f, 0.04f);
 					}
 					else
 					{
-						rotDest.y = fAngleDiff - D3DX_PI * 0.4f;
+						rotDest.y = fAngleDiff - D3DX_PI * m_info.fAngleDrift;
 
 						// カメラロール
 						Camera::ControlRoll(-0.3f, 0.04f);
@@ -425,7 +424,7 @@ void CPlayer::InputWire(void)
 
 				universal::LimitRot(&rotDest.y);
 
-				universal::FactingRot(&rot.y, rotDest.y, 0.1f);
+				universal::FactingRot(&rot.y, rotDest.y, 0.15f);
 
 				SetRotation(rot);
 
@@ -522,6 +521,7 @@ void CPlayer::InputWire(void)
 						fAngleMin = fDiff;
 
 						m_info.fLengthDrift = fLengthDiff;
+						m_info.fAngleDrift = 0.4f;
 					}
 				}
 
@@ -564,7 +564,7 @@ void CPlayer::LimitDrift(float fLength)
 
 	float fLengthDiff = sqrtf(vecDiff.x * vecDiff.x + vecDiff.z * vecDiff.z);
 
-	if (fLengthDiff < DIST_LIMIT - LINE_CORRECT_DRIFT)
+	//if (fLengthDiff < DIST_LIMIT - LINE_CORRECT_DRIFT)
 	{
 		//m_info.fAngleHandle = 0.2f;
 
