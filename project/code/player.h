@@ -73,6 +73,7 @@ private:
 		float fSpeedDest;	// 目標速度
 		float fAngleHandle;	// ハンドルをきっている値
 		float fTimerFlip;	// ドリフトカウンター
+		float fAngleDrift;	// ドリフト時の角度倍率の値
 		int nCntFlip;	// 弾きカウンター
 		CBlock *pBlock;	// 掴んでいるブロック
 		CObject3D *pRoap;
