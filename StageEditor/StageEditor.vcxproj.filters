@@ -53,7 +53,6 @@
     <ClCompile Include="code\tutorial.cpp" />
     <ClCompile Include="code\UI.cpp" />
     <ClCompile Include="code\UIManager.cpp" />
-    <ClCompile Include="code\universal.cpp" />
     <ClCompile Include="code\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
@@ -79,6 +78,12 @@
       <Filter>meshedit</Filter>
     </ClCompile>
     <ClCompile Include="code\meshRoad.cpp">
+      <Filter>meshedit</Filter>
+    </ClCompile>
+    <ClCompile Include="code\universal.cpp">
+      <Filter>meshedit</Filter>
+    </ClCompile>
+    <ClCompile Include="code\myLib.cpp">
       <Filter>meshedit</Filter>
     </ClCompile>
   </ItemGroup>
@@ -135,7 +140,6 @@
     <ClInclude Include="code\tutorial.h" />
     <ClInclude Include="code\UI.h" />
     <ClInclude Include="code\UIManager.h" />
-    <ClInclude Include="code\universal.h" />
     <ClInclude Include="code\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
@@ -170,6 +174,12 @@
       <Filter>meshedit</Filter>
     </ClInclude>
     <ClInclude Include="code\meshRoad.h">
+      <Filter>meshedit</Filter>
+    </ClInclude>
+    <ClInclude Include="code\universal.h">
+      <Filter>meshedit</Filter>
+    </ClInclude>
+    <ClInclude Include="code\myLib.h">
       <Filter>meshedit</Filter>
     </ClInclude>
   </ItemGroup>

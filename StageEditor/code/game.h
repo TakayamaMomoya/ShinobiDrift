@@ -56,6 +56,8 @@ private:
 	static STATE m_state;	// 状態
 	static CGame *m_pGame;	// 自身のポインタ
 
+	float m_fHoge;	// デバッグ用消せ消せ消せ
+
 	int m_nCntState;	// 状態遷移カウンター
 	bool m_bStop;	// 停止状態
 	CEdit *m_pEdit;	// エディット

@@ -308,8 +308,10 @@ void CStateEditMeshCurve::SetCurve(void)
 		it->pos;
 
 		CEffect3D::Create(it->pos, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));	// 曲がった先のエフェクト
-
 	}
+
+	float fAngleParabola = atan2f(vecDiff.x, vecDiff.z) + D3DX_PI * 0.5f;	// 伸ばす角度
+	universal::LimitRot(&fAngleParabola);
 
 	int nCntEdge = 0;
 	for (auto it = m_itStart; it != m_itEnd + 1; it++)
@@ -322,20 +324,20 @@ void CStateEditMeshCurve::SetCurve(void)
 		
 		// 放物線の計算
 		float fLength = universal::ParabolaY(fRate, -m_fAngleCurve);
-		D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, it->fRot, 0.0f)) * fLength;
+		D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngleParabola, 0.0f)) * fLength;
 		posEdge += vecPole;
 
 		// ずらす分の放物線の計算
 		fRate = 0.0f / (distance);
 		fRate -= 0.5f;
 		fLength = universal::ParabolaY(fRate, -m_fAngleCurve);
-		posEdge -= universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, it->fRot, 0.0f)) * fLength;
+		posEdge -= universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngleParabola, 0.0f)) * fLength;
 
 		CEffect3D::Create(posEdge, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));	// 曲がった先のエフェクト
 
 		// 辺の位置適用
 		CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
-		
+
 		if (pKeyboard->GetTrigger(DIK_RETURN))
 		{
 			it->pos = posEdge;
