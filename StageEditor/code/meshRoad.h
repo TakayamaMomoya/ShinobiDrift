@@ -16,16 +16,20 @@
 #include <vector>
 
 //*****************************************************
+// 前方定義
+//*****************************************************
+class CSpline;
+
+//*****************************************************
 // クラスの定義
 //*****************************************************
 class CMeshRoad : public CObject3D
 {
 public:
-	struct SInfoEdge
+	struct SInfoRoadPoint
 	{// 辺に必要な情報
 		D3DXVECTOR3 pos;
-		float fRot;
-		SInfoEdge() : pos({ 0.0f,0.0f,0.0f }), fRot(0.0f) {}
+		SInfoRoadPoint() : pos({ 0.0f,0.0f,0.0f }) {}
 	};
 
 	CMeshRoad(int nPriority = 3);	// コンストラクタ
@@ -37,23 +41,25 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	void AddEdge(D3DXVECTOR3 pos, float fRot,bool bReCreateVtx = false);
+	void AddRoadPoint(D3DXVECTOR3 pos,bool bReCreateVtx = false);
 	void CreateVtxBuffEdge(void);	// エッジ数に応じて頂点を生成する
 
 	void Save(void);	// エディターのみ。ゲームでは消してね
 	void Load(void);	// エディターのみ。ゲームでは消してね
 
-	std::vector<CMeshRoad::SInfoEdge>::iterator SelectEdge(void);
-	std::vector<SInfoEdge> *GetList(void) { return &m_listEdge; }
-	void DeleteEdge(std::vector<CMeshRoad::SInfoEdge>::iterator it);
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectEdge(void);
+	std::vector<SInfoRoadPoint> *GetList(void) { return &m_listRoadPoint; }
+	void DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void ResetIterator(void);
 
 private:
 	void SetNormal(VERTEX_3D *pVtx,int nIdx);	// 法線の設定
+	void CreateSpline(void);	// スプラインの生成
 
 	UINT m_nNumVtx;
-	std::vector<SInfoEdge> m_listEdge;
-	std::vector<SInfoEdge>::iterator m_it;
+	std::vector<SInfoRoadPoint> m_listRoadPoint;
+	std::vector<SInfoRoadPoint>::iterator m_it;
+	CSpline *m_pSpline;	// 道のスプライン
 	static CMeshRoad *m_pMeshRoad;
 };
 

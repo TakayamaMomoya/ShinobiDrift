@@ -68,12 +68,12 @@ public:
 	void Update(CEditMesh *pEdit) override;
 
 private:
-	void SetEdge(std::vector<CMeshRoad::SInfoEdge>::iterator it);
+	void SetEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void SetCurve(void);
 
-	std::vector<CMeshRoad::SInfoEdge>::iterator m_itStart;	// カーブの開始イテレイター
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itStart;	// カーブの開始イテレイター
 	bool m_bStart;	// 最初の辺を設置したかどうか
-	std::vector<CMeshRoad::SInfoEdge>::iterator m_itEnd;	// カーブの終了イテレイター
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// カーブの終了イテレイター
 	bool m_bEnd;	// 最後の辺を設置したかどうか
 	float m_fAngleCurve;	// カーブの角度
 };

@@ -35,8 +35,6 @@ void CSpline::Init(const std::vector<double>& x, const std::vector<double>& y)
     for (int i = 0; i < nSize - 1; ++i)
     {
         h[i] = x[i + 1] - x[i];
-
-        CDebugProc::GetInstance()->Print("\n%d区間の距離[%f]", i,h[i]);  // デバッグ表記
     }
 
     // 三重対角系のセットアップ
@@ -93,14 +91,6 @@ double CSpline::Interpolate(double xi)
     }
 
     double h = xi - x[i];
-
-    CDebugProc::GetInstance()->Print("\n何番目～～？[%d]", i);  // デバッグ表記
-    CDebugProc::GetInstance()->Print("\n高さ[%f]", a[i] + b[i] * h + c[i] * h * h + d[i] * h * h * h);  // デバッグ表記
-
-    if (i > 0)
-    {
-        CDebugProc::GetInstance()->Print("\n前の点の高さ[%f]", y[i - 1]);
-    }
 
     return a[i] + b[i] * h + c[i] * h * h + d[i] * h * h * h;
 }

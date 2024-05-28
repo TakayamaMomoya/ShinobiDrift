@@ -12,6 +12,7 @@
 #include "renderer.h"
 #include "texture.h"
 #include "effect3D.h"
+#include "myLib.h"
 #include <fstream>
 
 //*****************************************************
@@ -23,6 +24,7 @@ const UINT NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
 const float WIDTH_DEFAULT = 200.0f;	// デフォルトの幅
 const float LENGTH_DEFAULT = 200.0f;	// デフォルトの長さ
 const int NUM_VTX_IN_EDGE = 2;	// 一辺にある頂点数
+const int NUM_EDGE_IN_ROADPOINT = 10;	// ロードポイント一つにつき、ある辺の数
 const char PATH_SAVE[] = "data\\MAP\\road00.bin";	// 保存ファイルのパス
 const char* PATH_TEXTURE = "data\\TEXTURE\\MATERIAL\\road.jpg";	// テクスチャパス
 const float DIST_DEFAULT = 200.0f;	// デフォルトの辺間の距離
@@ -39,6 +41,7 @@ CMeshRoad *CMeshRoad::m_pMeshRoad = nullptr;	// 自身のポインタ
 CMeshRoad::CMeshRoad(int nPriority) : CObject3D(nPriority)
 {
 	m_nNumVtx = 0;
+	m_pSpline = nullptr;
 }
 
 //=====================================================
@@ -79,16 +82,16 @@ CMeshRoad *CMeshRoad::Create(void)
 HRESULT CMeshRoad::Init(void)
 {
 	// リストの初期化
-	m_listEdge.clear();
+	m_listRoadPoint.clear();
 
 	// テクスチャ読み込み
 	int nIdx = Texture::GetIdx(PATH_TEXTURE);
 	SetIdxTexture(nIdx);
 
 	// 読み込み処理
-	Load();
+	//Load();
 
-	m_it = m_listEdge.begin();
+	m_it = m_listRoadPoint.begin();
 
 	return S_OK;
 }
@@ -98,6 +101,12 @@ HRESULT CMeshRoad::Init(void)
 //=====================================================
 void CMeshRoad::Uninit(void)
 {
+	if (m_pSpline != nullptr)
+	{
+		delete m_pSpline;
+		m_pSpline = nullptr;
+	}
+
 	Release();
 }
 
@@ -106,7 +115,10 @@ void CMeshRoad::Uninit(void)
 //=====================================================
 void CMeshRoad::Update(void)
 {
-
+#ifdef _DEBUG
+	for (SInfoRoadPoint info : m_listRoadPoint)
+		CEffect3D::Create(info.pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+#endif // _DEBUG
 }
 
 //=====================================================
@@ -160,18 +172,18 @@ void CMeshRoad::Draw(void)
 }
 
 //=====================================================
-// 辺の選択
+// ロードポイントの選択
 //=====================================================
-std::vector<CMeshRoad::SInfoEdge>::iterator CMeshRoad::SelectEdge(void)
+std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectEdge(void)
 {
 	if (ImGui::Button("NextEdge", ImVec2(70, 30)))
 	{
-		if(m_it != m_listEdge.end() && std::next(m_it) != m_listEdge.end())
+		if(m_it != m_listRoadPoint.end() && std::next(m_it) != m_listRoadPoint.end())
 			std::advance(m_it, 1);
 	}
 	if (ImGui::Button("PrevEdge", ImVec2(70, 30)))
 	{
-		if (m_it != m_listEdge.begin())
+		if (m_it != m_listRoadPoint.begin())
 			std::advance(m_it, -1);
 	}
 
@@ -179,15 +191,15 @@ std::vector<CMeshRoad::SInfoEdge>::iterator CMeshRoad::SelectEdge(void)
 }
 
 //=====================================================
-// 辺の削除
+// ロードポイントの削除
 //=====================================================
-void CMeshRoad::DeleteEdge(std::vector<CMeshRoad::SInfoEdge>::iterator it)
+void CMeshRoad::DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
 {
-	m_listEdge.erase(it);
+	m_listRoadPoint.erase(it);
 
 	CreateVtxBuffEdge();
 
-	m_it = m_listEdge.begin();
+	m_it = m_listRoadPoint.begin();
 }
 
 //=====================================================
@@ -195,32 +207,36 @@ void CMeshRoad::DeleteEdge(std::vector<CMeshRoad::SInfoEdge>::iterator it)
 //=====================================================
 void CMeshRoad::ResetIterator(void)
 {
-	m_it = m_listEdge.begin();
+	m_it = m_listRoadPoint.begin();
 }
 
 //=====================================================
-// 辺の追加
+// ロードポイントの追加
 //=====================================================
-void CMeshRoad::AddEdge(D3DXVECTOR3 pos, float fRot, bool bReCreateVtx)
+void CMeshRoad::AddRoadPoint(D3DXVECTOR3 pos, bool bReCreateVtx)
 {
 	// リストに情報を追加
-	SInfoEdge info;
+	SInfoRoadPoint info;
 	info.pos = pos;
-	info.fRot = fRot;
 
-	m_listEdge.push_back(info);
+	m_listRoadPoint.push_back(info);
 
-	if(bReCreateVtx)	// 辺に応じた頂点の再生成
+	if(bReCreateVtx)	// ロードポイントに応じた頂点の再生成
 		CreateVtxBuffEdge();
+
+
 }
 
 //=====================================================
-// 辺に応じた頂点の生成
+// ロードポイントに応じた頂点の生成
 //=====================================================
 void CMeshRoad::CreateVtxBuffEdge(void)
 {
+	// スプラインの再生成
+	CreateSpline();
+
 	// 頂点の生成
-	m_nNumVtx = m_listEdge.size() * NUM_VTX_IN_EDGE;
+	m_nNumVtx = m_listRoadPoint.size() * NUM_VTX_IN_EDGE * NUM_EDGE_IN_ROADPOINT;
 	CreateVtxBuff(m_nNumVtx);
 
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
@@ -228,66 +244,6 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-	// 最初のテクスチャ座標設定
-	pVtx[0].tex = { 0.0f,0.0f };
-	pVtx[1].tex = { 1.0f,0.0f };
-
-	float fRateUp = 0.0f;
-	float fRateDown = 0.0f;
-
-	// 頂点位置を辺に合わせる
-	int nCntEdge = 0;
-	for (const auto& edge : m_listEdge)
-	{
-		int nIdx = nCntEdge * NUM_VTX_IN_EDGE;	// 頂点の番号計算
-
-		// 頂点位置の計算
-		D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, edge.fRot, 0.0f));
-
-		pVtx[nIdx].pos = edge.pos + vecPole * WIDTH_DEFAULT;
-		pVtx[nIdx + 1].pos = edge.pos - vecPole * WIDTH_DEFAULT;
-
-		// 法線の計算
-		if (nCntEdge != 0)
-		{// 最初の辺以外を設定する
-			SetNormal(pVtx, nIdx);
-		}
-
-		// テクスチャ座標の設定
-		if (nCntEdge > 0)
-		{// 最初の辺以外はテクスチャ座標を足していく
-			// デフォルトの距離をもとに前回の辺からどのくらい離れているか計算
-			int nIdxOld = nIdx - NUM_VTX_IN_EDGE;	// ひとつ前の辺の頂点番号
-
-			// 頂点位置
-			D3DXVECTOR3 vtxLu = pVtx[nIdxOld].pos;
-			D3DXVECTOR3 vtxLd = pVtx[nIdxOld + 1].pos;
-			D3DXVECTOR3 vtxRu = pVtx[nIdx].pos;
-			D3DXVECTOR3 vtxRd = pVtx[nIdx + 1].pos;
-
-			// 上下の辺の長さを計算
-			D3DXVECTOR3 vecDiffUp = vtxLu - vtxRu;
-			D3DXVECTOR3 vecDiffDown = vtxLd - vtxRd;
-			float fDistUp = D3DXVec3Length(&vecDiffUp);
-			float fDistDown = D3DXVec3Length(&vecDiffDown);
-
-			fRateUp += fDistUp / DIST_DEFAULT;
-			fRateDown += fDistDown / DIST_DEFAULT;
-
-			pVtx[nIdx].tex = { 0.0f,fRateUp };
-			pVtx[nIdx + 1].tex = { 1.0f,fRateDown };
-		}
-		else
-		{// 奇数の時
-		}
-
-		nCntEdge++;
-	}
-
-	// 最初の辺と二番目の辺の法線を合わせる
-	pVtx[0].nor = pVtx[NUM_VTX_IN_EDGE].nor;
-	pVtx[1].nor = pVtx[NUM_VTX_IN_EDGE + 1].nor;
 
 	// 頂点バッファをアンロック
 	pVtxBuff->Unlock();
@@ -324,6 +280,41 @@ void CMeshRoad::SetNormal(VERTEX_3D *pVtx, int nIdx)
 }
 
 //=====================================================
+// スプラインの生成
+//=====================================================
+void CMeshRoad::CreateSpline(void)
+{
+	if (m_pSpline != nullptr)
+	{// スプラインが既にあったら破棄
+		delete m_pSpline;
+		m_pSpline = nullptr;
+	}
+
+	m_pSpline = new CSpline;
+
+	if (m_pSpline != nullptr)
+	{
+		// データ点のベクター用意
+		std::vector<double> x;
+		std::vector<double> y;
+		
+		// ベクターを必要なサイズに調整
+		int nSize = m_listRoadPoint.size();
+		x.resize(nSize);
+		y.resize(nSize);
+		
+		for (int i = 0; i < nSize; i++)
+		{
+			x[i] = m_listRoadPoint[i].pos.x;
+			y[i] = m_listRoadPoint[i].pos.z;	// xz平面で計算するため、ｙにはｚ座標を代入
+		}
+		
+		// スプラインの初期化
+		m_pSpline->Init(x, y);
+	}
+}
+
+//=====================================================
 // 保存処理
 //=====================================================
 void CMeshRoad::Save(void)
@@ -335,11 +326,11 @@ void CMeshRoad::Save(void)
 		assert(("メッシュロードのファイルを開けませんでした", false));
 	
 	// 情報数保存
-	size_t size = m_listEdge.size();
+	size_t size = m_listRoadPoint.size();
 	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
 	// リストの情報保存
-	outputFile.write(reinterpret_cast<const char*>(m_listEdge.data()), sizeof(SInfoEdge) * size);
+	outputFile.write(reinterpret_cast<const char*>(m_listRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
 
 	outputFile.close();
 }
@@ -349,7 +340,7 @@ void CMeshRoad::Save(void)
 //=====================================================
 void CMeshRoad::Load(void)
 {
-	m_listEdge.clear();
+	m_listRoadPoint.clear();
 
 	// ファイルを開く
 	std::ifstream inputFile(PATH_SAVE, std::ios::binary);
@@ -360,10 +351,10 @@ void CMeshRoad::Load(void)
 	// データ数読み込み
 	size_t size;
 	inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-	m_listEdge.resize(size);
+	m_listRoadPoint.resize(size);
 
 	// 辺データ読み込み
-	inputFile.read(reinterpret_cast<char*>(m_listEdge.data()), sizeof(SInfoEdge) * size);
+	inputFile.read(reinterpret_cast<char*>(m_listRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
 
 	inputFile.close();
 

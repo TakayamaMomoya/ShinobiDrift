@@ -185,27 +185,15 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 		pEdit->SetPosition(pos);
 	}
 
-	D3DXVECTOR3 posD = pos + vecPole * 200.0f;
-	CDebugProc::GetInstance()->Print("オフセット[%f,%f,%f]", posD.x, posD.y, posD.z);
-	posD = pos - vecPole * 200.0f;
-	CDebugProc::GetInstance()->Print("オフセット[%f,%f,%f]", posD.x, posD.y, posD.z);
-
 	if (pKeyboard->GetTrigger(DIK_SPACE))
-	{// メッシュの追加
+	{// ロードポイントの追加
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
-		pMesh->AddEdge(pos, rot.y - D3DX_PI * 0.5f, true);
-
-		D3DXVECTOR3 pos = pos + vecPole * 200.0f;
-		CDebugProc::GetInstance()->Print("オフセット[%f,%f,%f]", pos.x, pos.y, pos.z);
-		pos = pos - vecPole * 200.0f;
-		CDebugProc::GetInstance()->Print("オフセット[%f,%f,%f]", pos.x, pos.y, pos.z);
-		CEffect3D::Create(pos + vecPole * 200.0f, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-		CEffect3D::Create(pos - vecPole * 200.0f, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+		pMesh->AddRoadPoint(pos, true);
 	}
 
 	if (ImGui::Button("Save", ImVec2(100, 50)))
-	{
+	{// 保存
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		if (pMesh != nullptr)
@@ -224,54 +212,10 @@ CStateEditMeshCurve::CStateEditMeshCurve() : m_bStart(false), m_bEnd(false), m_f
 
 void CStateEditMeshCurve::Update(CEditMesh *pEdit)
 {
-	// 辺の選択
-	std::vector<CMeshRoad::SInfoEdge>::iterator it = CMeshRoad::GetInstance()->SelectEdge();
 
-	// 選択している辺の上にエフェクトを出す
-	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, it->fRot, 0.0f));
-	CEffect3D::Create(it->pos + vecPole * 200.0f, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-	CEffect3D::Create(it->pos - vecPole * 200.0f, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-
-	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
-
-	if (pKeyboard == nullptr)
-		return;
-
-	if (pKeyboard->GetTrigger(DIK_SPACE))
-	{// 辺の選択
-		SetEdge(it);
-	}
-
-	if (pKeyboard->GetTrigger(DIK_R))
-	{// 選択辺の削除
-		m_bStart = false;
-		m_bEnd = false;
-	}
-
-	// 選択した辺にエフェクトを出す
-	if (m_bStart)
-	{
-		D3DXVECTOR3 pos = m_itStart->pos + vecPole * 200.0f;
-		pos.y += 100.0f;
-		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-	}
-
-	if (m_bEnd)
-	{
-		D3DXVECTOR3 pos = m_itEnd->pos + vecPole * 200.0f;
-		pos.y += 100.0f;
-		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	}
-
-	if (m_bStart && m_bEnd)
-	{// カーブの強さの調節
-		SetCurve();
-	}
 }
 
-void CStateEditMeshCurve::SetEdge(std::vector<CMeshRoad::SInfoEdge>::iterator it)
+void CStateEditMeshCurve::SetEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
 {// 最初と最後の辺の設定
 	if (!m_bStart)
 	{// 最初の辺設定
@@ -299,7 +243,7 @@ void CStateEditMeshCurve::SetCurve(void)
 
 	// 辺のリストの取得
 	CMeshRoad *pMeshRoad = MeshRoad::GetInstance();
-	std::vector<CMeshRoad::SInfoEdge> *pList = pMeshRoad->GetList();
+	std::vector<CMeshRoad::SInfoRoadPoint> *pList = pMeshRoad->GetList();
 
 	ptrdiff_t distance = std::distance(m_itStart, m_itEnd);	// イテレーター同士の距離
 
@@ -354,17 +298,5 @@ void CStateEditMeshCurve::SetCurve(void)
 //****************************************************************************************
 void CStateEditMeshDeleteEdge::Update(CEditMesh *pEdit)
 {
-	std::vector<CMeshRoad::SInfoEdge>::iterator it = CMeshRoad::GetInstance()->SelectEdge();
 
-	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, it->fRot, 0.0f));
-
-	CEffect3D::Create(it->pos + vecPole * 200.0f, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-	CEffect3D::Create(it->pos - vecPole * 200.0f, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-
-	if (ImGui::Button("Delete", ImVec2(100, 50)))
-	{
-		CMeshRoad::GetInstance()->DeleteEdge(it);
-
-		return;
-	}
 }

@@ -54,7 +54,6 @@ CGame::CGame()
 	m_nCntState = 0;
 	m_bStop = false;
 	m_pEdit = nullptr;
-	m_fHoge = 0.0f;
 }
 
 //=====================================================
@@ -282,7 +281,7 @@ void CGame::Debug(void)
 
 		CDebugProc::GetInstance()->Print("\nƒzƒQ[%f]", m_fHoge);
 
-		float fHeight = pSpline->Interpolate(m_fHoge);
+		float fHeight = (float)pSpline->Interpolate(m_fHoge);
 		CEffect3D::Create(D3DXVECTOR3(m_fHoge,fHeight,0.0f), 20.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 	}
 
