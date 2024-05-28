@@ -254,8 +254,8 @@ void CGame::Debug(void)
 	if (pSpline != nullptr)
 	{
 		// データ点の用意
-		std::vector<double> x = { 0.0,200.0,500.0f };
-		std::vector<double> y = { 0.0,100.0,0.0f };
+		std::vector<double> x = { 0.0,200.0,500.0,700.0 ,900.0};
+		std::vector<double> y = { 0.0,100.0,0.0,100.0,200.0 };
 
 		// 係数の計算
 		pSpline->Init(x, y);
@@ -280,9 +280,14 @@ void CGame::Debug(void)
 		if (CInputKeyboard::GetInstance()->GetPress(DIK_N))
 			m_fHoge -= 1.0f;
 
+		CDebugProc::GetInstance()->Print("\nホゲ[%f]", m_fHoge);
+
 		float fHeight = pSpline->Interpolate(m_fHoge);
 		CEffect3D::Create(D3DXVECTOR3(m_fHoge,fHeight,0.0f), 20.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 	}
+
+	delete pSpline;
+	pSpline = nullptr;
 }
 
 //=====================================================

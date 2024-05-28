@@ -9,6 +9,7 @@
 // インクルード
 //*****************************************************
 #include "myLib.h"
+#include "debugproc.h"
 
 //=================================================================================
 // スプライン
@@ -30,45 +31,46 @@ void CSpline::Init(const std::vector<double>& x, const std::vector<double>& y)
     d.resize(nSize, 0.0);
 
     // 区間の距離計算
-    std::vector<double> dist(nSize - 1);
+    std::vector<double> h(nSize - 1);
     for (int i = 0; i < nSize - 1; ++i)
     {
-        dist[i] = x[i + 1] - x[i];
+        h[i] = x[i + 1] - x[i];
+
+        CDebugProc::GetInstance()->Print("\n%d区間の距離[%f]", i,h[i]);  // デバッグ表記
     }
 
     // 三重対角系のセットアップ
     std::vector<double> alpha(nSize - 1);
-    std::vector<double> beta(nSize - 1);
 
     for (int i = 1; i < nSize - 1; ++i)
     {
-        alpha[i] = 3.0 / dist[i] * (a[i + 1] - a[i]) - 3.0 / dist[i - 1] * (a[i] - a[i - 1]);
+        alpha[i] = 3.0 / h[i] * (a[i + 1] - a[i]) - 3.0 / h[i - 1] * (a[i] - a[i - 1]);
     }
 
     // cの三重対角系を解く
-    std::vector<double> l(nSize);
-    std::vector<double> mu(nSize);
-    std::vector<double> z(nSize);
+    std::vector<double> l(nSize + 1);
+    std::vector<double> mu(nSize + 1);
+    std::vector<double> z(nSize + 1);
     l[0] = 1.0;
     mu[0] = 0.0;
     z[0] = 0.0;
 
     for (int i = 1; i < nSize - 1; ++i)
     {
-        l[i] = 2.0 * (x[i + 1] - x[i - 1]) - dist[i - 1] * mu[i - 1];
-        mu[i] = dist[i] / l[i];
-        z[i] = (alpha[i] - dist[i - 1] * z[i - 1]) / l[i];
+        l[i] = 2.0 * (x[i + 1] - x[i - 1]) - h[i - 1] * mu[i - 1];
+        mu[i] = h[i] / l[i];
+        z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / l[i];
     }
 
     l[nSize - 1] = 1.0;
     z[nSize - 1] = 0.0;
     c[nSize - 1] = 0.0;
 
-    for (int j = nSize - 2; j >= 0; --j)
+    for (int j = nSize - 2; j >= 0; j--)
     {
         c[j] = z[j] - mu[j] * c[j + 1];
-        b[j] = (a[j + 1] - a[j]) / dist[j] - dist[j] * (c[j + 1] + 2.0 * c[j]) / 3.0;
-        d[j] = (c[j + 1] - c[j]) / (3.0 * dist[j]);
+        b[j] = (a[j + 1] - a[j]) / h[j] - h[j] * (c[j + 1] + 2.0 * c[j]) / 3.0;
+        d[j] = (c[j + 1] - c[j]) / (3.0 * h[j]);
     }
 }
 
@@ -80,15 +82,25 @@ double CSpline::Interpolate(double xi)
     int n = x.size();
     int i = 0;
 
-    while (i < n && xi > x[i])
+    while (i < n && xi > x[i + 1])
     {
-        ++i;
+        i++;
     }
+
     if (i >= n)
     {
         i = n - 1;
     }
 
-    double dx = xi - x[i];
-    return a[i] + b[i] * dx + c[i] * dx * dx + d[i] * dx * dx * dx;
+    double h = xi - x[i];
+
+    CDebugProc::GetInstance()->Print("\n何番目～～？[%d]", i);  // デバッグ表記
+    CDebugProc::GetInstance()->Print("\n高さ[%f]", a[i] + b[i] * h + c[i] * h * h + d[i] * h * h * h);  // デバッグ表記
+
+    if (i > 0)
+    {
+        CDebugProc::GetInstance()->Print("\n前の点の高さ[%f]", y[i - 1]);
+    }
+
+    return a[i] + b[i] * h + c[i] * h * h + d[i] * h * h * h;
 }
