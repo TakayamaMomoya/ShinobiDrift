@@ -13,6 +13,7 @@
 #include "universal.h"
 #include "debugproc.h"
 #include <stdio.h>
+#include <cmath>
 
 namespace universal
 {

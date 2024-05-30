@@ -8,6 +8,8 @@
 #define _UNIVERSAL_H_
 
 #include "main.h"
+#include <vector>
+#include <iostream>
 
 //*****************************************
 // ƒNƒ‰ƒX‚Ì’è‹`
@@ -38,6 +40,7 @@ D3DXVECTOR3 VecToOffset(D3DXMATRIX mtx, D3DXVECTOR3 posOffset);
 D3DXVECTOR3 PolarCoordinates(D3DXVECTOR3 rot);
 float ParabolaY(float x, float a);
 float ParabolaX(float y, float a);
+void SolveTridiagonal(std::vector<double>& a, std::vector<double>& b, std::vector<double>& c, std::vector<double>& d, std::vector<double>& result);
 
 //======================================
 // •ÏŠ·Œn
