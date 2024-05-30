@@ -90,7 +90,7 @@ HRESULT CMeshRoad::Init(void)
 	SetIdxTexture(nIdx);
 
 	// “Ç‚İ‚İˆ—
-	Load();
+	//Load();
 
 	m_it = m_listRoadPoint.begin();
 
@@ -407,7 +407,7 @@ void CMeshRoad::CreateSpline(void)
 		{
 			x[i] = m_listRoadPoint[i].pos.x;
 			y[i] = m_listRoadPoint[i].pos.y;
-			z[i] = m_listRoadPoint[i].pos.z;	// xz•½–Ê‚ÅŒvZ‚·‚é‚½‚ßA‚™‚É‚Í‚šÀ•W‚ğ‘ã“ü
+			z[i] = m_listRoadPoint[i].pos.z;
 		}
 		
 		// ƒXƒvƒ‰ƒCƒ“‚Ì‰Šú‰»
@@ -470,7 +470,7 @@ CMeshRoad *GetInstance(void)
 	CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
 
 	if (pMeshRoad == nullptr)
-		assert("meshroad‚ª‚È‚¢‚æ``", false);
+		assert(("meshroad‚ª‚È‚¢‚æ``", false));
 
 	return pMeshRoad;
 }

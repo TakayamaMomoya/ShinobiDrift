@@ -57,6 +57,9 @@ public:
 	virtual ~CStateEditMeshCreateMesh() {};
 
 	void Update(CEditMesh *pEdit) override;
+
+private:
+	void LimitPos(D3DXVECTOR3 *pPos);
 };
 
 class CStateEditMeshCurve : public CStateEditMesh
