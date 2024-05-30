@@ -47,6 +47,7 @@ public:
 	HRESULT Init(HINSTANCE hInstance, HWND hWnd);
 	void Uninit(void);
 	void Update(void);
+	void UpdateDevice(void);
 	static CInputManager *GetInstance(void) { return m_pInputManager; }
 	bool GetTrigger(BUTTON button) { return m_info.abTrigger[button]; }
 	bool GetPress(BUTTON button) { return m_info.abPress[button]; }
