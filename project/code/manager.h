@@ -36,7 +36,7 @@ public:
 
 	HRESULT Init(HINSTANCE hInstance,HWND hWnd,BOOL bWindow);
 	void Uninit(void);
-	void Update();
+	void Update(void);
 	void Draw();
 	static CCamera *GetCamera(void) { return m_pCamera; }
 	static CLight *GetLight(void) { return m_pLight; }

@@ -97,8 +97,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 		// インスタンス生成
 		pManager = new CManager;
 
+#ifdef _DEBUG
+
 		// マネージャーの初期化
 		pManager->Init(hInstance, hWnd, TRUE);
+
+#else 
+
+		// マネージャーの初期化
+		pManager->Init(hInstance, hWnd, FALSE);
+
+#endif
+
+		
 	}
 
 	//分解能を設定

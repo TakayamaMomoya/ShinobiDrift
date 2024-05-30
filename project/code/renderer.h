@@ -31,6 +31,7 @@ public:
 	LPDIRECT3DDEVICE9 GetDevice(void) { return m_pD3DDevice; }	// デバイスの取得
 	bool IsFog(void) { return m_fogInfo.bEnable; }
 	void EnableFog(bool bFog) { m_fogInfo.bEnable = bFog; }
+
 	static CRenderer *GetInstance(void) { return m_pRenderer; }
 
 private:

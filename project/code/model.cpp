@@ -143,6 +143,8 @@ void CModel:: Unload(void)
 				m_apModel[nCntModel]->pIdxTexture = nullptr;
 			}
 
+			memset(&m_aPath[nCntModel][0], 0, sizeof(m_aPath[nCntModel]));
+
 			delete m_apModel[nCntModel];
 			m_apModel[nCntModel] = nullptr;
 
