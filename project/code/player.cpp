@@ -358,8 +358,15 @@ void CPlayer::InputWire(void)
 
 			universal::VecConvertLength(&vecDiff, fabs(D3DXVec3Dot(&move, &vecDiffNormal)));
 
-			move += vecDiff;
-
+			if (vecLength < 1000.0f && m_info.fLengthDrift < 500.0f)
+			{
+				move -= vecDiff * 0.1f;
+			}
+			else
+			{
+				move += vecDiff;
+			}
+			
 			SetMove(move);
 
 			float fAngleDiff = atan2f(vecDiff.x, vecDiff.z);
@@ -497,6 +504,9 @@ void CPlayer::InputWire(void)
 
 		//if (m_info.nCntFlip == 0)
 		{
+			float fLengthMin = 0.0f;
+			CBlock* pBlockMin = nullptr;
+
 			while (pBlock != nullptr)
 			{
 				// 次のアドレスを保存
@@ -514,19 +524,34 @@ void CPlayer::InputWire(void)
 				{
 					float fLengthDiff = sqrtf(vecBlockDiff.x * vecBlockDiff.x + vecBlockDiff.z * vecBlockDiff.z);
 
-					if (/*pBlock->CanGrab(posPlayer) && */fLengthDiff <= DIST_LIMIT)
+					if (/*pBlock->CanGrab(posPlayer) && */fLengthDiff <= DIST_LIMIT && (pBlockMin == nullptr || fLengthMin > fLengthDiff))
 					{
-						pBlockGrab = pBlock;
+						pBlockMin = pBlock;
 
 						fAngleMin = fDiff;
 
-						m_info.fLengthDrift = fLengthDiff;
-						m_info.fAngleDrift = 0.4f;
+						fLengthMin = fLengthDiff;
 					}
 				}
 
 				// 次のアドレスを代入
 				pBlock = pBlockNext;
+			}
+
+			if (pBlockMin != nullptr)
+			{
+				pBlockGrab = pBlockMin;
+
+				m_info.fLengthDrift = fLengthMin;
+
+				if (fLengthMin < 500.0f)
+				{
+					m_info.fAngleDrift = 0.4f;
+				}
+				else
+				{
+					m_info.fAngleDrift = 0.4f;
+				}
 			}
 
 			if (pBlockGrab != nullptr)

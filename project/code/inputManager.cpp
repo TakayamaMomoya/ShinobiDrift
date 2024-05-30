@@ -244,3 +244,26 @@ void CInputManager::Update(void)
 		m_fBreake = 1.0f;
 	}
 }
+
+void CInputManager::UpdateDevice(void)
+{
+	// 各入力デバイスの更新
+	CInputJoypad* pJoypad = CInputJoypad::GetInstance();
+	CInputKeyboard* pKeyboard = CInputKeyboard::GetInstance();
+	CInputMouse* pMouse = CInputMouse::GetInstance();
+
+	if (pJoypad != nullptr)
+	{
+		pJoypad->UpdateDevice();
+	}
+
+	if (pKeyboard != nullptr)
+	{
+		pKeyboard->UpdateDevice();
+	}
+
+	if (pMouse != nullptr)
+	{
+		pMouse->UpdateDevice();
+	}
+}

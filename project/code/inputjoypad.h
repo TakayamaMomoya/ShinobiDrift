@@ -72,6 +72,7 @@ public:
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
+	void UpdateDevice(void);
 	bool GetPress(PADBUTTOS nKey, int nPlayer);
 	bool GetTrigger(PADBUTTOS nKey, int nPlayer);
 	bool GetRelease(PADBUTTOS nKey, int nPlayer);
