@@ -53,13 +53,15 @@ public:
 	void ResetIterator(void);
 
 private:
-	void SetNormal(VERTEX_3D *pVtx,int nIdx);	// 法線の設定
+	void SetNormal(VERTEX_3D *pVtx);	// 法線の設定
 	void CreateSpline(void);	// スプラインの生成
+	void CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint,VERTEX_3D *pVtx, SInfoRoadPoint *infoRoadPointOld = nullptr);	// ロードポイント間の頂点の設定
 
 	UINT m_nNumVtx;
 	std::vector<SInfoRoadPoint> m_listRoadPoint;
 	std::vector<SInfoRoadPoint>::iterator m_it;
-	CSpline *m_pSpline;	// 道のスプライン
+	CSpline *m_pSplineXZ;	// XZ平面のスプライン
+	CSpline *m_pSplineXY;	// XY平面のスプライン
 	static CMeshRoad *m_pMeshRoad;
 };
 

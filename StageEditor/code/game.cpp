@@ -247,46 +247,46 @@ void CGame::Debug(void)
 	}
 
 	// スプライン補間のテスト
-	CSpline *pSpline = nullptr;
-	pSpline = new CSpline;
+	//CSpline *pSpline = nullptr;
+	//pSpline = new CSpline;
 
-	if (pSpline != nullptr)
-	{
-		// データ点の用意
-		std::vector<double> x = { 0.0,200.0,500.0,700.0 ,900.0};
-		std::vector<double> y = { 0.0,100.0,0.0,100.0,200.0 };
+	//if (pSpline != nullptr)
+	//{
+	//	// データ点の用意
+	//	std::vector<double> x = { 0.0,200.0,500.0,700.0 ,900.0};
+	//	std::vector<double> y = { 0.0,100.0,0.0,100.0,200.0 };
 
-		// 係数の計算
-		pSpline->Init(x, y);
+	//	// 係数の計算
+	//	pSpline->Init(x, y);
 
-		int nSize = x.size();
+	//	int nSize = x.size();
 
-		// データ点の位置にエフェクトを出す
-		std::vector<double>::iterator itX = x.begin();
-		std::vector<double>::iterator itY = y.begin();
-		for (int i = 0; i < nSize; i++)
-		{
-			D3DXVECTOR3 pos = { (float)*itX, (float)*itY, 0.0f };
+	//	// データ点の位置にエフェクトを出す
+	//	std::vector<double>::iterator itX = x.begin();
+	//	std::vector<double>::iterator itY = y.begin();
+	//	for (int i = 0; i < nSize; i++)
+	//	{
+	//		D3DXVECTOR3 pos = { (float)*itX, (float)*itY, 0.0f };
 
-			CEffect3D::Create(pos, 20.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	//		CEffect3D::Create(pos, 20.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
-			itX++;
-			itY++;
-		}
+	//		itX++;
+	//		itY++;
+	//	}
 
-		if (CInputKeyboard::GetInstance()->GetPress(DIK_M))
-			m_fHoge += 1.0f;
-		if (CInputKeyboard::GetInstance()->GetPress(DIK_N))
-			m_fHoge -= 1.0f;
+	//	if (CInputKeyboard::GetInstance()->GetPress(DIK_M))
+	//		m_fHoge += 1.0f;
+	//	if (CInputKeyboard::GetInstance()->GetPress(DIK_N))
+	//		m_fHoge -= 1.0f;
 
-		CDebugProc::GetInstance()->Print("\nホゲ[%f]", m_fHoge);
+	//	CDebugProc::GetInstance()->Print("\nホゲ[%f]", m_fHoge);
 
-		float fHeight = (float)pSpline->Interpolate(m_fHoge);
-		CEffect3D::Create(D3DXVECTOR3(m_fHoge,fHeight,0.0f), 20.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-	}
+	//	float fHeight = (float)pSpline->Interpolate(m_fHoge);
+	//	CEffect3D::Create(D3DXVECTOR3(m_fHoge,fHeight,0.0f), 20.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	//}
 
-	delete pSpline;
-	pSpline = nullptr;
+	//delete pSpline;
+	//pSpline = nullptr;
 }
 
 //=====================================================

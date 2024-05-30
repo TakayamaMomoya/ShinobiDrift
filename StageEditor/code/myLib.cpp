@@ -80,7 +80,10 @@ double CSpline::Interpolate(double xi)
     int n = x.size();
     int i = 0;
 
-    while (i < n && xi > x[i + 1])
+    if (n < 2)
+        return 0.0;
+
+    while (i < n - 1 && xi > x[i + 1])
     {
         i++;
     }
