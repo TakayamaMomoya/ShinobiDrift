@@ -209,24 +209,30 @@ void CBlock::Update(void)
 //=====================================================
 bool CBlock::CanGrab(D3DXVECTOR3 pos)
 {
-	bool bCanGrab = true;
+	bool bCanGrab1 = true;
+	bool bCanGrab2 = true;
 
 	// ”»’è‚ÌÝ’u
-	D3DXMATRIX mtxVec;
+	D3DXMATRIX mtxVec1;
+	D3DXMATRIX mtxVec2;
 	D3DXMATRIX mtx = *GetMatrix();
-	universal::SetOffSet(&mtxVec, mtx, D3DXVECTOR3(200.0f, 0.0f, 0.0f));
+	universal::SetOffSet(&mtxVec1, mtx, D3DXVECTOR3(200.0f, 0.0f, 0.0f));
+	universal::SetOffSet(&mtxVec2, mtx, D3DXVECTOR3(0.0f, 0.0f, 200.0f));
 
-	D3DXVECTOR3 posMtx = { mtxVec._41,mtxVec._42 ,mtxVec._43 };
+	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
+	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
 
 #ifdef _DEBUG
-	CEffect3D::Create(posMtx, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif
 
-	bCanGrab = universal::IsCross(pos, GetPosition(), posMtx, nullptr);
+	bCanGrab1 = universal::IsCross(pos, GetPosition(), posMtx1, nullptr);
+	bCanGrab2 = universal::IsCross(pos, GetPosition(), posMtx2, nullptr);
 
-	CDebugProc::GetInstance()->Print("\n’Í‚ß‚é[%d]", bCanGrab);
+	CDebugProc::GetInstance()->Print("\n’Í‚ß‚é1[%d]", bCanGrab1);
+	CDebugProc::GetInstance()->Print("\n’Í‚ß‚é2[%d]", bCanGrab2);
 
-	return bCanGrab;
+	return bCanGrab1 ^ bCanGrab2;
 }
 
 //=====================================================
