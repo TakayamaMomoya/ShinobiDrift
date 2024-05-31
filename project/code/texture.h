@@ -22,7 +22,8 @@
 
 namespace Texture
 {
-int GetIdx(const char *pFileName);
+int GetIdx(const char *pFileName);	// テクスチャ番号の取得
+LPDIRECT3DTEXTURE9 GetTexture(int nIdx);	// テクスチャの取得
 }
 
 //*****************************************************

@@ -91,6 +91,26 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	d3dpp.FullScreen_RefreshRateInHz = D3DPRESENT_RATE_DEFAULT;		// リフレッシュレート
 	d3dpp.PresentationInterval = D3DPRESENT_INTERVAL_DEFAULT;		// インターバル
 
+	if (!bWindow)
+	{
+		// ウィンドウスタイルを取得
+		LONG lStyle = GetWindowLong(hWnd, GWL_STYLE);
+
+		// ウィンドウスタイルをWS_POPUPに変更
+		SetWindowLong(hWnd, GWL_STYLE, lStyle & ~WS_OVERLAPPEDWINDOW | WS_POPUP);
+
+		// ウィンドウの位置とサイズを画面全体に設定
+		SetWindowPos
+		(
+			hWnd,
+			HWND_TOP,
+			0, 0, // x, y 座標
+			GetSystemMetrics(SCREEN_WIDTH), // 画面の幅
+			GetSystemMetrics(SCREEN_HEIGHT), // 画面の高さ
+			SWP_FRAMECHANGED | SWP_SHOWWINDOW
+		);
+	}
+
 	// Direct3Dデバイスの生成
 	if (FAILED(m_pD3D->CreateDevice(D3DADAPTER_DEFAULT,
 		D3DDEVTYPE_HAL,

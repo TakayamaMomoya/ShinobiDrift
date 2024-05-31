@@ -105,6 +105,8 @@ HRESULT CInputMouse::Init(HINSTANCE hInstance, HWND hWnd)
 //=====================================================
 void CInputMouse::Uninit(void)
 {
+	m_pMouse = nullptr;
+
 	// 基本クラスの終了処理
 	CInput::Uninit();
 }
@@ -149,6 +151,14 @@ void CInputMouse::Update(void)
 	}
 
 	//CDebugProc::GetInstance()->Print("\nマウス移動[%d,%d]", m_mouseState.lX, m_mouseState.lY);
+}
+
+//====================================================
+// マウスデバイスの更新処理
+//====================================================
+void CInputMouse::UpdateDevice(void)
+{
+	m_pDevice->Acquire();
 }
 
 //=====================================================

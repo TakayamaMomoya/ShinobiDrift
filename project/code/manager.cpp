@@ -262,7 +262,7 @@ void CManager::Update(void)
 		// ライトの更新
 		m_pLight->Update();
 	}
-	
+
 	if (CInputKeyboard::GetInstance() != nullptr)
 	{
 		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_F3))
