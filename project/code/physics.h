@@ -20,11 +20,11 @@ class CObjectX;
 //*****************************************************
 // ƒNƒ‰ƒX’è‹`
 //*****************************************************
-class CMyPhysics
+class CPhysics
 {
 public:
-	CMyPhysics();
-	~CMyPhysics();
+	CPhysics();
+	~CPhysics();
 
 	void Init(void);
 	void Uninit(void);
