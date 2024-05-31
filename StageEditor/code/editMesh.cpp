@@ -181,6 +181,9 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 			rot.y -= SPEED_ROLL;
 		}
 
+		// 位置の制限
+		LimitPos(&pos);
+
 		pEdit->SetRotation(rot);
 		pEdit->SetPosition(pos);
 	}
@@ -198,6 +201,24 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 
 		if (pMesh != nullptr)
 			pMesh->Save();
+	}
+}
+
+void CStateEditMeshCreateMesh::LimitPos(D3DXVECTOR3 *pPos)
+{// 位置の制限
+	// リストの取得
+	CMeshRoad *pMesh = MeshRoad::GetInstance();
+	
+	std::vector<CMeshRoad::SInfoRoadPoint> *pVectorRoadPoint = pMesh->GetList();
+	
+	if (!pVectorRoadPoint->empty())
+	{
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itLast = pVectorRoadPoint->end() - 1;
+
+		if (pPos->x <= itLast->pos.x)
+		{
+			pPos->x = itLast->pos.x;
+		}
 	}
 }
 

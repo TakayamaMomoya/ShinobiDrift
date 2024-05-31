@@ -30,6 +30,6 @@ public:
     CSpline() {};
     void Init(const std::vector<double>& x, const std::vector<double>& y);
 
-    double Interpolate(double xi);
+    double Interpolate(double xi,int nIdx = -1);
 };
 #endif

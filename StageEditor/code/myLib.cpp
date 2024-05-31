@@ -75,7 +75,7 @@ void CSpline::Init(const std::vector<double>& x, const std::vector<double>& y)
 //=====================================================
 // çÇÇ≥ÇÃåvéZ
 //=====================================================
-double CSpline::Interpolate(double xi)
+double CSpline::Interpolate(double xi, int nIdx)
 {
     int n = x.size();
     int i = 0;
@@ -83,14 +83,21 @@ double CSpline::Interpolate(double xi)
     if (n < 2)
         return 0.0;
 
-    while (i < n - 1 && xi > x[i + 1])
+    if (nIdx != -1)
     {
-        i++;
+        i = nIdx;
     }
-
-    if (i >= n)
+    else
     {
-        i = n - 1;
+        while (i < n - 1 && xi > x[i + 1])
+        {
+            i++;
+        }
+
+        if (i >= n)
+        {
+            i = n - 1;
+        }
     }
 
     double h = xi - x[i];
