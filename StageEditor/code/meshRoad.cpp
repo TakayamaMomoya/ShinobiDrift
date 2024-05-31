@@ -91,7 +91,7 @@ HRESULT CMeshRoad::Init(void)
 	SetIdxTexture(nIdx);
 
 	// 読み込み処理
-	//Load();
+	Load();
 
 	m_it = m_listRoadPoint.begin();
 
@@ -190,7 +190,7 @@ void CMeshRoad::Draw(void)
 //=====================================================
 // ロードポイントの選択
 //=====================================================
-std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectEdge(void)
+std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void)
 {
 	if (ImGui::Button("NextEdge", ImVec2(70, 30)))
 	{
@@ -203,7 +203,7 @@ std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectEdge(void)
 			std::advance(m_it, -1);
 	}
 
-	CEffect3D::Create(m_it->pos, 50.0f, 60, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(m_it->pos, 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 
 	return m_it;
 }
@@ -333,12 +333,14 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 			float z = (float)m_pSplineXZ->Interpolate(pos.x);
 			pos.z = z;
 
-			CEffect3D::Create(pos, 50.0f, 60, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));	// 中心座標のエフェクト
+			//CEffect3D::Create(pos, 50.0f, 60, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));	// 中心座標のエフェクト
 
 			if (i == 0)
 			{
 				pVtx[0].pos = pVtx[-2].pos;
 				pVtx[1].pos = pVtx[-1].pos;
+				pVtx[0].nor = pVtx[-2].nor;
+				pVtx[1].nor = pVtx[-1].nor;
 			}
 			else
 			{

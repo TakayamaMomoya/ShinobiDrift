@@ -119,4 +119,40 @@ END_INFOBLOCK
 #====================================================================
 # îzíuèÓïÒ
 #====================================================================
+SETBLOCK
+ IDX = 0
+ POS = 4580.00 0.00 -177.00
+ ROT = 0.00 3.14 0.00
+END_SETBLOCK
+
+SETBLOCK
+ IDX = 0
+ POS = 6043.00 0.00 105.00
+ ROT = 0.00 0.00 0.00
+END_SETBLOCK
+
+SETBLOCK
+ IDX = 0
+ POS = 7832.00 0.00 -3137.00
+ ROT = 0.00 -2.96 -0.01
+END_SETBLOCK
+
+SETBLOCK
+ IDX = 0
+ POS = 9019.00 0.00 -3952.00
+ ROT = 0.00 0.00 -0.01
+END_SETBLOCK
+
+SETBLOCK
+ IDX = 0
+ POS = 12318.00 0.00 -8249.00
+ ROT = 0.00 -2.84 -0.01
+END_SETBLOCK
+
+SETBLOCK
+ IDX = 0
+ POS = 13567.00 0.00 -9649.00
+ ROT = 0.00 -0.12 -0.01
+END_SETBLOCK
+
 END_SCRIPT

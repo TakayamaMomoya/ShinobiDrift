@@ -93,8 +93,11 @@ void CEditMesh::Update(void)
 	if (ImGui::Button("CreateEdge", ImVec2(70, 30)))	// メッシュ生成
 		ChangeState(new CStateEditMeshCreateMesh);
 
-	if (ImGui::Button("DeleteEdge", ImVec2(70, 30)))	// 辺の削除
-		ChangeState(new CStateEditMeshDeleteEdge);
+	if (ImGui::Button("AdjustRoadPoint", ImVec2(70, 30)))	// ロードポイントの調節
+		ChangeState(new CStateEditMeshAdjustRoadPoint);
+
+	if (ImGui::Button("DeleteRoadPoint", ImVec2(70, 30)))	// 辺の削除
+		ChangeState(new CStateEditMeshDeleteRoadPoint);
 }
 
 //=====================================================
@@ -220,21 +223,49 @@ void CStateEditMeshCreateMesh::LimitPos(D3DXVECTOR3 *pPos)
 }
 
 //****************************************************************************************
-// 辺の削除
+// ロードポイントの調節
 //****************************************************************************************
-CStateEditMeshDeleteEdge::CStateEditMeshDeleteEdge()
+CStateEditMeshAdjustRoadPoint::CStateEditMeshAdjustRoadPoint()
 {// コンストラクタ
 	CMeshRoad *pMesh = MeshRoad::GetInstance();
 
 	pMesh->ResetIterator();
 }
 
-void CStateEditMeshDeleteEdge::Update(CEditMesh *pEdit)
+void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
+{
+	CMeshRoad *pMesh = MeshRoad::GetInstance();
+
+	// ロードポイントの選択
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectRoadPoint();
+
+	D3DXVECTOR3 pos = it->pos;
+
+	ImGui::DragFloat("posRoadPointPOS.X", &pos.x, 2.0f, -FLT_MAX, FLT_MAX);
+	ImGui::DragFloat("posRoadPointPOS.Y", &pos.y, 2.0f, -FLT_MAX, FLT_MAX);
+	ImGui::DragFloat("posRoadPointPOS.Z", &pos.z, 2.0f, -FLT_MAX, FLT_MAX);
+
+	it->pos = pos;
+
+	pMesh->CreateVtxBuffEdge();
+}
+
+//****************************************************************************************
+// 辺の削除
+//****************************************************************************************
+CStateEditMeshDeleteRoadPoint::CStateEditMeshDeleteRoadPoint()
+{// コンストラクタ
+	CMeshRoad *pMesh = MeshRoad::GetInstance();
+
+	pMesh->ResetIterator();
+}
+
+void CStateEditMeshDeleteRoadPoint::Update(CEditMesh *pEdit)
 {
 	CMeshRoad *pMesh = MeshRoad::GetInstance();
 
 	// 辺の選択
-	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectEdge();
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectRoadPoint();
 
 	if (ImGui::Button("Delete", ImVec2(100, 50)))
 	{
