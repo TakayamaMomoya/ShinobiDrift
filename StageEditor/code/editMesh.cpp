@@ -93,9 +93,6 @@ void CEditMesh::Update(void)
 	if (ImGui::Button("CreateEdge", ImVec2(70, 30)))	// メッシュ生成
 		ChangeState(new CStateEditMeshCreateMesh);
 
-	if (ImGui::Button("Curve", ImVec2(70, 30)))	// カーブの調節
-		ChangeState(new CStateEditMeshCurve);
-
 	if (ImGui::Button("DeleteEdge", ImVec2(70, 30)))	// 辺の削除
 		ChangeState(new CStateEditMeshDeleteEdge);
 }
@@ -223,101 +220,26 @@ void CStateEditMeshCreateMesh::LimitPos(D3DXVECTOR3 *pPos)
 }
 
 //****************************************************************************************
-// カーブの調節
-//****************************************************************************************
-CStateEditMeshCurve::CStateEditMeshCurve() : m_bStart(false), m_bEnd(false), m_fAngleCurve(0.0f)
-{
-	CMeshRoad *pMeshRoad = MeshRoad::GetInstance();
-	pMeshRoad->ResetIterator();
-}
-
-void CStateEditMeshCurve::Update(CEditMesh *pEdit)
-{
-
-}
-
-void CStateEditMeshCurve::SetEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
-{// 最初と最後の辺の設定
-	if (!m_bStart)
-	{// 最初の辺設定
-		m_itStart = it;
-		m_bStart = true;
-	}
-	else if (!m_bEnd)
-	{// 最後の辺を設定
-		m_itEnd = it;
-		m_bEnd = true;
-	}
-}
-
-void CStateEditMeshCurve::SetCurve(void)
-{// カーブの調整
-	ImGui::DragFloat("AngleCurve", &m_fAngleCurve, 1.0f, -FLT_MAX, FLT_MAX);
-
-	// 辺をカーブに沿って設定
-	D3DXVECTOR3 posStart = m_itStart->pos;
-	D3DXVECTOR3 posEnd = m_itEnd->pos;
-	D3DXVECTOR3 vecDiff = posEnd - posStart;
-	D3DXVECTOR3 posMid = posStart + vecDiff * 0.5f;
-
-	CEffect3D::Create(posMid, 50.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));	// 中心座標のエフェクト
-
-	// 辺のリストの取得
-	CMeshRoad *pMeshRoad = MeshRoad::GetInstance();
-	std::vector<CMeshRoad::SInfoRoadPoint> *pList = pMeshRoad->GetList();
-
-	ptrdiff_t distance = std::distance(m_itStart, m_itEnd);	// イテレーター同士の距離
-
-	for (auto it = m_itStart; it != m_itEnd + 1; it++)
-	{
-		it->pos;
-
-		CEffect3D::Create(it->pos, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));	// 曲がった先のエフェクト
-	}
-
-	float fAngleParabola = atan2f(vecDiff.x, vecDiff.z) + D3DX_PI * 0.5f;	// 伸ばす角度
-	universal::LimitRot(&fAngleParabola);
-
-	int nCntEdge = 0;
-	for (auto it = m_itStart; it != m_itEnd + 1; it++)
-	{// 最初の辺から最後の辺の間をチェック
-		ptrdiff_t distanceCurrent = std::distance(it, m_itEnd);
-		float fRate = (float)nCntEdge / (distance);
-		fRate -= 0.5f;
-
-		D3DXVECTOR3 posEdge = posMid + vecDiff * fRate;	// 辺予測位置の整列
-		
-		// 放物線の計算
-		float fLength = universal::ParabolaY(fRate, -m_fAngleCurve);
-		D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngleParabola, 0.0f)) * fLength;
-		posEdge += vecPole;
-
-		// ずらす分の放物線の計算
-		fRate = 0.0f / (distance);
-		fRate -= 0.5f;
-		fLength = universal::ParabolaY(fRate, -m_fAngleCurve);
-		posEdge -= universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngleParabola, 0.0f)) * fLength;
-
-		CEffect3D::Create(posEdge, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));	// 曲がった先のエフェクト
-
-		// 辺の位置適用
-		CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
-
-		if (pKeyboard->GetTrigger(DIK_RETURN))
-		{
-			it->pos = posEdge;
-
-			pMeshRoad->CreateVtxBuffEdge();
-		}
-
-		nCntEdge++;
-	}
-}
-
-//****************************************************************************************
 // 辺の削除
 //****************************************************************************************
+CStateEditMeshDeleteEdge::CStateEditMeshDeleteEdge()
+{// コンストラクタ
+	CMeshRoad *pMesh = MeshRoad::GetInstance();
+
+	pMesh->ResetIterator();
+}
+
 void CStateEditMeshDeleteEdge::Update(CEditMesh *pEdit)
 {
+	CMeshRoad *pMesh = MeshRoad::GetInstance();
 
+	// 辺の選択
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectEdge();
+
+	if (ImGui::Button("Delete", ImVec2(100, 50)))
+	{
+		CMeshRoad::GetInstance()->DeleteEdge(it);
+
+		return;
+	}
 }

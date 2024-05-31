@@ -62,29 +62,10 @@ private:
 	void LimitPos(D3DXVECTOR3 *pPos);
 };
 
-class CStateEditMeshCurve : public CStateEditMesh
-{// カーブの調節
-public:
-	CStateEditMeshCurve();
-	virtual ~CStateEditMeshCurve() {};
-
-	void Update(CEditMesh *pEdit) override;
-
-private:
-	void SetEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
-	void SetCurve(void);
-
-	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itStart;	// カーブの開始イテレイター
-	bool m_bStart;	// 最初の辺を設置したかどうか
-	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// カーブの終了イテレイター
-	bool m_bEnd;	// 最後の辺を設置したかどうか
-	float m_fAngleCurve;	// カーブの角度
-};
-
 class CStateEditMeshDeleteEdge : public CStateEditMesh
 {// 辺の削除
 public:
-	CStateEditMeshDeleteEdge() {};
+	CStateEditMeshDeleteEdge();
 	virtual ~CStateEditMeshDeleteEdge() {};
 
 	void Update(CEditMesh *pEdit) override;

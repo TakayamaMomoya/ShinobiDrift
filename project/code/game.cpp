@@ -34,6 +34,7 @@
 #include "particle.h"
 #include "timer.h"
 #include "meter.h"
+#include "meshRoad.h"
 
 //*****************************************************
 // マクロ定義
@@ -93,15 +94,14 @@ HRESULT CGame::Init(void)
 
 	// スロー管理の生成
 	CSlow::Create();
-
-	// メッシュフィールド生成
-	CMeshField::Create();
-
 	// タイマー生成
 	CTimer::Create();
 
 	// メーター生成
 	CMeter::Create();
+
+	// メッシュロード生成
+	CMeshRoad::Create();
 
 	return S_OK;
 }

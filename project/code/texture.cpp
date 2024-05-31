@@ -191,4 +191,14 @@ int GetIdx(const char *pFileName)
 
 	return nIdx;
 }
+
+LPDIRECT3DTEXTURE9 GetTexture(int nIdx)
+{// テクスチャ取得
+	CTexture *pTexture = CTexture::GetInstance();
+
+	if (pTexture == nullptr)
+		return nullptr;
+
+	return pTexture->GetAddress(nIdx);
+}
 }
