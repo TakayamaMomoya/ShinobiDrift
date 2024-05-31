@@ -217,7 +217,7 @@ bool CBlock::CanGrab(D3DXVECTOR3 pos)
 	D3DXMATRIX mtxVec2;
 	D3DXMATRIX mtx = *GetMatrix();
 	universal::SetOffSet(&mtxVec1, mtx, D3DXVECTOR3(200.0f, 0.0f, 0.0f));
-	universal::SetOffSet(&mtxVec2, mtx, D3DXVECTOR3(0.0f, 0.0f, 200.0f));
+	universal::SetOffSet(&mtxVec2, mtx, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
 	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };

@@ -15,6 +15,7 @@
 #include "slow.h"
 #include "inputManager.h"
 #include "inputjoypad.h"
+#include "inputkeyboard.h"
 #include "pause.h"
 #include "debugproc.h"
 #include <string>
@@ -295,7 +296,7 @@ void CPlayer::InputCamera(void)
 //=====================================================
 void CPlayer::InputWire(void)
 {
-	CInputJoypad *pJoypad = CInputJoypad::GetInstance();
+	CInputJoypad* pJoypad = CInputJoypad::GetInstance();
 
 	if (pJoypad == nullptr)
 		return;
@@ -437,15 +438,29 @@ void CPlayer::InputWire(void)
 
 				bool bGrab = m_info.pBlock->CanGrab(posPlayer);
 
-				if (!m_info.bGrabOld && bGrab)
-				//if (fLength <= 0.5f)
-				{// ‘€ì‚µ‚Ä‚¢‚é”»’è
-					m_info.nCntFlip = 0;
-					m_info.fCntAngle = 0.0f;
+				if (m_info.bManual)
+				{
+					if (fLength <= 0.5f)
+					{// ‘€ì‚µ‚Ä‚¢‚é”»’è
+						m_info.nCntFlip = 0;
+						m_info.fCntAngle = 0.0f;
 
-					m_info.pBlock = nullptr;
+						m_info.pBlock = nullptr;
 
-					m_info.fLengthDrift = 0.0f;
+						m_info.fLengthDrift = 0.0f;
+					}
+				}
+				else
+				{
+					if (!m_info.bGrabOld && bGrab)
+					{// ‘€ì‚µ‚Ä‚¢‚é”»’è
+						m_info.nCntFlip = 0;
+						m_info.fCntAngle = 0.0f;
+
+						m_info.pBlock = nullptr;
+
+						m_info.fLengthDrift = 0.0f;
+					}
 				}
 
 				m_info.bGrabOld = bGrab;
@@ -566,6 +581,14 @@ void CPlayer::InputWire(void)
 					m_info.fTimerDriftChange = 0.7f;
 				}
 			}
+		}
+	}
+
+	if (CInputKeyboard::GetInstance() != nullptr)
+	{
+		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_F4))
+		{// ‘€ì•û–@•ÏX
+			m_info.bManual = m_info.bManual ? false : true;
 		}
 	}
 
