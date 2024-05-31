@@ -12,8 +12,6 @@
     <ClCompile Include="code\character.cpp" />
     <ClCompile Include="code\collision.cpp" />
     <ClCompile Include="code\debugproc.cpp" />
-    <ClCompile Include="code\edit.cpp" />
-    <ClCompile Include="code\editBlock.cpp" />
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
     <ClCompile Include="code\fade.cpp" />
@@ -86,6 +84,12 @@
     <ClCompile Include="code\myLib.cpp">
       <Filter>meshedit</Filter>
     </ClCompile>
+    <ClCompile Include="code\edit.cpp">
+      <Filter>meshedit</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editBlock.cpp">
+      <Filter>meshedit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\anim3D.h" />
@@ -99,8 +103,6 @@
     <ClInclude Include="code\character.h" />
     <ClInclude Include="code\collision.h" />
     <ClInclude Include="code\debugproc.h" />
-    <ClInclude Include="code\edit.h" />
-    <ClInclude Include="code\editBlock.h" />
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
     <ClInclude Include="code\fade.h" />
@@ -180,6 +182,12 @@
       <Filter>meshedit</Filter>
     </ClInclude>
     <ClInclude Include="code\myLib.h">
+      <Filter>meshedit</Filter>
+    </ClInclude>
+    <ClInclude Include="code\edit.h">
+      <Filter>meshedit</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editBlock.h">
       <Filter>meshedit</Filter>
     </ClInclude>
   </ItemGroup>

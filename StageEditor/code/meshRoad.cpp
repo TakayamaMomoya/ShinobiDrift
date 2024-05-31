@@ -28,6 +28,7 @@ const int NUM_EDGE_IN_ROADPOINT = 10;	// ロードポイント一つにつき、ある辺の数
 const char PATH_SAVE[] = "data\\MAP\\road00.bin";	// 保存ファイルのパス
 const char* PATH_TEXTURE = "data\\TEXTURE\\MATERIAL\\road.jpg";	// テクスチャパス
 const float DIST_DEFAULT = 200.0f;	// デフォルトの辺間の距離
+const float WIDTH_ROAD = 600.0f;	// 道の幅
 }
 
 //*****************************************************
@@ -189,7 +190,7 @@ void CMeshRoad::Draw(void)
 //=====================================================
 // ロードポイントの選択
 //=====================================================
-std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectEdge(void)
+std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void)
 {
 	if (ImGui::Button("NextEdge", ImVec2(70, 30)))
 	{
@@ -201,6 +202,8 @@ std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectEdge(void)
 		if (m_it != m_listRoadPoint.begin())
 			std::advance(m_it, -1);
 	}
+
+	CEffect3D::Create(m_it->pos, 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 
 	return m_it;
 }
@@ -258,7 +261,7 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	std::vector<SInfoRoadPoint>::iterator itRoadPoint = m_listRoadPoint.begin();
+	std::vector<SInfoRoadPoint>::iterator itRoadPoint;
 
 	for (itRoadPoint = m_listRoadPoint.begin(); itRoadPoint != m_listRoadPoint.end(); itRoadPoint++)
 	{
@@ -288,6 +291,13 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 	if (m_pSplineXZ == nullptr || m_pSplineXY == nullptr)
 		assert(("CreateVtxBetweenRoadPointでスプラインがnullです", false));
 
+	D3DXVECTOR3 posEdgeOld = {};	// 前回の辺の位置
+
+	if (pInfoRoadPointOld != nullptr)
+	{
+		posEdgeOld = pInfoRoadPointOld->pos;
+	}
+
 	// ロードポイント間で必要な辺
 	for (int i = 0; i < NUM_EDGE_IN_ROADPOINT; i++)
 	{
@@ -297,6 +307,15 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 		{// 前回のロードポイントがない場合、分割は実質無し
 			float z = (float)m_pSplineXZ->Interpolate(pos.x);
 			pos.z = z;
+
+			// 前回の辺と比べない頂点位置設定
+			pVtx[0].pos = pos;
+			pVtx[1].pos = pos;
+
+			pVtx[0].pos.z -= WIDTH_ROAD;
+			pVtx[1].pos.z += WIDTH_ROAD;
+
+			posEdgeOld = GetPosEdge(pVtx[0].pos, pVtx[1].pos);	// 辺の位置を保存
 		}
 		else
 		{
@@ -314,14 +333,23 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 			float z = (float)m_pSplineXZ->Interpolate(pos.x);
 			pos.z = z;
 
-			CEffect3D::Create(pos, 50.0f, 60, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));	// 中心座標のエフェクト
+			//CEffect3D::Create(pos, 50.0f, 60, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));	// 中心座標のエフェクト
+
+			if (i == 0)
+			{
+				pVtx[0].pos = pVtx[-2].pos;
+				pVtx[1].pos = pVtx[-1].pos;
+				pVtx[0].nor = pVtx[-2].nor;
+				pVtx[1].nor = pVtx[-1].nor;
+			}
+			else
+			{
+				// 辺の角度設定
+				SetEdgeAngle(pVtx, pos, posEdgeOld);
+			}
+
+			posEdgeOld =  GetPosEdge(pVtx[0].pos, pVtx[1].pos);	// 辺の位置を保存
 		}
-
-		pVtx[0].pos = pos;
-		pVtx[1].pos = pos;
-
-		pVtx[0].pos.z -= 100.0f;	// デバッグ用、消して
-		pVtx[1].pos.z += 100.0f;	// デバッグ用、消して
 
 		// 法線の設定
 		SetNormal(pVtx);
@@ -340,6 +368,40 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 
 		pVtx += NUM_VTX_IN_EDGE;	// 辺にある頂点数分ポインタを進める
 	}
+}
+
+//=====================================================
+// 辺の角度を設定
+//=====================================================
+void CMeshRoad::SetEdgeAngle(VERTEX_3D *pVtx, D3DXVECTOR3 posEdge, D3DXVECTOR3 posEdgeOld)
+{
+	if (pVtx == nullptr)
+		return;
+
+	// 差分ベクトルから角度を取得
+	D3DXVECTOR3 vecDiff = posEdge - posEdgeOld;
+	float fAngle = atan2f(vecDiff.x, vecDiff.z);
+	
+	fAngle += D3DX_PI * 0.5f;	// 角度を90度傾ける
+	universal::LimitRot(&fAngle);
+
+	// 角度から極座標で頂点位置を決定
+	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngle, 0.0f));
+
+	pVtx[0].pos = posEdge + vecPole * WIDTH_ROAD;
+	pVtx[1].pos = posEdge - vecPole * WIDTH_ROAD;
+}
+
+//=====================================================
+// 辺の位置を取得
+//=====================================================
+D3DXVECTOR3 CMeshRoad::GetPosEdge(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2)
+{
+	D3DXVECTOR3 vecDiff = vtx2 - vtx1;
+
+	D3DXVECTOR3 posEdge = vtx1 + vecDiff * 0.5f;
+
+	return posEdge;
 }
 
 //=====================================================
@@ -407,7 +469,7 @@ void CMeshRoad::CreateSpline(void)
 		{
 			x[i] = m_listRoadPoint[i].pos.x;
 			y[i] = m_listRoadPoint[i].pos.y;
-			z[i] = m_listRoadPoint[i].pos.z;	// xz平面で計算するため、ｙにはｚ座標を代入
+			z[i] = m_listRoadPoint[i].pos.z;
 		}
 		
 		// スプラインの初期化
@@ -470,7 +532,7 @@ CMeshRoad *GetInstance(void)
 	CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
 
 	if (pMeshRoad == nullptr)
-		assert("meshroadがないよ～～", false);
+		assert(("meshroadがないよ～～", false));
 
 	return pMeshRoad;
 }

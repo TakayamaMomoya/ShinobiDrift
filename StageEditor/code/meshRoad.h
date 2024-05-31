@@ -47,7 +47,7 @@ public:
 	void Save(void);	// エディターのみ。ゲームでは消してね
 	void Load(void);	// エディターのみ。ゲームでは消してね
 
-	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectEdge(void);
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectRoadPoint(void);
 	std::vector<SInfoRoadPoint> *GetList(void) { return &m_listRoadPoint; }
 	void DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void ResetIterator(void);
@@ -56,6 +56,8 @@ private:
 	void SetNormal(VERTEX_3D *pVtx);	// 法線の設定
 	void CreateSpline(void);	// スプラインの生成
 	void CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint,VERTEX_3D *pVtx, SInfoRoadPoint *infoRoadPointOld = nullptr);	// ロードポイント間の頂点の設定
+	void SetEdgeAngle(VERTEX_3D *pVtx, D3DXVECTOR3 posEdge, D3DXVECTOR3 posEdgeOld);	// 辺の角度の設定
+	D3DXVECTOR3 GetPosEdge(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2);
 
 	UINT m_nNumVtx;
 	std::vector<SInfoRoadPoint> m_listRoadPoint;

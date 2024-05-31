@@ -48,12 +48,14 @@ public:
 	int GetIdxTexture(void) { return m_nIdxTexture; }
 	D3DXCOLOR GetColor(void) { return m_col; }
 	void SetColor(D3DXCOLOR col);
+	D3DXMATRIX *GetMatrix(void) { return &m_mtxWorld; }
 	void SetTex(D3DXVECTOR2 rd, D3DXVECTOR2 lu);
 	void SetFactSB(float fFact) { m_fFactSB = fFact; }
 	void SetVtx(void);
 	void SetMode(MODE mode);
 	MODE GetMode(void) { return m_mode; }
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBuff(void) { return m_pVtxBuff; }
+	LPDIRECT3DVERTEXBUFFER9 CreateVtxBuff(int nNumVtx = 4);
 
 private:
 	void SetVtxNormal(void);

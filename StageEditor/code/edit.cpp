@@ -10,6 +10,14 @@
 //*****************************************************
 #include "edit.h"
 
+//*****************************************************
+// 定数定義
+//*****************************************************
+namespace
+{
+const float SPEED_MOVE = 10.0f;	// 移動速度
+}
+
 //=====================================================
 // コンストラクタ
 //=====================================================
@@ -40,7 +48,7 @@ HRESULT CEdit::Init(void)
 //=====================================================
 void CEdit::Uninit(void)
 {
-	delete this;
+
 }
 
 //=====================================================
@@ -48,5 +56,11 @@ void CEdit::Uninit(void)
 //=====================================================
 void CEdit::Update(void)
 {
+	D3DXVECTOR3 pos = GetPosition();
 
+	ImGui::DragFloat("POS.X", &pos.x, SPEED_MOVE, -FLT_MAX, FLT_MAX);
+	ImGui::DragFloat("POS.Y", &pos.y, SPEED_MOVE, -FLT_MAX, FLT_MAX);
+	ImGui::DragFloat("POS.Z", &pos.z, SPEED_MOVE, -FLT_MAX, FLT_MAX);
+
+	SetPosition(pos);
 }
