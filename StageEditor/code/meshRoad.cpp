@@ -261,7 +261,7 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	std::vector<SInfoRoadPoint>::iterator itRoadPoint = m_listRoadPoint.begin();
+	std::vector<SInfoRoadPoint>::iterator itRoadPoint;
 
 	for (itRoadPoint = m_listRoadPoint.begin(); itRoadPoint != m_listRoadPoint.end(); itRoadPoint++)
 	{
@@ -292,6 +292,11 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 		assert(("CreateVtxBetweenRoadPointでスプラインがnullです", false));
 
 	D3DXVECTOR3 posEdgeOld = {};	// 前回の辺の位置
+
+	if (pInfoRoadPointOld != nullptr)
+	{
+		posEdgeOld = pInfoRoadPointOld->pos;
+	}
 
 	// ロードポイント間で必要な辺
 	for (int i = 0; i < NUM_EDGE_IN_ROADPOINT; i++)
@@ -330,8 +335,16 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 
 			CEffect3D::Create(pos, 50.0f, 60, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));	// 中心座標のエフェクト
 
-			// 辺の角度設定
-			SetEdgeAngle(pVtx, pos, posEdgeOld);
+			if (i == 0)
+			{
+				pVtx[0].pos = pVtx[-2].pos;
+				pVtx[1].pos = pVtx[-1].pos;
+			}
+			else
+			{
+				// 辺の角度設定
+				SetEdgeAngle(pVtx, pos, posEdgeOld);
+			}
 
 			posEdgeOld =  GetPosEdge(pVtx[0].pos, pVtx[1].pos);	// 辺の位置を保存
 		}
