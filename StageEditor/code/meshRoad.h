@@ -47,7 +47,7 @@ public:
 	void Save(void);	// エディターのみ。ゲームでは消してね
 	void Load(void);	// エディターのみ。ゲームでは消してね
 
-	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectEdge(void);
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectRoadPoint(void);
 	std::vector<SInfoRoadPoint> *GetList(void) { return &m_listRoadPoint; }
 	void DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void ResetIterator(void);
