@@ -219,9 +219,6 @@
     <ClCompile Include="code\meshRoad.cpp">
       <Filter>ソース ファイル\mesh</Filter>
     </ClCompile>
-    <ClCompile Include="code\myLib.cpp">
-      <Filter>ソース ファイル\base</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\block.h">
