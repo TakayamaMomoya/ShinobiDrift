@@ -70,3 +70,16 @@ private:
 	CBlock::TYPE m_type;
 	CObjectX *m_pObjectCursor;	// カーソルの仮オブジェクト
 };
+
+class CStateEditGrabBlock : public CStateEditBlock
+{// 掴むブロックの生成
+public:
+	CStateEditGrabBlock() {};
+	virtual ~CStateEditGrabBlock() {};
+
+	void Init(CEditBlock *pEdit) override;
+	void Uninit(CEditBlock *pEdit) override;
+	void Update(CEditBlock *pEdit) override;
+
+private:
+};

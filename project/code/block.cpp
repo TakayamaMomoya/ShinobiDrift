@@ -141,14 +141,26 @@ CBlock::~CBlock()
 //=====================================================
 // 生成処理
 //=====================================================
-CBlock *CBlock::Create(int nIdxModel)
+CBlock *CBlock::Create(int nIdxModel, BEHAVIOUR behaviour)
 {
 	CBlock *pBlock = nullptr;
 
-	if (pBlock == nullptr)
-	{// インスタンス生成
+	// インスタンス生成
+	switch (behaviour)
+	{
+	case BEHAVIOUR_NORMAL:
 		pBlock = new CBlock;
+		break;
+	case BEHAVIOUR_GRAB:
+		pBlock = new CBlockGrab;
+		break;
+	default:
+		assert(("ブロックのビヘイビアーに不正な値が入力されました", false));
+		break;
+	}
 
+	if (pBlock != nullptr)
+	{
 		// 初期化処理
 		pBlock->Init();
 
@@ -266,4 +278,71 @@ void CBlock::Hit(float fDamage)
 void CBlock::SetRotation(D3DXVECTOR3 rot)
 {
 	CObjectX::SetRotation(rot);
+}
+
+//============================================================================
+// 掴めるブロッククラス
+//============================================================================
+//=====================================================
+// コンストラクタ
+//=====================================================
+CBlockGrab::CBlockGrab()
+{
+
+}
+ 
+//=====================================================
+// デストラクタ
+//=====================================================
+CBlockGrab::~CBlockGrab()
+{
+
+}
+
+//=====================================================
+// 初期化
+//=====================================================
+HRESULT CBlockGrab::Init(void)
+{
+	// 掴みブロックリストに追加
+	CBlockManager *pBlockManager =  BlockManager::GetInstance();
+
+	if (pBlockManager != nullptr)
+		pBlockManager->AddGrabList(this);
+
+	// 基底クラスの初期化
+	CBlock::Init();
+
+	return S_OK;
+}
+
+//=====================================================
+// 終了
+//=====================================================
+void CBlockGrab::Uninit(void)
+{
+	// 掴みブロックリストから除外
+	CBlockManager *pBlockManager = BlockManager::GetInstance();
+
+	if (pBlockManager != nullptr)
+		pBlockManager->RemoveGrabList(this);
+	
+	// 基底クラスの終了
+	CBlock::Uninit();
+}
+
+//=====================================================
+// 更新
+//=====================================================
+void CBlockGrab::Update(void)
+{
+	CBlock::Update();
+}
+
+//=====================================================
+// 描画
+//=====================================================
+void CBlockGrab::Draw(void)
+{
+	CBlock::Draw();
 }

@@ -17,6 +17,9 @@
 //*****************************************************
 // クラスの定義
 //*****************************************************
+//=====================================================
+// 通常ブロッククラス
+//=====================================================
 class CBlock : public CObjectX
 {
 public:
@@ -25,6 +28,12 @@ public:
 		TYPE_WALL = 0,	// 壁
 		TYPE_MAX
 	}TYPE;
+
+	typedef enum
+	{// 行動
+		BEHAVIOUR_NORMAL = 0,	// 通常
+		BEHAVIOUR_GRAB,	// 掴めるもの
+	}BEHAVIOUR;
 
 	typedef struct
 	{// 保存するときの情報
@@ -36,7 +45,7 @@ public:
 	CBlock(int nPriority = 3);	// コンストラクタ
 	~CBlock();	// デストラクタ
 
-	static CBlock *Create(int nIdxModel);
+	static CBlock *Create(int nIdxModel,BEHAVIOUR behaviour = BEHAVIOUR_NORMAL);
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
@@ -52,7 +61,6 @@ public:
 	bool CanGrab(D3DXVECTOR3 pos);
 
 private:
-
 	static int m_nNumAll;	// 総数
 	float m_fLife;	// 体力
 	int m_nIdx;	// 種類のインデックス
@@ -61,6 +69,23 @@ private:
 
 	CBlock *m_pPrev;	// 前のアドレス
 	CBlock *m_pNext;	// 次のアドレス
+};
+
+//=====================================================
+// 掴むブロッククラス
+//=====================================================
+class CBlockGrab : public CBlock
+{
+public:
+	CBlockGrab();	// コンストラクタ
+	~CBlockGrab();	// デストラクタ
+
+	HRESULT Init(void);
+	void Uninit(void);
+	void Update(void);
+	void Draw(void);
+
+private:
 };
 
 #endif

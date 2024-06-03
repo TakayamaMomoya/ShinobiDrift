@@ -44,6 +44,9 @@ public:
 	SInfoBlock *GetInfoBlock(void) { return m_pInfoBlock; }
 	void Save(char *pPath);
 	void DeleteAll(void);
+	std::list<CBlockGrab*> *GetListGrab(void) { return &m_listGrab; }
+	void AddGrabList(CBlockGrab *pBlock);
+	void RemoveGrabList(CBlockGrab *pBlock);
 	CBlock *GetHead(void) { return m_pHead; }
 	CBlock *GetTail(void) { return m_pTail; }
 	void SetHead(CBlock *pBlock) { m_pHead = pBlock; }
@@ -58,7 +61,13 @@ private:
 
 	CBlock *m_pHead;	// 先頭のアドレス
 	CBlock *m_pTail;	// 最後尾のアドレス
+	std::list<CBlockGrab*> m_listGrab;	// 掴めるブロックのリスト
 	static CBlockManager *m_pBlockManager;	// 自身のポインタ
 };
+
+namespace BlockManager
+{
+CBlockManager *GetInstance(void);
+}
 
 #endif
