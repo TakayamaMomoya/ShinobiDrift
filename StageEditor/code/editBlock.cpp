@@ -29,10 +29,6 @@
 //=====================================================
 CEditBlock::CEditBlock()
 {
-	m_pos = { 0.0f,0.0f,0.0f };
-	m_pObjectCursor = nullptr;
-	m_nIdxObject = 0;
-	m_type = CBlock::TYPE_WALL;
 	ZeroMemory(&m_aPath[0], sizeof(m_aPath));
 }
 
@@ -48,6 +44,81 @@ CEditBlock::~CEditBlock()
 // 初期化処理
 //=====================================================
 HRESULT CEditBlock::Init(void)
+{
+	// ステイトの初期設定
+	ChangeState(new CStateCreateBlockNormal);
+
+	CEdit::Init();
+
+	return S_OK;
+}
+
+//=====================================================
+// 終了処理
+//=====================================================
+void CEditBlock::Uninit(void)
+{
+	CEdit::Uninit();
+}
+
+//=====================================================
+// 更新処理
+//=====================================================
+void CEditBlock::Update(void)
+{
+	if (m_pState != nullptr)
+	{// ステイトの更新
+		m_pState->Update(this);
+	}
+
+	CEdit::Update();
+}
+
+//=====================================================
+// 保存を行う処理
+//=====================================================
+void CEditBlock::Save(void)
+{
+	ImGui::InputText("SavePath", &m_aPath[0], 256);
+
+	if (ImGui::Button("Save", ImVec2(50.0f, 20.0f)))
+	{// 保存
+		CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+		if (pBlockManager != nullptr)
+		{
+			pBlockManager->Save(&m_aPath[0]);
+		}
+	}
+}
+
+//=====================================================
+// ステイトの変更
+//=====================================================
+void CEditBlock::ChangeState(CStateEditBlock *pState)
+{
+	if (m_pState != nullptr)
+	{
+		m_pState->Uninit(this);
+		delete m_pState;
+		m_pState = nullptr;
+	}
+
+	m_pState = pState;
+
+	if (m_pState != nullptr)
+	{
+		m_pState->Init(this);
+	}
+}
+
+//===================================================================================
+// 通常ブロックの生成
+//===================================================================================
+//=====================================================
+// 初期化処理
+//=====================================================
+void CStateCreateBlockNormal::Init(CEditBlock *pEdit)
 {
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
@@ -72,50 +143,42 @@ HRESULT CEditBlock::Init(void)
 
 		m_pObjectCursor->SetEmissiveCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
 	}
-
-	CEdit::Init();
-
-	return S_OK;
 }
 
 //=====================================================
 // 終了処理
 //=====================================================
-void CEditBlock::Uninit(void)
+void CStateCreateBlockNormal::Uninit(CEditBlock *pEdit)
 {
 	if (m_pObjectCursor != nullptr)
 	{
 		m_pObjectCursor->Uninit();
 		m_pObjectCursor = nullptr;
 	}
-
-	CEdit::Uninit();
 }
 
 //=====================================================
 // 更新処理
 //=====================================================
-void CEditBlock::Update(void)
+void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 {
 	// 情報取得
 	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
 	CInputMouse* pMouse = CInputMouse::GetInstance();
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
-	D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f };
+	D3DXVECTOR3 rot = pEdit->GetRotation();
+	D3DXVECTOR3 pos = pEdit->GetPosition();
 	float fSpeed = SPEED_MOVE;
 
-	// カーソルのループ
-	LoopCursor();
-
-	if (m_pObjectCursor != nullptr && pKeyboard != nullptr && pMouse != nullptr && pBlockManager != nullptr)
+	if (pKeyboard != nullptr && pMouse != nullptr && pBlockManager != nullptr)
 	{
 		if (ImGui::TreeNode("POS"))
 		{
 			// ブロック移動
-			ImGui::DragFloat("POS.X", &m_pos.x, SPEED_MOVE, -FLT_MAX, FLT_MAX);
-			ImGui::DragFloat("POS.Y", &m_pos.y, SPEED_MOVE, -FLT_MAX, FLT_MAX);
-			ImGui::DragFloat("POS.Z", &m_pos.z, SPEED_MOVE, -FLT_MAX, FLT_MAX);
+			ImGui::DragFloat("POS.X", &pos.x, SPEED_MOVE, -FLT_MAX, FLT_MAX);
+			ImGui::DragFloat("POS.Y", &pos.y, SPEED_MOVE, -FLT_MAX, FLT_MAX);
+			ImGui::DragFloat("POS.Z", &pos.z, SPEED_MOVE, -FLT_MAX, FLT_MAX);
 
 			ImGui::TreePop();
 		}
@@ -123,9 +186,9 @@ void CEditBlock::Update(void)
 		if (ImGui::TreeNode("ROT"))
 		{
 			// ブロック向き
-			ImGui::DragFloat("ROT.X", &m_rot.x, 0.01f, -D3DX_PI, D3DX_PI);
-			ImGui::DragFloat("ROT.Y", &m_rot.y, 0.01f, -D3DX_PI, D3DX_PI);
-			ImGui::DragFloat("ROT.Z", &m_rot.z, 0.01f, -D3DX_PI, D3DX_PI);
+			ImGui::DragFloat("ROT.X", &rot.x, 0.01f, -D3DX_PI, D3DX_PI);
+			ImGui::DragFloat("ROT.Y", &rot.y, 0.01f, -D3DX_PI, D3DX_PI);
+			ImGui::DragFloat("ROT.Z", &rot.z, 0.01f, -D3DX_PI, D3DX_PI);
 
 			ImGui::TreePop();
 		}
@@ -161,17 +224,8 @@ void CEditBlock::Update(void)
 			pBlock->Uninit();
 		}
 
-		ImGui::InputText("SavePath", &m_aPath[0], 256);
-
-		if (ImGui::Button("Save", ImVec2(50.0f, 20.0f)))
-		{// 保存
-			CBlockManager *pBlockManager = CBlockManager::GetInstance();
-
-			if (pBlockManager != nullptr)
-			{
-				pBlockManager->Save(&m_aPath[0]);
-			}
-		}
+		// セーブ
+		pEdit->Save();
 
 		if (ImGui::Button("DeleteAll", ImVec2(80.0f, 20.0f)))
 		{// 全削除
@@ -182,43 +236,23 @@ void CEditBlock::Update(void)
 				pBlockManager->DeleteAll();
 			}
 		}
-
-		// 回転
-		if (pKeyboard->GetTrigger(DIK_Z))
-		{
-			rot.y = 0.0f;
-
-			m_pObjectCursor->SetRot(rot);
-		}
-		if (pKeyboard->GetTrigger(DIK_C))
-		{
-			rot.y = D3DX_PI * 0.5f;
-
-			m_pObjectCursor->SetRot(rot);
-		}
-
-		if (m_pObjectCursor != nullptr)
-		{// カーソルのトランスフォーム
-			m_pObjectCursor->SetPosition(m_pos);
-			m_pObjectCursor->SetRot(m_rot);
-		}
 	}
 
-	CEdit::Update();
-}
+	// エディットにトランスフォームを適用
+	pEdit->SetPosition(pos);
+	pEdit->SetRotation(rot);
 
-//=====================================================
-// カーソルのループ
-//=====================================================
-void CEditBlock::LoopCursor(void)
-{
-
+	if (m_pObjectCursor != nullptr)
+	{// カーソルのトランスフォーム
+		m_pObjectCursor->SetPosition(pos);
+		m_pObjectCursor->SetRot(rot);
+	}
 }
 
 //=====================================================
 // ブロックの生成
 //=====================================================
-void CEditBlock::CreateBlock(D3DXVECTOR3 pos)
+void CStateCreateBlockNormal::CreateBlock(D3DXVECTOR3 pos)
 {
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
@@ -236,18 +270,13 @@ void CEditBlock::CreateBlock(D3DXVECTOR3 pos)
 		pBlock->SetPosition(pos);
 		pBlock->SetRot(m_pObjectCursor->GetRot());
 		pBlock->SetIdx(m_nIdxObject);
-
-		if (pInfoBlock[m_nIdxObject].bSnag == false)
-		{
-			pBlock->DeleteCollision();
-		}
 	}
 }
 
 //=====================================================
 // 削除ブロックのチェック
 //=====================================================
-CBlock *CEditBlock::CheckDelete(void)
+CBlock *CStateCreateBlockNormal::CheckDelete(void)
 {
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 

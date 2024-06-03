@@ -16,6 +16,7 @@
 // 前方宣言
 //*****************************************************
 class CObjectX;
+class CStateEditBlock;
 
 //*****************************************************
 // クラスの定義
@@ -29,16 +30,43 @@ public:
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
+	void Save(void);
+	void ChangeState(CStateEditBlock *pState);
 
 private:
-	void LoopCursor(void);
+	char m_aPath[256];
+	CStateEditBlock *m_pState;	// ステイトのポインタ
+};
+
+//*****************************************************
+// ステイトクラスの定義
+//*****************************************************
+class CStateEditBlock
+{// ブロックエディットのステイト基底クラス
+public:
+	CStateEditBlock() {};
+	virtual ~CStateEditBlock() {};
+
+	virtual void Init(CEditBlock *pEdit) = 0;
+	virtual void Uninit(CEditBlock *pEdit) = 0;
+	virtual void Update(CEditBlock *pEdit) = 0;
+};
+
+class CStateCreateBlockNormal : public CStateEditBlock
+{// 通常ブロックの生成
+public:
+	CStateCreateBlockNormal() : m_pObjectCursor(nullptr) {};
+	virtual ~CStateCreateBlockNormal() {};
+
+	void Init(CEditBlock *pEdit) override;
+	void Uninit(CEditBlock *pEdit) override;
+	void Update(CEditBlock *pEdit) override;
+
+private:
 	void CreateBlock(D3DXVECTOR3 pos);
 	CBlock *CheckDelete(void);
 
-	D3DXVECTOR3 m_pos;	// 位置
-	D3DXVECTOR3 m_rot;	// 向き
-	CObjectX *m_pObjectCursor;	// カーソルのオブジェクトXへのポインタ
 	int m_nIdxObject;
-	char m_aPath[256];
 	CBlock::TYPE m_type;
+	CObjectX *m_pObjectCursor;	// カーソルの仮オブジェクト
 };
