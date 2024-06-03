@@ -13,11 +13,13 @@
 //*****************************************************
 // 前方宣言
 //*****************************************************
-class CCollisionCube;
 
 //*****************************************************
 // クラスの定義
 //*****************************************************
+//=====================================================
+// 通常ブロッククラス
+//=====================================================
 class CBlock : public CObjectX
 {
 public:
@@ -26,6 +28,12 @@ public:
 		TYPE_WALL = 0,	// 壁
 		TYPE_MAX
 	}TYPE;
+
+	typedef enum
+	{// 行動
+		BEHAVIOUR_NORMAL = 0,	// 通常
+		BEHAVIOUR_GRAB,	// 掴めるもの
+	}BEHAVIOUR;
 
 	typedef struct
 	{// 保存するときの情報
@@ -37,30 +45,47 @@ public:
 	CBlock(int nPriority = 3);	// コンストラクタ
 	~CBlock();	// デストラクタ
 
-	static CBlock *Create(int nIdxModel);
+	static CBlock *Create(int nIdxModel,BEHAVIOUR behaviour = BEHAVIOUR_NORMAL);
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 	void Hit(float fDamage);
-	void SetRot(D3DXVECTOR3 rot);
+	void SetRotation(D3DXVECTOR3 rot);
 	int GetIdx(void) { return m_nIdx; }
 	void SetIdx(int nIdx) { m_nIdx = nIdx; }
 	CBlock *GetNext(void) { return m_pNext; }
 	static int GetNumAll(void) { return m_nNumAll; }
 	void SetPosition(D3DXVECTOR3 pos);
-	void DeleteCollision(void);
+	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }
+	bool CanGrab(D3DXVECTOR3 pos);
 
 private:
-	void SwapVtx(void);
-
 	static int m_nNumAll;	// 総数
-	CCollisionCube *m_pCollisionCube;	// 立方体の当たり判定
 	float m_fLife;	// 体力
 	int m_nIdx;	// 種類のインデックス
+	bool m_bGrab;	// 掴めるかどうか
+	bool m_bCurrent;	// 選択されているかどうか
 
 	CBlock *m_pPrev;	// 前のアドレス
 	CBlock *m_pNext;	// 次のアドレス
+};
+
+//=====================================================
+// 掴むブロッククラス
+//=====================================================
+class CBlockGrab : public CBlock
+{
+public:
+	CBlockGrab();	// コンストラクタ
+	~CBlockGrab();	// デストラクタ
+
+	HRESULT Init(void);
+	void Uninit(void);
+	void Update(void);
+	void Draw(void);
+
+private:
 };
 
 #endif

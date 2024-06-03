@@ -14,16 +14,17 @@
 #include "renderer.h"
 #include "manager.h"
 #include "object.h"
-#include "collision.h"
-#include <stdio.h>
+#include "effect3D.h"
+#include "debugproc.h"
 
 //*****************************************************
-// マクロ定義
+// 定数定義
 //*****************************************************
 namespace
 {
 	const float SPEED_MOVE(1.0f);	// 移動速度
 	const char* MAP_FILE = "data\\MAP\\map01.bin";	// マップのファイルパス
+	const float RADIUS_DRIFT_DEFAULT = 1000.0f;	// ドリフト半径のデフォルト値
 }
 
 //*****************************************************
@@ -36,11 +37,12 @@ int CBlock::m_nNumAll = 0;	// 総数
 //=====================================================
 CBlock::CBlock(int nPriority)
 {
-	m_pCollisionCube = nullptr;
 	m_fLife = 0.0f;
 	m_pPrev = nullptr;
 	m_pNext = nullptr;
 	m_nIdx = -1;
+	m_bGrab = true;
+	m_bCurrent = false;
 
 	// 先頭、最後尾アドレス取得
 	CBlockManager *pManager = CBlockManager::GetInstance();
@@ -138,31 +140,31 @@ CBlock::~CBlock()
 //=====================================================
 // 生成処理
 //=====================================================
-CBlock *CBlock::Create(int nIdxModel)
+CBlock *CBlock::Create(int nIdxModel, BEHAVIOUR behaviour)
 {
 	CBlock *pBlock = nullptr;
 
-	if (pBlock == nullptr)
-	{// インスタンス生成
+	// インスタンス生成
+	switch (behaviour)
+	{
+	case BEHAVIOUR_NORMAL:
 		pBlock = new CBlock;
+		break;
+	case BEHAVIOUR_GRAB:
+		pBlock = new CBlockGrab;
+		break;
+	default:
+		assert(("ブロックのビヘイビアーに不正な値が入力されました", false));
+		break;
+	}
 
+	if (pBlock != nullptr)
+	{
 		// 初期化処理
 		pBlock->Init();
 
 		// 種類ごとのモデル読込
 		pBlock->BindModel(nIdxModel);
-
-		if (pBlock->m_pCollisionCube == nullptr)
-		{// 当たり判定生成
-			pBlock->m_pCollisionCube = CCollisionCube::Create(CCollision::TAG_BLOCK, pBlock);
-
-			if (pBlock->m_pCollisionCube != nullptr)
-			{
-				pBlock->m_pCollisionCube->SetPosition(pBlock->GetPosition());
-
-				pBlock->m_pCollisionCube->SetVtx(pBlock->GetVtxMax(), pBlock->GetVtxMin());
-			}
-		}
 	}
 
 	return pBlock;
@@ -195,24 +197,8 @@ HRESULT CBlock::Init(void)
 //=====================================================
 void CBlock::Uninit(void)
 {
-	// 当たり判定削除
-	DeleteCollision();
-
 	// 継承クラスの終了
 	CObjectX::Uninit();
-}
-
-//=====================================================
-// 当たり判定の削除
-//=====================================================
-void CBlock::DeleteCollision(void)
-{
-	if (m_pCollisionCube != nullptr)
-	{// 当たり判定の消去
-		m_pCollisionCube->Uninit();
-
-		m_pCollisionCube = nullptr;
-	}
 }
 
 //=====================================================
@@ -222,6 +208,42 @@ void CBlock::Update(void)
 {
 	// 継承クラスの更新
 	CObjectX::Update();
+
+	if (m_bCurrent)
+	{
+		CEffect3D::Create(GetPosition(),200.0f,5,D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
+	}
+}
+
+//=====================================================
+// 掴めるかの判定
+//=====================================================
+bool CBlock::CanGrab(D3DXVECTOR3 pos)
+{
+	bool bCanGrab1 = true;
+	bool bCanGrab2 = true;
+
+	// 判定の設置
+	D3DXMATRIX mtxVec1;
+	D3DXMATRIX mtxVec2;
+	D3DXMATRIX mtx = *GetMatrix();
+	universal::SetOffSet(&mtxVec1, mtx, D3DXVECTOR3(200.0f, 0.0f, 0.0f));
+	universal::SetOffSet(&mtxVec2, mtx, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
+	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
+	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
+
+#ifdef _DEBUG
+	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+#endif
+
+	bCanGrab1 = universal::IsCross(pos, GetPosition(), posMtx1, nullptr);
+	bCanGrab2 = universal::IsCross(pos, GetPosition(), posMtx2, nullptr);
+
+	CDebugProc::GetInstance()->Print("\n掴める1[%d]", bCanGrab1);
+	CDebugProc::GetInstance()->Print("\n掴める2[%d]", bCanGrab2);
+
+	return bCanGrab1 ^ bCanGrab2;
 }
 
 //=====================================================
@@ -229,11 +251,6 @@ void CBlock::Update(void)
 //=====================================================
 void CBlock::SetPosition(D3DXVECTOR3 pos)
 {
-	if (m_pCollisionCube != nullptr)
-	{
-		m_pCollisionCube->SetPosition(pos);
-	}
-
 	CObjectX::SetPosition(pos);
 }
 
@@ -257,33 +274,74 @@ void CBlock::Hit(float fDamage)
 //=====================================================
 // 頂点を入れ替える処理
 //=====================================================
-void CBlock::SetRot(D3DXVECTOR3 rot)
+void CBlock::SetRotation(D3DXVECTOR3 rot)
 {
-	if (rot.y != 0)
-	{// 角度によって最大頂点、最小頂点を変える処理
-		SwapVtx();
-	}
-
 	CObjectX::SetRot(rot);
 }
 
+//============================================================================
+// 掴めるブロッククラス
+//============================================================================
 //=====================================================
-// 頂点を入れ替える処理
+// コンストラクタ
 //=====================================================
-void CBlock::SwapVtx(void)
+CBlockGrab::CBlockGrab()
 {
-	D3DXVECTOR3 vtxMax = GetVtxMax();
-	D3DXVECTOR3 vtxMin = GetVtxMin();
-	D3DXVECTOR3 vtxTemp = vtxMin;
+
+}
+ 
+//=====================================================
+// デストラクタ
+//=====================================================
+CBlockGrab::~CBlockGrab()
+{
+
+}
+
+//=====================================================
+// 初期化
+//=====================================================
+HRESULT CBlockGrab::Init(void)
+{
+	// 掴みブロックリストに追加
+	CBlockManager *pBlockManager =  BlockManager::GetInstance();
+
+	if (pBlockManager != nullptr)
+		pBlockManager->AddGrabList(this);
+
+	// 基底クラスの初期化
+	CBlock::Init();
+
+	return S_OK;
+}
+
+//=====================================================
+// 終了
+//=====================================================
+void CBlockGrab::Uninit(void)
+{
+	// 掴みブロックリストから除外
+	CBlockManager *pBlockManager = BlockManager::GetInstance();
+
+	if (pBlockManager != nullptr)
+		pBlockManager->RemoveGrabList(this);
 	
-	vtxMin = { -vtxMax.z,vtxMin.y,-vtxMax.x };
-	vtxMax = { -vtxTemp.z,vtxMax.y,-vtxTemp.x };
+	// 基底クラスの終了
+	CBlock::Uninit();
+}
 
-	SetVtxMax(vtxMax);
-	SetVtxMin(vtxMin);
+//=====================================================
+// 更新
+//=====================================================
+void CBlockGrab::Update(void)
+{
+	CBlock::Update();
+}
 
-	if (m_pCollisionCube != nullptr)
-	{
-		m_pCollisionCube->SetVtx(vtxMax, vtxMin);
-	}
+//=====================================================
+// 描画
+//=====================================================
+void CBlockGrab::Draw(void)
+{
+	CBlock::Draw();
 }

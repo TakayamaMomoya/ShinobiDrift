@@ -10,7 +10,6 @@
 //*****************************************************
 #include "main.h"
 #include "BlockManager.h"
-#include <stdio.h>
 
 //*****************************************************
 // 定数定義
@@ -65,6 +64,8 @@ CBlockManager *CBlockManager::Create(void)
 //=====================================================
 HRESULT CBlockManager::Init(void)
 {
+	m_listGrab.clear();
+
 	Load();
 
 	return S_OK;
@@ -214,12 +215,12 @@ void CBlockManager::LoadMap(FILE *pFile, char *pTemp)
 				if (pBlock != nullptr)
 				{
 					pBlock->SetPosition(pos);
-					pBlock->SetRot(rot);
+					pBlock->SetRotation(rot);
 					pBlock->SetIdx(nIdx);
 
 					if (m_pInfoBlock[nIdx].bSnag == false)
 					{
-						pBlock->DeleteCollision();
+						pBlock->EnableShadow(false);
 					}
 				}
 
@@ -354,4 +355,33 @@ void CBlockManager::Draw(void)
 #ifdef _DEBUG
 
 #endif
+}
+
+//=====================================================
+// 掴みブロックリストに追加
+//=====================================================
+void CBlockManager::AddGrabList(CBlockGrab *pBlock)
+{
+	m_listGrab.push_back(pBlock);
+}
+
+//=====================================================
+// 掴みブロックリストから除外
+//=====================================================
+void CBlockManager::RemoveGrabList(CBlockGrab *pBlock)
+{
+	m_listGrab.remove(pBlock);
+}
+
+namespace BlockManager
+{
+CBlockManager *GetInstance(void)
+{
+	CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+	if (pBlockManager == nullptr)
+		assert(("nullのブロックマネージャーを取得しようとしています", false));
+
+	return pBlockManager;
+}
 }
