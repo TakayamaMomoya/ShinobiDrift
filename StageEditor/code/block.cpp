@@ -230,7 +230,7 @@ bool CBlock::CanGrab(D3DXVECTOR3 pos)
 	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif
 
-	bCanGrab1 = universal::IsCross(pos, GetPosition(), posMtx1, nullptr);
+	bCanGrab1 = universal::IsCross(pos, posMtx1, GetPosition(), nullptr);
 	bCanGrab2 = universal::IsCross(pos, GetPosition(), posMtx2, nullptr);
 
 	CDebugProc::GetInstance()->Print("\n’Í‚ß‚é1[%d]", bCanGrab1);
