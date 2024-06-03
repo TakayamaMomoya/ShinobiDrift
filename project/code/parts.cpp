@@ -25,6 +25,10 @@ CParts::CParts()
 	m_fRadius = 0.0f;
 	m_bChangeCol = false;
 	m_col = { 0.0f,0.0f,0.0f,0.0f };
+
+	m_pDynamicsWorld = nullptr;
+	m_nMass = 1;
+	m_nIdxPhysics - 1;
 }
 
 //====================================================
@@ -64,6 +68,36 @@ void CParts::Uninit(void)
 //====================================================
 void CParts::Update(void)
 {
+	// 箱の位置姿勢情報の取得
+	btTransform trans;
+
+	if (CManager::GetPhysics())
+		return;
+
+	if (CManager::GetPhysics()->GetDynamicsWorld())
+		return;
+
+	btCollisionObject* obj = CManager::GetPhysics()->GetDynamicsWorld()->getCollisionObjectArray()[m_nIdxPhysics];
+	btRigidBody* fallRigidBody = btRigidBody::upcast(obj);
+
+	if (fallRigidBody && fallRigidBody->getMotionState())
+	{// 通っちゃったね...//
+
+		fallRigidBody->activate(true);
+		fallRigidBody->getMotionState()->getWorldTransform(trans);
+
+		// 位置取得
+		m_pos = D3DXVECTOR3(trans.getOrigin().getX(), trans.getOrigin().getY(), trans.getOrigin().getZ());
+
+		// 角度取得
+		btQuaternion quaternion = fallRigidBody->getOrientation();
+		btMatrix3x3 rot = trans.getBasis();
+		btVector3 euler;
+		rot.getEulerZYX(euler[2], euler[1], euler[0]);
+
+		m_rot = D3DXVECTOR3(euler[0], euler[1], euler[2]);
+	}
+
 	// 移動量を加算
 	m_pos += m_move;
 }
@@ -175,6 +209,35 @@ void CParts::DrawShadow(void)
 }
 
 //=====================================================
+// 物理設定
+//=====================================================
+void CParts::InitPhysics(void)
+{
+	// 落下する箱の衝突形状の作成
+	btCollisionShape* pFallShapes = new btBoxShape(btVector3(m_vtxMax.x, m_vtxMax.y, m_vtxMax.z));
+
+	btTransform StratTransform;
+	StratTransform.setIdentity();
+	StratTransform.setOrigin(btVector3(m_pos.x, m_pos.y, m_pos.z));
+
+	btVector3 fallInertia(0, 0, 0);
+	pFallShapes->calculateLocalInertia(m_nMass, fallInertia);
+
+	// 箱のMotionStateの設定
+	btDefaultMotionState* fallMotionState = new btDefaultMotionState(btTransform(btQuaternion(0, 0, 0, 1), btVector3(m_pos.x, m_pos.y, m_pos.z)));
+	// 箱の初期情報を設定
+	btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(m_nMass, fallMotionState, pFallShapes, fallInertia);
+	// 箱の剛体の作成
+	btRigidBody* fallRigidBody = new btRigidBody(fallRigidBodyCI);
+
+	// ワールドに箱の剛体を追加
+	CManager::GetPhysics()->GetDynamicsWorld()->addRigidBody(fallRigidBody);
+	
+	// 番号
+	m_nIdxPhysics = CManager::GetPhysics()->GetDynamicsWorld()->getNumCollisionObjects() - 1;
+}
+
+//=====================================================
 // マトリックス設定処理
 //=====================================================
 void CParts::SetMatrix(void)
@@ -234,6 +297,8 @@ void CParts::SetRadius(void)
 	DWORD dwSizeFVF;		//頂点フォーマットのサイズ
 	BYTE *pVtxBuff;			//頂点バッファへのポインタ
 	float fLength = 0.0f;
+	D3DXVECTOR3 vtxMin = { 0.0f,0.0f,0.0f };
+	D3DXVECTOR3 vtxMax = { 0.0f,0.0f,0.0f };
 
 	// 頂点数の取得
 	nNumVtx = m_pModel->pMesh->GetNumVertices();
@@ -248,6 +313,33 @@ void CParts::SetRadius(void)
 	{
 		D3DXVECTOR3 vtx = *(D3DXVECTOR3*)pVtxBuff;
 
+		if (vtx.x > vtxMax.x)
+		{// Xの最大値
+			vtxMax.x = vtx.x;
+		}
+		else if (vtx.x < vtxMin.x)
+		{// Xの最小値
+			vtxMin.x = vtx.x;
+		}
+
+		if (vtx.z > vtxMax.z)
+		{// Zの最大値
+			vtxMax.z = vtx.z;
+		}
+		else if (vtx.z < vtxMin.z)
+		{// Zの最小値
+			vtxMin.z = vtx.z;
+		}
+
+		if (vtx.y > vtxMax.y)
+		{// Yの最大値
+			vtxMax.y = vtx.y;
+		}
+		else if (vtx.y < vtxMin.y)
+		{// Yの最小値
+			vtxMin.y = vtx.y;
+		}
+
 		if (D3DXVec3Length(&vtx) > fLength)
 		{
 			fLength = D3DXVec3Length(&vtx);
@@ -255,6 +347,10 @@ void CParts::SetRadius(void)
 
 		pVtxBuff += dwSizeFVF;
 	}
+
+	// 最大・最小頂点設定
+	m_vtxMax = vtxMax;
+	m_vtxMin = vtxMin;
 
 	// 頂点バッファのアンロック
 	m_pModel->pMesh->UnlockVertexBuffer();

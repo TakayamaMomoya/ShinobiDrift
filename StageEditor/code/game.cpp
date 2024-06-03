@@ -54,6 +54,7 @@ CGame::CGame()
 {
 	m_nCntState = 0;
 	m_bStop = false;
+	m_bBlock = false;
 	m_pEdit = nullptr;
 }
 
@@ -158,6 +159,32 @@ void CGame::Update(void)
 
 	// ó‘ÔŠÇ—
 	ManageState();
+
+	if (CInputKeyboard::GetInstance()->GetTrigger(DIK_G))
+	{
+		if (m_pEdit != nullptr)
+		{
+			m_pEdit->Uninit();
+			delete m_pEdit;
+			m_pEdit = nullptr;
+		}
+
+		if (m_bBlock)
+		{
+			m_pEdit = new CEditMesh;
+
+			m_bBlock = false;
+		}
+		else
+		{
+			m_pEdit = new CEditBlock;
+
+			m_bBlock = true;
+		}
+
+		if (m_pEdit != nullptr)
+			m_pEdit->Init();
+	}
 
 #ifdef _DEBUG
 	Debug();

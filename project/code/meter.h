@@ -14,6 +14,7 @@
 #include "main.h"
 #include "number.h"
 #include "player.h"
+#include "UI.h"
 
 //*****************************************************
 // マクロ定義
@@ -36,6 +37,7 @@ public:
 	void Uninit();
 	void Update();
 	void Acceleration();
+	void Needle();
 
 	// メーターの取得
 	int GetMeter() { return m_NowMeter; }
@@ -46,8 +48,13 @@ private:
 	//メンバ変数
 	int m_NowMeter;		// 現在のメーター値
 	int m_nCntMeter;	// カウント加算
+	int m_nIdxTexture;	// テクスチャ番号
+
+	float m_fRot;		// 向き
+
 	CNumber* m_pNumber;	// ナンバーのポインタ
 	CPlayer* m_pPlayer;	// プレイヤーのポインタ
+	CUI* m_pUI;			// UIのポインタ
 	static CMeter* m_pMeter;	// 自身のポインタ
 };
 

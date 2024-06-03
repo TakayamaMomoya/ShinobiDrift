@@ -15,6 +15,8 @@
 #include "meshRoad.h"
 #include "objectX.h"
 #include "debugproc.h"
+#include "camera.h"
+#include "manager.h"
 
 //*****************************************************
 // 定数定義
@@ -93,8 +95,11 @@ void CEditMesh::Update(void)
 	if (ImGui::Button("CreateEdge", ImVec2(70, 30)))	// メッシュ生成
 		ChangeState(new CStateEditMeshCreateMesh);
 
-	if (ImGui::Button("DeleteEdge", ImVec2(70, 30)))	// 辺の削除
-		ChangeState(new CStateEditMeshDeleteEdge);
+	if (ImGui::Button("AdjustRoadPoint", ImVec2(70, 30)))	// ロードポイントの調節
+		ChangeState(new CStateEditMeshAdjustRoadPoint);
+
+	if (ImGui::Button("DeleteRoadPoint", ImVec2(70, 30)))	// 辺の削除
+		ChangeState(new CStateEditMeshDeleteRoadPoint);
 }
 
 //=====================================================
@@ -120,7 +125,7 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 	CInputMouse* pMouse = CInputMouse::GetInstance();
 
 	D3DXVECTOR3 pos = pEdit->GetPosition();
-	D3DXVECTOR3 rot = pEdit->GetRotation();
+	D3DXVECTOR3 rot = CManager::GetCamera()->GetCamera()->rot;
 
 	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, rot.y - D3DX_PI * 0.5f, 0.0f));
 
@@ -139,25 +144,23 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 		// 視点移動===============================================
 		if (pKeyboard->GetPress(DIK_A) == true)
 		{// 左移動
-			pos.x -= sinf(rot.y - D3DX_PI * 0.5f) * fMove;
-			pos.z -= cosf(rot.y - D3DX_PI * 0.5f) * fMove;
+			pos.x += sinf(rot.y - D3DX_PI * 0.5f) * fMove;
+			pos.z += cosf(rot.y - D3DX_PI * 0.5f) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_D) == true)
 		{// 右移動
-			pos.x -= sinf(rot.y - D3DX_PI * -0.5f) * fMove;
-			pos.z -= cosf(rot.y - D3DX_PI * -0.5f) * fMove;
+			pos.x += sinf(rot.y - D3DX_PI * -0.5f) * fMove;
+			pos.z += cosf(rot.y - D3DX_PI * -0.5f) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_W) == true)
 		{// 前移動
-			pos.x += sinf(rot.x - D3DX_PI * 0.5f) * sinf(rot.y) * fMove;
-			pos.y -= cosf(rot.x - D3DX_PI * 0.5f) * fMove;
-			pos.z += sinf(rot.x - D3DX_PI * 0.5f) * cosf(rot.y) * fMove;
+			pos.x += sinf(D3DX_PI * 0.5f) * sinf(rot.y) * fMove;
+			pos.z += sinf(D3DX_PI * 0.5f) * cosf(rot.y) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_S) == true)
 		{// 後移動
-			pos.x += sinf(rot.x + D3DX_PI * 0.5f) * sinf(rot.y) * fMove;
-			pos.y -= cosf(rot.x + D3DX_PI * 0.5f) * fMove;
-			pos.z += sinf(rot.x + D3DX_PI * 0.5f) * cosf(rot.y) * fMove;
+			pos.x += sinf(-D3DX_PI * 0.5f) * sinf(rot.y) * fMove;
+			pos.z += sinf(-D3DX_PI * 0.5f) * cosf(rot.y) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_E) == true)
 		{// 上昇
@@ -220,21 +223,49 @@ void CStateEditMeshCreateMesh::LimitPos(D3DXVECTOR3 *pPos)
 }
 
 //****************************************************************************************
-// 辺の削除
+// ロードポイントの調節
 //****************************************************************************************
-CStateEditMeshDeleteEdge::CStateEditMeshDeleteEdge()
+CStateEditMeshAdjustRoadPoint::CStateEditMeshAdjustRoadPoint()
 {// コンストラクタ
 	CMeshRoad *pMesh = MeshRoad::GetInstance();
 
 	pMesh->ResetIterator();
 }
 
-void CStateEditMeshDeleteEdge::Update(CEditMesh *pEdit)
+void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
+{
+	CMeshRoad *pMesh = MeshRoad::GetInstance();
+
+	// ロードポイントの選択
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectRoadPoint();
+
+	D3DXVECTOR3 pos = it->pos;
+
+	ImGui::DragFloat("posRoadPointPOS.X", &pos.x, 2.0f, -FLT_MAX, FLT_MAX);
+	ImGui::DragFloat("posRoadPointPOS.Y", &pos.y, 2.0f, -FLT_MAX, FLT_MAX);
+	ImGui::DragFloat("posRoadPointPOS.Z", &pos.z, 2.0f, -FLT_MAX, FLT_MAX);
+
+	it->pos = pos;
+
+	pMesh->CreateVtxBuffEdge();
+}
+
+//****************************************************************************************
+// 辺の削除
+//****************************************************************************************
+CStateEditMeshDeleteRoadPoint::CStateEditMeshDeleteRoadPoint()
+{// コンストラクタ
+	CMeshRoad *pMesh = MeshRoad::GetInstance();
+
+	pMesh->ResetIterator();
+}
+
+void CStateEditMeshDeleteRoadPoint::Update(CEditMesh *pEdit)
 {
 	CMeshRoad *pMesh = MeshRoad::GetInstance();
 
 	// 辺の選択
-	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectEdge();
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectRoadPoint();
 
 	if (ImGui::Button("Delete", ImVec2(100, 50)))
 	{

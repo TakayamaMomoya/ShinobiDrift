@@ -79,6 +79,7 @@ private:
 		CObject3D *pRoap;
 		float fCntAngle;	// アングルのカウンター
 		bool bGrabOld;
+		bool bManual;		// マニュアル操作
 		float fLengthDrift;
 		float fTimerDriftChange;
 	};

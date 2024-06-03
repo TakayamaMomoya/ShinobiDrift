@@ -633,6 +633,8 @@ void CMotion::Load(char *pPath)
 
 						}//END_PART
 
+						m_apParts[nCntModel]->pParts->InitPhysics();
+
 						nCntModel++;
 					}
 				}//END_CHAR

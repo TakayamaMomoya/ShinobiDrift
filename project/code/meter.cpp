@@ -11,14 +11,19 @@
 #include "meter.h"
 #include "manager.h"
 #include "debugproc.h"
+#include "texture.h"
+#include "input.h"
+#include "inputkeyboard.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-	const int SECOND = 70;		// メーターの表示値
-	const int PLACE = 2;		// 桁数
+	const int SECOND = 140;		// メーターの表示値
+	const int PLACE = 3;		// 桁数
+	const float WIDTH = SCREEN_WIDTH * 0.80f;		// 幅
+	const float HEIGHT = SCREEN_HEIGHT * 0.83f;		// 高さ
 }
 
 //=====================================================
@@ -33,8 +38,11 @@ CMeter::CMeter(int nPriority)
 {
 	m_NowMeter = 0;			// 現在のメーター値
 	m_nCntMeter = 0;		// メーター加算
+	m_nIdxTexture = 0;		// テクスチャ番号
+	m_fRot = 0.0f;			// 向き
 	m_pNumber = nullptr;	// ナンバーのポインタ
 	m_pPlayer = nullptr;	// プレイヤーのポインタ
+	m_pUI = nullptr;		// UIのポインタ
 }
 
 //=====================================================
@@ -65,25 +73,55 @@ CMeter* CMeter::Create(void)
 //=====================================================
 // 初期化処理
 //=====================================================
-HRESULT CMeter::Init(void)
+HRESULT CMeter::Init()
 {
+	// 速度
+	m_NowMeter = 0;
+
+	// カウント加算
+	m_nCntMeter = 0;
+
+	// テクスチャ番号
+	m_nIdxTexture = 0;
+
 	// プレイヤーの情報取得
 	m_pPlayer = CPlayer::GetInstance();
 
-	// 速度
-	m_NowMeter = 0;
+	// テクスチャ情報の取得
+	CTexture* pTexture = CTexture::GetInstance();
+
+	// テクスチャ番号
+	m_nIdxTexture = pTexture->Regist("data\\TEXTURE\\UI\\1st.png");
 
 	// 生成
 	m_pNumber = CNumber::Create(PLACE, 0);
 
 	// 位置設定
-	m_pNumber->SetPosition(D3DXVECTOR3(1000, 600.0f, 0.0f));
+	m_pNumber->SetPosition(D3DXVECTOR3(WIDTH, HEIGHT, 0.0f));
 
 	// サイズ調整
 	m_pNumber->SetSizeAll(35.0f, 35.0f);
 
 	// 色設定
 	m_pNumber->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	// 生成
+	m_pUI = CUI::Create();
+
+	// テクスチャ設定
+	m_pUI->SetIdxTexture(m_nIdxTexture);
+
+	// 位置設定
+	m_pUI->SetPosition(D3DXVECTOR3(1100, 600.0f, 0.0f));
+
+	// サイズ設定
+	m_pUI->SetSize(50.0f, 35.0f);
+
+	// 向き設定
+	m_pUI->SetRotation(0.0f);
+
+	// 頂点情報設定
+	m_pUI->SetVtx();
 
 	return S_OK;
 }
@@ -97,6 +135,10 @@ void CMeter::Uninit(void)
 
 	m_pMeter = nullptr;
 
+	m_pPlayer = nullptr;
+
+	m_pUI = nullptr;
+
 	// 自身の破棄
 	Release();
 }
@@ -106,12 +148,14 @@ void CMeter::Uninit(void)
 //=====================================================
 void CMeter::Update(void)
 {
-	// メーター値の加算
+	// メーター値
 	Acceleration();
+
+	CDebugProc::GetInstance()->Print("\n現在の向き[%f]", m_fRot);
 }
 
 //=====================================================
-// 加速時処理
+// メーター値処理
 //=====================================================
 void CMeter::Acceleration()
 {
@@ -119,10 +163,13 @@ void CMeter::Acceleration()
 	float fDeltaTime = CManager::GetDeltaTime();
 
 	// 速度取得
-	float fSpeed = m_pPlayer->GetSpeed();
+	float fPlayerSpeed = m_pPlayer->GetSpeed();
+
+	// 最高速度
 	float fMaxSpeed = m_pPlayer->GetParam().fSpeedMax;
 
-	m_NowMeter = fSpeed;
+	// 速度取得
+	m_NowMeter = fPlayerSpeed;
 
 	if (m_NowMeter >= fMaxSpeed)
 	{// プレイヤーパラメーターの速度を超えないように
@@ -133,7 +180,7 @@ void CMeter::Acceleration()
 	int Meter = m_NowMeter % SECOND;
 
 	if (m_pNumber != nullptr)
-	{// 秒表示の制御
+	{// 値表示の制御
 		m_pNumber->SetValue(Meter, PLACE);
 	}
 
@@ -141,4 +188,19 @@ void CMeter::Acceleration()
 	{// マイナスの値にいかないように
 		m_NowMeter = 0;
 	}
+}
+
+//=====================================================
+// メーター針処理
+//=====================================================
+void CMeter::Needle()
+{
+	// 向き取得
+	m_fRot = m_pUI->GetRotation();
+
+	// 
+	m_fRot;
+
+	// 向き設定
+	m_pUI->SetRotation(m_fRot);
 }

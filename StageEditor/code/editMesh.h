@@ -41,6 +41,9 @@ private:
 	CStateEditMesh *m_pState;	// ステイト
 };
 
+//*****************************************************
+// ステイトクラスの定義
+//*****************************************************
 class CStateEditMesh
 {// メッシュエディットのステイト基底クラス
 public:
@@ -62,11 +65,20 @@ private:
 	void LimitPos(D3DXVECTOR3 *pPos);
 };
 
-class CStateEditMeshDeleteEdge : public CStateEditMesh
-{// 辺の削除
+class CStateEditMeshAdjustRoadPoint : public CStateEditMesh
+{// ロードポイントの調節
 public:
-	CStateEditMeshDeleteEdge();
-	virtual ~CStateEditMeshDeleteEdge() {};
+	CStateEditMeshAdjustRoadPoint();
+	virtual ~CStateEditMeshAdjustRoadPoint() {};
+
+	void Update(CEditMesh *pEdit) override;
+};
+
+class CStateEditMeshDeleteRoadPoint : public CStateEditMesh
+{// ロードポイントの削除
+public:
+	CStateEditMeshDeleteRoadPoint();
+	virtual ~CStateEditMeshDeleteRoadPoint() {};
 
 	void Update(CEditMesh *pEdit) override;
 };
