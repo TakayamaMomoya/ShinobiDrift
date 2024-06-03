@@ -15,6 +15,8 @@
 #include "meshRoad.h"
 #include "objectX.h"
 #include "debugproc.h"
+#include "camera.h"
+#include "manager.h"
 
 //*****************************************************
 // 定数定義
@@ -123,7 +125,7 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 	CInputMouse* pMouse = CInputMouse::GetInstance();
 
 	D3DXVECTOR3 pos = pEdit->GetPosition();
-	D3DXVECTOR3 rot = pEdit->GetRotation();
+	D3DXVECTOR3 rot = CManager::GetCamera()->GetCamera()->rot;
 
 	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, rot.y - D3DX_PI * 0.5f, 0.0f));
 
@@ -142,25 +144,23 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 		// 視点移動===============================================
 		if (pKeyboard->GetPress(DIK_A) == true)
 		{// 左移動
-			pos.x -= sinf(rot.y - D3DX_PI * 0.5f) * fMove;
-			pos.z -= cosf(rot.y - D3DX_PI * 0.5f) * fMove;
+			pos.x += sinf(rot.y - D3DX_PI * 0.5f) * fMove;
+			pos.z += cosf(rot.y - D3DX_PI * 0.5f) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_D) == true)
 		{// 右移動
-			pos.x -= sinf(rot.y - D3DX_PI * -0.5f) * fMove;
-			pos.z -= cosf(rot.y - D3DX_PI * -0.5f) * fMove;
+			pos.x += sinf(rot.y - D3DX_PI * -0.5f) * fMove;
+			pos.z += cosf(rot.y - D3DX_PI * -0.5f) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_W) == true)
 		{// 前移動
-			pos.x += sinf(rot.x - D3DX_PI * 0.5f) * sinf(rot.y) * fMove;
-			pos.y -= cosf(rot.x - D3DX_PI * 0.5f) * fMove;
-			pos.z += sinf(rot.x - D3DX_PI * 0.5f) * cosf(rot.y) * fMove;
+			pos.x += sinf(D3DX_PI * 0.5f) * sinf(rot.y) * fMove;
+			pos.z += sinf(D3DX_PI * 0.5f) * cosf(rot.y) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_S) == true)
 		{// 後移動
-			pos.x += sinf(rot.x + D3DX_PI * 0.5f) * sinf(rot.y) * fMove;
-			pos.y -= cosf(rot.x + D3DX_PI * 0.5f) * fMove;
-			pos.z += sinf(rot.x + D3DX_PI * 0.5f) * cosf(rot.y) * fMove;
+			pos.x += sinf(-D3DX_PI * 0.5f) * sinf(rot.y) * fMove;
+			pos.z += sinf(-D3DX_PI * 0.5f) * cosf(rot.y) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_E) == true)
 		{// 上昇

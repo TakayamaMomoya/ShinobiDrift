@@ -91,7 +91,7 @@ HRESULT CMeshRoad::Init(void)
 	SetIdxTexture(nIdx);
 
 	// 読み込み処理
-	Load();
+	//Load();
 
 	m_it = m_listRoadPoint.begin();
 
@@ -320,7 +320,7 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 		else
 		{
 			float fDiff = infoRoadPoint.pos.x - pInfoRoadPointOld->pos.x;
-			float fRate = (float)i / NUM_EDGE_IN_ROADPOINT;
+			float fRate = ((float)i + 1.0f) / NUM_EDGE_IN_ROADPOINT;
 
 			// X座標の決定
 			pos.x = pInfoRoadPointOld->pos.x + fRate * fDiff;
@@ -339,6 +339,7 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 			{
 				pVtx[0].pos = pVtx[-2].pos;
 				pVtx[1].pos = pVtx[-1].pos;
+
 				pVtx[0].nor = pVtx[-2].nor;
 				pVtx[1].nor = pVtx[-1].nor;
 			}
@@ -428,8 +429,8 @@ void CMeshRoad::SetNormal(VERTEX_3D *pVtx)
 	D3DXVec3Normalize(&nor, &nor);	// 法線を正規化
 
 	// 法線を適用
-	pVtx[0].nor = nor;
-	pVtx[1].nor = nor;
+	pVtx[0].nor = { 0.0f,1.0f,0.0f };
+	pVtx[1].nor = { 0.0f,1.0f,0.0f };
 }
 
 //=====================================================
