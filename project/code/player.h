@@ -16,7 +16,7 @@
 //*****************************************************
 // 前方宣言
 //*****************************************************
-class CBlock;
+class CBlockGrab;
 class CObject3D;
 
 //*****************************************************
@@ -58,7 +58,7 @@ public:
 	void Draw(void);
 	void Hit(float fDamage);
 	SParam GetParam(void) { return m_param; }
-	CBlock *GetBlock(void) { return m_info.pBlock; }
+	CBlockGrab *GetBlock(void) { return m_info.pBlockGrab; }
 	float GetSpeed() { return m_info.fSpeed; }
 
 private:
@@ -75,7 +75,7 @@ private:
 		float fTimerFlip;	// ドリフトカウンター
 		float fAngleDrift;	// ドリフト時の角度倍率の値
 		int nCntFlip;	// 弾きカウンター
-		CBlock *pBlock;	// 掴んでいるブロック
+		CBlockGrab *pBlockGrab;	// 掴んでいるブロック
 		CObject3D *pRoap;
 		float fCntAngle;	// アングルのカウンター
 		bool bGrabOld;

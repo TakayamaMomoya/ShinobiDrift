@@ -210,7 +210,7 @@ void CBlockManager::LoadMap(FILE *pFile, char *pTemp)
 			if (strcmp(pTemp, "END_SETBLOCK") == 0)
 			{
 				// ブロック生成
-				CBlock *pBlock = CBlock::Create(m_pInfoBlock[nIdx].nIdxModel);
+				CBlock *pBlock = CBlock::Create(m_pInfoBlock[nIdx].nIdxModel, CBlock::BEHAVIOUR_GRAB);
 
 				if (pBlock != nullptr)
 				{
@@ -378,9 +378,6 @@ namespace BlockManager
 CBlockManager *GetInstance(void)
 {
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
-
-	if (pBlockManager == nullptr)
-		assert(("nullのブロックマネージャーを取得しようとしています", false));
 
 	return pBlockManager;
 }

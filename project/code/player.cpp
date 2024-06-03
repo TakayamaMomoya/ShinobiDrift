@@ -252,7 +252,7 @@ void CPlayer::InputMove(void)
 
 	CDebugProc::GetInstance()->Print("\nアクセル値[%f]", fAccele);
 
-	if (m_info.pBlock == nullptr)
+	if (m_info.pBlockGrab == nullptr)
 	{
 		// ハンドルの操作
 		CInputManager::SAxis axis = pInputManager->GetAxis();
@@ -331,23 +331,23 @@ void CPlayer::InputWire(void)
 #endif
 
 
-	CBlock *pBlockGrab = nullptr;
+	CBlockGrab *pBlockGrab = nullptr;
 	float fAngleMin = D3DX_PI;
 
 	float fLength = sqrtf(vecStickR.x * vecStickR.x + vecStickR.y * vecStickR.y);
 
-	if (m_info.pBlock != nullptr)
+	if (m_info.pBlockGrab != nullptr)
 	{
-		m_info.pBlock->EnableCurrent(true);
+		m_info.pBlockGrab->EnableCurrent(true);
 	}
 
 	//if (pJoypad->GetPress(CInputJoypad::PADBUTTONS_LB, 0))
-	if (m_info.pBlock != nullptr)
+	if (m_info.pBlockGrab != nullptr)
 	{
 		//if (fLength > 0.5f)
 		{// 操作している判定
 			D3DXVECTOR3 posPlayer = GetPosition();
-			D3DXVECTOR3 posBlock = m_info.pBlock->GetPosition();
+			D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
 			D3DXVECTOR3 vecDiff = posBlock - posPlayer;
 			float vecLength = D3DXVec3Length(&(posBlock - posPlayer));
 
@@ -436,7 +436,7 @@ void CPlayer::InputWire(void)
 
 				SetRotation(rot);
 
-				bool bGrab = m_info.pBlock->CanGrab(posPlayer);
+				bool bGrab = m_info.pBlockGrab->CanGrab(posPlayer);
 
 				if (m_info.bManual)
 				{
@@ -445,7 +445,7 @@ void CPlayer::InputWire(void)
 						m_info.nCntFlip = 0;
 						m_info.fCntAngle = 0.0f;
 
-						m_info.pBlock = nullptr;
+						m_info.pBlockGrab = nullptr;
 
 						m_info.fLengthDrift = 0.0f;
 					}
@@ -457,7 +457,7 @@ void CPlayer::InputWire(void)
 						m_info.nCntFlip = 0;
 						m_info.fCntAngle = 0.0f;
 
-						m_info.pBlock = nullptr;
+						m_info.pBlockGrab = nullptr;
 
 						m_info.fLengthDrift = 0.0f;
 					}
@@ -520,13 +520,12 @@ void CPlayer::InputWire(void)
 		//if (m_info.nCntFlip == 0)
 		{
 			float fLengthMin = 0.0f;
-			CBlock* pBlockMin = nullptr;
+			CBlockGrab* pBlockMin = nullptr;
 
-			while (pBlock != nullptr)
+			std::list<CBlockGrab*> *pListGrab = pBlockManager->GetListGrab();
+
+			for (CBlockGrab *pBlock : *pListGrab)
 			{
-				// 次のアドレスを保存
-				CBlock *pBlockNext = pBlock->GetNext();
-
 				D3DXVECTOR3 posBlock = pBlock->GetPosition();
 				D3DXVECTOR3 vecBlockDiff = posBlock - posPlayer;
 				float fAngleDiff = atan2f(vecBlockDiff.x, vecBlockDiff.z) - rotPlayer.y;
@@ -548,9 +547,6 @@ void CPlayer::InputWire(void)
 						fLengthMin = fLengthDiff;
 					}
 				}
-
-				// 次のアドレスを代入
-				pBlock = pBlockNext;
 			}
 
 			if (pBlockMin != nullptr)
@@ -576,7 +572,7 @@ void CPlayer::InputWire(void)
 					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_UP, 0) ||
 					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_RIGHT, 0))
 				{// 弾いた瞬間
-					m_info.pBlock = pBlockGrab;
+					m_info.pBlockGrab = pBlockGrab;
 
 					m_info.fTimerDriftChange = 0.7f;
 				}
@@ -592,7 +588,7 @@ void CPlayer::InputWire(void)
 		}
 	}
 
-	CDebugProc::GetInstance()->Print("\n掴んでるブロックはある？[%d]", m_info.pBlock != nullptr);
+	CDebugProc::GetInstance()->Print("\n掴んでるブロックはある？[%d]", m_info.pBlockGrab != nullptr);
 	CDebugProc::GetInstance()->Print("\nロックオン方向[%f]", fAngleInput);
 }
 
@@ -601,11 +597,11 @@ void CPlayer::InputWire(void)
 //=====================================================
 void CPlayer::LimitDrift(float fLength)
 {
-	if (m_info.pBlock == nullptr)
+	if (m_info.pBlockGrab == nullptr)
 		return;
 
 	D3DXVECTOR3 posPlayer = GetPosition();
-	D3DXVECTOR3 posBlock = m_info.pBlock->GetPosition();
+	D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
 	D3DXVECTOR3 vecDiff = posPlayer - posBlock;
 
 	vecDiff.y = 0.0f;

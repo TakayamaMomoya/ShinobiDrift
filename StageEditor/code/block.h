@@ -57,15 +57,12 @@ public:
 	CBlock *GetNext(void) { return m_pNext; }
 	static int GetNumAll(void) { return m_nNumAll; }
 	void SetPosition(D3DXVECTOR3 pos);
-	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }
 	bool CanGrab(D3DXVECTOR3 pos);
 
 private:
 	static int m_nNumAll;	// 総数
 	float m_fLife;	// 体力
 	int m_nIdx;	// 種類のインデックス
-	bool m_bGrab;	// 掴めるかどうか
-	bool m_bCurrent;	// 選択されているかどうか
 
 	CBlock *m_pPrev;	// 前のアドレス
 	CBlock *m_pNext;	// 次のアドレス
@@ -80,12 +77,18 @@ public:
 	CBlockGrab();	// コンストラクタ
 	~CBlockGrab();	// デストラクタ
 
+	// メンバ関数
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 
 private:
+	// メンバ関数
+	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }	// 選択フラグの設定
+	
+	// メンバ変数
+	bool m_bCurrent;	// 選択されているかどうか
 };
 
 #endif

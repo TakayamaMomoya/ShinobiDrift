@@ -41,8 +41,6 @@ CBlock::CBlock(int nPriority)
 	m_pPrev = nullptr;
 	m_pNext = nullptr;
 	m_nIdx = -1;
-	m_bGrab = true;
-	m_bCurrent = false;
 
 	// 先頭、最後尾アドレス取得
 	CBlockManager *pManager = CBlockManager::GetInstance();
@@ -208,11 +206,6 @@ void CBlock::Update(void)
 {
 	// 継承クラスの更新
 	CObjectX::Update();
-
-	if (m_bCurrent)
-	{
-		CEffect3D::Create(GetPosition(),200.0f,5,D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
-	}
 }
 
 //=====================================================
@@ -285,7 +278,7 @@ void CBlock::SetRotation(D3DXVECTOR3 rot)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CBlockGrab::CBlockGrab()
+CBlockGrab::CBlockGrab() : m_bCurrent(false)
 {
 
 }
@@ -335,6 +328,11 @@ void CBlockGrab::Uninit(void)
 //=====================================================
 void CBlockGrab::Update(void)
 {
+	if (m_bCurrent)
+	{
+		CEffect3D::Create(GetPosition(), 200.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+
 	CBlock::Update();
 }
 
