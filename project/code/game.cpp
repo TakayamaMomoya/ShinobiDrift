@@ -35,6 +35,7 @@
 #include "timer.h"
 #include "meter.h"
 #include "meshRoad.h"
+#include "goal.h"
 
 //*****************************************************
 // マクロ定義
@@ -103,6 +104,9 @@ HRESULT CGame::Init(void)
 
 	// メッシュロード生成
 	CMeshRoad::Create();
+
+	// ゴール生成
+	CGoal::Create();
 
 	return S_OK;
 }
