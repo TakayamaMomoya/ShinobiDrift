@@ -354,6 +354,9 @@ void CBlockGrab::Update(void)
 
 		float fRate = fDiff / (D3DX_PI * 2.0f);
 
+		if (fRate < 0)
+			fRate = 1.0f + fRate;
+
 		m_pFan->SetRateAngle(fRate);
 
 		pos.y += 10.0f;

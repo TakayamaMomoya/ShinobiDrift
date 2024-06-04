@@ -278,8 +278,10 @@ void CStateCreateBlockNormal::ChangeBlockBehaviour(void)
 	const char* apText[CBlock::BEHAVIOUR::BEHAVIOUR_MAX] =
 	{
 		"NORMAL",
-		"EDITGRAB"
+		"GRAB"
 	};
+
+	ImGui::Text("Now[%s]",apText[m_behaviour]);
 
 	for (int i = 0; i < CBlock::BEHAVIOUR::BEHAVIOUR_MAX; i++)
 	{
