@@ -55,7 +55,7 @@ public:
 class CStateCreateBlockNormal : public CStateEditBlock
 {// í èÌÉuÉçÉbÉNÇÃê∂ê¨
 public:
-	CStateCreateBlockNormal() : m_pObjectCursor(nullptr) {};
+	CStateCreateBlockNormal() : m_pObjectCursor(nullptr), m_nIdxObject(-1), m_type(CBlock::TYPE::TYPE_WALL) {};
 	virtual ~CStateCreateBlockNormal() {};
 
 	void Init(CEditBlock *pEdit) override;

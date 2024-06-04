@@ -182,11 +182,6 @@ HRESULT CBlock::Init(void)
 	// タイプの設定
 	SetType(TYPE_BLOCK);
 
-	m_fLife = 300.0f;
-
-	// 影の有効化
-	EnableShadow(true);
-
 	return S_OK;
 }
 
@@ -230,21 +225,13 @@ bool CBlock::CanGrab(D3DXVECTOR3 pos)
 	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif
 
-	bCanGrab1 = universal::IsCross(pos, GetPosition(), posMtx1, nullptr);
+	bCanGrab1 = universal::IsCross(pos, posMtx1, GetPosition(), nullptr);
 	bCanGrab2 = universal::IsCross(pos, GetPosition(), posMtx2, nullptr);
 
 	CDebugProc::GetInstance()->Print("\n掴める1[%d]", bCanGrab1);
 	CDebugProc::GetInstance()->Print("\n掴める2[%d]", bCanGrab2);
 
 	return bCanGrab1 ^ bCanGrab2;
-}
-
-//=====================================================
-// 位置設定
-//=====================================================
-void CBlock::SetPosition(D3DXVECTOR3 pos)
-{
-	CObjectX::SetPosition(pos);
 }
 
 //=====================================================
