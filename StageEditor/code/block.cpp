@@ -182,11 +182,6 @@ HRESULT CBlock::Init(void)
 	// タイプの設定
 	SetType(TYPE_BLOCK);
 
-	m_fLife = 300.0f;
-
-	// 影の有効化
-	EnableShadow(true);
-
 	return S_OK;
 }
 
@@ -237,14 +232,6 @@ bool CBlock::CanGrab(D3DXVECTOR3 pos)
 	CDebugProc::GetInstance()->Print("\n掴める2[%d]", bCanGrab2);
 
 	return bCanGrab1 ^ bCanGrab2;
-}
-
-//=====================================================
-// 位置設定
-//=====================================================
-void CBlock::SetPosition(D3DXVECTOR3 pos)
-{
-	CObjectX::SetPosition(pos);
 }
 
 //=====================================================

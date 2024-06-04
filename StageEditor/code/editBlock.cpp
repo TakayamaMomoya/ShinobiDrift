@@ -58,6 +58,13 @@ HRESULT CEditBlock::Init(void)
 //=====================================================
 void CEditBlock::Uninit(void)
 {
+	if (m_pState != nullptr)
+	{
+		m_pState->Uninit(this);
+		delete m_pState;
+		m_pState = nullptr;
+	}
+
 	CEdit::Uninit();
 }
 
