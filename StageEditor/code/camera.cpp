@@ -70,6 +70,8 @@ HRESULT CCamera::Init(void)
 
 	m_camera.fTimeEvent = 0.0f;
 
+	m_bAbove = false;
+
 	return S_OK;
 }
 
@@ -135,7 +137,10 @@ void CCamera::Control(void)
 
 	float fMove = MOVE_SPEED;
 
-	if (pKeyboard->GetPress(DIK_F))
+	if(pKeyboard->GetTrigger(DIK_F))
+		m_bAbove = m_bAbove ? false : true;
+
+	if (m_bAbove)
 	{// ã‹ó‹“_
 		m_camera.posV = m_posAbove;
 		m_camera.posR = { m_posAbove.x,0.0f,m_posAbove.z + 1.0f };
