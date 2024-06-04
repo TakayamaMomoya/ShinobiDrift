@@ -13,6 +13,7 @@
 //*****************************************************
 // 前方宣言
 //*****************************************************
+class CFan3D;
 
 //*****************************************************
 // クラスの定義
@@ -56,7 +57,7 @@ public:
 	void SetIdx(int nIdx) { m_nIdx = nIdx; }
 	CBlock *GetNext(void) { return m_pNext; }
 	static int GetNumAll(void) { return m_nNumAll; }
-	bool CanGrab(D3DXVECTOR3 pos);
+	void SetPosition(D3DXVECTOR3 pos);
 
 private:
 	static int m_nNumAll;	// 総数
@@ -81,13 +82,25 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
+	bool CanGrab(D3DXVECTOR3 pos);
+
+	// 変数取得・設定
+	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }	// 選択フラグ
+	bool IsCurrent(void) { return m_bCurrent; }
+	float GetRadiusOffset(void) { return m_fRadiusOffset; }	// オフセット半径
+	void SetRadiusOffset(float fRadius) { m_fRadiusOffset = fRadius; }
+	float GeAngleOffset(int nIdx) { return m_afAngleOffset[nIdx]; }	// オフセット角度
+	void SetAngleOffset(float fAngle, int nIdx) { m_afAngleOffset[nIdx] = fAngle; }
 
 private:
-	// メンバ関数
-	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }	// 選択フラグの設定
-	
+	// 定数
+	static const int NUM_OFFSET = 2;	// オフセットの数
+
 	// メンバ変数
+	float m_afAngleOffset[NUM_OFFSET];	// オフセットの角度
+	float m_fRadiusOffset;	// オフセットの半径
 	bool m_bCurrent;	// 選択されているかどうか
+	CFan3D *m_pFan;	// 判定可視化用の扇ポリゴン
 };
 
 #endif

@@ -275,7 +275,7 @@ void CStateCreateBlockNormal::CreateBlock(D3DXVECTOR3 pos)
 	if (pBlock != nullptr)
 	{
 		pBlock->SetPosition(pos);
-		pBlock->SetRot(m_pObjectCursor->GetRot());
+		pBlock->SetRot(m_pObjectCursor->GetRotation());
 		pBlock->SetIdx(m_nIdxObject);
 	}
 }

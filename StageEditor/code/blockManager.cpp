@@ -210,7 +210,7 @@ void CBlockManager::LoadMap(FILE *pFile, char *pTemp)
 			if (strcmp(pTemp, "END_SETBLOCK") == 0)
 			{
 				// ブロック生成
-				CBlock *pBlock = CBlock::Create(m_pInfoBlock[nIdx].nIdxModel);
+				CBlock *pBlock = CBlock::Create(m_pInfoBlock[nIdx].nIdxModel, CBlock::BEHAVIOUR::BEHAVIOUR_GRAB);
 
 				if (pBlock != nullptr)
 				{
@@ -280,7 +280,7 @@ void CBlockManager::Save(char *pPath)
 			if (pBlock != nullptr)
 			{
 				D3DXVECTOR3 pos = pBlock->GetPosition();
-				D3DXVECTOR3 rot = pBlock->GetRot();
+				D3DXVECTOR3 rot = pBlock->GetRotation();
 				int nIdx = pBlock->GetIdx();
 
 				fprintf(pFile, "SETBLOCK\n");
@@ -378,9 +378,6 @@ namespace BlockManager
 CBlockManager *GetInstance(void)
 {
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
-
-	if (pBlockManager == nullptr)
-		assert(("nullのブロックマネージャーを取得しようとしています", false));
 
 	return pBlockManager;
 }
