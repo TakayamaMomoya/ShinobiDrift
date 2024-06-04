@@ -16,6 +16,7 @@
 #include "debugproc.h"
 #include "block.h"
 #include "blockManager.h"
+#include "effect3D.h"
 #include <assert.h>
 
 //*****************************************************
@@ -370,7 +371,15 @@ CBlock *CStateCreateBlockNormal::CheckDelete(void)
 //=====================================================
 void CStateEditGrabBlock::Init(CEditBlock *pEdit)
 {
+	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
+	if (pBlockManager == nullptr)
+		return;
+
+	// ブロックの選択
+	std::list<CBlockGrab*> *pList = pBlockManager->GetListGrab();
+
+	m_it = pList->begin();
 }
 
 //=====================================================
@@ -386,5 +395,24 @@ void CStateEditGrabBlock::Uninit(CEditBlock *pEdit)
 //=====================================================
 void CStateEditGrabBlock::Update(CEditBlock *pEdit)
 {
+	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
+	if (pBlockManager == nullptr)
+		return;
+
+	// ブロックの選択
+	std::list<CBlockGrab*> *pList = pBlockManager->GetListGrab();
+
+	if (ImGui::Button("NextBlock", ImVec2(70, 30)))
+	{
+		if (m_it != pList->end() && std::next(m_it) != pList->end())
+			std::advance(m_it, 1);
+	}
+	if (ImGui::Button("PrevBlock", ImVec2(70, 30)))
+	{
+		if (m_it != pList->begin())
+			std::advance(m_it, -1);
+	}
+
+	CEffect3D::Create((*m_it)->GetPosition(), 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 }

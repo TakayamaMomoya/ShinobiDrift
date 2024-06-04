@@ -11,6 +11,7 @@
 #include "main.h"
 #include "block.h"
 #include "edit.h"
+#include <list>
 
 //*****************************************************
 // 前方宣言
@@ -84,4 +85,5 @@ public:
 	void Update(CEditBlock *pEdit) override;
 
 private:
+	std::list<CBlockGrab*>::iterator m_it;	// イテレーター
 };
