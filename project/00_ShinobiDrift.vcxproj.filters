@@ -228,6 +228,15 @@
     <ClCompile Include="code\fan.cpp">
       <Filter>ソース ファイル\mesh</Filter>
     </ClCompile>
+    <ClCompile Include="code\myLib.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="code\physics.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="code\goal.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\block.h">
@@ -424,6 +433,12 @@
     </ClInclude>
     <ClInclude Include="code\fan.h">
       <Filter>ソース ファイル\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="code\physics.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="code\goal.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
