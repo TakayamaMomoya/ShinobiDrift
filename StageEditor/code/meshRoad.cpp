@@ -91,7 +91,7 @@ HRESULT CMeshRoad::Init(void)
 	SetIdxTexture(nIdx);
 
 	// “Ç‚İ‚İˆ—
-	//Load();
+	Load();
 
 	m_it = m_listRoadPoint.begin();
 
