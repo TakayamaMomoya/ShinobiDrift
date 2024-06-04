@@ -55,7 +55,7 @@ public:
 class CStateCreateBlockNormal : public CStateEditBlock
 {// 通常ブロックの生成
 public:
-	CStateCreateBlockNormal() : m_pObjectCursor(nullptr), m_nIdxObject(-1), m_type(CBlock::TYPE::TYPE_WALL) {};
+	CStateCreateBlockNormal() : m_pObjectCursor(nullptr), m_nIdxObject(-1), m_type(CBlock::TYPE::TYPE_WALL), m_behaviour(CBlock::BEHAVIOUR::BEHAVIOUR_NORMAL) {};
 	virtual ~CStateCreateBlockNormal() {};
 
 	void Init(CEditBlock *pEdit) override;
@@ -63,16 +63,18 @@ public:
 	void Update(CEditBlock *pEdit) override;
 
 private:
+	void ChangeBlockBehaviour(void);
 	void CreateBlock(D3DXVECTOR3 pos);
 	CBlock *CheckDelete(void);
 
 	int m_nIdxObject;
 	CBlock::TYPE m_type;
 	CObjectX *m_pObjectCursor;	// カーソルの仮オブジェクト
+	CBlock::BEHAVIOUR m_behaviour;	// ブロックのビヘイビア
 };
 
 class CStateEditGrabBlock : public CStateEditBlock
-{// 掴むブロックの生成
+{// 掴むブロックの編集
 public:
 	CStateEditGrabBlock() {};
 	virtual ~CStateEditGrabBlock() {};

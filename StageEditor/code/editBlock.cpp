@@ -78,6 +78,13 @@ void CEditBlock::Update(void)
 		m_pState->Update(this);
 	}
 
+	// ステイトの選択
+	if (ImGui::Button("CreateNormalBlock", ImVec2(70, 30)))	// 通常ブロックの生成
+		ChangeState(new CStateCreateBlockNormal);
+
+	if (ImGui::Button("EditGrabBlock", ImVec2(70, 30)))	// 掴めるブロックの編集
+		ChangeState(new CStateEditGrabBlock);
+
 	CEdit::Update();
 }
 
@@ -127,6 +134,8 @@ void CEditBlock::ChangeState(CStateEditBlock *pState)
 //=====================================================
 void CStateCreateBlockNormal::Init(CEditBlock *pEdit)
 {
+	m_nIdxObject = 0;
+
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
 	if (pBlockManager != nullptr)
@@ -178,70 +187,73 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 	D3DXVECTOR3 pos = pEdit->GetPosition();
 	float fSpeed = SPEED_MOVE;
 
-	if (pKeyboard != nullptr && pMouse != nullptr && pBlockManager != nullptr)
+	if (pKeyboard == nullptr || pMouse == nullptr || pBlockManager == nullptr)
+		return;
+
+	if (ImGui::TreeNode("POS"))
 	{
-		if (ImGui::TreeNode("POS"))
-		{
-			// ブロック移動
-			ImGui::DragFloat("POS.X", &pos.x, SPEED_MOVE, -FLT_MAX, FLT_MAX);
-			ImGui::DragFloat("POS.Y", &pos.y, SPEED_MOVE, -FLT_MAX, FLT_MAX);
-			ImGui::DragFloat("POS.Z", &pos.z, SPEED_MOVE, -FLT_MAX, FLT_MAX);
+		// ブロック移動
+		ImGui::DragFloat("POS.X", &pos.x, SPEED_MOVE, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat("POS.Y", &pos.y, SPEED_MOVE, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat("POS.Z", &pos.z, SPEED_MOVE, -FLT_MAX, FLT_MAX);
 
-			ImGui::TreePop();
-		}
+		ImGui::TreePop();
+	}
 
-		if (ImGui::TreeNode("ROT"))
-		{
-			// ブロック向き
-			ImGui::DragFloat("ROT.X", &rot.x, 0.01f, -D3DX_PI, D3DX_PI);
-			ImGui::DragFloat("ROT.Y", &rot.y, 0.01f, -D3DX_PI, D3DX_PI);
-			ImGui::DragFloat("ROT.Z", &rot.z, 0.01f, -D3DX_PI, D3DX_PI);
+	if (ImGui::TreeNode("ROT"))
+	{
+		// ブロック向き
+		ImGui::DragFloat("ROT.X", &rot.x, 0.01f, -D3DX_PI, D3DX_PI);
+		ImGui::DragFloat("ROT.Y", &rot.y, 0.01f, -D3DX_PI, D3DX_PI);
+		ImGui::DragFloat("ROT.Z", &rot.z, 0.01f, -D3DX_PI, D3DX_PI);
 
-			ImGui::TreePop();
-		}
+		ImGui::TreePop();
+	}
 
-		int nNumBlock = pBlockManager->GetNumBlock();
-		CBlockManager::SInfoBlock *pInfoBlock = pBlockManager->GetInfoBlock();
+	int nNumBlock = pBlockManager->GetNumBlock();
+	CBlockManager::SInfoBlock *pInfoBlock = pBlockManager->GetInfoBlock();
 
-		if (ImGui::TreeNode("SelectBlock"))
-		{
-			for (int i = 0; i < nNumBlock; i++)
-			{// ブロック選択
-				if (ImGui::Button(&pInfoBlock[i].aTag[0], ImVec2(50.0f, 20.0f)))
-				{
-					m_nIdxObject = i;
-
-					m_pObjectCursor->BindModel(pInfoBlock[i].nIdxModel);
-				}
-			}
-
-			ImGui::TreePop();
-		}
-
-		if (ImGui::Button("Create", ImVec2(50.0f, 20.0f)))
-		{// ブロック生成
-			CreateBlock(m_pObjectCursor->GetPosition());
-		}
-
-		// 削除ブロック選択
-		CBlock *pBlock = CheckDelete();
-
-		if (ImGui::Button("Delete", ImVec2(60.0f, 20.0f)))
-		{// 削除
-			pBlock->Uninit();
-		}
-
-		// セーブ
-		pEdit->Save();
-
-		if (ImGui::Button("DeleteAll", ImVec2(80.0f, 20.0f)))
-		{// 全削除
-			CBlockManager *pBlockManager = CBlockManager::GetInstance();
-
-			if (pBlockManager != nullptr)
+	if (ImGui::TreeNode("SelectBlock"))
+	{
+		for (int i = 0; i < nNumBlock; i++)
+		{// ブロック選択
+			if (ImGui::Button(&pInfoBlock[i].aTag[0], ImVec2(50.0f, 20.0f)))
 			{
-				pBlockManager->DeleteAll();
+				m_nIdxObject = i;
+
+				m_pObjectCursor->BindModel(pInfoBlock[i].nIdxModel);
 			}
+		}
+
+		ImGui::TreePop();
+	}
+
+	// ブロックのビヘイビアの変更
+	ChangeBlockBehaviour();
+
+	if (ImGui::Button("Create", ImVec2(50.0f, 20.0f)))
+	{// ブロック生成
+		CreateBlock(m_pObjectCursor->GetPosition());
+	}
+
+	// 削除ブロック選択
+	CBlock *pBlock = CheckDelete();
+
+	if (ImGui::Button("Delete", ImVec2(60.0f, 20.0f)))
+	{// 削除
+		pBlock->Uninit();
+	}
+
+	// セーブ
+	pEdit->Save();
+
+	if (ImGui::Button("DeleteAll", ImVec2(80.0f, 20.0f)))
+	{// 全削除
+		CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+		if (pBlockManager != nullptr)
+		{
+			pBlockManager->DeleteAll();
 		}
 	}
 
@@ -253,6 +265,28 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 	{// カーソルのトランスフォーム
 		m_pObjectCursor->SetPosition(pos);
 		m_pObjectCursor->SetRot(rot);
+	}
+}
+
+//=====================================================
+// ブロックのビヘイビア変更
+//=====================================================
+void CStateCreateBlockNormal::ChangeBlockBehaviour(void)
+{
+	ImGui::Text("Behaviour");
+
+	const char* apText[CBlock::BEHAVIOUR::BEHAVIOUR_MAX] =
+	{
+		"NORMAL",
+		"EDITGRAB"
+	};
+
+	for (int i = 0; i < CBlock::BEHAVIOUR::BEHAVIOUR_MAX; i++)
+	{
+		if (ImGui::Button(apText[i], ImVec2(80.0f, 20.0f)))
+		{// ビヘイビア設定
+			m_behaviour = (CBlock::BEHAVIOUR)i;
+		}
 	}
 }
 
@@ -270,7 +304,7 @@ void CStateCreateBlockNormal::CreateBlock(D3DXVECTOR3 pos)
 
 	CBlockManager::SInfoBlock *pInfoBlock = pBlockManager->GetInfoBlock();
 
-	CBlock *pBlock = CBlock::Create(pInfoBlock[m_nIdxObject].nIdxModel);
+	CBlock *pBlock = CBlock::Create(pInfoBlock[m_nIdxObject].nIdxModel, m_behaviour);
 
 	if (pBlock != nullptr)
 	{

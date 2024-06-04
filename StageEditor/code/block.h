@@ -34,6 +34,7 @@ public:
 	{// çsìÆ
 		BEHAVIOUR_NORMAL = 0,	// í èÌ
 		BEHAVIOUR_GRAB,	// íÕÇﬂÇÈÇ‡ÇÃ
+		BEHAVIOUR_MAX
 	}BEHAVIOUR;
 
 	typedef struct

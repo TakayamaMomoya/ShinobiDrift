@@ -197,8 +197,14 @@ void CFan3D::Draw(void)
 		//頂点フォーマットの設定
 		pDevice->SetFVF(FVF_VERTEX_3D);
 
+		// カリングを無効化
+		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+
 		// ポリゴンの描画
 		CFan::Draw();
+
+		// カリングを有効化
+		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	}
 }
 
