@@ -452,7 +452,7 @@ void CPlayer::InputWire(void)
 				}
 				else
 				{
-					if (!m_info.bGrabOld && bGrab)
+					if (m_info.bGrabOld && !bGrab)
 					{// ƒƒCƒ„[‚ğŠO‚·
 						m_info.nCntFlip = 0;
 						m_info.fCntAngle = 0.0f;

@@ -277,9 +277,10 @@ HRESULT CBlockGrab::Init(void)
 
 	// オフセットの初期化
 	m_afAngleOffset[0] = D3DX_PI;
-	m_afAngleOffset[1] = 0.0f;
+	m_afAngleOffset[1] = D3DX_PI * 0.5f;
 	m_fRadiusOffset = 1000.0f;
 
+#ifdef _DEBUG
 	// 判定可視化用の扇生成
 	if (m_pFan == nullptr)
 	{
@@ -291,6 +292,7 @@ HRESULT CBlockGrab::Init(void)
 			m_pFan->SetRadius(400.0f);
 		}
 	}
+#endif
 
 	return S_OK;
 }
@@ -365,16 +367,35 @@ bool CBlockGrab::CanGrab(D3DXVECTOR3 pos)
 	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
 	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
 
-#ifdef _DEBUG
-	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
-	CEffect3D::Create(posMtx2, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-#endif
-
-	bCanGrab1 = universal::IsCross(pos,  posMtx1, GetPosition(), nullptr);
+	bCanGrab1 = universal::IsCross(pos, posMtx1, GetPosition(), nullptr);
 	bCanGrab2 = universal::IsCross(pos, GetPosition(), posMtx2, nullptr);
 
 	CDebugProc::GetInstance()->Print("\n掴める1[%d]", bCanGrab1);
 	CDebugProc::GetInstance()->Print("\n掴める2[%d]", bCanGrab2);
 
-	return bCanGrab1 & bCanGrab2;
+	bool bOK = bCanGrab1 && bCanGrab2;
+
+#ifdef _DEBUG
+	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(posMtx2, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	
+	if (bCanGrab1)
+	{
+		posMtx1.y += 100.0f;
+		CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+	
+	if (bCanGrab2)
+	{
+		posMtx2.y += 100.0f;
+		CEffect3D::Create(posMtx2, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+
+	if (bOK)
+	{
+		CEffect3D::Create(GetPosition(), 150.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+#endif
+
+	return bOK;
 }
