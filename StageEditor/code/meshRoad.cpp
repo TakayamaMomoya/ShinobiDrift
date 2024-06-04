@@ -225,7 +225,7 @@ void CMeshRoad::DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
 //=====================================================
 void CMeshRoad::ResetIterator(void)
 {
-	m_it = m_listRoadPoint.begin();
+	m_it = m_listRoadPoint.end() - 1;
 }
 
 //=====================================================
