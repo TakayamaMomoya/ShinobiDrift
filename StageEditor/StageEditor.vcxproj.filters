@@ -90,6 +90,7 @@
     <ClCompile Include="code\editBlock.cpp">
       <Filter>meshedit</Filter>
     </ClCompile>
+    <ClCompile Include="code\fan.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\anim3D.h" />
@@ -190,6 +191,7 @@
     <ClInclude Include="code\editBlock.h">
       <Filter>meshedit</Filter>
     </ClInclude>
+    <ClInclude Include="code\fan.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="code\backends\imgui_impl_metal.mm">

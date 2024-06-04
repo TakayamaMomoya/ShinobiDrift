@@ -277,7 +277,7 @@ HRESULT CBlockGrab::Init(void)
 
 	// オフセットの初期化
 	m_afAngleOffset[0] = D3DX_PI;
-	m_afAngleOffset[1] = D3DX_PI * 0.5f;
+	m_afAngleOffset[1] = D3DX_PI * 0.7f;
 	m_fRadiusOffset = 1000.0f;
 
 #ifdef _DEBUG
@@ -289,7 +289,7 @@ HRESULT CBlockGrab::Init(void)
 		if (m_pFan != nullptr)
 		{
 			m_pFan->SetRotation(D3DXVECTOR3(D3DX_PI * 0.5f, 0.0f, 0.0f));
-			m_pFan->SetRadius(400.0f);
+			m_pFan->SetRadius(1000.0f);
 		}
 	}
 #endif
@@ -324,16 +324,44 @@ void CBlockGrab::Update(void)
 
 	CBlock::Update();
 
+#ifdef _DEBUG
+	// オフセットの設定
+	D3DXMATRIX mtxVec1;
+	D3DXMATRIX mtxVec2;
+	D3DXMATRIX mtx = *GetMatrix();
+
+	D3DXVECTOR3 offset1 = { sinf(m_afAngleOffset[0]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[0]) * m_fRadiusOffset };
+	D3DXVECTOR3 offset2 = { sinf(m_afAngleOffset[1]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[1]) * m_fRadiusOffset };
+
+	universal::SetOffSet(&mtxVec1, mtx, offset1);
+	universal::SetOffSet(&mtxVec2, mtx, offset2);
+
+	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
+	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
+
+	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(posMtx2, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	// 扇の角度の設定
 	if (m_pFan != nullptr)
 	{
 		D3DXVECTOR3 pos = GetPosition();
-		
+
+		float fAngleOffset1 = atan2f(posMtx1.x - pos.x, posMtx1.z - pos.z);
+		float fAngleOffset2 = atan2f(posMtx2.x - pos.x, posMtx2.z - pos.z);
+
+		float fDiff = fAngleOffset1 - fAngleOffset2;
+
+		float fRate = fDiff / (D3DX_PI * 2.0f);
+
+		m_pFan->SetRateAngle(fRate);
+
 		pos.y += 10.0f;
-
 		m_pFan->SetPosition(pos);
-
-		m_pFan->SetRotation(D3DXVECTOR3(D3DX_PI * 0.5f, GetRotation().y, 0.0f));
+		m_pFan->SetRotation(D3DXVECTOR3(D3DX_PI * 0.5f, fAngleOffset2, 0.0f));
+		m_pFan->SetVtx();
 	}
+#endif
 }
 
 //=====================================================
