@@ -90,7 +90,7 @@ public:
 	bool IsCurrent(void) { return m_bCurrent; }
 	float GetRadiusOffset(void) { return m_fRadiusOffset; }	// オフセット半径
 	void SetRadiusOffset(float fRadius) { m_fRadiusOffset = fRadius; }
-	float GeAngleOffset(int nIdx) { return m_afAngleOffset[nIdx]; }	// オフセット角度
+	float GetAngleOffset(int nIdx) { return m_afAngleOffset[nIdx]; }	// オフセット角度
 	void SetAngleOffset(float fAngle, int nIdx) { m_afAngleOffset[nIdx] = fAngle; }
 
 private:

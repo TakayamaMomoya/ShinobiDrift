@@ -371,12 +371,12 @@ CBlock *CStateCreateBlockNormal::CheckDelete(void)
 //=====================================================
 void CStateEditGrabBlock::Init(CEditBlock *pEdit)
 {
+	// イテレーターの初期化
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
 	if (pBlockManager == nullptr)
 		return;
 
-	// ブロックの選択
 	std::list<CBlockGrab*> *pList = pBlockManager->GetListGrab();
 
 	m_it = pList->begin();
@@ -395,6 +395,18 @@ void CStateEditGrabBlock::Uninit(CEditBlock *pEdit)
 //=====================================================
 void CStateEditGrabBlock::Update(CEditBlock *pEdit)
 {
+	// ブロックの選択
+	SelectGrabBlock();
+
+	// ブロックの編集
+	EditGrabBlock();
+}
+
+//=====================================================
+// ブロックの選択
+//=====================================================
+void CStateEditGrabBlock::SelectGrabBlock(void)
+{
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
 	if (pBlockManager == nullptr)
@@ -402,6 +414,14 @@ void CStateEditGrabBlock::Update(CEditBlock *pEdit)
 
 	// ブロックの選択
 	std::list<CBlockGrab*> *pList = pBlockManager->GetListGrab();
+
+
+
+	std::vector<int> v = { 1,2,3,4,5 };
+
+
+
+
 
 	if (ImGui::Button("NextBlock", ImVec2(70, 30)))
 	{
@@ -415,4 +435,19 @@ void CStateEditGrabBlock::Update(CEditBlock *pEdit)
 	}
 
 	CEffect3D::Create((*m_it)->GetPosition(), 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+}
+
+//=====================================================
+// ブロックの編集
+//=====================================================
+void CStateEditGrabBlock::EditGrabBlock(void)
+{
+	float fAngle1 = (*m_it)->GetAngleOffset(0);
+	float fAngle2 = (*m_it)->GetAngleOffset(1);
+
+	ImGui::DragFloat("Angle1", &fAngle1, 0.05f, -D3DX_PI, D3DX_PI);
+	ImGui::DragFloat("Angle2", &fAngle2, 0.05f, -D3DX_PI, D3DX_PI);
+
+	(*m_it)->SetAngleOffset(fAngle1, 0);
+	(*m_it)->SetAngleOffset(fAngle1, 1);
 }

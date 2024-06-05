@@ -25,7 +25,19 @@
 #include <time.h>
 #include <string>
 #include <list>
+#include <vector>
+#include <map>
 #include <locale>
 #include <codecvt>
+
+//========================================
+// UsingêÈåæ
+//========================================
+using std::unique_ptr;
+using std::shared_ptr;
+using std::weak_ptr;
+using std::vector;
+using std::list;
+using std::map;
 
 #endif // _PRECOMPILE_H_
