@@ -22,6 +22,8 @@
 #include "blockManager.h"
 #include "effect3D.h"
 #include "object3D.h"
+#include "blur.h"
+#include "renderer.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -32,6 +34,8 @@ const std::string PATH_PARAM = "data\\TEXT\\playerParam.txt";	// ƒpƒ‰ƒ[ƒ^[ƒf
 const float NOTROTATE = 1.0f;		// ‰ñ“]‚µ‚È‚¢‚æ‚¤‚É‚·‚é’l
 const float DIST_LIMIT = 3000.0f;	// ƒƒCƒ„[§ŒÀ‹——£
 const float LINE_CORRECT_DRIFT = 40.0f;	// ƒhƒŠƒtƒg•â³‚Ì‚µ‚«‚¢’l
+const float SIZE_BLUR = -20.0f;	// ƒuƒ‰[‚ÌƒTƒCƒY
+const float DENSITY_BLUR = 0.5f;	// ƒuƒ‰[‚Ì”Z‚³
 }
 
 //*****************************************************
@@ -82,6 +86,9 @@ CPlayer *CPlayer::Create(void)
 //=====================================================
 HRESULT CPlayer::Init(void)
 {
+	// ƒuƒ‰[‚ð‚©‚¯‚È‚¢Ý’è‚É‚·‚é
+	EnableBlur(false);
+
 	// Œp³ƒNƒ‰ƒX‚Ì‰Šú‰»
 	CMotion::Init();
 
@@ -97,10 +104,10 @@ HRESULT CPlayer::Init(void)
 	CMotion::Load(&m_param.aPathBody[0]);
 
 	m_info.pRoap = CObject3D::Create(GetPosition());
-
 	m_info.fLengthDrift = 1500.0f;
-
 	m_info.bGrabOld = true;
+	m_info.fDesityBlurDrift = DENSITY_BLUR;
+	m_info.fSizeBlurDrift = SIZE_BLUR;
 
 	return S_OK;
 }
@@ -215,11 +222,11 @@ void CPlayer::Input(void)
 	// ƒJƒƒ‰‘€ì
 	InputCamera();
 
+	// ƒƒCƒ„[‚Ì‘€ì
 	InputWire();
 
 	// ƒXƒs[ƒh‚ÌŠÇ—
 	ManageSpeed();
-
 
 	CInputManager *pInputManager = CInputManager::GetInstance();
 
@@ -344,6 +351,15 @@ void CPlayer::InputWire(void)
 	//if (pJoypad->GetPress(CInputJoypad::PADBUTTONS_LB, 0))
 	if (m_info.pBlockGrab != nullptr)
 	{
+		// ƒuƒ‰[‚ð‚©‚¯‚é
+		CBlur *pBlur = CBlur::GetInstance();
+
+		if (pBlur != nullptr)
+		{
+			pBlur->SetAddSizePolygon(m_info.fSizeBlurDrift);
+			pBlur->SetPolygonColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, m_info.fDesityBlurDrift));
+		}
+
 		//if (fLength > 0.5f)
 		{// ‘€ì‚µ‚Ä‚¢‚é”»’è
 			D3DXVECTOR3 posPlayer = GetPosition();
@@ -460,6 +476,15 @@ void CPlayer::InputWire(void)
 						m_info.pBlockGrab = nullptr;
 
 						m_info.fLengthDrift = 0.0f;
+
+						// ƒuƒ‰[‚ð–ß‚·
+						CBlur *pBlur = CBlur::GetInstance();
+
+						if (pBlur != nullptr)
+						{
+							pBlur->SetAddSizePolygon(0.0f);
+							pBlur->SetPolygonColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
+						}
 					}
 				}
 
@@ -750,8 +775,20 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 //=====================================================
 void CPlayer::Draw(void)
 {
+	CBlur *pBlur = CBlur::GetInstance();
+
+	if (pBlur != nullptr)
+	{
+		pBlur->SetRenderToNotBlur();
+	}
+
 	// Œp³ƒNƒ‰ƒX‚Ì•`‰æ
 	CMotion::Draw();
+
+	if (pBlur != nullptr)
+	{
+		pBlur->ChangeTarget();
+	}
 }
 
 //=====================================================
@@ -787,4 +824,26 @@ void CPlayer::Debug(void)
 	pDebugProc->Print("\nŒ»Ý‚Ì‘¬“x[%f]", m_info.fSpeed);
 	pDebugProc->Print("\n’e‚«ƒJƒEƒ“ƒ^[[%d]", m_info.nCntFlip);
 	pDebugProc->Print("\nŠp“xƒJƒEƒ“ƒ^[[%f]", m_info.fCntAngle);
+	pDebugProc->Print("\nƒuƒ‰[‚ÌƒTƒCƒY[%f]", m_info.fSizeBlurDrift);
+	pDebugProc->Print("\nƒuƒ‰[‚Ì”Z‚³[%f]", m_info.fDesityBlurDrift);
+
+	// ƒuƒ‰[‚ÌƒTƒCƒY’²®
+	if (CInputKeyboard::GetInstance()->GetPress(DIK_UP))
+	{
+		m_info.fSizeBlurDrift += 0.3f;
+	}
+	else if (CInputKeyboard::GetInstance()->GetPress(DIK_DOWN))
+	{
+		m_info.fSizeBlurDrift -= 0.3f;
+	}
+
+	// ƒuƒ‰[‚Ì”Z‚³’²®
+	if (CInputKeyboard::GetInstance()->GetPress(DIK_LEFT))
+	{
+		m_info.fDesityBlurDrift += 0.03f;
+	}
+	else if (CInputKeyboard::GetInstance()->GetPress(DIK_RIGHT))
+	{
+		m_info.fDesityBlurDrift -= 0.03f;
+	}
 }

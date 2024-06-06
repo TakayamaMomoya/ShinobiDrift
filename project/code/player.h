@@ -82,6 +82,8 @@ private:
 		bool bManual;		// マニュアル操作
 		float fLengthDrift;
 		float fTimerDriftChange;
+		float fSizeBlurDrift;	// ドリフト時のブラーの強さ
+		float fDesityBlurDrift;	// ドリフト時のブラーの濃さ
 	};
 
 	void Load(void);
