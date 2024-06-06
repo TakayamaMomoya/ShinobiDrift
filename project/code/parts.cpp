@@ -28,7 +28,7 @@ CParts::CParts()
 
 	m_pDynamicsWorld = nullptr;
 	m_nMass = 1;
-	m_nIdxPhysics - 1;
+	m_nIdxPhysics = - 1;
 }
 
 //====================================================
