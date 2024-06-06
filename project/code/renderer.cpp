@@ -14,6 +14,7 @@
 #include "object.h"
 #include "fade.h"
 #include "block.h"
+#include "blur.h"
 
 //*****************************************************
 // 静的メンバ変数宣言
@@ -175,6 +176,9 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	// オブジェクトのリリース処理
 	CObject::ReleaseAll();
 
+	// ブラーの生成
+	CBlur::Create();
+
 	return S_OK;
 }
 
@@ -183,6 +187,15 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 //=====================================================
 void CRenderer::Uninit(void)
 {
+	// ブラーの破棄
+	CBlur *pBlur = CBlur::GetInstance();
+
+	if (pBlur != nullptr)
+	{
+		pBlur->Uninit();
+		delete pBlur;
+	}
+
 	// オブジェクトのリリース
 	CObject::ReleaseAll();
 
@@ -246,12 +259,29 @@ void CRenderer::Draw(void)
 		// FPS表示
 		DrawFPS();
 		
+		// ブラーの取得
+		CBlur * pBlur = CBlur::GetInstance();
+
+		if (pBlur != nullptr)
+		{
+			pBlur->SaveRenderInfo();	// 描画の情報を保存
+			pBlur->ChangeTarget();	// レンダーターゲットの変更
+		}
+
 		// オブジェクトの描画
 		CObject::DrawAll();
 
 		if (pFade != nullptr)
 		{// フェード描画
 			pFade->Draw();
+		}
+
+		if (pBlur != nullptr)
+		{
+			pBlur->OverlapLastTexture();	// 前回のテクスチャを重ねる
+			pBlur->RestoreTarget();	// レンダーターゲットの復元
+			pBlur->DrawBuckBuffer();	// バックバッファへの描画
+			pBlur->SwapBuffer();	// バッファーの入れ替え
 		}
 
 		CDebugProc::GetInstance()->Draw();
@@ -277,4 +307,24 @@ void CRenderer::DrawFPS(void)
 	//文字列に代入
 	CDebugProc::GetInstance()->Print("FPS:%d\n", GetFPS());
 	CDebugProc::GetInstance()->Print("オブジェクト総数:[%d]\n", CObject::GetNumAll());
+}
+
+namespace Renderer
+{
+LPDIRECT3DDEVICE9 GetDevice(void)
+{
+	CRenderer *pRenderer = CRenderer::GetInstance();
+	LPDIRECT3DDEVICE9 pDevice = nullptr;
+
+	if (pRenderer != nullptr)
+	{
+		pDevice = pRenderer->GetDevice();
+	}
+	else
+	{
+		assert(("デバイスの取得に失敗", false));
+	}
+
+	return pDevice;
+}
 }
