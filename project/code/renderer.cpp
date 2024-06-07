@@ -15,6 +15,7 @@
 #include "fade.h"
 #include "block.h"
 #include "blur.h"
+#include "player.h"
 
 //*****************************************************
 // 静的メンバ変数宣言
@@ -233,7 +234,7 @@ void CRenderer::Draw(void)
 
 	// 画面クリア
 	m_pD3DDevice->Clear(0, nullptr,
-		(D3DCLEAR_STENCIL | D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
+		(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
 		D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
 
 	float fStart = 5000;
@@ -259,15 +260,6 @@ void CRenderer::Draw(void)
 		// FPS表示
 		DrawFPS();
 		
-		// ブラーの取得
-		CBlur * pBlur = CBlur::GetInstance();
-
-		if (pBlur != nullptr)
-		{
-			pBlur->SaveRenderInfo();	// 描画の情報を保存
-			pBlur->ChangeTarget();	// レンダーターゲットの変更
-		}
-
 		// オブジェクトの描画
 		CObject::DrawAll();
 
@@ -276,24 +268,18 @@ void CRenderer::Draw(void)
 			pFade->Draw();
 		}
 
-		if (pBlur != nullptr)
-		{
-			pBlur->OverlapLastTexture();	// 前回のテクスチャを重ねる
-			pBlur->RestoreTarget();	// レンダーターゲットの復元
-			pBlur->DrawBuckBuffer();	// バックバッファへの描画
-			pBlur->SwapBuffer();	// バッファーの入れ替え
-		}
-
 		CDebugProc::GetInstance()->Draw();
 
 		// 描画終了
 		m_pD3DDevice->EndScene();
 	}
 
-	// アルファテストの無効化
-	m_pD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-	m_pD3DDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);
-	m_pD3DDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+	CBlur *pBlur = CBlur::GetInstance();
+
+	if (pBlur != nullptr)
+	{
+		pBlur->ClearNotBlur();
+	}
 
 	// バック・フロントバッファを入れ替える
 	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);

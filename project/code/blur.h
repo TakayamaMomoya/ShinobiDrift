@@ -13,12 +13,18 @@
 //*****************************************************
 #include "main.h"
 
+namespace Blur
+{
 //*****************************************************
 // 定数定義
 //*****************************************************
-namespace Blur
-{
-const int NUM_RENDER = 2;   // ターゲットレンダリング用のインターフェースの数
+const int NUM_RENDER = 3;   // ターゲットレンダリング用のインターフェースの数
+
+//*****************************************************
+// ショートカット関数
+//*****************************************************
+void SetBlur(float fSize, float fDensity);  // パラメーターの設定
+void ResetBlur(void);   // パラメーターのリセット
 }
 
 //*****************************************************
@@ -39,6 +45,8 @@ public:
     void RestoreTarget(void);   // レンダーターゲットの復元
     void DrawBuckBuffer(void);   // バックバッファへの描画
     void SwapBuffer(void);  // バッファーの入れ替え
+    void SetRenderToNotBlur(void);  // ブラーしないレンダーへの変更
+    void ClearNotBlur(void);    // ブラーしないレンダーのクリア
 
     // 変数取得・設定関数
     D3DXCOLOR GetPolygonColor(void) { return m_colPolygon; }    // ポリゴンの色
