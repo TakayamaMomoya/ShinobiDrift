@@ -494,7 +494,7 @@ void CBlur::ClearNotBlur(void)
     pDevice->SetRenderTarget(0, m_pRenderDef);
 }
 
-namespace
+namespace Blur
 {
 //=====================================================
 // パラメーターの設定
