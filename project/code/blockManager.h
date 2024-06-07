@@ -12,6 +12,7 @@
 // インクルード
 //*****************************************************
 #include "block.h"
+#include <list>
 
 //*****************************************************
 // 前方宣言
@@ -54,7 +55,7 @@ public:
 
 private:
 	void Load(void);
-	void LoadMap(FILE *pFile,char *pTemp);
+	void LoadMap(FILE *pFile,char *pTemp,CBlock *pBlock);
 
 	SInfoBlock *m_pInfoBlock;	// ブロック情報のポインタ
 	int m_nNumInfoBlock;	// ブロック情報の数

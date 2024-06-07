@@ -307,7 +307,7 @@ void CStateCreateBlockNormal::CreateBlock(D3DXVECTOR3 pos)
 
 	CBlockManager::SInfoBlock *pInfoBlock = pBlockManager->GetInfoBlock();
 
-	CBlock *pBlock = CBlock::Create(pInfoBlock[m_nIdxObject].nIdxModel, m_behaviour);
+	CBlock *pBlock = CBlock::Create(m_behaviour);
 
 	if (pBlock != nullptr)
 	{

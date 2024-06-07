@@ -153,8 +153,23 @@ void CBlockManager::Load(void)
 				}
 			}
 
-			// ロード情報の読み込み
-			LoadMap(pFile, &cTemp[0]);
+			if (strcmp(cTemp, "SETBLOCK") == 0)
+			{
+				// 通常ブロック生成
+				CBlock *pBlock = CBlock::Create(CBlock::BEHAVIOUR::BEHAVIOUR_NORMAL);
+
+				// ロード情報の読み込み
+				LoadMap(pFile, &cTemp[0],pBlock);
+			}
+
+			if (strcmp(cTemp, "SETGRABBLOCK") == 0)
+			{
+				// 掴むブロック生成
+				CBlock *pBlock = CBlock::Create(CBlock::BEHAVIOUR::BEHAVIOUR_GRAB);
+
+				// ロード情報の読み込み
+				LoadMap(pFile, &cTemp[0], pBlock);
+			}
 
 			if (strcmp(cTemp, "END_SCRIPT") == 0)
 			{
@@ -169,53 +184,18 @@ void CBlockManager::Load(void)
 //=====================================================
 // マップ配置の読み込み
 //=====================================================
-void CBlockManager::LoadMap(FILE *pFile, char *pTemp)
+void CBlockManager::LoadMap(FILE *pFile, char *pTemp, CBlock *pBlock)
 {
-	if (strcmp(pTemp, "SETBLOCK") == 0)
+	if (pBlock != nullptr)
 	{
-		// ブロック生成
-		CBlock *pBlock = CBlock::Create(0, CBlock::BEHAVIOUR::BEHAVIOUR_GRAB);
-
-		while (true && pBlock != nullptr)
+		while (true)
 		{
 			//文字読み込み
 			(void)fscanf(pFile, "%s", pTemp);
 
-			if (strcmp(pTemp, "IDX") == 0)
-			{// インデックス
-				int nIdx;
-
-				(void)fscanf(pFile, "%s", pTemp);
-
-				(void)fscanf(pFile, "%d", &nIdx);
-
-				pBlock->BindModel(m_pInfoBlock[nIdx].nIdxModel);
-			}
-
-			if (strcmp(pTemp, "POS") == 0)
-			{// 位置
-				D3DXVECTOR3 pos;
-
-				(void)fscanf(pFile, "%s", pTemp);
-
-				(void)fscanf(pFile, "%f", &pos.x);
-				(void)fscanf(pFile, "%f", &pos.y);
-				(void)fscanf(pFile, "%f", &pos.z);
-
-				pBlock->SetPosition(pos);
-			}
-
-			if (strcmp(pTemp, "ROT") == 0)
-			{// 向き
-				D3DXVECTOR3 rot;
-
-				(void)fscanf(pFile, "%s", pTemp);
-
-				(void)fscanf(pFile, "%f", &rot.x);
-				(void)fscanf(pFile, "%f", &rot.y);
-				(void)fscanf(pFile, "%f", &rot.z);
-
-				pBlock->SetRotation(rot);
+			if (pBlock != nullptr)
+			{
+				pBlock->Load(pFile, pTemp);
 			}
 
 			if (strcmp(pTemp, "END_SETBLOCK") == 0)
@@ -275,23 +255,13 @@ void CBlockManager::Save(char *pPath)
 
 			if (pBlock != nullptr)
 			{
-				D3DXVECTOR3 pos = pBlock->GetPosition();
-				D3DXVECTOR3 rot = pBlock->GetRotation();
-				int nIdx = pBlock->GetIdx();
-
-				fprintf(pFile, "SETBLOCK\n");
-
-				fprintf(pFile, " IDX = %d\n", nIdx);
-				fprintf(pFile, " POS = %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
-				fprintf(pFile, " ROT = %.2f %.2f %.2f\n", rot.x, rot.y, rot.z);
+				pBlock->Save(pFile);
 
 				fprintf(pFile, "END_SETBLOCK\n\n");
-
 			}
 
 			pBlock = pBlockNext;
 		}
-
 
 		fprintf(pFile, "END_SCRIPT\n");
 
