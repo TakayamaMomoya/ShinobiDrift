@@ -173,57 +173,53 @@ void CBlockManager::LoadMap(FILE *pFile, char *pTemp)
 {
 	if (strcmp(pTemp, "SETBLOCK") == 0)
 	{
-		D3DXVECTOR3 pos;
-		D3DXVECTOR3 rot;
-		int nIdx;
+		// ブロック生成
+		CBlock *pBlock = CBlock::Create(0, CBlock::BEHAVIOUR::BEHAVIOUR_GRAB);
 
-		while (true)
+		while (true && pBlock != nullptr)
 		{
 			//文字読み込み
 			(void)fscanf(pFile, "%s", pTemp);
 
 			if (strcmp(pTemp, "IDX") == 0)
 			{// インデックス
+				int nIdx;
+
 				(void)fscanf(pFile, "%s", pTemp);
 
 				(void)fscanf(pFile, "%d", &nIdx);
+
+				pBlock->BindModel(m_pInfoBlock[nIdx].nIdxModel);
 			}
 
 			if (strcmp(pTemp, "POS") == 0)
 			{// 位置
+				D3DXVECTOR3 pos;
+
 				(void)fscanf(pFile, "%s", pTemp);
 
 				(void)fscanf(pFile, "%f", &pos.x);
 				(void)fscanf(pFile, "%f", &pos.y);
 				(void)fscanf(pFile, "%f", &pos.z);
+
+				pBlock->SetPosition(pos);
 			}
 
 			if (strcmp(pTemp, "ROT") == 0)
 			{// 向き
+				D3DXVECTOR3 rot;
+
 				(void)fscanf(pFile, "%s", pTemp);
 
 				(void)fscanf(pFile, "%f", &rot.x);
 				(void)fscanf(pFile, "%f", &rot.y);
 				(void)fscanf(pFile, "%f", &rot.z);
+
+				pBlock->SetRotation(rot);
 			}
 
 			if (strcmp(pTemp, "END_SETBLOCK") == 0)
 			{
-				// ブロック生成
-				CBlock *pBlock = CBlock::Create(m_pInfoBlock[nIdx].nIdxModel, CBlock::BEHAVIOUR::BEHAVIOUR_GRAB);
-
-				if (pBlock != nullptr)
-				{
-					pBlock->SetPosition(pos);
-					pBlock->SetRotation(rot);
-					pBlock->SetIdx(nIdx);
-
-					if (m_pInfoBlock[nIdx].bSnag == false)
-					{
-						pBlock->EnableShadow(false);
-					}
-				}
-
 				break;
 			}
 		}

@@ -59,6 +59,8 @@ public:
 	CBlock *GetNext(void) { return m_pNext; }
 	static int GetNumAll(void) { return m_nNumAll; }
 	void SetPosition(D3DXVECTOR3 pos);
+	virtual void Save(FILE *pFile);	// •Û‘¶ˆ—
+	virtual void Load(FILE *pFile);	// “Çˆ—
 
 private:
 	static int m_nNumAll;	// ‘”
