@@ -104,6 +104,7 @@ HRESULT CPlayer::Init(void)
 	CMotion::Load(&m_param.aPathBody[0]);
 
 	m_info.pRoap = CObject3D::Create(GetPosition());
+
 	m_info.fLengthDrift = 1500.0f;
 	m_info.bGrabOld = true;
 	m_info.fDesityBlurDrift = DENSITY_BLUR;
@@ -352,13 +353,7 @@ void CPlayer::InputWire(void)
 	if (m_info.pBlockGrab != nullptr)
 	{
 		// ブラーをかける
-		CBlur *pBlur = CBlur::GetInstance();
-
-		if (pBlur != nullptr)
-		{
-			pBlur->SetAddSizePolygon(m_info.fSizeBlurDrift);
-			pBlur->SetPolygonColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, m_info.fDesityBlurDrift));
-		}
+		Blur::SetBlur(m_info.fSizeBlurDrift, m_info.fDesityBlurDrift);
 
 		//if (fLength > 0.5f)
 		{// 操作している判定
@@ -478,13 +473,7 @@ void CPlayer::InputWire(void)
 						m_info.fLengthDrift = 0.0f;
 
 						// ブラーを戻す
-						CBlur *pBlur = CBlur::GetInstance();
-
-						if (pBlur != nullptr)
-						{
-							pBlur->SetAddSizePolygon(0.0f);
-							pBlur->SetPolygonColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
-						}
+						Blur::ResetBlur();
 					}
 				}
 

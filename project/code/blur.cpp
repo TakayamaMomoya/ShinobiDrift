@@ -102,11 +102,11 @@ void CBlur::Init(void)
         D3DUSAGE_RENDERTARGET,
         D3DFMT_A8R8G8B8,
         D3DPOOL_DEFAULT,
-        &m_apTextureMT[2],
+        &m_apTextureMT[Blur::NUM_RENDER - 1],
         nullptr)))
     {
         // ターゲットレンダリング用インターフェイス生成
-        if (FAILED(m_apTextureMT[2]->GetSurfaceLevel(0, &m_apRenderMT[2])))
+        if (FAILED(m_apTextureMT[Blur::NUM_RENDER - 1]->GetSurfaceLevel(0, &m_apRenderMT[Blur::NUM_RENDER - 1])))
         {
             assert(("ターゲットレンダリング用インターフェース生成に失敗", false));
         }
@@ -492,4 +492,35 @@ void CBlur::ClearNotBlur(void)
         D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
 
     pDevice->SetRenderTarget(0, m_pRenderDef);
+}
+
+namespace
+{
+//=====================================================
+// パラメーターの設定
+//=====================================================
+void SetBlur(float fSize, float fDensity)
+{
+    CBlur *pBlur = CBlur::GetInstance();
+
+    if (pBlur != nullptr)
+    {
+        pBlur->SetAddSizePolygon(fSize);
+        pBlur->SetPolygonColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, fDensity));
+    }
+}
+
+//=====================================================
+// パラメーターのリセット
+//=====================================================
+void ResetBlur(void)
+{
+    CBlur *pBlur = CBlur::GetInstance();
+
+    if (pBlur != nullptr)
+    {
+        pBlur->SetAddSizePolygon(0.0f);
+        pBlur->SetPolygonColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
+    }
+}
 }
