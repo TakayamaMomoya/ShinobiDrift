@@ -415,14 +415,6 @@ void CStateEditGrabBlock::SelectGrabBlock(void)
 	// ブロックの選択
 	std::list<CBlockGrab*> *pList = pBlockManager->GetListGrab();
 
-
-
-	std::vector<int> v = { 1,2,3,4,5 };
-
-
-
-
-
 	if (ImGui::Button("NextBlock", ImVec2(70, 30)))
 	{
 		if (m_it != pList->end() && std::next(m_it) != pList->end())
@@ -449,5 +441,5 @@ void CStateEditGrabBlock::EditGrabBlock(void)
 	ImGui::DragFloat("Angle2", &fAngle2, 0.05f, -D3DX_PI, D3DX_PI);
 
 	(*m_it)->SetAngleOffset(fAngle1, 0);
-	(*m_it)->SetAngleOffset(fAngle1, 1);
+	(*m_it)->SetAngleOffset(fAngle2, 1);
 }
