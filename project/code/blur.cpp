@@ -523,4 +523,26 @@ void ResetBlur(void)
         pBlur->SetPolygonColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
     }
 }
+//=====================================================
+// パラメーターの加算
+//=====================================================
+void AddParameter(float fAddSize, float fAddDensity, float fMaxSize, float fMinSize, float fMaxDesity, float fMinDensity)
+{
+    CBlur *pBlur = CBlur::GetInstance();
+
+    if (pBlur != nullptr)
+    {
+        float fSize = pBlur->GetAddSizePolygon();
+        D3DXCOLOR col = pBlur->GetPolygonColor();
+
+        fSize += fAddSize;
+        col.a += fAddDensity;
+
+        universal::LimitValue(&fSize, fMaxSize, fMinSize);
+        universal::LimitValue(&col.a, fMaxDesity, fMinDensity);
+
+        pBlur->SetAddSizePolygon(fSize);
+        pBlur->SetPolygonColor(col);
+    }
+}
 }

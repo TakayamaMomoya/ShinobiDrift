@@ -339,7 +339,7 @@ void CPlayer::InputWire(void)
 		m_info.pBlockGrab->EnableCurrent(true);
 
 		// ブラーをかける
-		Blur::SetBlur(m_info.fSizeBlurDrift, m_info.fDesityBlurDrift);
+		Blur::AddParameter(0.0f, 0.01f, 15.0f, 0.0f, 0.7f);
 
 		// 差分角度の計算
 		D3DXVECTOR3 posPlayer = GetPosition();
@@ -439,6 +439,8 @@ void CPlayer::JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength)
 			float fDiffInput = fAngle - fAngleDiff;
 
 			m_info.fAngleDrift = 0.29f;
+
+			Blur::AddParameter(5.0f, 0.5f, 15.0f, 0.0f, 0.7f);
 		}
 		else
 		{
