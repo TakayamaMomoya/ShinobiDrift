@@ -4,8 +4,7 @@
 // Author:髙山桃也
 //
 //*****************************************************
-
-#ifndef _MESHCYLINDER_H_
+#ifndef _MESHCYLINDER_H_	// 二重インクルード防止
 #define _MESHCYLINDER_H_
 
 //*****************************************************
@@ -32,23 +31,24 @@ const float MESH_HEIGHT = 50.0f;	// メッシュの高さ
 class CMeshCylinder : public CObject
 {
 public:
-	CMeshCylinder(int nPriority = 5);	// コンストラクタ
-	~CMeshCylinder();	// デストラクタ
-
-	typedef struct
+	// 構造体定義
+	struct MeshCylinder
 	{
-		D3DXVECTOR3 pos;						//位置
-		D3DXVECTOR3 rot;						//向き
-		D3DXMATRIX mtxWorld;					//ワールドマトリックス
-		int nNumIdx;							//インデックス数
-		int nNumVtx;							//頂点数
+		D3DXVECTOR3 pos;	//位置
+		D3DXVECTOR3 rot;	//向き
+		D3DXMATRIX mtxWorld;	//ワールドマトリックス
+		int nNumIdx;	//インデックス数
+		int nNumVtx;	//頂点数
 		float fRadius;	// 半径
 		float fHeight;	// 高さ
 		int nMeshU;	// 横の分割数
 		int nMeshV;	// 縦の分割数
 		int nTexU;	// テクスチャの横の分割数
 		int nTexV;	// テクスチャの縦の分割数
-	}MeshCylinder;
+	};
+
+	CMeshCylinder(int nPriority = 5);	// コンストラクタ
+	~CMeshCylinder();	// デストラクタ
 
 	static CMeshCylinder *Create
 	(
@@ -65,8 +65,8 @@ public:
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBuff(void) { return m_pVtxBuff; }
 	void SetPosition(D3DXVECTOR3 pos) { m_meshCylinder.pos = pos; }
 	D3DXVECTOR3 GetPosition(void) { return m_meshCylinder.pos; }
-	void SetRot(D3DXVECTOR3 rot) { m_meshCylinder.rot = rot; }
-	D3DXVECTOR3 GetRot(void) { return m_meshCylinder.rot; }
+	void SetRotation(D3DXVECTOR3 rot) { m_meshCylinder.rot = rot; }
+	D3DXVECTOR3 GetRotation(void) { return m_meshCylinder.rot; }
 	int GetNumVtx(void) { return m_meshCylinder.nNumVtx; }
 	void SetRadius(float fRadius) { m_meshCylinder.fRadius = fRadius; }
 	void SetHeight(float fHeight) { m_meshCylinder.fHeight = fHeight; }
@@ -80,6 +80,7 @@ public:
 	void SetVtx(void);
 
 private:
+	// メンバ変数
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;	//頂点バッファへのポインタ
 	LPDIRECT3DINDEXBUFFER9 m_pIdxBuff;	//インデックスバッファへのポインタ
 	MeshCylinder m_meshCylinder;	//構造体の情報
