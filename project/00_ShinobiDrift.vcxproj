@@ -169,6 +169,7 @@
     <ClCompile Include="code\billboard.cpp" />
     <ClCompile Include="code\block.cpp" />
     <ClCompile Include="code\blockManager.cpp" />
+    <ClCompile Include="code\blur.cpp" />
     <ClCompile Include="code\camera.cpp" />
     <ClCompile Include="code\cameraState.cpp" />
     <ClCompile Include="code\character.cpp" />
@@ -179,9 +180,11 @@
     <ClCompile Include="code\effect3D.cpp" />
     <ClCompile Include="code\effekseer.cpp" />
     <ClCompile Include="code\fade.cpp" />
+    <ClCompile Include="code\fan.cpp" />
     <ClCompile Include="code\fan2D.cpp" />
     <ClCompile Include="code\fan3D.cpp" />
     <ClCompile Include="code\game.cpp" />
+    <ClCompile Include="code\goal.cpp" />
     <ClCompile Include="code\inpact.cpp" />
     <ClCompile Include="code\input.cpp" />
     <ClCompile Include="code\inputjoypad.cpp" />
@@ -238,6 +241,7 @@
     <ClInclude Include="code\billboard.h" />
     <ClInclude Include="code\block.h" />
     <ClInclude Include="code\blockManager.h" />
+    <ClInclude Include="code\blur.h" />
     <ClInclude Include="code\camera.h" />
     <ClInclude Include="code\cameraState.h" />
     <ClInclude Include="code\character.h" />
@@ -248,9 +252,11 @@
     <ClInclude Include="code\effect3D.h" />
     <ClInclude Include="code\effekseer.h" />
     <ClInclude Include="code\fade.h" />
+    <ClInclude Include="code\fan.h" />
     <ClInclude Include="code\fan2D.h" />
     <ClInclude Include="code\fan3D.h" />
     <ClInclude Include="code\game.h" />
+    <ClInclude Include="code\goal.h" />
     <ClInclude Include="code\inpact.h" />
     <ClInclude Include="code\input.h" />
     <ClInclude Include="code\inputjoypad.h" />

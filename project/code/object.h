@@ -54,6 +54,7 @@ public:
 	static void UpdateNotStop(void);	// 動かないオブジェクトの更新
 	static void DeleteAll(void);	// 全削除処理
 	static void DrawAll(void);	// 全て描画
+	static void DrawObject(bool bBlur);	// オブジェクトの描画
 	virtual void Hit(float fDamage){}	// ヒット処理
 	void SetType(TYPE type);
 	TYPE GetType(void) { return m_type; }
@@ -73,6 +74,7 @@ public:
 	void EnableCull(bool bCull) { m_bCull = bCull; }
 	void SetAlphaTest(DWORD dValue) { m_dAlpha = dValue; }
 	DWORD GetAlpha(void) { return m_dAlpha; }
+	void EnableBlur(bool bBlur) { m_bBlur = bBlur; }
 
 protected:
 	void Release(void);	// 個別リリース処理
@@ -97,6 +99,7 @@ private:
 	bool m_bFog;	// フォグをかけるかどうか
 	bool m_bCull;	// カリングするかどうか
 	DWORD m_dAlpha;	// アルファテストの値
+	bool m_bBlur;	// ブラーをかけるかどうか
 	static CObject *m_apNotStop[NUM_OBJECT];	// 停止中にも動くオブジェクトの配列
 };
 

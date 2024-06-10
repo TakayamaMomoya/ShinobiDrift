@@ -69,6 +69,18 @@ HRESULT CEditMesh::Init(void)
 //=====================================================
 void CEditMesh::Uninit(void)
 {
+	if (m_pState != nullptr)
+	{
+		delete m_pState;
+		m_pState = nullptr;
+	}
+
+	if (m_pManipulator != nullptr)
+	{
+		m_pManipulator->Uninit();
+		m_pManipulator = nullptr;
+	}
+
 	CEdit::Uninit();
 }
 

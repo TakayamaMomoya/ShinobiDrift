@@ -10,6 +10,7 @@
 //*****************************************************
 #include "UI.h"
 #include "UIManager.h"
+#include "blur.h"
 
 //=====================================================
 // 優先順位を決めるコンストラクタ
@@ -80,6 +81,13 @@ void CUI::Update(void)
 //=====================================================
 void CUI::Draw(void)
 {
+	CBlur *pBlur = CBlur::GetInstance();
+
+	if (pBlur != nullptr)
+	{
+		pBlur->SetRenderToNotBlur();
+	}
+
 	bool bDisp = true;
 
 	CUIManager *pUIManager = CUIManager::GetInstance();
@@ -92,5 +100,10 @@ void CUI::Draw(void)
 	if (bDisp)
 	{
 		CObject2D::Draw();
+	}
+
+	if (pBlur != nullptr)
+	{
+		pBlur->ChangeTarget();
 	}
 }

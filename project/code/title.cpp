@@ -1,7 +1,7 @@
 //*****************************************************
 //
 // タイトル処理[title.cpp]
-// Author:酒井南勝
+// Author:髙山桃也
 //
 //*****************************************************
 
@@ -260,9 +260,6 @@ void CTitleStart::Update(CTitle *pTitle)
 				m_pAfter->SetIdxTexture(nIdx);
 				m_pAfter->SetVtx();
 			}
-
-			// サウンド再生
-			Sound::Play(CSound::LABEL_SE_START_GAME);
 		}
 	}
 	else
@@ -420,8 +417,6 @@ void CTitleMenu::Fade(void)
 
 	if (pFade->GetState() != CFade::FADE_NONE)
 		return;
-
-	Sound::Play(CSound::LABEL_SE_START_GAME);
 
 	switch (m_menu)
 	{

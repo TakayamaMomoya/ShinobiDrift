@@ -14,8 +14,8 @@
 #include "renderer.h"
 #include "manager.h"
 #include "object.h"
-#include "debrisSpawner.h"
 #include "effect3D.h"
+#include "fan3D.h"
 #include "debugproc.h"
 
 //*****************************************************
@@ -42,8 +42,6 @@ CBlock::CBlock(int nPriority)
 	m_pPrev = nullptr;
 	m_pNext = nullptr;
 	m_nIdx = -1;
-	m_bGrab = true;
-	m_bCurrent = false;
 
 	// 先頭、最後尾アドレス取得
 	CBlockManager *pManager = CBlockManager::GetInstance();
@@ -141,19 +139,28 @@ CBlock::~CBlock()
 //=====================================================
 // 生成処理
 //=====================================================
-CBlock *CBlock::Create(int nIdxModel)
+CBlock *CBlock::Create(BEHAVIOUR behaviour)
 {
 	CBlock *pBlock = nullptr;
 
-	if (pBlock == nullptr)
-	{// インスタンス生成
+	// インスタンス生成
+	switch (behaviour)
+	{
+	case BEHAVIOUR_NORMAL:
 		pBlock = new CBlock;
+		break;
+	case BEHAVIOUR_GRAB:
+		pBlock = new CBlockGrab;
+		break;
+	default:
+		assert(("ブロックのビヘイビアーに不正な値が入力されました", false));
+		break;
+	}
 
+	if (pBlock != nullptr)
+	{
 		// 初期化処理
 		pBlock->Init();
-
-		// 種類ごとのモデル読込
-		pBlock->BindModel(nIdxModel);
 	}
 
 	return pBlock;
@@ -175,9 +182,6 @@ HRESULT CBlock::Init(void)
 
 	m_fLife = 300.0f;
 
-	// 影の有効化
-	EnableShadow(true);
-
 	return S_OK;
 }
 
@@ -197,42 +201,6 @@ void CBlock::Update(void)
 {
 	// 継承クラスの更新
 	CObjectX::Update();
-
-	if (m_bCurrent)
-	{
-		CEffect3D::Create(GetPosition(),200.0f,5,D3DXCOLOR(1.0f,1.0f,1.0f,1.0f));
-	}
-}
-
-//=====================================================
-// 掴めるかの判定
-//=====================================================
-bool CBlock::CanGrab(D3DXVECTOR3 pos)
-{
-	bool bCanGrab1 = true;
-	bool bCanGrab2 = true;
-
-	// 判定の設置
-	D3DXMATRIX mtxVec1;
-	D3DXMATRIX mtxVec2;
-	D3DXMATRIX mtx = *GetMatrix();
-	universal::SetOffSet(&mtxVec1, mtx, D3DXVECTOR3(200.0f, 0.0f, 0.0f));
-	universal::SetOffSet(&mtxVec2, mtx, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-
-	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
-	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
-
-#ifdef _DEBUG
-	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-#endif
-
-	bCanGrab1 = universal::IsCross(pos, GetPosition(), posMtx1, nullptr);
-	bCanGrab2 = universal::IsCross(pos, GetPosition(), posMtx2, nullptr);
-
-	CDebugProc::GetInstance()->Print("\n掴める1[%d]", bCanGrab1);
-	CDebugProc::GetInstance()->Print("\n掴める2[%d]", bCanGrab2);
-
-	return bCanGrab1 ^ bCanGrab2;
 }
 
 //=====================================================
@@ -253,17 +221,306 @@ void CBlock::Draw(void)
 }
 
 //=====================================================
-// ヒット処理
+// 保存処理
 //=====================================================
-void CBlock::Hit(float fDamage)
+void CBlock::Save(FILE *pFile)
+{
+	fprintf(pFile, "SETBLOCK\n");
+
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
+	int nIdx = GetIdx();
+
+	fprintf(pFile, " IDX = %d\n", nIdx);
+	fprintf(pFile, " POS = %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
+	fprintf(pFile, " ROT = %.2f %.2f %.2f\n", rot.x, rot.y, rot.z);
+}
+
+//=====================================================
+// 読込処理
+//=====================================================
+void CBlock::Load(FILE *pFile, char* pTemp)
+{
+	if (strcmp(pTemp, "IDX") == 0)
+	{// インデックス
+		int nIdx;
+
+		CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+		if (pBlockManager != nullptr)
+		{
+			(void)fscanf(pFile, "%s", pTemp);
+
+			(void)fscanf(pFile, "%d", &nIdx);
+
+			SetIdx(nIdx);
+
+			CBlockManager::SInfoBlock *InfoBlock = pBlockManager->GetInfoBlock();
+
+			BindModel(InfoBlock[nIdx].nIdxModel);
+		}
+	}
+
+	if (strcmp(pTemp, "POS") == 0)
+	{// 位置
+		D3DXVECTOR3 pos;
+
+		(void)fscanf(pFile, "%s", pTemp);
+
+		(void)fscanf(pFile, "%f", &pos.x);
+		(void)fscanf(pFile, "%f", &pos.y);
+		(void)fscanf(pFile, "%f", &pos.z);
+
+		SetPosition(pos);
+	}
+
+	if (strcmp(pTemp, "ROT") == 0)
+	{// 向き
+		D3DXVECTOR3 rot;
+
+		(void)fscanf(pFile, "%s", pTemp);
+
+		(void)fscanf(pFile, "%f", &rot.x);
+		(void)fscanf(pFile, "%f", &rot.y);
+		(void)fscanf(pFile, "%f", &rot.z);
+
+		SetRotation(rot);
+	}
+}
+
+//============================================================================
+// 掴めるブロッククラス
+//============================================================================
+//=====================================================
+// コンストラクタ
+//=====================================================
+CBlockGrab::CBlockGrab() : m_bCurrent(false), m_fRadiusOffset(0.0f),m_pFan(nullptr)
+{
+	for (int i = 0; i < NUM_OFFSET; i++)
+	{
+		m_afAngleOffset[i] = 0.0f;
+	}
+}
+ 
+//=====================================================
+// デストラクタ
+//=====================================================
+CBlockGrab::~CBlockGrab()
 {
 
 }
 
 //=====================================================
-// 頂点を入れ替える処理
+// 初期化
 //=====================================================
-void CBlock::SetRotation(D3DXVECTOR3 rot)
+HRESULT CBlockGrab::Init(void)
 {
-	CObjectX::SetRotation(rot);
+	// 掴みブロックリストに追加
+	CBlockManager *pBlockManager =  BlockManager::GetInstance();
+
+	if (pBlockManager != nullptr)
+		pBlockManager->AddGrabList(this);
+
+	// 基底クラスの初期化
+	CBlock::Init();
+
+	// オフセットの初期化
+	m_afAngleOffset[0] = D3DX_PI;
+	m_afAngleOffset[1] = D3DX_PI * 0.7f;
+	m_fRadiusOffset = 1000.0f;
+
+#ifdef _DEBUG
+	// 判定可視化用の扇生成
+	if (m_pFan == nullptr)
+	{
+		m_pFan = CFan3D::Create();
+		
+		if (m_pFan != nullptr)
+		{
+			m_pFan->SetRotation(D3DXVECTOR3(D3DX_PI * 0.5f, 0.0f, 0.0f));
+			m_pFan->SetRadius(400.0f);
+		}
+	}
+#endif
+
+	return S_OK;
+}
+
+//=====================================================
+// 終了
+//=====================================================
+void CBlockGrab::Uninit(void)
+{
+	// 掴みブロックリストから除外
+	CBlockManager *pBlockManager = BlockManager::GetInstance();
+
+	if (pBlockManager != nullptr)
+		pBlockManager->RemoveGrabList(this);
+	
+	// 基底クラスの終了
+	CBlock::Uninit();
+}
+
+//=====================================================
+// 更新
+//=====================================================
+void CBlockGrab::Update(void)
+{
+	if (m_bCurrent)
+	{
+		CEffect3D::Create(GetPosition(), 200.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+
+	CBlock::Update();
+
+#ifdef _DEBUG
+	// オフセットの設定
+	D3DXMATRIX mtxVec1;
+	D3DXMATRIX mtxVec2;
+	D3DXMATRIX mtx = *GetMatrix();
+
+	D3DXVECTOR3 offset1 = { sinf(m_afAngleOffset[0]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[0]) * m_fRadiusOffset };
+	D3DXVECTOR3 offset2 = { sinf(m_afAngleOffset[1]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[1]) * m_fRadiusOffset };
+
+	universal::SetOffSet(&mtxVec1, mtx, offset1);
+	universal::SetOffSet(&mtxVec2, mtx, offset2);
+
+	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
+	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
+
+	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(posMtx2, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	// 扇の角度の設定
+	if (m_pFan != nullptr)
+	{
+		D3DXVECTOR3 pos = GetPosition();
+
+		float fAngleOffset1 = atan2f(posMtx1.x - pos.x, posMtx1.z - pos.z);
+		float fAngleOffset2 = atan2f(posMtx2.x - pos.x, posMtx2.z - pos.z);
+
+		float fDiff = fAngleOffset1 - fAngleOffset2;
+
+		float fRate = fDiff / (D3DX_PI * 2.0f);
+
+		if (fRate < 0)
+			fRate = 1.0f + fRate;
+
+		m_pFan->SetRateAngle(fRate);
+
+		pos.y += 10.0f;
+		m_pFan->SetPosition(pos);
+		m_pFan->SetRotation(D3DXVECTOR3(D3DX_PI * 0.5f, fAngleOffset2, 0.0f));
+		m_pFan->SetVtx();
+	}
+#endif
+}
+
+//=====================================================
+// 描画
+//=====================================================
+void CBlockGrab::Draw(void)
+{
+	CBlock::Draw();
+}
+
+//=====================================================
+// 掴めるかの判定
+//=====================================================
+bool CBlockGrab::CanGrab(D3DXVECTOR3 pos)
+{
+	bool bCanGrab1 = true;
+	bool bCanGrab2 = true;
+
+	// 判定の設置
+	D3DXMATRIX mtxVec1;
+	D3DXMATRIX mtxVec2;
+	D3DXMATRIX mtx = *GetMatrix();
+
+	// オフセットの設定
+	D3DXVECTOR3 offset1 = { sinf(m_afAngleOffset[0]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[0]) * m_fRadiusOffset };
+	D3DXVECTOR3 offset2 = { sinf(m_afAngleOffset[1]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[1]) * m_fRadiusOffset };
+
+	universal::SetOffSet(&mtxVec1, mtx, offset1);
+	universal::SetOffSet(&mtxVec2, mtx, offset2);
+
+	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
+	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
+
+	bCanGrab1 = universal::IsCross(pos, posMtx1, GetPosition(), nullptr);
+	bCanGrab2 = universal::IsCross(pos, GetPosition(), posMtx2, nullptr);
+
+	CDebugProc::GetInstance()->Print("\n掴める1[%d]", bCanGrab1);
+	CDebugProc::GetInstance()->Print("\n掴める2[%d]", bCanGrab2);
+
+	bool bOK = bCanGrab1 && bCanGrab2;
+
+#ifdef _DEBUG
+	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(posMtx2, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	
+	if (bCanGrab1)
+	{
+		posMtx1.y += 100.0f;
+		CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+	
+	if (bCanGrab2)
+	{
+		posMtx2.y += 100.0f;
+		CEffect3D::Create(posMtx2, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+
+	if (bOK)
+	{
+		CEffect3D::Create(GetPosition(), 150.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+#endif
+
+	return bOK;
+}
+
+//=====================================================
+// 保存処理
+//=====================================================
+void CBlockGrab::Save(FILE *pFile)
+{
+	fprintf(pFile, "SETGRABBLOCK\n");
+
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
+	int nIdx = GetIdx();
+
+	fprintf(pFile, " IDX = %d\n", nIdx);
+	fprintf(pFile, " POS = %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
+	fprintf(pFile, " ROT = %.2f %.2f %.2f\n", rot.x, rot.y, rot.z);
+
+	fprintf(pFile, " ANGLE_OFFSET = %.2f %.2f\n", m_afAngleOffset[0], m_afAngleOffset[1]);
+	fprintf(pFile, " RADIUS_OFFSET = %.2f\n", m_fRadiusOffset);
+}
+
+//=====================================================
+// 読込処理
+//=====================================================
+void CBlockGrab::Load(FILE *pFile, char* pTemp)
+{
+	// 共通の読込
+	CBlock::Load(pFile, pTemp);
+
+	if (strcmp(pTemp, "ANGLE_OFFSET") == 0)
+	{// オフセットの角度
+		(void)fscanf(pFile, "%s", pTemp);
+
+		for (int i = 0; i < NUM_OFFSET; i++)
+		{
+			(void)fscanf(pFile, "%f", &m_afAngleOffset[i]);
+		}
+	}
+
+	if (strcmp(pTemp, "RADIUS_OFFSET") == 0)
+	{// オフセットの半径
+		(void)fscanf(pFile, "%s", pTemp);
+
+		(void)fscanf(pFile, "%f", &m_fRadiusOffset);
+	}
 }

@@ -62,6 +62,7 @@ private:
 
 	D3DXVECTOR3 m_posAbove;	// 上空視点の位置
 	Camera m_camera;	// 構造体の情報
+	bool m_bAbove;	// 上空視点かどうか
 };
 
 #endif

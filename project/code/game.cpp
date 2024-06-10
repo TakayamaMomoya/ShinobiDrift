@@ -35,6 +35,7 @@
 #include "timer.h"
 #include "meter.h"
 #include "meshRoad.h"
+#include "goal.h"
 
 //*****************************************************
 // マクロ定義
@@ -76,7 +77,7 @@ HRESULT CGame::Init(void)
 	// ３Dアニメーション管理の生成
 	CAnimEffect3D::Create();
 
-	Sound::Play(CSound::LABEL_BGM_GAME);
+	Sound::Play(CSound::LABEL_BGM_GAME01);
 
 	// フォグをかける
 	CRenderer *pRenderer = CRenderer::GetInstance();
@@ -103,6 +104,9 @@ HRESULT CGame::Init(void)
 
 	// メッシュロード生成
 	CMeshRoad::Create();
+
+	// ゴール生成
+	CGoal::Create();
 
 	return S_OK;
 }

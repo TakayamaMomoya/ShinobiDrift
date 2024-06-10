@@ -335,6 +335,9 @@ void CObjectX::SetRadius(void)
 	D3DXVECTOR3 vtxMin = { 0.0f,0.0f,0.0f };
 	D3DXVECTOR3 vtxMax = { 0.0f,0.0f,0.0f };
 
+	if (m_pModel == nullptr)
+		return;
+
 	//’¸“_”‚ÌŽæ“¾
 	nNumVtx = m_pModel->pMesh->GetNumVertices();
 

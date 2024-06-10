@@ -13,10 +13,14 @@
 //*****************************************************
 // 前方宣言
 //*****************************************************
+class CFan3D;
 
 //*****************************************************
 // クラスの定義
 //*****************************************************
+//=====================================================
+// 通常ブロッククラス
+//=====================================================
 class CBlock : public CObjectX
 {
 public:
@@ -25,6 +29,13 @@ public:
 		TYPE_WALL = 0,	// 壁
 		TYPE_MAX
 	}TYPE;
+
+	typedef enum
+	{// 行動
+		BEHAVIOUR_NORMAL = 0,	// 通常
+		BEHAVIOUR_GRAB,	// 掴めるもの
+		BEHAVIOUR_MAX
+	}BEHAVIOUR;
 
 	typedef struct
 	{// 保存するときの情報
@@ -36,31 +47,63 @@ public:
 	CBlock(int nPriority = 3);	// コンストラクタ
 	~CBlock();	// デストラクタ
 
-	static CBlock *Create(int nIdxModel);
+	static CBlock *Create(BEHAVIOUR behaviour = BEHAVIOUR_NORMAL);
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	void Hit(float fDamage);
-	void SetRotation(D3DXVECTOR3 rot);
 	int GetIdx(void) { return m_nIdx; }
 	void SetIdx(int nIdx) { m_nIdx = nIdx; }
 	CBlock *GetNext(void) { return m_pNext; }
 	static int GetNumAll(void) { return m_nNumAll; }
 	void SetPosition(D3DXVECTOR3 pos);
-	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }
-	bool CanGrab(D3DXVECTOR3 pos);
+	virtual void Save(FILE *pFile);	// 保存処理
+	virtual void Load(FILE *pFile, char* pTemp);	// 読込処理
 
 private:
-
 	static int m_nNumAll;	// 総数
 	float m_fLife;	// 体力
 	int m_nIdx;	// 種類のインデックス
-	bool m_bGrab;	// 掴めるかどうか
-	bool m_bCurrent;	// 選択されているかどうか
 
 	CBlock *m_pPrev;	// 前のアドレス
 	CBlock *m_pNext;	// 次のアドレス
+};
+
+//=====================================================
+// 掴むブロッククラス
+//=====================================================
+class CBlockGrab : public CBlock
+{
+public:
+	CBlockGrab();	// コンストラクタ
+	~CBlockGrab();	// デストラクタ
+
+	// メンバ関数
+	HRESULT Init(void);
+	void Uninit(void);
+	void Update(void);
+	void Draw(void);
+	bool CanGrab(D3DXVECTOR3 pos);
+	void Save(FILE *pFile) override;	// 保存処理
+	void Load(FILE *pFile, char* pTemp) override;	// 読込処理
+
+	// 変数取得・設定
+	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }	// 選択フラグ
+	bool IsCurrent(void) { return m_bCurrent; }
+	float GetRadiusOffset(void) { return m_fRadiusOffset; }	// オフセット半径
+	void SetRadiusOffset(float fRadius) { m_fRadiusOffset = fRadius; }
+	float GetAngleOffset(int nIdx) { return m_afAngleOffset[nIdx]; }	// オフセット角度
+	void SetAngleOffset(float fAngle, int nIdx) { m_afAngleOffset[nIdx] = fAngle; }
+
+private:
+	// 定数
+	static const int NUM_OFFSET = 2;	// オフセットの数
+
+	// メンバ変数
+	float m_afAngleOffset[NUM_OFFSET];	// オフセットの角度
+	float m_fRadiusOffset;	// オフセットの半径
+	bool m_bCurrent;	// 選択されているかどうか
+	CFan3D *m_pFan;	// 判定可視化用の扇ポリゴン
 };
 
 #endif

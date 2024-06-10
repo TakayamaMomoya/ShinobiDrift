@@ -14,6 +14,8 @@
 #include "object.h"
 #include "fade.h"
 #include "block.h"
+#include "blur.h"
+#include "player.h"
 
 //*****************************************************
 // 静的メンバ変数宣言
@@ -175,6 +177,9 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	// オブジェクトのリリース処理
 	CObject::ReleaseAll();
 
+	// ブラーの生成
+	CBlur::Create();
+
 	return S_OK;
 }
 
@@ -183,6 +188,15 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 //=====================================================
 void CRenderer::Uninit(void)
 {
+	// ブラーの破棄
+	CBlur *pBlur = CBlur::GetInstance();
+
+	if (pBlur != nullptr)
+	{
+		pBlur->Uninit();
+		delete pBlur;
+	}
+
 	// オブジェクトのリリース
 	CObject::ReleaseAll();
 
@@ -220,7 +234,7 @@ void CRenderer::Draw(void)
 
 	// 画面クリア
 	m_pD3DDevice->Clear(0, nullptr,
-		(D3DCLEAR_STENCIL | D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
+		(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
 		D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
 
 	float fStart = 5000;
@@ -260,10 +274,12 @@ void CRenderer::Draw(void)
 		m_pD3DDevice->EndScene();
 	}
 
-	// アルファテストの無効化
-	m_pD3DDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-	m_pD3DDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);
-	m_pD3DDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+	CBlur *pBlur = CBlur::GetInstance();
+
+	if (pBlur != nullptr)
+	{
+		pBlur->ClearNotBlur();
+	}
 
 	// バック・フロントバッファを入れ替える
 	m_pD3DDevice->Present(nullptr, nullptr, nullptr, nullptr);
@@ -277,4 +293,24 @@ void CRenderer::DrawFPS(void)
 	//文字列に代入
 	CDebugProc::GetInstance()->Print("FPS:%d\n", GetFPS());
 	CDebugProc::GetInstance()->Print("オブジェクト総数:[%d]\n", CObject::GetNumAll());
+}
+
+namespace Renderer
+{
+LPDIRECT3DDEVICE9 GetDevice(void)
+{
+	CRenderer *pRenderer = CRenderer::GetInstance();
+	LPDIRECT3DDEVICE9 pDevice = nullptr;
+
+	if (pRenderer != nullptr)
+	{
+		pDevice = pRenderer->GetDevice();
+	}
+	else
+	{
+		assert(("デバイスの取得に失敗", false));
+	}
+
+	return pDevice;
+}
 }

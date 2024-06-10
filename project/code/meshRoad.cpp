@@ -350,7 +350,7 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 				SetEdgeAngle(pVtx, pos, posEdgeOld);
 			}
 
-			posEdgeOld =  GetPosEdge(pVtx[0].pos, pVtx[1].pos);	// •Ó‚ÌˆÊ’u‚ğ•Û‘¶
+			posEdgeOld = GetPosEdge(pVtx[0].pos, pVtx[1].pos);	// •Ó‚ÌˆÊ’u‚ğ•Û‘¶
 		}
 
 		// –@ü‚Ìİ’è

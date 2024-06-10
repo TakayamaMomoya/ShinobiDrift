@@ -174,6 +174,7 @@
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
     <ClCompile Include="code\fade.cpp" />
+    <ClCompile Include="code\fan.cpp" />
     <ClCompile Include="code\fan2D.cpp" />
     <ClCompile Include="code\fan3D.cpp" />
     <ClCompile Include="code\game.cpp" />
@@ -214,6 +215,7 @@
     <ClCompile Include="code\sound.cpp" />
     <ClCompile Include="code\texture.cpp" />
     <ClCompile Include="code\title.cpp" />
+    <ClCompile Include="code\tunnel.cpp" />
     <ClCompile Include="code\tutorial.cpp" />
     <ClCompile Include="code\UI.cpp" />
     <ClCompile Include="code\UIManager.cpp" />
@@ -241,6 +243,7 @@
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
     <ClInclude Include="code\fade.h" />
+    <ClInclude Include="code\fan.h" />
     <ClInclude Include="code\fan2D.h" />
     <ClInclude Include="code\fan3D.h" />
     <ClInclude Include="code\game.h" />
@@ -282,6 +285,7 @@
     <ClInclude Include="code\sound.h" />
     <ClInclude Include="code\texture.h" />
     <ClInclude Include="code\title.h" />
+    <ClInclude Include="code\tunnel.h" />
     <ClInclude Include="code\tutorial.h" />
     <ClInclude Include="code\UI.h" />
     <ClInclude Include="code\UIManager.h" />

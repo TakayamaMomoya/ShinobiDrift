@@ -104,3 +104,50 @@ double CSpline::Interpolate(double xi, int nIdx)
 
     return a[i] + b[i] * h + c[i] * h * h + d[i] * h * h * h;
 }
+
+//=====================================================
+// 初期化処理
+//=====================================================
+void CCutMullSpline::Init(const std::vector<D3DXVECTOR3> vPos)
+{
+    // 配列のリサイズ
+    int nSize = vPos.size();
+    m_vPos.resize(nSize + 2);
+
+    for (int i = 0; i < nSize; i++)
+    {// 引数の受け取り
+        m_vPos[i + 1] = vPos[i];
+    }
+
+    // ダミーの最初と最後の位置情報を追加
+    m_vPos[0] = vPos[0];
+    m_vPos[0].x -= 50.0f;
+    m_vPos[nSize + 1] = vPos[nSize - 1];
+    m_vPos[nSize + 1].x += 50.0f;
+}
+
+//=====================================================
+// 補間
+//=====================================================
+D3DXVECTOR3 CCutMullSpline::Interpolate(float t,int nIdx)
+{
+    D3DXVECTOR3 a1, a2, a3, a4;
+    D3DXVECTOR3 pos;
+
+    // a4の決定
+    a4 = m_vPos[nIdx];
+
+    // a3の決定
+    a3 = (m_vPos[nIdx] - m_vPos[nIdx - 1]) / 2;
+
+    // a1の決定
+    a1 = (m_vPos[nIdx + 2] - m_vPos[nIdx]) / 2 - 2 * m_vPos[nIdx + 1] + a3 + 2 * a4;
+
+    // a2の決定
+    a2 = 3 * m_vPos[nIdx + 1] - (m_vPos[nIdx + 2] - m_vPos[nIdx]) / 2 - 2 * a3 - 3 * a4;
+
+    // 計算結果を返す
+    pos = a1 * t * t * t + a2 * t * t + a3 * t + a4;
+
+    return pos;
+}

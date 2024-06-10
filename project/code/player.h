@@ -16,7 +16,7 @@
 //*****************************************************
 // 前方宣言
 //*****************************************************
-class CBlock;
+class CBlockGrab;
 class CObject3D;
 
 //*****************************************************
@@ -58,7 +58,7 @@ public:
 	void Draw(void);
 	void Hit(float fDamage);
 	SParam GetParam(void) { return m_param; }
-	CBlock *GetBlock(void) { return m_info.pBlock; }
+	CBlockGrab *GetBlock(void) { return m_info.pBlockGrab; }
 	float GetSpeed() { return m_info.fSpeed; }
 
 private:
@@ -75,13 +75,15 @@ private:
 		float fTimerFlip;	// ドリフトカウンター
 		float fAngleDrift;	// ドリフト時の角度倍率の値
 		int nCntFlip;	// 弾きカウンター
-		CBlock *pBlock;	// 掴んでいるブロック
+		CBlockGrab *pBlockGrab;	// 掴んでいるブロック
 		CObject3D *pRoap;
 		float fCntAngle;	// アングルのカウンター
 		bool bGrabOld;
 		bool bManual;		// マニュアル操作
 		float fLengthDrift;
 		float fTimerDriftChange;
+		float fSizeBlurDrift;	// ドリフト時のブラーの強さ
+		float fDesityBlurDrift;	// ドリフト時のブラーの濃さ
 	};
 
 	void Load(void);
@@ -90,6 +92,13 @@ private:
 	void InputMove(void);
 	void InputCamera(void);
 	void InputWire(void);
+	void ForwardFollowWire(float vecLength, D3DXVECTOR3 vecDiff);	// ワイヤーに沿って進める
+	void JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength);	// ドリフト変化の判定
+	void ControlRoap(void);	// ロープの制御
+	void SarchGrab(void);	// 掴むブロックの探知
+	void ManageRotateGrab(float fAngleDiff);	// 掴んでいるときの回転制御
+	void JudgeRemoveWire(float fLength);	// ワイヤーを外すかの判定
+	void RemoveWire(void);	// ワイヤーを外す処理
 	void LimitDrift(float fLength);
 	void ManageSpeed(void);
 	void ManageState(void);
