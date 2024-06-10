@@ -47,7 +47,7 @@ public:
 	CBlock(int nPriority = 3);	// コンストラクタ
 	~CBlock();	// デストラクタ
 
-	static CBlock *Create(int nIdxModel,BEHAVIOUR behaviour = BEHAVIOUR_NORMAL);
+	static CBlock *Create(BEHAVIOUR behaviour = BEHAVIOUR_NORMAL);
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
@@ -59,6 +59,8 @@ public:
 	CBlock *GetNext(void) { return m_pNext; }
 	static int GetNumAll(void) { return m_nNumAll; }
 	void SetPosition(D3DXVECTOR3 pos);
+	virtual void Save(FILE *pFile);	// 保存処理
+	virtual void Load(FILE *pFile, char* pTemp);	// 読込処理
 
 private:
 	static int m_nNumAll;	// 総数
@@ -84,6 +86,8 @@ public:
 	void Update(void);
 	void Draw(void);
 	bool CanGrab(D3DXVECTOR3 pos);
+	void Save(FILE *pFile) override;	// 保存処理
+	void Load(FILE *pFile, char* pTemp) override;	// 読込処理
 
 	// 変数取得・設定
 	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }	// 選択フラグ

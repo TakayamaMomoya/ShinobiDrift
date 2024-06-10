@@ -139,7 +139,7 @@ CBlock::~CBlock()
 //=====================================================
 // 生成処理
 //=====================================================
-CBlock *CBlock::Create(int nIdxModel, BEHAVIOUR behaviour)
+CBlock *CBlock::Create(BEHAVIOUR behaviour)
 {
 	CBlock *pBlock = nullptr;
 
@@ -161,9 +161,6 @@ CBlock *CBlock::Create(int nIdxModel, BEHAVIOUR behaviour)
 	{
 		// 初期化処理
 		pBlock->Init();
-
-		// 種類ごとのモデル読込
-		pBlock->BindModel(nIdxModel);
 	}
 
 	return pBlock;
@@ -237,6 +234,74 @@ void CBlock::Hit(float fDamage)
 void CBlock::SetRotation(D3DXVECTOR3 rot)
 {
 	CObjectX::SetRot(rot);
+}
+
+//=====================================================
+// 保存処理
+//=====================================================
+void CBlock::Save(FILE *pFile)
+{
+	fprintf(pFile, "SETBLOCK\n");
+
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
+	int nIdx = GetIdx();
+
+	fprintf(pFile, " IDX = %d\n", nIdx);
+	fprintf(pFile, " POS = %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
+	fprintf(pFile, " ROT = %.2f %.2f %.2f\n", rot.x, rot.y, rot.z);
+}
+
+//=====================================================
+// 読込処理
+//=====================================================
+void CBlock::Load(FILE *pFile, char* pTemp)
+{
+	if (strcmp(pTemp, "IDX") == 0)
+	{// インデックス
+		int nIdx;
+
+		CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+		if (pBlockManager != nullptr)
+		{
+			(void)fscanf(pFile, "%s", pTemp);
+
+			(void)fscanf(pFile, "%d", &nIdx);
+
+			SetIdx(nIdx);
+
+			CBlockManager::SInfoBlock *InfoBlock = pBlockManager->GetInfoBlock();
+
+			BindModel(InfoBlock[nIdx].nIdxModel);
+		}
+	}
+
+	if (strcmp(pTemp, "POS") == 0)
+	{// 位置
+		D3DXVECTOR3 pos;
+
+		(void)fscanf(pFile, "%s", pTemp);
+
+		(void)fscanf(pFile, "%f", &pos.x);
+		(void)fscanf(pFile, "%f", &pos.y);
+		(void)fscanf(pFile, "%f", &pos.z);
+
+		SetPosition(pos);
+	}
+
+	if (strcmp(pTemp, "ROT") == 0)
+	{// 向き
+		D3DXVECTOR3 rot;
+
+		(void)fscanf(pFile, "%s", pTemp);
+
+		(void)fscanf(pFile, "%f", &rot.x);
+		(void)fscanf(pFile, "%f", &rot.y);
+		(void)fscanf(pFile, "%f", &rot.z);
+
+		SetRotation(rot);
+	}
 }
 
 //============================================================================
@@ -429,4 +494,49 @@ bool CBlockGrab::CanGrab(D3DXVECTOR3 pos)
 #endif
 
 	return bOK;
+}
+
+//=====================================================
+// 保存処理
+//=====================================================
+void CBlockGrab::Save(FILE *pFile)
+{
+	fprintf(pFile, "SETGRABBLOCK\n");
+
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
+	int nIdx = GetIdx();
+
+	fprintf(pFile, " IDX = %d\n", nIdx);
+	fprintf(pFile, " POS = %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
+	fprintf(pFile, " ROT = %.2f %.2f %.2f\n", rot.x, rot.y, rot.z);
+
+	fprintf(pFile, " ANGLE_OFFSET = %.2f %.2f\n", m_afAngleOffset[0], m_afAngleOffset[1]);
+	fprintf(pFile, " RADIUS_OFFSET = %.2f\n", m_fRadiusOffset);
+}
+
+//=====================================================
+// 読込処理
+//=====================================================
+void CBlockGrab::Load(FILE *pFile, char* pTemp)
+{
+	// 共通の読込
+	CBlock::Load(pFile, pTemp);
+
+	if (strcmp(pTemp, "ANGLE_OFFSET") == 0)
+	{// オフセットの角度
+		(void)fscanf(pFile, "%s", pTemp);
+
+		for (int i = 0; i < NUM_OFFSET; i++)
+		{
+			(void)fscanf(pFile, "%f", &m_afAngleOffset[i]);
+		}
+	}
+
+	if (strcmp(pTemp, "RADIUS_OFFSET") == 0)
+	{// オフセットの半径
+		(void)fscanf(pFile, "%s", pTemp);
+
+		(void)fscanf(pFile, "%f", &m_fRadiusOffset);
+	}
 }

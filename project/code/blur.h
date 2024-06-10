@@ -13,12 +13,19 @@
 //*****************************************************
 #include "main.h"
 
+namespace Blur
+{
 //*****************************************************
 // 定数定義
 //*****************************************************
-namespace Blur
-{
 const int NUM_RENDER = 3;   // ターゲットレンダリング用のインターフェースの数
+
+//*****************************************************
+// ショートカット関数
+//*****************************************************
+void SetBlur(float fSize, float fDensity);  // パラメーターの設定
+void ResetBlur(void);   // パラメーターのリセット
+void AddParameter(float fAddSize, float fAddDensity,float fMaxSize = FLT_MAX, float fMinSize = -FLT_MAX,float fMaxDesity = 1.0f,float fMinDensity = 0.0f); // パラメーターの加算
 }
 
 //*****************************************************
