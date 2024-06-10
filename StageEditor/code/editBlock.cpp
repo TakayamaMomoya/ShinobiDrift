@@ -17,6 +17,8 @@
 #include "block.h"
 #include "blockManager.h"
 #include "effect3D.h"
+#include "manager.h"
+#include "camera.h"
 #include <assert.h>
 
 //*****************************************************
@@ -80,6 +82,8 @@ void CEditBlock::Update(void)
 	}
 
 	// ステイトの選択
+	ImGui::Text("[ChangeMode]");
+
 	if (ImGui::Button("CreateNormalBlock", ImVec2(70, 30)))	// 通常ブロックの生成
 		ChangeState(new CStateCreateBlockNormal);
 
@@ -94,6 +98,8 @@ void CEditBlock::Update(void)
 //=====================================================
 void CEditBlock::Save(void)
 {
+	ImGui::Text("[Save]");
+
 	ImGui::InputText("SavePath", &m_aPath[0], 256);
 
 	if (ImGui::Button("Save", ImVec2(50.0f, 20.0f)))
@@ -185,20 +191,52 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
 	D3DXVECTOR3 rot = pEdit->GetRotation();
+	D3DXVECTOR3 rotCamera = CManager::GetCamera()->GetCamera()->rot;
 	D3DXVECTOR3 pos = pEdit->GetPosition();
 	float fSpeed = SPEED_MOVE;
 
 	if (pKeyboard == nullptr || pMouse == nullptr || pBlockManager == nullptr)
 		return;
 
-	if (ImGui::TreeNode("POS"))
-	{
-		// ブロック移動
-		ImGui::DragFloat("POS.X", &pos.x, SPEED_MOVE, -FLT_MAX, FLT_MAX);
-		ImGui::DragFloat("POS.Y", &pos.y, SPEED_MOVE, -FLT_MAX, FLT_MAX);
-		ImGui::DragFloat("POS.Z", &pos.z, SPEED_MOVE, -FLT_MAX, FLT_MAX);
+	if (!pMouse->GetPress(CInputMouse::BUTTON_RMB))
+	{// 右クリックしてないときに、移動可能
 
-		ImGui::TreePop();
+		float fMove = SPEED_MOVE;
+
+		if (pKeyboard->GetPress(DIK_LSHIFT) == true)
+		{// 加速
+			fMove *= 7;
+		}
+
+		// ブロック移動
+		if (pKeyboard->GetPress(DIK_A) == true)
+		{// 左移動
+			pos.x += sinf(rotCamera.y - D3DX_PI * 0.5f) * fMove;
+			pos.z += cosf(rotCamera.y - D3DX_PI * 0.5f) * fMove;
+		}
+		if (pKeyboard->GetPress(DIK_D) == true)
+		{// 右移動
+			pos.x += sinf(rotCamera.y - D3DX_PI * -0.5f) * fMove;
+			pos.z += cosf(rotCamera.y - D3DX_PI * -0.5f) * fMove;
+		}
+		if (pKeyboard->GetPress(DIK_W) == true)
+		{// 前移動
+			pos.x += sinf(D3DX_PI * 0.5f) * sinf(rotCamera.y) * fMove;
+			pos.z += sinf(D3DX_PI * 0.5f) * cosf(rotCamera.y) * fMove;
+		}
+		if (pKeyboard->GetPress(DIK_S) == true)
+		{// 後移動
+			pos.x += sinf(-D3DX_PI * 0.5f) * sinf(rotCamera.y) * fMove;
+			pos.z += sinf(-D3DX_PI * 0.5f) * cosf(rotCamera.y) * fMove;
+		}
+		if (pKeyboard->GetPress(DIK_E) == true)
+		{// 上昇
+			pos.y += fMove;
+		}
+		if (pKeyboard->GetPress(DIK_Q) == true)
+		{// 下降
+			pos.y -= fMove;
+		}
 	}
 
 	if (ImGui::TreeNode("ROT"))
@@ -232,6 +270,8 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 	// ブロックのビヘイビアの変更
 	ChangeBlockBehaviour();
 
+	ImGui::Text("[Action]");
+
 	if (ImGui::Button("Create", ImVec2(50.0f, 20.0f)))
 	{// ブロック生成
 		CreateBlock(m_pObjectCursor->GetPosition());
@@ -245,9 +285,6 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 		pBlock->Uninit();
 	}
 
-	// セーブ
-	pEdit->Save();
-
 	if (ImGui::Button("DeleteAll", ImVec2(80.0f, 20.0f)))
 	{// 全削除
 		CBlockManager *pBlockManager = CBlockManager::GetInstance();
@@ -257,6 +294,9 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 			pBlockManager->DeleteAll();
 		}
 	}
+
+	// セーブ
+	pEdit->Save();
 
 	// エディットにトランスフォームを適用
 	pEdit->SetPosition(pos);
@@ -274,7 +314,7 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 //=====================================================
 void CStateCreateBlockNormal::ChangeBlockBehaviour(void)
 {
-	ImGui::Text("Behaviour");
+	ImGui::Text("[BlockBehaviour]");
 
 	const char* apText[CBlock::BEHAVIOUR::BEHAVIOUR_MAX] =
 	{
@@ -435,6 +475,8 @@ void CStateEditGrabBlock::SelectGrabBlock(void)
 //=====================================================
 void CStateEditGrabBlock::EditGrabBlock(void)
 {
+	ImGui::Text("[EditAngle]");
+
 	float fAngle1 = (*m_it)->GetAngleOffset(0);
 	float fAngle2 = (*m_it)->GetAngleOffset(1);
 
