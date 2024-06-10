@@ -35,7 +35,7 @@ public:
 private:
 	//メンバ変数
 	CPlayer* m_pPlayer;		// プレイヤーのポインタ
-	CObject3D* m_pObj3D;
+	CObject3D* m_pObj3D;	// オブジェクト3Dのポインタ
 };
 
 #endif

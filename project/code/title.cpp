@@ -260,9 +260,6 @@ void CTitleStart::Update(CTitle *pTitle)
 				m_pAfter->SetIdxTexture(nIdx);
 				m_pAfter->SetVtx();
 			}
-
-			// ƒTƒEƒ“ƒhÄ¶
-			Sound::Play(CSound::LABEL_SE_START_GAME);
 		}
 	}
 	else
@@ -420,8 +417,6 @@ void CTitleMenu::Fade(void)
 
 	if (pFade->GetState() != CFade::FADE_NONE)
 		return;
-
-	Sound::Play(CSound::LABEL_SE_START_GAME);
 
 	switch (m_menu)
 	{
