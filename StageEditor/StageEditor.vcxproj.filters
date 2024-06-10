@@ -91,6 +91,9 @@
       <Filter>meshedit</Filter>
     </ClCompile>
     <ClCompile Include="code\fan.cpp" />
+    <ClCompile Include="code\tunnel.cpp">
+      <Filter>meshedit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\anim3D.h" />
@@ -192,6 +195,9 @@
       <Filter>meshedit</Filter>
     </ClInclude>
     <ClInclude Include="code\fan.h" />
+    <ClInclude Include="code\tunnel.h">
+      <Filter>meshedit</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="code\backends\imgui_impl_metal.mm">
