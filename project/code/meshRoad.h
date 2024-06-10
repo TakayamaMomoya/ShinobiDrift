@@ -44,6 +44,8 @@ public:
 	void AddRoadPoint(D3DXVECTOR3 pos,bool bReCreateVtx = false);
 	void CreateVtxBuffEdge(void);	// エッジ数に応じて頂点を生成する
 
+	bool CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld);
+
 	void Save(void);	// エディターのみ。ゲームでは消してね
 	void Load(void);	// エディターのみ。ゲームでは消してね
 
@@ -64,6 +66,8 @@ private:
 	std::vector<SInfoRoadPoint>::iterator m_it;
 	CSpline *m_pSplineXZ;	// XZ平面のスプライン
 	CSpline *m_pSplineXY;	// XY平面のスプライン
+
+	int m_effectNum;
 	static CMeshRoad *m_pMeshRoad;
 };
 

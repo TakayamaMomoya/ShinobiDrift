@@ -22,6 +22,7 @@
 #include "blockManager.h"
 #include "effect3D.h"
 #include "object3D.h"
+#include "meshRoad.h"
 
 //*****************************************************
 // 定数定義
@@ -184,6 +185,9 @@ void CPlayer::Update(void)
 {
 	// 入力
 	Input();
+
+	//当たり判定
+	Collision();
 
 	// 前回の位置を保存
 	D3DXVECTOR3 pos = GetPosition();
@@ -632,6 +636,29 @@ void CPlayer::LimitDrift(float fLength)
 	{
 		m_info.fAngleHandle = 0.0f;
 	}*/
+}
+
+//=====================================================
+// 当たり判定処理
+//=====================================================
+void CPlayer::Collision(void)
+{
+	// 前回の位置を保存
+	D3DXVECTOR3 pos = GetPosition();
+
+	pos.y -= 2.0f;
+
+	if (CInputKeyboard::GetInstance() != nullptr)
+	{
+		if (CInputKeyboard::GetInstance()->GetPress(DIK_SPACE))
+		{// 操作方法変更
+			pos.y += 10.5f;
+		}
+	}
+
+	CMeshRoad::GetInstance()->CollisionRoad(&pos, GetPositionOld());
+
+	SetPosition(pos);
 }
 
 //=====================================================
