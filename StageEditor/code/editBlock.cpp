@@ -311,6 +311,7 @@ void CStateCreateBlockNormal::CreateBlock(D3DXVECTOR3 pos)
 
 	if (pBlock != nullptr)
 	{
+		pBlock->BindModel(pInfoBlock[m_nIdxObject].nIdxModel);
 		pBlock->SetPosition(pos);
 		pBlock->SetRot(m_pObjectCursor->GetRotation());
 		pBlock->SetIdx(m_nIdxObject);
@@ -437,8 +438,8 @@ void CStateEditGrabBlock::EditGrabBlock(void)
 	float fAngle1 = (*m_it)->GetAngleOffset(0);
 	float fAngle2 = (*m_it)->GetAngleOffset(1);
 
-	ImGui::DragFloat("Angle1", &fAngle1, 0.05f, -D3DX_PI, D3DX_PI);
-	ImGui::DragFloat("Angle2", &fAngle2, 0.05f, -D3DX_PI, D3DX_PI);
+	ImGui::DragFloat("Angle1", &fAngle1, 0.05f, fAngle2, D3DX_PI);
+	ImGui::DragFloat("Angle2", &fAngle2, 0.05f, -D3DX_PI, fAngle1);
 
 	(*m_it)->SetAngleOffset(fAngle1, 0);
 	(*m_it)->SetAngleOffset(fAngle2, 1);
