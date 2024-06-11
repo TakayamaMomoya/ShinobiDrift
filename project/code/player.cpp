@@ -725,6 +725,7 @@ void CPlayer::Collision(void)
 		}
 	}
 
+	// タイヤの位置保存
 	posParts[0].x = GetParts(2)->pParts->GetMatrix()->_41;
 	posParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y);
 	posParts[0].z = GetParts(2)->pParts->GetMatrix()->_43;
@@ -733,31 +734,35 @@ void CPlayer::Collision(void)
 	posParts[1].y = GetParts(3)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y);
 	posParts[1].z = GetParts(3)->pParts->GetMatrix()->_43;
 
+	// タイヤの中点を計算
 	posDef = posParts[0] + posParts[1] * 0.5f;
 
+	// タイヤそれぞれで当たり判定をとる
 	bRoad[0] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[0]);
 	bRoad[1] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[1]);
 
+	// プレイヤーの高さを調整
 	pos.y += (posParts[0] + posParts[1] * 0.5f).y - posDef.y;
 
+	// タイヤの位置関係から角度を計算
 	if ((posParts[0].y - posParts[1].y) < D3DXVec3Length(&(posParts[0] - posParts[1])))
-	{
 		rot.x = asinf((posParts[0].y - posParts[1].y) / D3DXVec3Length(&(posParts[0] - posParts[1])));
-	}
+
 
 	if (bRoad[0] && bRoad[1])
-	{
+	{// タイヤが両方道に触れているとき
 
 	}
 	else if (bRoad[0] || bRoad[1])
-	{
+	{// タイヤが片方だけ道に触れているとき
 		rot.x += (0.0f - rot.x) * 0.1f;
 	}
 	else
-	{
+	{// タイヤがどちらも道に触れていないとき
 		rot.x += (0.0f - rot.x) * 0.1f;
 	}
 
+	// 位置と角度を代入
 	SetPosition(pos);
 	SetRotation(rot);
 }

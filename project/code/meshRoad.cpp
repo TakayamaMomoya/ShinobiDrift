@@ -517,46 +517,25 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos)
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 	int effectNum = 0;
 
-#ifdef _DEBUG
-	if (CInputKeyboard::GetInstance() != nullptr)
-	{
-		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_L))
-		{// 操作方法変更
-			m_effectNum += 0;
-		}
-	}
-#endif
-
 	for (auto itRoadPoint : m_listRoadPoint)
 	{
 		for (int i = 0; i < NUM_EDGE_IN_ROADPOINT; i++)
 		{
-			/*if (pVtx[0].pos != pVtx[1].pos &&
-				pVtx[0].pos != pVtx[2].pos &&
-				pVtx[1].pos != pVtx[3].pos &&
-				pVtx[2].pos != pVtx[3].pos && 
-				D3DXVec3Length(&pVtx[0].nor) != 0.0f &&
-				D3DXVec3Length(&pVtx[1].nor) != 0.0f &&
-				D3DXVec3Length(&pVtx[2].nor) != 0.0f &&
-				D3DXVec3Length(&pVtx[3].nor) != 0.0f)*/
-			{
-				if (universal::IsOnPolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, fHeight))
-				{
-					pPos->y = fHeight;
+			// ポリゴンの上に乗っているか判定する
+			if (universal::IsOnPolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, fHeight))
+			{// 当たっていたら
 
-					// 頂点バッファをアンロック
-					pVtxBuff->Unlock();
+				// 高さを位置に代入
+				pPos->y = fHeight;
 
-					return true;
-				}
-			}
-			//else
-			{
-				/*D3DXVECTOR3 effpocCenter = pVtx[0].pos + pVtx[1].pos + pVtx[2].pos + pVtx[3].pos;
-				CEffect3D::Create(effpocCenter * 0.25f, 100.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));*/
+				// 頂点バッファをアンロック
+				pVtxBuff->Unlock();
+
+				return true;
 			}
 			
 #ifdef _DEBUG
+			// デバッグ用のエフェクト
 			if (m_effectNum == effectNum)
 			{
 				CEffect3D::Create(pVtx[0].pos, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
