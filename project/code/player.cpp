@@ -711,35 +711,35 @@ void CPlayer::Collision(void)
 {
 	// 前回の位置を保存
 	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 move = GetMove();
 	D3DXVECTOR3 rot = GetRotation();
 	D3DXVECTOR3 posParts[2];
+	D3DXVECTOR3 posOldParts[2];
 	D3DXVECTOR3 posDef;
 	bool bRoad[2];
-	pos.y -= 10.0f;
-
-	if (CInputKeyboard::GetInstance() != nullptr)
-	{
-		if (CInputKeyboard::GetInstance()->GetPress(DIK_SPACE))
-		{// 操作方法変更
-			pos.y += 15.0f;
-		}
-	}
 
 	// タイヤの位置保存
 	posParts[0].x = GetParts(2)->pParts->GetMatrix()->_41;
 	posParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y);
 	posParts[0].z = GetParts(2)->pParts->GetMatrix()->_43;
-
 	posParts[1].x = GetParts(3)->pParts->GetMatrix()->_41;
 	posParts[1].y = GetParts(3)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y);
 	posParts[1].z = GetParts(3)->pParts->GetMatrix()->_43;
+
+	// タイヤの過去位置保存
+	posOldParts[0].x = GetParts(2)->pParts->GetMatrix()->_41;
+	posOldParts[0].y = GetParts(2)->pParts->GetMatrix()->_42;
+	posOldParts[0].z = GetParts(2)->pParts->GetMatrix()->_43;
+	posOldParts[1].x = GetParts(3)->pParts->GetMatrix()->_41;
+	posOldParts[1].y = GetParts(3)->pParts->GetMatrix()->_42;
+	posOldParts[1].z = GetParts(3)->pParts->GetMatrix()->_43;
 
 	// タイヤの中点を計算
 	posDef = posParts[0] + posParts[1] * 0.5f;
 
 	// タイヤそれぞれで当たり判定をとる
-	bRoad[0] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[0]);
-	bRoad[1] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[1]);
+	bRoad[0] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[0], posOldParts[0]);
+	bRoad[1] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[1], posOldParts[1]);
 
 	// プレイヤーの高さを調整
 	pos.y += (posParts[0] + posParts[1] * 0.5f).y - posDef.y;
@@ -748,22 +748,35 @@ void CPlayer::Collision(void)
 	if ((posParts[0].y - posParts[1].y) < D3DXVec3Length(&(posParts[0] - posParts[1])))
 		rot.x = asinf((posParts[0].y - posParts[1].y) / D3DXVec3Length(&(posParts[0] - posParts[1])));
 
-
 	if (bRoad[0] && bRoad[1])
 	{// タイヤが両方道に触れているとき
 
+		// 角度によって重力変更
+		if (rot.x > 0.0f)
+		{
+			move.y = -10.0f;
+		}
+		else
+		{
+			move.y = -1.0f;
+		}
 	}
-	else if (bRoad[0] || bRoad[1])
+	else if (bRoad[0])
 	{// タイヤが片方だけ道に触れているとき
-		rot.x += (0.0f - rot.x) * 0.1f;
+		rot.x += 0.01f;
+	}
+	else if (bRoad[1])
+	{// タイヤが片方だけ道に触れているとき
+		rot.x -= 0.01f;
 	}
 	else
 	{// タイヤがどちらも道に触れていないとき
-		rot.x += (0.0f - rot.x) * 0.1f;
+		rot.x += 0.01f;
 	}
 
-	// 位置と角度を代入
+	// 位置と移動量と角度を代入
 	SetPosition(pos);
+	SetMove(move);
 	SetRotation(rot);
 }
 
@@ -820,7 +833,11 @@ void CPlayer::ManageSpeed(void)
 	D3DXVECTOR3 vecForward = universal::PolarCoordinates(rot);
 
 	// 現在のスピードと前方ベクトルをかけて移動量に適用
-	move = vecForward * m_info.fSpeed;
+	move.x = vecForward.x * m_info.fSpeed;
+	move.z = vecForward.z * m_info.fSpeed;
+
+	// 移動量に重力を適用
+	move.y += -0.6f;
 
 	SetMove(move);
 }

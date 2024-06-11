@@ -26,7 +26,7 @@ const UINT NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
 const float WIDTH_DEFAULT = 200.0f;	// デフォルトの幅
 const float LENGTH_DEFAULT = 200.0f;	// デフォルトの長さ
 const int NUM_VTX_IN_EDGE = 2;	// 一辺にある頂点数
-const int NUM_EDGE_IN_ROADPOINT = 10;	// ロードポイント一つにつき、ある辺の数
+const int NUM_EDGE_IN_ROADPOINT = 20;	// ロードポイント一つにつき、ある辺の数
 const char PATH_SAVE[] = "data\\MAP\\road00.bin";	// 保存ファイルのパス
 const char* PATH_TEXTURE = "data\\TEXTURE\\MATERIAL\\road.jpg";	// テクスチャパス
 const float DIST_DEFAULT = 200.0f;	// デフォルトの辺間の距離
@@ -507,7 +507,7 @@ void CMeshRoad::Load(void)
 //=====================================================
 // 当たり判定処理
 //=====================================================
-bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos)
+bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 {
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 	VERTEX_3D* pVtx;
@@ -522,7 +522,7 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos)
 		for (int i = 0; i < NUM_EDGE_IN_ROADPOINT; i++)
 		{
 			// ポリゴンの上に乗っているか判定する
-			if (universal::IsOnPolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, fHeight))
+			if (universal::IsOnPolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
 			{// 当たっていたら
 
 				// 高さを位置に代入
