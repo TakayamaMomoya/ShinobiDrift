@@ -434,20 +434,26 @@ bool IsOnPolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTO
 	D3DXVECTOR3 vecP, vecPOld, vecTemp;
 	float fHeight, fHeightOld;
 
+	// 1つ目のポリゴンと内外判定
 	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &(vtx2 - vtx1))->y < 0 &&
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &(vtx3 - vtx2))->y <= 0 &&
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx1 - vtx3))->y < 0)
 	{
+		// 角から目標位置へのベクトル
 		vecP = posTarget - vtx1;
 		vecPOld = posOldTarget - vtx1;
 
+		// y軸法線が0ではないか判定
 		if (vtxNor1.y != 0.0f)
 		{
+			// 内積を用いて高さを計算
 			fHeight = -(((vtxNor1.x * vecP.x) + (vtxNor1.z * vecP.z)) / vtxNor1.y) + vtx1.y;
 			fHeightOld = -(((vtxNor1.x * vecPOld.x) + (vtxNor1.z * vecPOld.z)) / vtxNor1.y) + vtx1.y;
 
-			if (fHeight > posTarget.y /*&& fHeightOld <= posOldTarget.y*/)
+			// 高さが目標位置より高いか判定
+			if (fHeight > posTarget.y)
 			{
+				// 高さ代入
 				rHeight = fHeight;
 				return true;
 			}
@@ -465,20 +471,26 @@ bool IsOnPolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTO
 		}
 	}
 
+	// 2つ目のポリゴンと内外判定
 	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx4), &(vtx3 - vtx4))->y < 0 &&
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx2 - vtx3))->y <= 0 &&
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &(vtx4 - vtx2))->y < 0)
 	{
+		// 角から目標位置へのベクトル
 		vecP = posTarget - vtx1;
 		vecPOld = posOldTarget - vtx1;
 
+		// y軸法線が0ではないか判定
 		if (vtxNor2.y != 0.0f)
 		{
+			// 内積を用いて高さを計算
 			fHeight = -(((vtxNor2.x * vecP.x) + (vtxNor2.z * vecP.z)) / vtxNor2.y) + vtx1.y;
-			fHeightOld = -(((vtxNor2.x * vecPOld.x) + (vtxNor2.z * vecPOld.z)) / vtxNor2.y) + vtx1.y;
+			fHeightOld = -(((vtxNor1.x * vecPOld.x) + (vtxNor1.z * vecPOld.z)) / vtxNor1.y) + vtx1.y;
 
-			if (fHeight > posTarget.y /*&& fHeightOld <= posOldTarget.y*/)
+			// 高さが目標位置より高いか判定
+			if (fHeight > posTarget.y)
 			{
+				// 高さ代入
 				rHeight = fHeight;
 				return true;
 			}
