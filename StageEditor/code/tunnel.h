@@ -10,7 +10,7 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "meshcylinder.h"
+#include "meshCylinder.h"
 #include "meshRoad.h"
 
 //*****************************************************
@@ -32,5 +32,12 @@ public:
 	static CTunnel *Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart, std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd);
 
 private:
+	// メンバ関数
+	void CreateVtx(void);	// 頂点の生成
+	void VtxFollowRoad(void);	// 頂点を道に沿わせる
+
+	// メンバ変数
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itStart;	// 開始イテレイター
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// 終了イテレイター
 };
 #endif

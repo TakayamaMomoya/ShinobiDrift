@@ -4,7 +4,8 @@
 // Author:髙山桃也
 //
 //*****************************************************
-#ifndef _MESHCYLINDER_H_	// 二重インクルード防止
+
+#ifndef _MESHCYLINDER_H_
 #define _MESHCYLINDER_H_
 
 //*****************************************************
@@ -31,24 +32,23 @@ const float MESH_HEIGHT = 50.0f;	// メッシュの高さ
 class CMeshCylinder : public CObject
 {
 public:
-	// 構造体定義
-	struct MeshCylinder
+	CMeshCylinder(int nPriority = 5);	// コンストラクタ
+	~CMeshCylinder();	// デストラクタ
+
+	typedef struct
 	{
-		D3DXVECTOR3 pos;	//位置
-		D3DXVECTOR3 rot;	//向き
-		D3DXMATRIX mtxWorld;	//ワールドマトリックス
-		int nNumIdx;	//インデックス数
-		int nNumVtx;	//頂点数
+		D3DXVECTOR3 pos;						//位置
+		D3DXVECTOR3 rot;						//向き
+		D3DXMATRIX mtxWorld;					//ワールドマトリックス
+		int nNumIdx;							//インデックス数
+		int nNumVtx;							//頂点数
 		float fRadius;	// 半径
 		float fHeight;	// 高さ
 		int nMeshU;	// 横の分割数
 		int nMeshV;	// 縦の分割数
 		int nTexU;	// テクスチャの横の分割数
 		int nTexV;	// テクスチャの縦の分割数
-	};
-
-	CMeshCylinder(int nPriority = 5);	// コンストラクタ
-	~CMeshCylinder();	// デストラクタ
+	}MeshCylinder;
 
 	static CMeshCylinder *Create
 	(
@@ -80,7 +80,6 @@ public:
 	void SetVtx(void);
 
 private:
-	// メンバ変数
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;	//頂点バッファへのポインタ
 	LPDIRECT3DINDEXBUFFER9 m_pIdxBuff;	//インデックスバッファへのポインタ
 	MeshCylinder m_meshCylinder;	//構造体の情報
