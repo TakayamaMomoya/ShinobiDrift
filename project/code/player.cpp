@@ -718,6 +718,15 @@ void CPlayer::Collision(void)
 	D3DXVECTOR3 posDef;
 	bool bRoad[2];
 
+	if (CInputKeyboard::GetInstance() != nullptr)
+	{
+		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_SPACE))
+		{// 操作方法変更
+			pos.y = 1500.0f;
+			rot.x = -2.0f;
+		}
+	}
+
 	// タイヤの位置保存
 	posParts[0].x = GetParts(2)->pParts->GetMatrix()->_41;
 	posParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y);
