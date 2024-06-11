@@ -17,8 +17,8 @@
 //*****************************************************
 namespace
 {
-	const D3DXVECTOR3 STARTPOS = D3DXVECTOR3(17000.0f, 0.0f, -15000.0f);		// 始点の位置
-	const D3DXVECTOR3 ENDPOS = D3DXVECTOR3(20000.0f, 0.0f, -12000.0f);		// 終点の位置
+	D3DXVECTOR3 STARTPOS = D3DXVECTOR3(17000.0f, 500.0f, -15000.0f);		// 始点の位置
+	D3DXVECTOR3 ENDPOS = D3DXVECTOR3(20000.0f, 500.0f, -12000.0f);		// 終点の位置
 }
 
 //=====================================================
@@ -59,10 +59,17 @@ HRESULT CGoal::Init()
 	m_pObj3D = CObject3D::Create(STARTPOS);
 
 	// 色設定
-	m_pObj3D->SetColor(D3DXCOLOR(1.0f, 1.0f, 0.0f, 0.5f));
+	m_pObj3D->SetColor(D3DXCOLOR(1.0f, 0.5f, 0.0f, 0.5f));
+
+	// サイズ設定
+	m_pObj3D->SetSize(2000.0f, 100.0f);
+
+	D3DXVECTOR3 vec = STARTPOS - ENDPOS;
 
 	// 位置設定
-	m_pObj3D->SetPosition(STARTPOS);
+	m_pObj3D->SetPosition(D3DXVECTOR3(STARTPOS - vec * 0.5f));
+
+	m_pObj3D->SetRotation(D3DXVECTOR3(0.0f, D3DX_PI * 0.75f, 0.0f));
 
 	return S_OK;
 }
@@ -88,6 +95,9 @@ void CGoal::Update()
 {
 	// 確認用変数
 	int n = 0;
+
+	// 遷移時間
+	int nTransitionTime = 0;
 
 	// 交点の割合
 	float fCross = 0.0f;
@@ -115,8 +125,13 @@ void CGoal::Update()
 		{// 始点と終点の間を通った時
 			n = 1;
 
-			// 画面遷移
-			//pFade->SetFade(CScene::MODE_RESULT);
+			nTransitionTime++;
+
+			if (nTransitionTime <= 120)
+			{
+				// 画面遷移
+				//pFade->SetFade(CScene::MODE_RESULT);
+			}
 
 			CDebugProc::GetInstance()->Print("\nゴールした");
 		}
