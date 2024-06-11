@@ -88,6 +88,7 @@ private:
 
 	void Load(void);
 	void Input(void);
+	void Collision(void);
 	void InputMove(void);
 	void InputCamera(void);
 	void InputWire(void);

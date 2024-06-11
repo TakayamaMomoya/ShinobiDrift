@@ -14,6 +14,8 @@
 #include "effect3D.h"
 #include "myLib.h"
 #include <fstream>
+#include "inputkeyboard.h"
+#include "debugproc.h"
 
 //*****************************************************
 // 定数定義
@@ -86,6 +88,10 @@ HRESULT CMeshRoad::Init(void)
 	// リストの初期化
 	m_listRoadPoint.clear();
 
+#ifdef _DEBUG
+	EnableWire(true);
+#endif // _DEBUG
+	
 	// テクスチャ読み込み
 	int nIdx = Texture::GetIdx(PATH_TEXTURE);
 	SetIdxTexture(nIdx);
@@ -126,6 +132,27 @@ void CMeshRoad::Update(void)
 #ifdef _DEBUG
 	for (SInfoRoadPoint info : m_listRoadPoint)
 		CEffect3D::Create(info.pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
+	if (CInputKeyboard::GetInstance() != nullptr)
+	{
+		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_I))
+		{// 操作方法変更
+			m_effectNum += 1;
+		}
+
+		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_K))
+		{// 操作方法変更
+			m_effectNum -= 1;
+		}
+
+		if (m_effectNum < 0)
+			m_effectNum = 0;
+
+		/*if (m_effectNum > NUM_EDGE_IN_ROADPOINT - 1)
+			m_effectNum = NUM_EDGE_IN_ROADPOINT - 1;*/
+	}
+	CDebugProc::GetInstance()->Print("\nエフェクト位置[%d]", m_effectNum);
+
 #endif // _DEBUG
 }
 
@@ -329,6 +356,9 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 		// 法線の設定
 		SetNormal(pVtx);
 
+		pVtx[0].nor;
+		pVtx[1].nor;
+
 		// テクスチャ座標の設定
 		if (i % 2 == 0)
 		{
@@ -498,6 +528,79 @@ void CMeshRoad::Load(void)
 	inputFile.close();
 
 	CreateVtxBuffEdge();
+}
+
+//=====================================================
+// 当たり判定処理
+//=====================================================
+bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
+{
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
+	VERTEX_3D* pVtx;
+	float fHeight = pPos->y;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+	int effectNum = 0;
+
+#ifdef _DEBUG
+	if (CInputKeyboard::GetInstance() != nullptr)
+	{
+		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_L))
+		{// 操作方法変更
+			m_effectNum += 0;
+		}
+	}
+#endif
+
+	for (auto itRoadPoint : m_listRoadPoint)
+	{
+		for (int i = 0; i < NUM_EDGE_IN_ROADPOINT; i++)
+		{
+			/*if (pVtx[0].pos != pVtx[1].pos &&
+				pVtx[0].pos != pVtx[2].pos &&
+				pVtx[1].pos != pVtx[3].pos &&
+				pVtx[2].pos != pVtx[3].pos && 
+				D3DXVec3Length(&pVtx[0].nor) != 0.0f &&
+				D3DXVec3Length(&pVtx[1].nor) != 0.0f &&
+				D3DXVec3Length(&pVtx[2].nor) != 0.0f &&
+				D3DXVec3Length(&pVtx[3].nor) != 0.0f)*/
+			{
+				if (universal::IsOnPolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
+				{
+					pPos->y = fHeight;
+
+					// 頂点バッファをアンロック
+					pVtxBuff->Unlock();
+
+					return true;
+				}
+			}
+			//else
+			{
+				/*D3DXVECTOR3 effpocCenter = pVtx[0].pos + pVtx[1].pos + pVtx[2].pos + pVtx[3].pos;
+				CEffect3D::Create(effpocCenter * 0.25f, 100.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));*/
+			}
+			
+#ifdef _DEBUG
+			if (m_effectNum == effectNum)
+			{
+				CEffect3D::Create(pVtx[0].pos, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
+				CEffect3D::Create(pVtx[1].pos, 50.0f, 5, D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.5f));
+				CEffect3D::Create(pVtx[2].pos, 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
+				CEffect3D::Create(pVtx[3].pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+			}
+			effectNum++;
+#endif
+
+			pVtx += NUM_VTX_IN_EDGE;
+		}
+	}
+
+	// 頂点バッファをアンロック
+	pVtxBuff->Unlock();
+
+	return false;
 }
 
 namespace MeshRoad
