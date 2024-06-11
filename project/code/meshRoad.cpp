@@ -533,7 +533,7 @@ void CMeshRoad::Load(void)
 //=====================================================
 // “–‚½‚è”»’èˆ—
 //=====================================================
-bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
+bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos)
 {
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 	VERTEX_3D* pVtx;
@@ -566,7 +566,7 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 				D3DXVec3Length(&pVtx[2].nor) != 0.0f &&
 				D3DXVec3Length(&pVtx[3].nor) != 0.0f)*/
 			{
-				if (universal::IsOnPolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
+				if (universal::IsOnPolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, fHeight))
 				{
 					pPos->y = fHeight;
 
@@ -589,6 +589,11 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 				CEffect3D::Create(pVtx[1].pos, 50.0f, 5, D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.5f));
 				CEffect3D::Create(pVtx[2].pos, 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
 				CEffect3D::Create(pVtx[3].pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+
+				CEffect3D::Create(pVtx[0].pos + (pVtx[0].nor * 50.0f), 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
+				CEffect3D::Create(pVtx[1].pos + (pVtx[1].nor * 50.0f), 50.0f, 5, D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.5f));
+				CEffect3D::Create(pVtx[2].pos + (pVtx[2].nor * 50.0f), 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
+				CEffect3D::Create(pVtx[3].pos + (pVtx[3].nor * 50.0f), 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
 			}
 			effectNum++;
 #endif

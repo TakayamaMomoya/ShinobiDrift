@@ -44,7 +44,7 @@ public:
 	void AddRoadPoint(D3DXVECTOR3 pos,bool bReCreateVtx = false);
 	void CreateVtxBuffEdge(void);	// エッジ数に応じて頂点を生成する
 
-	bool CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld);
+	bool CollisionRoad(D3DXVECTOR3* pPos);
 
 	void Save(void);	// エディターのみ。ゲームでは消してね
 	void Load(void);	// エディターのみ。ゲームでは消してね

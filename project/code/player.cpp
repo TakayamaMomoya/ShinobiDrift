@@ -711,20 +711,55 @@ void CPlayer::Collision(void)
 {
 	// 前回の位置を保存
 	D3DXVECTOR3 pos = GetPosition();
-
-	pos.y -= 2.0f;
+	D3DXVECTOR3 rot = GetRotation();
+	D3DXVECTOR3 posParts[2];
+	D3DXVECTOR3 posDef;
+	bool bRoad[2];
+	pos.y -= 10.0f;
 
 	if (CInputKeyboard::GetInstance() != nullptr)
 	{
 		if (CInputKeyboard::GetInstance()->GetPress(DIK_SPACE))
 		{// 操作方法変更
-			pos.y += 10.5f;
+			pos.y += 15.0f;
 		}
 	}
 
-	CMeshRoad::GetInstance()->CollisionRoad(&pos, GetPositionOld());
+	posParts[0].x = GetParts(2)->pParts->GetMatrix()->_41;
+	posParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y);
+	posParts[0].z = GetParts(2)->pParts->GetMatrix()->_43;
+
+	posParts[1].x = GetParts(3)->pParts->GetMatrix()->_41;
+	posParts[1].y = GetParts(3)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y);
+	posParts[1].z = GetParts(3)->pParts->GetMatrix()->_43;
+
+	posDef = posParts[0] + posParts[1] * 0.5f;
+
+	bRoad[0] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[0]);
+	bRoad[1] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[1]);
+
+	pos.y += (posParts[0] + posParts[1] * 0.5f).y - posDef.y;
+
+	if ((posParts[0].y - posParts[1].y) < D3DXVec3Length(&(posParts[0] - posParts[1])))
+	{
+		rot.x = asinf((posParts[0].y - posParts[1].y) / D3DXVec3Length(&(posParts[0] - posParts[1])));
+	}
+
+	if (bRoad[0] && bRoad[1])
+	{
+
+	}
+	else if (bRoad[0] || bRoad[1])
+	{
+		rot.x += (0.0f - rot.x) * 0.1f;
+	}
+	else
+	{
+		rot.x += (0.0f - rot.x) * 0.1f;
+	}
 
 	SetPosition(pos);
+	SetRotation(rot);
 }
 
 //=====================================================
