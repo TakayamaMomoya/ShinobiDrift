@@ -271,7 +271,7 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 	std::vector<SInfoRoadPoint>::iterator itRoadPoint;
 	int nIdx = 0;
 
-	for (itRoadPoint = m_listRoadPoint.begin(); itRoadPoint != m_listRoadPoint.end() - 1; itRoadPoint++)
+	for (itRoadPoint = m_listRoadPoint.begin(); itRoadPoint != m_listRoadPoint.end(); itRoadPoint++)
 	{
 		if (itRoadPoint != m_listRoadPoint.begin())
 		{
