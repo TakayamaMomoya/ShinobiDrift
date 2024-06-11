@@ -65,6 +65,25 @@ private:
 	void LimitPos(D3DXVECTOR3 *pPos);
 };
 
+class CStateEditMeshCreateTunnel : public CStateEditMesh
+{// トンネルの生成
+public:
+	CStateEditMeshCreateTunnel();	// コンストラクタ
+	virtual ~CStateEditMeshCreateTunnel() {};	// デストラクタ
+
+	// メンバ関数
+	void Update(CEditMesh *pEdit) override;	// 更新処理
+
+private:
+	// メンバ関数
+	void SetTunnel(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
+
+	// メンバ変数
+	bool m_bEnd;	// スタートの選択かどうか
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itStart;	// トンネルの開始イテレイター
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// トンネルの終了イテレイター
+};
+
 class CStateEditMeshAdjustRoadPoint : public CStateEditMesh
 {// ロードポイントの調節
 public:
