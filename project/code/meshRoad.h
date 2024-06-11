@@ -18,7 +18,7 @@
 //*****************************************************
 // 前方定義
 //*****************************************************
-class CSpline;
+class CCutMullSpline;
 
 //*****************************************************
 // クラスの定義
@@ -57,15 +57,14 @@ public:
 private:
 	void SetNormal(VERTEX_3D *pVtx);	// 法線の設定
 	void CreateSpline(void);	// スプラインの生成
-	void CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint,VERTEX_3D *pVtx, SInfoRoadPoint *infoRoadPointOld = nullptr);	// ロードポイント間の頂点の設定
+	void CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3D *pVtx, SInfoRoadPoint *infoRoadPointOld = nullptr, int nIdx = 0);	// ロードポイント間の頂点の設定
 	void SetEdgeAngle(VERTEX_3D *pVtx, D3DXVECTOR3 posEdge, D3DXVECTOR3 posEdgeOld);	// 辺の角度の設定
 	D3DXVECTOR3 GetPosEdge(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2);
 
 	UINT m_nNumVtx;
 	std::vector<SInfoRoadPoint> m_listRoadPoint;
 	std::vector<SInfoRoadPoint>::iterator m_it;
-	CSpline *m_pSplineXZ;	// XZ平面のスプライン
-	CSpline *m_pSplineXY;	// XY平面のスプライン
+	CCutMullSpline *m_pSpline;	// スプライン
 
 	int m_effectNum;
 	static CMeshRoad *m_pMeshRoad;

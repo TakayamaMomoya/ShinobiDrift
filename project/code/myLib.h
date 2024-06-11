@@ -17,7 +17,13 @@
 // クラスの定義
 //*****************************************************
 class CSpline
-{
+{// 自然スプライン
+public:
+    CSpline() {};
+    void Init(const std::vector<double>& x, const std::vector<double>& y);
+
+    double Interpolate(double xi,int nIdx = -1);
+
 private:
     std::vector<double> x;
     std::vector<double> y;
@@ -25,11 +31,20 @@ private:
     std::vector<double> b;
     std::vector<double> c;
     std::vector<double> d;
+};
 
+class CCutMullSpline
+{// カットマル・スプライン
 public:
-    CSpline() {};
-    void Init(const std::vector<double>& x, const std::vector<double>& y);
+    CCutMullSpline() {};    // コンストラクタ
+    ~CCutMullSpline() {};    // デストラクタ
 
-    double Interpolate(double xi,int nIdx = -1);
+    // メンバ関数
+    void Init(const std::vector<D3DXVECTOR3> vPos); // 初期化処理
+    D3DXVECTOR3 Interpolate(float t, int nIdx);   // 補間処理
+
+private:
+    // メンバ変数
+    std::vector<D3DXVECTOR3> m_vPos;    // 点の配列
 };
 #endif
