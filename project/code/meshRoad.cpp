@@ -328,9 +328,6 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 			{
 				pVtx[0].pos = pVtx[-2].pos;
 				pVtx[1].pos = pVtx[-1].pos;
-
-				pVtx[0].nor = pVtx[-2].nor;
-				pVtx[1].nor = pVtx[-1].nor;
 			}
 			else
 			{
@@ -343,6 +340,12 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 
 		// 法線の設定
 		SetNormal(pVtx);
+
+		if (i == 0)
+		{// 最初の辺と最後の辺の法線をくっつける
+			pVtx[0].nor = pVtx[-2].nor;
+			pVtx[1].nor = pVtx[-1].nor;
+		}
 
 		// テクスチャ座標の設定
 		if (i % 2 == 0)

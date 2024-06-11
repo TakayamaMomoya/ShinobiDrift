@@ -43,8 +43,6 @@ CMeshRoad::CMeshRoad(int nPriority) : CObject3D(nPriority)
 {
 	m_nNumVtx = 0;
 	m_pSpline = nullptr;
-	//m_pSplineXZ = nullptr;
-	//m_pSplineXY = nullptr;
 }
 
 //=====================================================
