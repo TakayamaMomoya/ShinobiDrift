@@ -17,6 +17,7 @@
 #include "debugproc.h"
 #include "camera.h"
 #include "manager.h"
+#include "tunnel.h"
 
 //*****************************************************
 // 定数定義
@@ -106,6 +107,9 @@ void CEditMesh::Update(void)
 
 	if (ImGui::Button("CreateEdge", ImVec2(70, 30)))	// メッシュ生成
 		ChangeState(new CStateEditMeshCreateMesh);
+
+	if (ImGui::Button("CreateTunnel", ImVec2(70, 30)))	// トンネルの生成
+		ChangeState(new CStateEditMeshCreateTunnel);
 
 	if (ImGui::Button("AdjustRoadPoint", ImVec2(70, 30)))	// ロードポイントの調節
 		ChangeState(new CStateEditMeshAdjustRoadPoint);
@@ -231,6 +235,71 @@ void CStateEditMeshCreateMesh::LimitPos(D3DXVECTOR3 *pPos)
 		{
 			pPos->x = itLast->pos.x;
 		}
+	}
+}
+
+//****************************************************************************************
+// トンネルの生成
+//****************************************************************************************
+//=====================================================
+// コンストラクタ
+//=====================================================
+CStateEditMeshCreateTunnel::CStateEditMeshCreateTunnel() : m_bEnd(false)
+{
+	CMeshRoad *pMeshRoad = MeshRoad::GetInstance();
+	pMeshRoad->ResetIterator();
+}
+
+//=====================================================
+// 更新処理
+//=====================================================
+void CStateEditMeshCreateTunnel::Update(CEditMesh *pEdit)
+{
+	CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+
+	if (pKeyboard == nullptr || pMesh == nullptr)
+		return;
+
+	// ロードポイントの選択
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectRoadPoint();
+
+	if (pKeyboard->GetTrigger(DIK_SPACE))
+	{// ロードポイントの決定
+		SetTunnel(it);
+	}
+
+	if (pKeyboard->GetTrigger(DIK_R))
+	{// 選択の撤回
+		m_bEnd = false;
+	}
+
+	if (m_bEnd)
+	{// 選択したロードポイントにエフェクトを出す
+		D3DXVECTOR3 pos = m_itStart->pos;
+		pos.y += 100.0f;
+		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+}
+
+//=====================================================
+// トンネルの設置
+//=====================================================
+void CStateEditMeshCreateTunnel::SetTunnel(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
+{// 最初と最後の辺の設定
+	if (!m_bEnd)
+	{// 最初の辺設定
+		m_itStart = it;
+		m_bEnd = true;
+	}
+	else if (!m_bEnd)
+	{// 最後の辺を設定
+		m_itEnd = it;
+		m_bEnd = true;
+
+		// トンネルの生成
+		CTunnel::Create(m_itStart, m_itEnd);
 	}
 }
 

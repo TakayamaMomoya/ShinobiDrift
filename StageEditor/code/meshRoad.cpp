@@ -43,8 +43,6 @@ CMeshRoad::CMeshRoad(int nPriority) : CObject3D(nPriority)
 {
 	m_nNumVtx = 0;
 	m_pSpline = nullptr;
-	//m_pSplineXZ = nullptr;
-	//m_pSplineXY = nullptr;
 }
 
 //=====================================================
@@ -199,6 +197,18 @@ void CMeshRoad::Draw(void)
 //=====================================================
 std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void)
 {
+	ImGui::Text("[SelectRoadPoint]");
+
+	int nDist = std::distance(m_listRoadPoint.begin(), m_it);
+	int nSize = m_listRoadPoint.size();
+
+	if (ImGui::DragInt("Index", &nDist, 1.0f, 0, nSize - 1))
+	{
+		// イテレータを再初期化して指定番号の要素に移動
+		m_it = m_listRoadPoint.begin();
+		std::advance(m_it, nDist);
+	}
+
 	if (ImGui::Button("NextEdge", ImVec2(70, 30)))
 	{
 		if(m_it != m_listRoadPoint.end() && std::next(m_it) != m_listRoadPoint.end())
@@ -271,7 +281,7 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 	std::vector<SInfoRoadPoint>::iterator itRoadPoint;
 	int nIdx = 0;
 
-	for (itRoadPoint = m_listRoadPoint.begin(); itRoadPoint != m_listRoadPoint.end() - 1; itRoadPoint++)
+	for (itRoadPoint = m_listRoadPoint.begin(); itRoadPoint != m_listRoadPoint.end(); itRoadPoint++)
 	{
 		if (itRoadPoint != m_listRoadPoint.begin())
 		{
