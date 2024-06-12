@@ -23,8 +23,6 @@ namespace
 const UINT NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
 const float WIDTH_DEFAULT = 200.0f;	// デフォルトの幅
 const float LENGTH_DEFAULT = 200.0f;	// デフォルトの長さ
-const int NUM_VTX_IN_EDGE = 2;	// 一辺にある頂点数
-const int NUM_EDGE_IN_ROADPOINT = 10;	// ロードポイント一つにつき、ある辺の数
 const char PATH_SAVE[] = "data\\MAP\\road00.bin";	// 保存ファイルのパス
 const char* PATH_TEXTURE = "data\\TEXTURE\\MATERIAL\\road.jpg";	// テクスチャパス
 const float DIST_DEFAULT = 200.0f;	// デフォルトの辺間の距離
@@ -269,7 +267,7 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 	CreateSpline();
 
 	// 頂点の生成
-	m_nNumVtx = m_listRoadPoint.size() * NUM_VTX_IN_EDGE * NUM_EDGE_IN_ROADPOINT;
+	m_nNumVtx = m_listRoadPoint.size() * MeshRoad::NUM_VTX_IN_EDGE * MeshRoad::NUM_EDGE_IN_ROADPOINT;
 	CreateVtxBuff(m_nNumVtx);
 
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
@@ -291,7 +289,7 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 			CreateVtxBetweenRoadPoint(*itRoadPoint, pVtx, pInfoRoadPointOld, nIdx);
 		}
 
-		pVtx += NUM_EDGE_IN_ROADPOINT * NUM_VTX_IN_EDGE;
+		pVtx += MeshRoad::NUM_EDGE_IN_ROADPOINT * MeshRoad::NUM_VTX_IN_EDGE;
 
 		nIdx++;
 	}
@@ -319,7 +317,7 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 	}
 
 	// ロードポイント間で必要な辺
-	for (int i = 0; i < NUM_EDGE_IN_ROADPOINT; i++)
+	for (int i = 0; i < MeshRoad::NUM_EDGE_IN_ROADPOINT; i++)
 	{
 		D3DXVECTOR3 pos = infoRoadPoint.pos;
 
@@ -339,7 +337,7 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 		else
 		{
 			float fDiff = infoRoadPoint.pos.x - pInfoRoadPointOld->pos.x;
-			float fRate = ((float)i + 1.0f) / NUM_EDGE_IN_ROADPOINT;
+			float fRate = ((float)i + 1.0f) / MeshRoad::NUM_EDGE_IN_ROADPOINT;
 
 			// 座標の決定
 			pos = m_pSpline->Interpolate(fRate, nIdx);
@@ -376,7 +374,7 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 			pVtx[1].tex = { 1.0f,1.0f };
 		}
 
-		pVtx += NUM_VTX_IN_EDGE;	// 辺にある頂点数分ポインタを進める
+		pVtx += MeshRoad::NUM_VTX_IN_EDGE;	// 辺にある頂点数分ポインタを進める
 	}
 }
 
@@ -423,7 +421,7 @@ void CMeshRoad::SetNormal(VERTEX_3D *pVtx)
 		return;
 
 	// 頂点位置
-	D3DXVECTOR3 vtxLu = pVtx[-NUM_VTX_IN_EDGE].pos;
+	D3DXVECTOR3 vtxLu = pVtx[-MeshRoad::NUM_VTX_IN_EDGE].pos;
 	D3DXVECTOR3 vtxRu = pVtx[0].pos;
 	D3DXVECTOR3 vtxRd = pVtx[1].pos;
 
@@ -519,17 +517,4 @@ void CMeshRoad::Load(void)
 	inputFile.close();
 
 	CreateVtxBuffEdge();
-}
-
-namespace MeshRoad
-{
-CMeshRoad *GetInstance(void)
-{
-	CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
-
-	if (pMeshRoad == nullptr)
-		assert(("meshroadがないよ～～", false));
-
-	return pMeshRoad;
-}
 }

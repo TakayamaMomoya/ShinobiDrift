@@ -53,6 +53,7 @@ public:
 	void SetMode(MODE mode);
 	LPDIRECT3DVERTEXBUFFER9 CreateVtxBuff(int nNum);
 	LPDIRECT3DVERTEXBUFFER9 GetVtxBuff(void) { return m_pVtxBuff; }
+	void ReleaseVtxBuff(void);
 	D3DXMATRIX *GetMatrix(void) { return &m_mtxWorld; }
 
 private:

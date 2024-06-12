@@ -512,6 +512,9 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 	VERTEX_3D* pVtx;
 	float fHeight = pPos->y;
+	float fHeightDef = 0.0f;
+	int nRoadPointCount = 0;
+	bool bColRoad = false;
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -525,13 +528,12 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 			if (universal::IsOnPolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
 			{// 当たっていたら
 
-				// 高さを位置に代入
-				pPos->y = fHeight;
+				if (fHeightDef > fHeight || (i == 0 && nRoadPointCount == 0))
+				{
+					fHeightDef = fHeight;
+				}
 
-				// 頂点バッファをアンロック
-				pVtxBuff->Unlock();
-
-				return true;
+				bColRoad = true;
 			}
 			
 #ifdef _DEBUG
@@ -553,12 +555,16 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 
 			pVtx += NUM_VTX_IN_EDGE;
 		}
+
+		nRoadPointCount++;
 	}
+
+	pPos->y = fHeight;
 
 	// 頂点バッファをアンロック
 	pVtxBuff->Unlock();
 
-	return false;
+	return bColRoad;
 }
 
 namespace MeshRoad

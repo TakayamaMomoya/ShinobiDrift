@@ -124,6 +124,7 @@ LPDIRECT3DVERTEXBUFFER9 CObject3D::CreateVtxBuff(int nNum)
 	{// 情報の初期化
 		pVtx[i].nor = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 		pVtx[i].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[i].pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 	}
 
 	//頂点バッファをアンロック
@@ -133,15 +134,23 @@ LPDIRECT3DVERTEXBUFFER9 CObject3D::CreateVtxBuff(int nNum)
 }
 
 //=====================================================
+// 頂点バッファの破棄
+//=====================================================
+void CObject3D::ReleaseVtxBuff(void)
+{
+	if (m_pVtxBuff != nullptr)
+	{
+		m_pVtxBuff->Release();
+		m_pVtxBuff = nullptr;
+	}
+}
+
+//=====================================================
 // 終了処理
 //=====================================================
 void CObject3D::Uninit(void)
 {
-	if (m_pVtxBuff != nullptr)
-	{//頂点バッファポインタの破棄
-		m_pVtxBuff->Release();
-		m_pVtxBuff = nullptr;
-	}
+	ReleaseVtxBuff();
 
 	Release();
 }
