@@ -37,10 +37,9 @@ CMeshRoad *CMeshRoad::m_pMeshRoad = nullptr;	// 自身のポインタ
 //=====================================================
 // コンストラクタ
 //=====================================================
-CMeshRoad::CMeshRoad(int nPriority) : CObject3D(nPriority)
+CMeshRoad::CMeshRoad(int nPriority) : CObject3D(nPriority), m_nNumVtx(0), m_pSpline(nullptr), m_pSplineL(nullptr), m_pSplineR(nullptr)
 {
-	m_nNumVtx = 0;
-	m_pSpline = nullptr;
+
 }
 
 //=====================================================
@@ -92,6 +91,8 @@ HRESULT CMeshRoad::Init(void)
 
 	m_it = m_listRoadPoint.begin();
 
+	//EnableWire(true);
+
 	return S_OK;
 }
 
@@ -106,17 +107,17 @@ void CMeshRoad::Uninit(void)
 		m_pSpline = nullptr;
 	}
 
-	/*if (m_pSplineXZ != nullptr)
+	if (m_pSplineL != nullptr)
 	{
-		delete m_pSplineXZ;
-		m_pSplineXZ = nullptr;
+		delete m_pSplineL;
+		m_pSplineL = nullptr;
 	}
 
-	if (m_pSplineXY != nullptr)
+	if (m_pSplineR != nullptr)
 	{
-		delete m_pSplineXY;
-		m_pSplineXY = nullptr;
-	}*/
+		delete m_pSplineR;
+		m_pSplineR = nullptr;
+	}
 
 	Release();
 }
@@ -352,8 +353,11 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 			}
 			else
 			{
+				pVtx[0].pos = m_pSplineL->Interpolate(fRate, nIdx);
+				pVtx[1].pos = m_pSplineR->Interpolate(fRate, nIdx);
+
 				// 辺の角度設定
-				SetEdgeAngle(pVtx, pos, posEdgeOld);
+				//SetEdgeAngle(pVtx, pos, posEdgeOld);
 			}
 
 			posEdgeOld =  GetPosEdge(pVtx[0].pos, pVtx[1].pos);	// 辺の位置を保存
@@ -383,21 +387,21 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 //=====================================================
 void CMeshRoad::SetEdgeAngle(VERTEX_3D *pVtx, D3DXVECTOR3 posEdge, D3DXVECTOR3 posEdgeOld)
 {
-	if (pVtx == nullptr)
-		return;
+	//if (pVtx == nullptr)
+	//	return;
 
-	// 差分ベクトルから角度を取得
-	D3DXVECTOR3 vecDiff = posEdge - posEdgeOld;
-	float fAngle = atan2f(vecDiff.x, vecDiff.z);
-	
-	fAngle += D3DX_PI * 0.5f;	// 角度を90度傾ける
-	universal::LimitRot(&fAngle);
+	//// 差分ベクトルから角度を取得
+	//D3DXVECTOR3 vecDiff = posEdge - posEdgeOld;
+	//float fAngle = atan2f(vecDiff.x, vecDiff.z);
+	//
+	//fAngle += D3DX_PI * 0.5f;	// 角度を90度傾ける
+	//universal::LimitRot(&fAngle);
 
-	// 角度から極座標で頂点位置を決定
-	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngle, 0.0f));
+	//// 角度から極座標で頂点位置を決定
+	//D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngle, 0.0f));
 
-	pVtx[0].pos = posEdge + vecPole * WIDTH_ROAD;
-	pVtx[1].pos = posEdge - vecPole * WIDTH_ROAD;
+	//pVtx[0].pos = posEdge + vecPole * WIDTH_ROAD;
+	//pVtx[1].pos = posEdge - vecPole * WIDTH_ROAD;
 }
 
 //=====================================================
@@ -467,8 +471,127 @@ void CMeshRoad::CreateSpline(void)
 			vPos[i] = m_listRoadPoint[i].pos;
 		}
 		
-		// スプラインの初期化
+		// 中心スプラインの初期化
 		m_pSpline->Init(vPos);
+
+		// 左右のスプラインの生成
+		CreateSideSpline();
+	}
+}
+
+//=====================================================
+// 左右のスプライン生成
+//=====================================================
+void CMeshRoad::CreateSideSpline(void)
+{
+	if (m_pSpline == nullptr)
+		return;
+
+	int nSize = m_listRoadPoint.size();
+
+	std::vector<D3DXVECTOR3> aPosL;
+	std::vector<D3DXVECTOR3> aPosR;
+
+	for (int i = 0; i < nSize; i++)
+	{
+		D3DXVECTOR3 posL;
+		D3DXVECTOR3 posR;
+
+		if (i == 0)
+		{// 最初のスプラインの設定
+			// 次回のデータ点との差分ベクトルから側面のデータ点を算出
+			D3DXVECTOR3 vecDiff = m_listRoadPoint[i + 1].pos - m_listRoadPoint[i].pos;
+
+			float fAngle = atan2f(vecDiff.x, vecDiff.z);
+
+			fAngle += D3DX_PI * 0.5f;	// 角度を90度傾ける
+			universal::LimitRot(&fAngle);
+
+			// 角度から極座標で頂点位置を決定
+			D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngle, 0.0f));
+
+			posL = m_listRoadPoint[i].pos + vecPole * WIDTH_ROAD;
+			posR = m_listRoadPoint[i].pos - vecPole * WIDTH_ROAD;
+		}
+		else if (i == nSize - 1)
+		{// 最後のスプラインの設定
+			// 前回のデータ点との差分ベクトルから側面のデータ点を算出
+			D3DXVECTOR3 vecDiff = m_listRoadPoint[i].pos - m_listRoadPoint[i - 1].pos;
+
+			float fAngle = atan2f(vecDiff.x, vecDiff.z);
+
+			fAngle += D3DX_PI * 0.5f;	// 角度を90度傾ける
+			universal::LimitRot(&fAngle);
+
+			// 角度から極座標で頂点位置を決定
+			D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngle, 0.0f));
+
+			posL = m_listRoadPoint[i].pos + vecPole * WIDTH_ROAD;
+			posR = m_listRoadPoint[i].pos - vecPole * WIDTH_ROAD;
+		}
+		else
+		{// 中間のスプラインの設定
+			// 判断用のカーブ角度計算
+			D3DXVECTOR3 vecDiffNext = m_listRoadPoint[i + 1].pos - m_listRoadPoint[i].pos;
+			D3DXVECTOR3 vecDiffPrev = m_listRoadPoint[i - 1].pos - m_listRoadPoint[i].pos;
+
+			float fDot = universal::Vec3Dot(vecDiffNext, vecDiffPrev);
+
+			if (fDot < WIDTH_ROAD)
+			{// 緩やかなカーブの場合
+				// 前回のデータ点との差分ベクトルから側面のデータ点を算出
+				D3DXVECTOR3 vecDiff = m_listRoadPoint[i].pos - m_listRoadPoint[i - 1].pos;
+
+				float fAngle = atan2f(vecDiff.x, vecDiff.z);
+
+				fAngle += D3DX_PI * 0.5f;	// 角度を90度傾ける
+				universal::LimitRot(&fAngle);
+
+				// 角度から極座標で頂点位置を決定
+				D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngle, 0.0f));
+
+				posL = m_listRoadPoint[i].pos + vecPole * WIDTH_ROAD;
+				posR = m_listRoadPoint[i].pos - vecPole * WIDTH_ROAD;
+			}
+			else
+			{// 角度がしきい値を超えた急カーブだったら
+				// 前回のデータ点と次回のデータ点と自身の位置からできる三角形の中心座標
+				D3DXVECTOR3 posMid = (m_listRoadPoint[i].pos + m_listRoadPoint[i + 1].pos + m_listRoadPoint[i - 1].pos) / 3;
+
+				// 道幅に正規化
+				D3DXVECTOR3 vecDiff = posMid - m_listRoadPoint[i].pos;
+
+				D3DXVec3Normalize(&vecDiff, &vecDiff);
+
+				vecDiff *= WIDTH_ROAD;
+
+				bool bCross = universal::IsCross(m_listRoadPoint[i + 1].pos, m_listRoadPoint[i - 1].pos, posMid, nullptr);
+
+				if (bCross)
+				{
+					posL = m_listRoadPoint[i].pos + vecDiff;
+					posR = m_listRoadPoint[i].pos - vecDiff;
+				}
+				else
+				{
+					posL = m_listRoadPoint[i].pos - vecDiff;
+					posR = m_listRoadPoint[i].pos + vecDiff;
+				}
+			}
+		}
+
+
+		aPosL.push_back(posL);
+		aPosR.push_back(posR);
+	}
+
+	m_pSplineL = new CCutMullSpline;
+	m_pSplineR = new CCutMullSpline;
+
+	if (m_pSplineL != nullptr && m_pSplineR != nullptr)
+	{
+		m_pSplineL->Init(aPosL);
+		m_pSplineR->Init(aPosR);
 	}
 }
 

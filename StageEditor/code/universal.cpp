@@ -265,6 +265,18 @@ float ParabolaX(float y, float a)
 }
 
 //========================================
+// 3次元ベクトルの内積
+//========================================
+float Vec3Dot(D3DXVECTOR3 vec1, D3DXVECTOR3 vec2)
+{
+	float fDot = 0.0f;
+
+	fDot = vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
+
+	return fDot;
+}
+
+//========================================
 // オフセット設定処理
 //========================================
 void SetOffSet(D3DXMATRIX *pMtxWorldOffset, D3DXMATRIX mtxWorldOwner, D3DXVECTOR3 posOffset, D3DXVECTOR3 rot)
