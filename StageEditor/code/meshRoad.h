@@ -28,9 +28,10 @@ class CMeshRoad : public CObject3D
 {
 public:
 	struct SInfoRoadPoint
-	{// 辺に必要な情報
-		D3DXVECTOR3 pos;
-		SInfoRoadPoint() : pos({ 0.0f,0.0f,0.0f }) {}
+	{// ロードポイントに必要な情報
+		D3DXVECTOR3 pos;	// 位置
+		float fWidth;	// 幅
+		SInfoRoadPoint() : pos({ 0.0f,0.0f,0.0f }), fWidth(0.0f) {}
 	};
 
 	CMeshRoad(int nPriority = 3);	// コンストラクタ
@@ -49,7 +50,7 @@ public:
 	void Load(void);	// エディターのみ。ゲームでは消してね
 
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectRoadPoint(void);
-	std::vector<SInfoRoadPoint> *GetList(void) { return &m_listRoadPoint; }
+	std::vector<SInfoRoadPoint> *GetList(void) { return &m_aRoadPoint; }
 	void DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void ResetIterator(void);
 
@@ -62,7 +63,7 @@ private:
 	D3DXVECTOR3 GetPosEdge(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2);
 
 	UINT m_nNumVtx;
-	std::vector<SInfoRoadPoint> m_listRoadPoint;
+	std::vector<SInfoRoadPoint> m_aRoadPoint;
 	std::vector<SInfoRoadPoint>::iterator m_it;
 	CCutMullSpline *m_pSpline;	// スプライン
 	CCutMullSpline *m_pSplineL;	// 左側のスプライン

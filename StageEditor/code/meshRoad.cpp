@@ -80,7 +80,7 @@ CMeshRoad *CMeshRoad::Create(void)
 HRESULT CMeshRoad::Init(void)
 {
 	// リストの初期化
-	m_listRoadPoint.clear();
+	m_aRoadPoint.clear();
 
 	// テクスチャ読み込み
 	int nIdx = Texture::GetIdx(PATH_TEXTURE);
@@ -89,7 +89,7 @@ HRESULT CMeshRoad::Init(void)
 	// 読み込み処理
 	Load();
 
-	m_it = m_listRoadPoint.begin();
+	m_it = m_aRoadPoint.begin();
 
 	//EnableWire(true);
 
@@ -128,7 +128,7 @@ void CMeshRoad::Uninit(void)
 void CMeshRoad::Update(void)
 {
 #ifdef _DEBUG
-	for (SInfoRoadPoint info : m_listRoadPoint)
+	for (SInfoRoadPoint info : m_aRoadPoint)
 		CEffect3D::Create(info.pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 #endif // _DEBUG
 }
@@ -198,24 +198,24 @@ std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void
 {
 	ImGui::Text("[SelectRoadPoint]");
 
-	int nDist = std::distance(m_listRoadPoint.begin(), m_it);
-	int nSize = m_listRoadPoint.size();
+	int nDist = std::distance(m_aRoadPoint.begin(), m_it);
+	int nSize = m_aRoadPoint.size();
 
 	if (ImGui::DragInt("Index", &nDist, 1.0f, 0, nSize - 1))
 	{
 		// イテレータを再初期化して指定番号の要素に移動
-		m_it = m_listRoadPoint.begin();
+		m_it = m_aRoadPoint.begin();
 		std::advance(m_it, nDist);
 	}
 
 	if (ImGui::Button("NextEdge", ImVec2(70, 30)))
 	{
-		if(m_it != m_listRoadPoint.end() && std::next(m_it) != m_listRoadPoint.end())
+		if(m_it != m_aRoadPoint.end() && std::next(m_it) != m_aRoadPoint.end())
 			std::advance(m_it, 1);
 	}
 	if (ImGui::Button("PrevEdge", ImVec2(70, 30)))
 	{
-		if (m_it != m_listRoadPoint.begin())
+		if (m_it != m_aRoadPoint.begin())
 			std::advance(m_it, -1);
 	}
 
@@ -229,11 +229,11 @@ std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void
 //=====================================================
 void CMeshRoad::DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
 {
-	m_listRoadPoint.erase(it);
+	m_aRoadPoint.erase(it);
 
 	CreateVtxBuffEdge();
 
-	m_it = m_listRoadPoint.begin();
+	m_it = m_aRoadPoint.begin();
 }
 
 //=====================================================
@@ -241,7 +241,7 @@ void CMeshRoad::DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
 //=====================================================
 void CMeshRoad::ResetIterator(void)
 {
-	m_it = m_listRoadPoint.end() - 1;
+	m_it = m_aRoadPoint.end() - 1;
 }
 
 //=====================================================
@@ -253,7 +253,7 @@ void CMeshRoad::AddRoadPoint(D3DXVECTOR3 pos, bool bReCreateVtx)
 	SInfoRoadPoint info;
 	info.pos = pos;
 
-	m_listRoadPoint.push_back(info);
+	m_aRoadPoint.push_back(info);
 
 	if(bReCreateVtx)	// ロードポイントに応じた頂点の再生成
 		CreateVtxBuffEdge();
@@ -268,7 +268,7 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 	CreateSpline();
 
 	// 頂点の生成
-	m_nNumVtx = m_listRoadPoint.size() * MeshRoad::NUM_VTX_IN_EDGE * MeshRoad::NUM_EDGE_IN_ROADPOINT;
+	m_nNumVtx = m_aRoadPoint.size() * MeshRoad::NUM_VTX_IN_EDGE * MeshRoad::NUM_EDGE_IN_ROADPOINT;
 	CreateVtxBuff(m_nNumVtx);
 
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
@@ -280,9 +280,9 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 	std::vector<SInfoRoadPoint>::iterator itRoadPoint;
 	int nIdx = 0;
 
-	for (itRoadPoint = m_listRoadPoint.begin(); itRoadPoint != m_listRoadPoint.end(); itRoadPoint++)
+	for (itRoadPoint = m_aRoadPoint.begin(); itRoadPoint != m_aRoadPoint.end(); itRoadPoint++)
 	{
-		if (itRoadPoint != m_listRoadPoint.begin())
+		if (itRoadPoint != m_aRoadPoint.begin())
 		{
 			SInfoRoadPoint *pInfoRoadPointOld = &*std::prev(itRoadPoint);
 
@@ -355,9 +355,6 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 			{
 				pVtx[0].pos = m_pSplineL->Interpolate(fRate, nIdx);
 				pVtx[1].pos = m_pSplineR->Interpolate(fRate, nIdx);
-
-				// 辺の角度設定
-				//SetEdgeAngle(pVtx, pos, posEdgeOld);
 			}
 
 			posEdgeOld =  GetPosEdge(pVtx[0].pos, pVtx[1].pos);	// 辺の位置を保存
@@ -463,12 +460,12 @@ void CMeshRoad::CreateSpline(void)
 		std::vector<D3DXVECTOR3> vPos;
 
 		// ベクターを必要なサイズに調整
-		int nSize = m_listRoadPoint.size();
+		int nSize = m_aRoadPoint.size();
 		vPos.resize(nSize);
 		
 		for (int i = 0; i < nSize; i++)
 		{
-			vPos[i] = m_listRoadPoint[i].pos;
+			vPos[i] = m_aRoadPoint[i].pos;
 		}
 		
 		// 中心スプラインの初期化
@@ -487,7 +484,7 @@ void CMeshRoad::CreateSideSpline(void)
 	if (m_pSpline == nullptr)
 		return;
 
-	int nSize = m_listRoadPoint.size();
+	int nSize = m_aRoadPoint.size();
 
 	std::vector<D3DXVECTOR3> aPosL;
 	std::vector<D3DXVECTOR3> aPosR;
@@ -500,7 +497,7 @@ void CMeshRoad::CreateSideSpline(void)
 		if (i == 0)
 		{// 最初のスプラインの設定
 			// 次回のデータ点との差分ベクトルから側面のデータ点を算出
-			D3DXVECTOR3 vecDiff = m_listRoadPoint[i + 1].pos - m_listRoadPoint[i].pos;
+			D3DXVECTOR3 vecDiff = m_aRoadPoint[i + 1].pos - m_aRoadPoint[i].pos;
 
 			float fAngle = atan2f(vecDiff.x, vecDiff.z);
 
@@ -510,13 +507,13 @@ void CMeshRoad::CreateSideSpline(void)
 			// 角度から極座標で頂点位置を決定
 			D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngle, 0.0f));
 
-			posL = m_listRoadPoint[i].pos + vecPole * WIDTH_ROAD;
-			posR = m_listRoadPoint[i].pos - vecPole * WIDTH_ROAD;
+			posL = m_aRoadPoint[i].pos + vecPole * m_aRoadPoint[i].fWidth;
+			posR = m_aRoadPoint[i].pos - vecPole * m_aRoadPoint[i].fWidth;
 		}
 		else if (i == nSize - 1)
 		{// 最後のスプラインの設定
 			// 前回のデータ点との差分ベクトルから側面のデータ点を算出
-			D3DXVECTOR3 vecDiff = m_listRoadPoint[i].pos - m_listRoadPoint[i - 1].pos;
+			D3DXVECTOR3 vecDiff = m_aRoadPoint[i].pos - m_aRoadPoint[i - 1].pos;
 
 			float fAngle = atan2f(vecDiff.x, vecDiff.z);
 
@@ -526,21 +523,21 @@ void CMeshRoad::CreateSideSpline(void)
 			// 角度から極座標で頂点位置を決定
 			D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngle, 0.0f));
 
-			posL = m_listRoadPoint[i].pos + vecPole * WIDTH_ROAD;
-			posR = m_listRoadPoint[i].pos - vecPole * WIDTH_ROAD;
+			posL = m_aRoadPoint[i].pos + vecPole * m_aRoadPoint[i].fWidth;
+			posR = m_aRoadPoint[i].pos - vecPole * m_aRoadPoint[i].fWidth;
 		}
 		else
 		{// 中間のスプラインの設定
 			// 判断用のカーブ角度計算
-			D3DXVECTOR3 vecDiffNext = m_listRoadPoint[i + 1].pos - m_listRoadPoint[i].pos;
-			D3DXVECTOR3 vecDiffPrev = m_listRoadPoint[i - 1].pos - m_listRoadPoint[i].pos;
+			D3DXVECTOR3 vecDiffNext = m_aRoadPoint[i + 1].pos - m_aRoadPoint[i].pos;
+			D3DXVECTOR3 vecDiffPrev = m_aRoadPoint[i - 1].pos - m_aRoadPoint[i].pos;
 
 			float fDot = universal::Vec3Dot(vecDiffNext, vecDiffPrev);
 
-			if (fDot < WIDTH_ROAD)
+			if (fDot < m_aRoadPoint[i].fWidth)
 			{// 緩やかなカーブの場合
 				// 前回のデータ点との差分ベクトルから側面のデータ点を算出
-				D3DXVECTOR3 vecDiff = m_listRoadPoint[i].pos - m_listRoadPoint[i - 1].pos;
+				D3DXVECTOR3 vecDiff = m_aRoadPoint[i].pos - m_aRoadPoint[i - 1].pos;
 
 				float fAngle = atan2f(vecDiff.x, vecDiff.z);
 
@@ -550,32 +547,32 @@ void CMeshRoad::CreateSideSpline(void)
 				// 角度から極座標で頂点位置を決定
 				D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fAngle, 0.0f));
 
-				posL = m_listRoadPoint[i].pos + vecPole * WIDTH_ROAD;
-				posR = m_listRoadPoint[i].pos - vecPole * WIDTH_ROAD;
+				posL = m_aRoadPoint[i].pos + vecPole * m_aRoadPoint[i].fWidth;
+				posR = m_aRoadPoint[i].pos - vecPole * m_aRoadPoint[i].fWidth;
 			}
 			else
 			{// 角度がしきい値を超えた急カーブだったら
 				// 前回のデータ点と次回のデータ点と自身の位置からできる三角形の中心座標
-				D3DXVECTOR3 posMid = (m_listRoadPoint[i].pos + m_listRoadPoint[i + 1].pos + m_listRoadPoint[i - 1].pos) / 3;
+				D3DXVECTOR3 posMid = (m_aRoadPoint[i].pos + m_aRoadPoint[i + 1].pos + m_aRoadPoint[i - 1].pos) / 3;
 
 				// 道幅に正規化
-				D3DXVECTOR3 vecDiff = posMid - m_listRoadPoint[i].pos;
+				D3DXVECTOR3 vecDiff = posMid - m_aRoadPoint[i].pos;
 
 				D3DXVec3Normalize(&vecDiff, &vecDiff);
 
-				vecDiff *= WIDTH_ROAD;
+				vecDiff *= m_aRoadPoint[i].fWidth;
 
-				bool bCross = universal::IsCross(m_listRoadPoint[i + 1].pos, m_listRoadPoint[i - 1].pos, posMid, nullptr);
+				bool bCross = universal::IsCross(m_aRoadPoint[i + 1].pos, m_aRoadPoint[i - 1].pos, posMid, nullptr);
 
 				if (bCross)
 				{
-					posL = m_listRoadPoint[i].pos + vecDiff;
-					posR = m_listRoadPoint[i].pos - vecDiff;
+					posL = m_aRoadPoint[i].pos + vecDiff;
+					posR = m_aRoadPoint[i].pos - vecDiff;
 				}
 				else
 				{
-					posL = m_listRoadPoint[i].pos - vecDiff;
-					posR = m_listRoadPoint[i].pos + vecDiff;
+					posL = m_aRoadPoint[i].pos - vecDiff;
+					posR = m_aRoadPoint[i].pos + vecDiff;
 				}
 			}
 		}
@@ -607,11 +604,11 @@ void CMeshRoad::Save(void)
 		assert(("メッシュロードのファイルを開けませんでした", false));
 	
 	// 情報数保存
-	size_t size = m_listRoadPoint.size();
+	size_t size = m_aRoadPoint.size();
 	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
 	// リストの情報保存
-	outputFile.write(reinterpret_cast<const char*>(m_listRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
+	outputFile.write(reinterpret_cast<char*>(m_aRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
 
 	outputFile.close();
 }
@@ -621,7 +618,7 @@ void CMeshRoad::Save(void)
 //=====================================================
 void CMeshRoad::Load(void)
 {
-	m_listRoadPoint.clear();
+	m_aRoadPoint.clear();
 
 	// ファイルを開く
 	std::ifstream inputFile(PATH_SAVE, std::ios::binary);
@@ -632,10 +629,15 @@ void CMeshRoad::Load(void)
 	// データ数読み込み
 	size_t size;
 	inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
-	m_listRoadPoint.resize(size);
+	m_aRoadPoint.resize(size);
+
+	for (auto it : m_aRoadPoint)
+	{// 道幅のリセット
+		it.fWidth = WIDTH_ROAD;
+	}
 
 	// 辺データ読み込み
-	inputFile.read(reinterpret_cast<char*>(m_listRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
+	inputFile.read(reinterpret_cast<char*>(m_aRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
 
 	inputFile.close();
 

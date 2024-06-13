@@ -317,6 +317,7 @@ void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 	CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 	// ロードポイントの選択
+	// 位置の調整
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectRoadPoint();
 
 	D3DXVECTOR3 pos = it->pos;
@@ -326,6 +327,11 @@ void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 	ImGui::DragFloat("posRoadPointPOS.Z", &pos.z, 2.0f, -FLT_MAX, FLT_MAX);
 
 	it->pos = pos;
+
+	// 幅の調整
+	float fWidth = it->fWidth;
+	ImGui::DragFloat("Width", &fWidth, 2.0f, -FLT_MAX, FLT_MAX);
+	it->fWidth = fWidth;
 
 	pMesh->CreateVtxBuffEdge();
 }
