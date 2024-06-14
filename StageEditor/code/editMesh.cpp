@@ -223,7 +223,7 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 void CStateEditMeshCreateMesh::LimitPos(D3DXVECTOR3 *pPos)
 {// 位置の制限
 	// リストの取得
-	CMeshRoad *pMesh = MeshRoad::GetInstance();
+	CMeshRoad *pMesh = CMeshRoad::GetInstance();
 	
 	std::vector<CMeshRoad::SInfoRoadPoint> *pVectorRoadPoint = pMesh->GetList();
 	
@@ -246,7 +246,7 @@ void CStateEditMeshCreateMesh::LimitPos(D3DXVECTOR3 *pPos)
 //=====================================================
 CStateEditMeshCreateTunnel::CStateEditMeshCreateTunnel() : m_bEnd(false)
 {
-	CMeshRoad *pMeshRoad = MeshRoad::GetInstance();
+	CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
 	pMeshRoad->ResetIterator();
 }
 
@@ -293,10 +293,9 @@ void CStateEditMeshCreateTunnel::SetTunnel(std::vector<CMeshRoad::SInfoRoadPoint
 		m_itStart = it;
 		m_bEnd = true;
 	}
-	else if (!m_bEnd)
+	else if (m_bEnd)
 	{// 最後の辺を設定
 		m_itEnd = it;
-		m_bEnd = true;
 
 		// トンネルの生成
 		CTunnel::Create(m_itStart, m_itEnd);
@@ -308,16 +307,17 @@ void CStateEditMeshCreateTunnel::SetTunnel(std::vector<CMeshRoad::SInfoRoadPoint
 //****************************************************************************************
 CStateEditMeshAdjustRoadPoint::CStateEditMeshAdjustRoadPoint()
 {// コンストラクタ
-	CMeshRoad *pMesh = MeshRoad::GetInstance();
+	CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 	pMesh->ResetIterator();
 }
 
 void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 {
-	CMeshRoad *pMesh = MeshRoad::GetInstance();
+	CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 	// ロードポイントの選択
+	// 位置の調整
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectRoadPoint();
 
 	D3DXVECTOR3 pos = it->pos;
@@ -328,6 +328,11 @@ void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 
 	it->pos = pos;
 
+	// 幅の調整
+	float fWidth = it->fWidth;
+	ImGui::DragFloat("Width", &fWidth, 2.0f, -FLT_MAX, FLT_MAX);
+	it->fWidth = fWidth;
+
 	pMesh->CreateVtxBuffEdge();
 }
 
@@ -336,14 +341,14 @@ void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 //****************************************************************************************
 CStateEditMeshDeleteRoadPoint::CStateEditMeshDeleteRoadPoint()
 {// コンストラクタ
-	CMeshRoad *pMesh = MeshRoad::GetInstance();
+	CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 	pMesh->ResetIterator();
 }
 
 void CStateEditMeshDeleteRoadPoint::Update(CEditMesh *pEdit)
 {
-	CMeshRoad *pMesh = MeshRoad::GetInstance();
+	CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 	// 辺の選択
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectRoadPoint();
