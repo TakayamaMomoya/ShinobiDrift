@@ -711,6 +711,7 @@ void CPlayer::Collision(void)
 {
 	// 前回の位置を保存
 	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 posCol = GetPosition();
 	D3DXVECTOR3 move = GetMove();
 	D3DXVECTOR3 rot = GetRotation();
 	D3DXVECTOR3 posParts[2];
@@ -718,29 +719,20 @@ void CPlayer::Collision(void)
 	D3DXVECTOR3 posDef;
 	bool bRoad[2];
 
-	if (CInputKeyboard::GetInstance() != nullptr)
-	{
-		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_SPACE))
-		{// 操作方法変更
-			pos.y = 1500.0f;
-			rot.x = -2.0f;
-		}
-	}
-
 	// タイヤの位置保存
-	posParts[0].x = GetParts(2)->pParts->GetMatrix()->_41;
-	posParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y);
-	posParts[0].z = GetParts(2)->pParts->GetMatrix()->_43;
-	posParts[1].x = GetParts(3)->pParts->GetMatrix()->_41;
-	posParts[1].y = GetParts(3)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y);
-	posParts[1].z = GetParts(3)->pParts->GetMatrix()->_43;
+	posParts[0].x = GetParts(2)->pParts->GetMatrix()->_41 + (pos.x - GetPositionOld().x);
+	posParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y) - 41.05f;
+	posParts[0].z = GetParts(2)->pParts->GetMatrix()->_43 + (pos.z - GetPositionOld().z);
+	posParts[1].x = GetParts(3)->pParts->GetMatrix()->_41 + (pos.x - GetPositionOld().x);
+	posParts[1].y = GetParts(3)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y) - 41.1f;
+	posParts[1].z = GetParts(3)->pParts->GetMatrix()->_43 + (pos.z - GetPositionOld().z);
 
 	// タイヤの過去位置保存
 	posOldParts[0].x = GetParts(2)->pParts->GetMatrix()->_41;
-	posOldParts[0].y = GetParts(2)->pParts->GetMatrix()->_42;
+	posOldParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 - 41.05f;
 	posOldParts[0].z = GetParts(2)->pParts->GetMatrix()->_43;
 	posOldParts[1].x = GetParts(3)->pParts->GetMatrix()->_41;
-	posOldParts[1].y = GetParts(3)->pParts->GetMatrix()->_42;
+	posOldParts[1].y = GetParts(3)->pParts->GetMatrix()->_42 - 41.1f;
 	posOldParts[1].z = GetParts(3)->pParts->GetMatrix()->_43;
 
 	// タイヤの中点を計算
@@ -763,11 +755,11 @@ void CPlayer::Collision(void)
 		// 角度によって重力変更
 		if (rot.x > 0.0f)
 		{
-			move.y = -10.0f;
+			move.y = -20.0f;
 		}
 		else
 		{
-			move.y = -1.0f;
+			move.y = -0.1f;
 		}
 	}
 	else if (bRoad[0])
@@ -781,6 +773,16 @@ void CPlayer::Collision(void)
 	else
 	{// タイヤがどちらも道に触れていないとき
 		rot.x += 0.01f;
+	}
+
+	if (CInputKeyboard::GetInstance() != nullptr)
+	{
+		if (CInputKeyboard::GetInstance()->GetPress(DIK_SPACE))
+		{// 操作方法変更
+			pos.y += 10.0f;
+			move.y = 0.0f;
+			rot.x = 0.0f;
+		}
 	}
 
 	// 位置と移動量と角度を代入

@@ -474,7 +474,7 @@ bool IsOnPolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTO
 				D3DXVec3Cross(&vecTemp, &(posOldTarget - vtx3), &(vtx2 - vtx3))->y <= 0 &&
 				D3DXVec3Cross(&vecTemp, &(posOldTarget - vtx2), &(vtx4 - vtx2))->y < 0)
 			{
-				if (fHeight > posTarget.y && fHeightOld <= posOldTarget.y)
+				if (fHeight > posTarget.y)
 				{
 					rHeight = fHeight;
 					return true;
@@ -489,15 +489,15 @@ bool IsOnPolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTO
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &(vtx4 - vtx2))->y < 0)
 	{
 		// 角から目標位置へのベクトル
-		vecP = posTarget - vtx1;
-		vecPOld = posOldTarget - vtx1;
+		vecP = posTarget - vtx4;
+		vecPOld = posOldTarget - vtx4;
 
 		// y軸法線が0ではないか判定
 		if (vtxNor2.y != 0.0f)
 		{
 			// 内積を用いて高さを計算
-			fHeight = -(((vtxNor2.x * vecP.x) + (vtxNor2.z * vecP.z)) / vtxNor2.y) + vtx1.y;
-			fHeightOld = -(((vtxNor1.x * vecPOld.x) + (vtxNor1.z * vecPOld.z)) / vtxNor1.y) + vtx1.y;
+			fHeight = -(((vtxNor2.x * vecP.x) + (vtxNor2.z * vecP.z)) / vtxNor2.y) + vtx4.y;
+			fHeightOld = -(((vtxNor1.x * vecPOld.x) + (vtxNor1.z * vecPOld.z)) / vtxNor1.y) + vtx4.y;
 
 			// 高さが目標位置より高いか判定
 			if (fHeight > posTarget.y)
@@ -511,7 +511,7 @@ bool IsOnPolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTO
 				D3DXVec3Cross(&vecTemp, &(posOldTarget - vtx2), &(vtx3 - vtx2))->y <= 0 &&
 				D3DXVec3Cross(&vecTemp, &(posOldTarget - vtx3), &(vtx1 - vtx3))->y < 0)
 			{
-				if (fHeight > posTarget.y && fHeightOld <= posOldTarget.y)
+				if (fHeight > posTarget.y)
 				{
 					rHeight = fHeight;
 					return true;
