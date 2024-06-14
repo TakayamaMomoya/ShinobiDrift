@@ -13,6 +13,7 @@
 #include "texture.h"
 #include "effect3D.h"
 #include "myLib.h"
+#include "inputkeyboard.h"
 #include <fstream>
 
 //*****************************************************
@@ -130,6 +131,11 @@ void CMeshRoad::Update(void)
 #ifdef _DEBUG
 	for (SInfoRoadPoint info : m_aRoadPoint)
 		CEffect3D::Create(info.pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
+	if(CInputKeyboard::GetInstance()->GetTrigger(DIK_UP))
+		m_effectNum++;
+	if (CInputKeyboard::GetInstance()->GetTrigger(DIK_DOWN))
+		m_effectNum--;
 #endif // _DEBUG
 }
 
