@@ -69,8 +69,6 @@ void CCamera::Update(void)
 	{
 		m_pBehavior->Update(this);
 	}
-
-	//Quake();	// ƒJƒƒ‰—h‚ê
 }
 
 //====================================================
