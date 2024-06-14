@@ -49,6 +49,8 @@ public:
 	void Save(void);	// エディターのみ。ゲームでは消してね
 	void Load(void);	// エディターのみ。ゲームでは消してね
 
+	bool CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld);
+
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectRoadPoint(void);
 	std::vector<SInfoRoadPoint> *GetList(void) { return &m_aRoadPoint; }
 	void DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
@@ -68,6 +70,8 @@ private:
 	CCutMullSpline *m_pSpline;	// スプライン
 	CCutMullSpline *m_pSplineL;	// 左側のスプライン
 	CCutMullSpline *m_pSplineR;	// 右側のスプライン
+
+	int m_effectNum;
 	static CMeshRoad *m_pMeshRoad;	// 自身のポインタ
 };
 

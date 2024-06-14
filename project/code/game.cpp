@@ -202,23 +202,6 @@ void CGame::ManageState(void)
 }
 
 //=====================================================
-// イベントカメラの設定
-//=====================================================
-void CGame::SetEventCamera(float fTime, D3DXVECTOR3 posRDest, D3DXVECTOR3 posVDest)
-{
-	CCamera *pCamera = CManager::GetCamera();
-
-	if (pCamera != nullptr)
-	{
-		pCamera->SetEventTimer(fTime);
-		pCamera->SetPosRDest(posRDest);
-		pCamera->SetPosVDest(posVDest);
-
-		EnableStop(true);
-	}
-}
-
-//=====================================================
 // デバッグ処理
 //=====================================================
 void CGame::Debug(void)
