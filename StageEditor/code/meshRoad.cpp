@@ -593,6 +593,69 @@ void CMeshRoad::CreateSideSpline(void)
 }
 
 //=====================================================
+// 当たり判定処理
+//=====================================================
+bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
+{
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
+	VERTEX_3D* pVtx;
+	float fHeight = pPos->y;
+	float fHeightDef = 0.0f;
+	int nRoadPointCount = 0;
+	bool bColRoad = false;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+	int effectNum = 0;
+
+	for (auto itRoadPoint : m_aRoadPoint)
+	{
+		for (int i = 0; i < MeshRoad::NUM_EDGE_IN_ROADPOINT; i++)
+		{
+			// ポリゴンの上に乗っているか判定する
+			if (universal::IsOnPolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
+			{// 当たっていたら
+
+				if (fHeightDef > fHeight || (i == 0 && nRoadPointCount == 0))
+				{
+					fHeightDef = fHeight;
+				}
+
+				bColRoad = true;
+			}
+
+#ifdef _DEBUG
+			// デバッグ用のエフェクト
+			if (m_effectNum == effectNum)
+			{
+				CEffect3D::Create(pVtx[0].pos, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
+				CEffect3D::Create(pVtx[1].pos, 50.0f, 5, D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.5f));
+				CEffect3D::Create(pVtx[2].pos, 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
+				CEffect3D::Create(pVtx[3].pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+
+				CEffect3D::Create(pVtx[0].pos + (pVtx[0].nor * 50.0f), 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
+				CEffect3D::Create(pVtx[1].pos + (pVtx[1].nor * 50.0f), 50.0f, 5, D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.5f));
+				CEffect3D::Create(pVtx[2].pos + (pVtx[2].nor * 50.0f), 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
+				CEffect3D::Create(pVtx[3].pos + (pVtx[3].nor * 50.0f), 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+			}
+			effectNum++;
+#endif
+
+			pVtx += MeshRoad::NUM_VTX_IN_EDGE;
+		}
+
+		nRoadPointCount++;
+	}
+
+	pPos->y = fHeight;
+
+	// 頂点バッファをアンロック
+	pVtxBuff->Unlock();
+
+	return bColRoad;
+}
+
+//=====================================================
 // 保存処理
 //=====================================================
 void CMeshRoad::Save(void)
