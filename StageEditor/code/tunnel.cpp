@@ -17,7 +17,7 @@
 //*****************************************************
 namespace
 {
-const int MESH_U = 16;	// 横の分割数
+const int MESH_U = 32;	// 横の分割数
 const float MESH_HEIGHT = 50.0f;	// メッシュの高さ
 const char* TEX_PATH = "data\\TEXTURE\\MATERIAL\\concrete.jpg";	// テクスチャパス
 const int NUM_VTX_IN_EDGE = 5;	// 辺の中にある頂点数
@@ -139,8 +139,6 @@ void CTunnel::VtxFollowRoad(void)
 
 		for (int i = 0; i < nDistBetween; i++)
 		{
-			CEffect3D::Create(pVtx[0].pos, 200.0f, 5000, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
-
 			vectorPosEdge.push_back(pVtx[0].pos);
 
 			pVtx++;
@@ -167,12 +165,40 @@ void CTunnel::VtxFollowRoad(void)
 
 	for (int i = 0; i < nMeshV + 1; i++)
 	{
-		for (int j = 0; j < MESH_U + 1; j++)
-		{
-			CEffect3D::Create(pVtx[0].pos, 10.0f, 5000, D3DXCOLOR(1.0f, 1.0f - 0.1 * j, 0.0f, 1.0f));
+		int nIdx = i * 2;
 
-			pVtx++;
+		D3DXVECTOR3 pos1;
+		D3DXVECTOR3 pos2;
+
+		if (i == nMeshV)
+		{
+			pos1 = vectorPosEdge[nMeshV * 2 - 2];
+			pos2 = vectorPosEdge[nMeshV * 2 - 1];
 		}
+		else
+		{
+			pos1 = vectorPosEdge[nIdx];
+			pos2 = vectorPosEdge[nIdx + 1];
+		}
+
+		D3DXVECTOR3 vecDiff = pos2 - pos1;
+
+		float fWidthRoad = sqrtf(vecDiff.x * vecDiff.x + vecDiff.z * vecDiff.z) * 0.5f;
+
+		for (int j = 0; j <= MESH_U / 2; j++)
+		{
+			float fRate = (float)j / (MESH_U / 2);
+			
+			pVtx[j].pos = pos1 + vecDiff * 0.5f * cosf(D3DX_PI * fRate) + vecDiff * 0.5f;
+
+			float fHeight = sinf(D3DX_PI * fRate) * fWidthRoad;
+			pVtx[j].pos.y += fHeight;
+
+			pVtx[MESH_U - j].pos = pVtx[j].pos;
+			pVtx[MESH_U - j].pos.y -= fHeight * 2;
+		}
+
+		pVtx += MESH_U + 1;
 	}
 
 	// 頂点バッファをアンロック
