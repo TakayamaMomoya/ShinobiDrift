@@ -34,6 +34,8 @@ public:
 
 private:
 	//メンバ変数
+	int m_nTransitionTime = 0;		// 遷移時間
+
 	CPlayer* m_pPlayer;		// プレイヤーのポインタ
 	CObject3D* m_pObj3D;	// オブジェクト3Dのポインタ
 };
