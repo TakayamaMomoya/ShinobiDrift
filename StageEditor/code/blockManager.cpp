@@ -190,7 +190,6 @@ void CBlockManager::LoadMap(FILE *pFile, char *pTemp, CBlock *pBlock)
 	{
 		while (true)
 		{
-			//ï∂éöì«Ç›çûÇ›
 			(void)fscanf(pFile, "%s", pTemp);
 
 			if (pBlock != nullptr)

@@ -20,6 +20,7 @@
 //*****************************************************
 class CSpline;
 class CCutMullSpline;
+class CTunnel;
 
 //*****************************************************
 // クラスの定義
@@ -53,6 +54,7 @@ public:
 
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectRoadPoint(void);
 	std::vector<SInfoRoadPoint> *GetList(void) { return &m_aRoadPoint; }
+	std::vector<CTunnel*> *GetArrayTunnel(void) { return &m_aTunnel; }
 	void DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void ResetIterator(void);
 
@@ -70,6 +72,7 @@ private:
 	CCutMullSpline *m_pSpline;	// スプライン
 	CCutMullSpline *m_pSplineL;	// 左側のスプライン
 	CCutMullSpline *m_pSplineR;	// 右側のスプライン
+	std::vector<CTunnel*> m_aTunnel;	// トンネルのポインタの配列
 
 	int m_effectNum;
 	static CMeshRoad *m_pMeshRoad;	// 自身のポインタ
