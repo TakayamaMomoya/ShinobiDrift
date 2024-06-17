@@ -331,6 +331,8 @@ void CObject::DrawAll(void)
 	// オブジェクトの描画
 	DrawObject(true);
 
+	DrawObject(false);
+
 	if (CManager::GetMyEffekseer() != nullptr)
 	{// エフェクシアの更新
 		CManager::GetMyEffekseer()->Update();
@@ -404,8 +406,23 @@ void CObject::DrawObject(bool bBlur)
 
 			pDevice->SetRenderState(D3DRS_FOGENABLE, pObject->m_bFog && CRenderer::GetInstance()->IsFog());
 
+			CBlur *pBlur = CBlur::GetInstance();
+
+			if (pObject->m_bBlur != bBlur)
+			{
+				if (pBlur != nullptr)
+				{
+					pBlur->SetRenderToNotBlur();
+				}
+			}
+
 			// 描画処理
 			pObject->Draw();
+
+			if (pBlur != nullptr)
+			{
+				pBlur->RestoreTargetBlur();
+			}
 
 			if (pObject->m_bWire)
 			{

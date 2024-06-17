@@ -77,7 +77,7 @@ HRESULT CGame::Init(void)
 	// ３Dアニメーション管理の生成
 	CAnimEffect3D::Create();
 
-	Sound::Play(CSound::LABEL_BGM_GAME01);
+	//Sound::Play(CSound::LABEL_BGM_GAME01);
 
 	// フォグをかける
 	CRenderer *pRenderer = CRenderer::GetInstance();
@@ -97,13 +97,13 @@ HRESULT CGame::Init(void)
 	CSlow::Create();
 
 	// タイマー生成
-	CTimer::Create();
+	//CTimer::Create();
 
 	// メーター生成
-	CMeter::Create();
+	//CMeter::Create();
 
 	// ゴール生成
-	CGoal::Create();
+	//CGoal::Create();
 
 	// メッシュロード生成
 	CMeshRoad::Create();

@@ -91,7 +91,7 @@ void CSkybox::Draw(void)
 	if (pRenderer->IsFog())
 	{
 		// フォグを有効化
-		pDevice->SetRenderState(D3DRS_FOGENABLE, TRUE);
+		//pDevice->SetRenderState(D3DRS_FOGENABLE, TRUE);
 	}
 }
 

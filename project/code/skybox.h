@@ -19,7 +19,7 @@
 class CSkybox : public CObjectX
 {
 public:
-	CSkybox(int nPriority = 3);	// コンストラクタ
+	CSkybox(int nPriority = 5);	// コンストラクタ
 	~CSkybox();	// デストラクタ
 
 	HRESULT Init(void);
