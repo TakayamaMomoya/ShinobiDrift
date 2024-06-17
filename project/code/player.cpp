@@ -18,7 +18,6 @@
 #include "inputkeyboard.h"
 #include "pause.h"
 #include "debugproc.h"
-#include <string>
 #include "blockManager.h"
 #include "effect3D.h"
 #include "object3D.h"
