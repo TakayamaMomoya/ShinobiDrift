@@ -25,6 +25,7 @@
 #include "blur.h"
 #include "renderer.h"
 #include "meshRoad.h"
+#include "player_ninja.h"
 
 //*****************************************************
 // 定数定義
@@ -103,6 +104,19 @@ HRESULT CPlayer::Init(void)
 
 	// モデルの設定
 	CMotion::Load(&m_param.aPathBody[0]);
+
+	// バイクに乗っている忍者の初期化とモデルの設定
+	if (m_pPlayerNinja == nullptr)
+	{
+		m_pPlayerNinja = new CMotion;
+
+		if (m_pPlayerNinja != nullptr)
+		{
+			m_pPlayerNinja->Init();
+			m_pPlayerNinja->Load("data\\MOTION\\motionPlayer.txt");
+			m_pPlayerNinja->SetMatrix(*GetMatrix());
+		}
+	}
 
 	m_info.pRoap = CObject3D::Create(GetPosition());
 
@@ -209,6 +223,14 @@ void CPlayer::Update(void)
 
 	// 継承クラスの更新
 	CMotion::Update();
+
+	if (m_pPlayerNinja != nullptr)
+	{
+		m_pPlayerNinja->SetPosition(D3DXVECTOR3(pos.x, pos.y + 50.0f, pos.z));
+		m_pPlayerNinja->SetRotation(GetRotation());
+		m_pPlayerNinja->Update();
+	}
+		
 
 // デバッグ処理
 #if _DEBUG
@@ -924,6 +946,11 @@ void CPlayer::Draw(void)
 
 	// 継承クラスの描画
 	CMotion::Draw();
+
+	if (m_pPlayerNinja != nullptr)
+	{
+		m_pPlayerNinja->Draw();
+	}
 
 	if (pBlur != nullptr)
 	{
