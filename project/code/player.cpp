@@ -25,7 +25,6 @@
 #include "blur.h"
 #include "renderer.h"
 #include "meshRoad.h"
-#include "player_ninja.h"
 
 //*****************************************************
 // ’è”’è‹`
