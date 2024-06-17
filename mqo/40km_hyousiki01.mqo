@@ -4,8 +4,8 @@ Format Text Ver 1.0
 Scene {
 	pos -184.6667 -541.0173 6144.0015
 	lookat 0.0000 0.0000 0.0000
-	head 0.0464
-	pich 0.1036
+	head 0.0764
+	pich 0.1736
 	bank 0.0000
 	ortho 0
 	zoom2 1.2206
@@ -18,9 +18,9 @@ Scene {
 	}
 }
 Material 3 {
-	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\23453717.png")
-	"mat2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Pictures\team\tukoukinsi.png")
-	"mat3" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.150) spc(0.000) power(5.00) tex("C:\Users\student\Pictures\team\metal_00003.jpg")
+	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Desktop\クローン\ShinobiDrift\project\data\TEXTURE\MATERIAL\40km.png")
+	"mat2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Desktop\クローン\ShinobiDrift\project\data\TEXTURE\MATERIAL\tukoukinsi.png")
+	"mat3" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.150) spc(0.000) power(5.00) tex("C:\Users\student\Desktop\クローン\ShinobiDrift\project\data\TEXTURE\MATERIAL\metal_00003.jpg")
 }
 Object "obj1" {
 	visible 15

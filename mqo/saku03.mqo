@@ -19,7 +19,7 @@ Scene {
 }
 Material 2 {
 	"mat1" col(0.447 0.553 0.671 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
-	"mat2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Pictures\team\metal_00003.jpg")
+	"mat2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Desktop\ÉNÉçÅ[Éì\ShinobiDrift\project\data\TEXTURE\MATERIAL\metal_00003.jpg")
 }
 Object "obj1" {
 	visible 15

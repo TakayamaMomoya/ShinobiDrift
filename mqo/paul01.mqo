@@ -5,7 +5,7 @@ Scene {
 	pos -3.3666 -96.8593 6144.0000
 	lookat 0.0000 0.0000 0.0000
 	head 18.8549
-	pich 0.4692
+	pich 0.2992
 	bank 0.0000
 	ortho 0
 	zoom2 1.2207
@@ -18,7 +18,7 @@ Scene {
 	}
 }
 Material 2 {
-	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Pictures\team\23119576.png")
+	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Desktop\ÉNÉçÅ[Éì\ShinobiDrift\project\data\TEXTURE\MATERIAL\paul.png")
 	"mat2" col(1.000 0.675 0.388 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
 }
 Object "obj1" {

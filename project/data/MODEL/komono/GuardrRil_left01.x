@@ -347,7 +347,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\クローン\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\GardRail01.png";
+    "data\\TEXTURE\\MATERIAL\\GardRail01.png";
    }
   }
   Material {
@@ -356,7 +356,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.050000;0.050000;0.050000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\クローン\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\metal_00003.jpg";
+    data\\TEXTURE\\MATERIAL\\metal_00003.jpg";
    }
   }
  }

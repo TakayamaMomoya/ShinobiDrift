@@ -4,8 +4,8 @@ Format Text Ver 1.0
 Scene {
 	pos -21.3390 -155.5453 2328.3064
 	lookat 0.0000 0.0000 0.0000
-	head -12.5967
-	pich 0.0608
+	head -12.6167
+	pich 0.0308
 	bank -0.0100
 	ortho 0
 	zoom2 3.2212
@@ -19,7 +19,7 @@ Scene {
 }
 Material 2 {
 	"mat1" col(1.000 0.000 0.035 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
-	"mat2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\traffic_cone-1.png")
+	"mat2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Desktop\ÉNÉçÅ[Éì\ShinobiDrift\project\data\TEXTURE\MATERIAL\traffic_cone-1.png")
 }
 Object "obj1" {
 	visible 15

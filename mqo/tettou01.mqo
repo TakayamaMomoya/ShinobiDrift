@@ -2,13 +2,13 @@ Metasequoia Document
 Format Text Ver 1.0
 
 Scene {
-	pos -1055.6998 -2154.7837 39062.5000
+	pos -839.3267 -2109.8760 24414.0625
 	lookat 0.0000 0.0000 0.0000
-	head 38.8102
-	pich 0.0692
+	head 37.6202
+	pich 0.0392
 	bank 0.0100
 	ortho 0
-	zoom2 0.1920
+	zoom2 0.3072
 	amb 0.250 0.250 0.250
 	dirlights 1 {
 		light {
@@ -19,7 +19,7 @@ Scene {
 }
 Material 2 {
 	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\145150.png")
-	"mat2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.200) spc(0.000) power(5.00) tex("C:\Users\student\Pictures\team\metal_00003.jpg")
+	"mat2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.200) spc(0.000) power(5.00) tex("C:\Users\student\Desktop\ÉNÉçÅ[Éì\ShinobiDrift\project\data\TEXTURE\MATERIAL\metal_00003.jpg")
 }
 Object "obj1" {
 	visible 15

@@ -4,8 +4,8 @@ Format Text Ver 1.0
 Scene {
 	pos -159.3315 -330.7035 3840.0000
 	lookat 0.0000 0.0000 0.0000
-	head 6.3064
-	pich 0.0808
+	head 6.2264
+	pich 0.0008
 	bank 0.0000
 	ortho 0
 	zoom2 1.9531
@@ -18,8 +18,8 @@ Scene {
 	}
 }
 Material 3 {
-	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Pictures\team\metal_00003.jpg")
-	"mat2" col(0.180 0.106 0.090 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Pictures\team\metal_00003.jpg")
+	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Desktop\クローン\ShinobiDrift\project\data\TEXTURE\MATERIAL\metal_00003.jpg")
+	"mat2" col(0.180 0.106 0.090 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Desktop\クローン\ShinobiDrift\project\data\TEXTURE\MATERIAL\metal_00003.jpg")
 	"mat3" col(0.812 0.812 0.812 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00)
 }
 Object "obj1" {

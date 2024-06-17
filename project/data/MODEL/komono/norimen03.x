@@ -165,7 +165,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\22130766_m.jpg";
+    "data\\TEXTURE\\MATERIAL\\norimen.jpg";
    }
   }
  }

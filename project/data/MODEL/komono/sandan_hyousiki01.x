@@ -209,49 +209,49 @@ Mesh {
  4;37,36,35,34;;
  
  MeshMaterialList {
-  8;
+  7;
   34;
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  6,
-  0,
-  7,
-  1,
-  7,
-  2,
-  7,
-  3,
   5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  5,
+  0,
+  6,
+  1,
+  6,
+  2,
+  6,
+  3,
+  6,
   4,
-  7;;
+  6;;
   Material {
    0.800000;0.800000;0.800000;1.000000;;
    5.000000;
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\2534269.png";
+    "data\\TEXTURE\\MATERIAL\\carb01.png";
    }
   }
   Material {
@@ -260,7 +260,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\hyousiki01.jpg";
+    "data\\TEXTURE\\MATERIAL\\hyousiki01.jpg";
    }
   }
   Material {
@@ -269,7 +269,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\hyousiki03.png";
+    "data\\TEXTURE\\MATERIAL\\keisya01.png";
    }
   }
   Material {
@@ -278,7 +278,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\hyousiki02.png";
+    "data\\TEXTURE\\MATERIAL\\hyousiki02.png";
    }
   }
   Material {
@@ -287,14 +287,8 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\hyousiki04.png";
+    "data\\TEXTURE\\MATERIAL\\slip01.png";
    }
-  }
-  Material {
-   0.800000;0.800000;0.800000;1.000000;;
-   5.000000;
-   0.000000;0.000000;0.000000;;
-   0.000000;0.000000;0.000000;;
   }
   Material {
    0.800000;0.800000;0.800000;1.000000;;
@@ -302,7 +296,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.150000;0.150000;0.150000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\metal_00003.jpg";
+    "data\\TEXTURE\\MATERIAL\\metal_00003.jpg";
    }
   }
   Material {
