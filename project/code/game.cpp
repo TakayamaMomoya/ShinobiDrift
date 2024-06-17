@@ -102,11 +102,11 @@ HRESULT CGame::Init(void)
 	// メーター生成
 	CMeter::Create();
 
-	// メッシュロード生成
-	CMeshRoad::Create();
-
 	// ゴール生成
 	CGoal::Create();
+
+	// メッシュロード生成
+	CMeshRoad::Create();
 
 	return S_OK;
 }
