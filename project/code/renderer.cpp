@@ -270,15 +270,15 @@ void CRenderer::Draw(void)
 
 		CDebugProc::GetInstance()->Draw();
 
+		CBlur *pBlur = CBlur::GetInstance();
+
+		if (pBlur != nullptr)
+		{
+			pBlur->ClearNotBlur();
+		}
+
 		// 描画終了
 		m_pD3DDevice->EndScene();
-	}
-
-	CBlur *pBlur = CBlur::GetInstance();
-
-	if (pBlur != nullptr)
-	{
-		pBlur->ClearNotBlur();
 	}
 
 	// バック・フロントバッファを入れ替える

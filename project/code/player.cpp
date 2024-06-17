@@ -935,25 +935,8 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 //=====================================================
 void CPlayer::Draw(void)
 {
-	CBlur *pBlur = CBlur::GetInstance();
-
-	if (pBlur != nullptr)
-	{
-		pBlur->SetRenderToNotBlur();
-	}
-
 	// Œp³ƒNƒ‰ƒX‚Ì•`‰æ
 	CMotion::Draw();
-
-	if (m_pPlayerNinja != nullptr)
-	{
-		m_pPlayerNinja->Draw();
-	}
-
-	if (pBlur != nullptr)
-	{
-		pBlur->ChangeTarget();
-	}
 }
 
 //=====================================================
