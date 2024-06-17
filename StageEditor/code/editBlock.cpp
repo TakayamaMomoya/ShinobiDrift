@@ -195,7 +195,7 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 	D3DXVECTOR3 pos = pEdit->GetPosition();
 	float fSpeed = SPEED_MOVE;
 
-	if (pKeyboard == nullptr || pMouse == nullptr || pBlockManager == nullptr)
+	if (pKeyboard == nullptr || pMouse == nullptr || pBlockManager == nullptr )
 		return;
 
 	if (!pMouse->GetPress(CInputMouse::BUTTON_RMB))
@@ -282,7 +282,10 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 
 	if (ImGui::Button("Delete", ImVec2(60.0f, 20.0f)))
 	{// íœ
-		pBlock->Uninit();
+		if (pBlock != nullptr)
+		{
+			pBlock->Uninit();
+		}
 	}
 
 	if (ImGui::Button("DeleteAll", ImVec2(80.0f, 20.0f)))
