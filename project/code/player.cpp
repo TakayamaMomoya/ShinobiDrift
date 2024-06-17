@@ -22,6 +22,9 @@
 #include "blockManager.h"
 #include "effect3D.h"
 #include "object3D.h"
+#include "blur.h"
+#include "renderer.h"
+#include "meshRoad.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -32,6 +35,8 @@ const std::string PATH_PARAM = "data\\TEXT\\playerParam.txt";	// ƒpƒ‰ƒ[ƒ^[ƒf
 const float NOTROTATE = 1.0f;		// ‰ñ“]‚µ‚È‚¢‚æ‚¤‚É‚·‚é’l
 const float DIST_LIMIT = 3000.0f;	// ƒƒCƒ„[§ŒÀ‹——£
 const float LINE_CORRECT_DRIFT = 40.0f;	// ƒhƒŠƒtƒg•â³‚Ì‚µ‚«‚¢’l
+const float SIZE_BLUR = -20.0f;	// ƒuƒ‰[‚ÌƒTƒCƒY
+const float DENSITY_BLUR = 0.5f;	// ƒuƒ‰[‚Ì”Z‚³
 }
 
 //*****************************************************
@@ -82,6 +87,9 @@ CPlayer *CPlayer::Create(void)
 //=====================================================
 HRESULT CPlayer::Init(void)
 {
+	// ƒuƒ‰[‚ğ‚©‚¯‚È‚¢İ’è‚É‚·‚é
+	EnableBlur(false);
+
 	// Œp³ƒNƒ‰ƒX‚Ì‰Šú‰»
 	CMotion::Init();
 
@@ -99,8 +107,9 @@ HRESULT CPlayer::Init(void)
 	m_info.pRoap = CObject3D::Create(GetPosition());
 
 	m_info.fLengthDrift = 1500.0f;
-
 	m_info.bGrabOld = true;
+	m_info.fDesityBlurDrift = DENSITY_BLUR;
+	m_info.fSizeBlurDrift = SIZE_BLUR;
 
 	return S_OK;
 }
@@ -185,6 +194,9 @@ void CPlayer::Update(void)
 	// “ü—Í
 	Input();
 
+	//“–‚½‚è”»’è
+	Collision();
+
 	// ‘O‰ñ‚ÌˆÊ’u‚ğ•Û‘¶
 	D3DXVECTOR3 pos = GetPosition();
 	SetPositionOld(pos);
@@ -215,11 +227,11 @@ void CPlayer::Input(void)
 	// ƒJƒƒ‰‘€ì
 	InputCamera();
 
+	// ƒƒCƒ„[‚Ì‘€ì
 	InputWire();
 
 	// ƒXƒs[ƒh‚ÌŠÇ—
 	ManageSpeed();
-
 
 	CInputManager *pInputManager = CInputManager::GetInstance();
 
@@ -307,277 +319,71 @@ void CPlayer::InputWire(void)
 		pJoypad->GetJoyStickRY(0)
 	};
 
+	// ƒXƒeƒBƒbƒN“ü—ÍŠp“x
 	float fAngleInput = atan2f(vecStickR.x, vecStickR.y);
 
-	universal::LimitRot(&fAngleInput);
-
-	CBlockManager *pBlockManager = CBlockManager::GetInstance();
-
-	// ƒuƒƒbƒN‚Ìƒ`ƒFƒbƒN
-	CBlock *pBlock = pBlockManager->GetHead();
-	D3DXVECTOR3 posPlayer = GetPosition();
-	D3DXVECTOR3 rotPlayer = GetRotation();
+	// “ü—ÍŠp“x‚ÆƒJƒƒ‰Šp“x‚ğ‘«‚µ‚½Šp“x
 	D3DXVECTOR3 rotCamera = CManager::GetCamera()->GetCamera()->rot;
 
 	float fAngle = fAngleInput + rotCamera.y + D3DX_PI;
 	universal::LimitRot(&fAngle);
 
-#ifdef _DEBUG
-	D3DXVECTOR3 pole = universal::PolarCoordinates(D3DXVECTOR3(GetRotation().x + D3DX_PI * 0.5f , fAngle, 0.0f));
-
-	D3DXVECTOR3 posEffect = GetPosition() + pole * 500.0f;
-
-	CEffect3D::Create(posEffect, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-#endif
-
-
-	CBlockGrab *pBlockGrab = nullptr;
-	float fAngleMin = D3DX_PI;
-
+	// ƒXƒeƒBƒbƒN“ü—Í‚Ì‹­‚³
 	float fLength = sqrtf(vecStickR.x * vecStickR.x + vecStickR.y * vecStickR.y);
+
+	universal::LimitRot(&fAngleInput);
+
+	// ƒuƒƒbƒN‚Ìƒ`ƒFƒbƒN
+	CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+	CBlock *pBlock = pBlockManager->GetHead();
 
 	if (m_info.pBlockGrab != nullptr)
 	{
 		m_info.pBlockGrab->EnableCurrent(true);
-	}
 
-	//if (pJoypad->GetPress(CInputJoypad::PADBUTTONS_LB, 0))
-	if (m_info.pBlockGrab != nullptr)
-	{
-		//if (fLength > 0.5f)
-		{// ‘€ì‚µ‚Ä‚¢‚é”»’è
-			D3DXVECTOR3 posPlayer = GetPosition();
-			D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
-			D3DXVECTOR3 vecDiff = posBlock - posPlayer;
-			float vecLength = D3DXVec3Length(&(posBlock - posPlayer));
+		// ƒuƒ‰[‚ğ‚©‚¯‚é
+		Blur::AddParameter(0.0f, 0.01f, 15.0f, 0.0f, 0.7f);
 
-			D3DXVECTOR3 move = GetMove();
-			D3DXVECTOR3 rot = GetRotation();
+		// ·•ªŠp“x‚ÌŒvZ
+		D3DXVECTOR3 posPlayer = GetPosition();
+		D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
+		D3DXVECTOR3 vecDiff = posBlock - posPlayer;
+		float vecLength = D3DXVec3Length(&(posBlock - posPlayer));
 
-			D3DXVECTOR3 vecDiffNormal = vecDiff;
-			D3DXVec3Normalize(&vecDiffNormal, &vecDiff);
+		D3DXVECTOR3 vecDiffNormal = vecDiff;
+		D3DXVec3Normalize(&vecDiffNormal, &vecDiff);
 
-			universal::VecConvertLength(&vecDiff, fabs(D3DXVec3Dot(&move, &vecDiffNormal)));
+		D3DXVECTOR3 move = GetMove();
+		universal::VecConvertLength(&vecDiff, fabs(D3DXVec3Dot(&move, &vecDiffNormal)));
 
-			if (vecLength < 1000.0f && m_info.fLengthDrift < 500.0f)
-			{
-				move -= vecDiff * 0.1f;
-			}
-			else
-			{
-				move += vecDiff;
-			}
-			
-			SetMove(move);
+		// ƒƒCƒ„[‚É‰ˆ‚Á‚Äi‚ß‚é
+		ForwardFollowWire(vecLength, vecDiff);
 
-			float fAngleDiff = atan2f(vecDiff.x, vecDiff.z);
-			float fDiff = rot.y - fAngleDiff;
+		float fAngleDiff = atan2f(vecDiff.x, vecDiff.z);
 
-			universal::LimitRot(&fDiff);
+		// ƒhƒŠƒtƒg‚ğ•Ï‚¦‚é‚©‚Ì”»’è
+		JudgeChangeDrift(fAngle, fAngleDiff, fLength);
 
-			if (m_info.fTimerDriftChange > 0.0f)
-			{
-				m_info.fTimerDriftChange -= CManager::GetDeltaTime();
+		// ‰ñ“]‚Ì§Œä
+		ManageRotateGrab(fAngleDiff);
 
-				if (pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_DOWN, 0) ||
-					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_LEFT, 0) ||
-					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_UP, 0) ||
-					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_RIGHT, 0))
-				{// ’e‚¢‚½uŠÔ
-					m_info.fTimerFlip = 0.8f;
+		// ƒƒCƒ„[‚ğŠO‚·‚©‚Ì”»’è
+		JudgeRemoveWire(fLength);
 
-					m_info.nCntFlip++;
+		// ƒhƒŠƒtƒg‚Ì•â³
+		LimitDrift(m_info.fLengthDrift);
 
-					float fDiffInput = fAngle - fAngleDiff;
-
-					m_info.fAngleDrift = 0.29f;
-				}
-				else
-				{
-					if (m_info.fTimerFlip > 0.0f)
-					{// ’e‚«ƒ^ƒCƒ}[Œ¸Z
-						m_info.fTimerFlip -= CManager::GetDeltaTime();
-					}
-					else
-					{// —P—\ŠÔ‚ª‰ß‚¬‚é‚Æ’e‚«ƒJƒEƒ“ƒ^[ƒŠƒZƒbƒg
-						if (fLength <= 0.5f)
-						{// ‰½‚à’Í‚ñ‚Å‚¢‚È‚¯‚ê‚ÎƒŠƒZƒbƒg
-							m_info.nCntFlip = 0;
-						}
-					}
-				}
-			}
-
-			//if (m_info.nCntFlip >= 1)
-			{
-				D3DXVECTOR3 rotDest = rot;
-
-				//if (vecLength > m_info.fLengthDrift)
-				{
-					if (fDiff > 0.0f)
-					{
-						rotDest.y = fAngleDiff + D3DX_PI * m_info.fAngleDrift;
-
-						// ƒJƒƒ‰ƒ[ƒ‹
-						Camera::ControlRoll(0.3f, 0.04f);
-					}
-					else
-					{
-						rotDest.y = fAngleDiff - D3DX_PI * m_info.fAngleDrift;
-
-						// ƒJƒƒ‰ƒ[ƒ‹
-						Camera::ControlRoll(-0.3f, 0.04f);
-					}
-				}
-
-				universal::LimitRot(&rotDest.y);
-
-				universal::FactingRot(&rot.y, rotDest.y, 0.15f);
-
-				SetRotation(rot);
-
-				bool bGrab = m_info.pBlockGrab->CanGrab(posPlayer);
-
-				if (m_info.bManual)
-				{
-					if (fLength <= 0.5f)
-					{// ‘€ì‚µ‚Ä‚¢‚é”»’è
-						m_info.nCntFlip = 0;
-						m_info.fCntAngle = 0.0f;
-
-						m_info.pBlockGrab = nullptr;
-
-						m_info.fLengthDrift = 0.0f;
-					}
-				}
-				else
-				{
-					if (m_info.bGrabOld && !bGrab)
-					{// ƒƒCƒ„[‚ğŠO‚·
-						m_info.nCntFlip = 0;
-						m_info.fCntAngle = 0.0f;
-
-						m_info.pBlockGrab = nullptr;
-
-						m_info.fLengthDrift = 0.0f;
-					}
-				}
-
-				m_info.bGrabOld = bGrab;
-
-				if (m_info.fLengthDrift <= 50.0f)
-				{
-					CEffect3D::Create(GetPosition(), 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-				}
-				else
-				{
-					CEffect3D::Create(GetPosition(), 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));
-				}
-
-				// ƒhƒŠƒtƒg‚Ì•â³
-				LimitDrift(m_info.fLengthDrift);
-			}
-			//else
-			{
-				//m_info.fAngleHandle *= 1.9f;
-
-				//CEffect3D::Create(GetPosition(), 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));
-			}
-
-			if (m_info.pRoap != nullptr)
-			{
-				LPDIRECT3DVERTEXBUFFER9 pVtxBuff = m_info.pRoap->GetVtxBuff();
-
-				//’¸“_î•ñ‚Ìƒ|ƒCƒ“ƒ^
-				VERTEX_3D *pVtx;
-
-				//’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN‚µA’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾
-				pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-				//’¸“_À•W‚Ìİ’è
-				float fHeight = 100.0f;
-
-				D3DXVECTOR3 vec = { vecDiff.z, 0.0f, -vecDiff.x };
-
-				D3DXVec3Normalize(&vec, &vec);
-
-				pVtx[0].pos = D3DXVECTOR3(posBlock.x - vec.x * 20.0f, fHeight, posBlock.z);
-				pVtx[1].pos = D3DXVECTOR3(posBlock.x + vec.x * 20.0f, fHeight, posBlock.z);
-				pVtx[2].pos = D3DXVECTOR3(posPlayer.x - vec.x * 20.0f, fHeight, posPlayer.z);
-				pVtx[3].pos = D3DXVECTOR3(posPlayer.x + vec.x * 20.0f, fHeight, posPlayer.z);
-
-				//’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN
-				pVtxBuff->Unlock();
-			}
-
-		}
+		// ƒ[ƒv‚Ì§Œä
+		ControlRoap();
 	}
 	else
 	{
 		// ƒJƒƒ‰‚Ìƒ[ƒ‹’l‚ğ‚Ü‚Á‚·‚®‚É–ß‚·
 		Camera::ControlRoll(0.0f, 0.1f);
 
-		//if (m_info.nCntFlip == 0)
-		{
-			float fLengthMin = 0.0f;
-			CBlockGrab* pBlockMin = nullptr;
-
-			std::list<CBlockGrab*> *pListGrab = pBlockManager->GetListGrab();
-
-			for (CBlockGrab *pBlock : *pListGrab)
-			{
-				D3DXVECTOR3 posBlock = pBlock->GetPosition();
-				D3DXVECTOR3 vecBlockDiff = posBlock - posPlayer;
-				float fAngleDiff = atan2f(vecBlockDiff.x, vecBlockDiff.z) - rotPlayer.y;
-				float fDiff = fabs(fAngleInput - fAngleDiff);
-
-				universal::LimitRot(&fDiff);
-				pBlock->EnableCurrent(false);
-
-				if (fDiff < D3DX_PI * 0.5f && fDiff > -D3DX_PI * 0.5f)
-				{
-					float fLengthDiff = sqrtf(vecBlockDiff.x * vecBlockDiff.x + vecBlockDiff.z * vecBlockDiff.z);
-
-					if (/*pBlock->CanGrab(posPlayer) && */fLengthDiff <= DIST_LIMIT && (pBlockMin == nullptr || fLengthMin > fLengthDiff))
-					{
-						pBlockMin = pBlock;
-
-						fAngleMin = fDiff;
-
-						fLengthMin = fLengthDiff;
-					}
-				}
-			}
-
-			if (pBlockMin != nullptr)
-			{
-				pBlockGrab = pBlockMin;
-
-				m_info.fLengthDrift = fLengthMin;
-
-				if (fLengthMin < 500.0f)
-				{
-					m_info.fAngleDrift = 0.4f;
-				}
-				else
-				{
-					m_info.fAngleDrift = 0.4f;
-				}
-			}
-
-			if (pBlockGrab != nullptr)
-			{
-				if (pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_DOWN, 0) ||
-					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_LEFT, 0) ||
-					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_UP, 0) ||
-					pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_RIGHT, 0))
-				{// ’e‚¢‚½uŠÔ
-					m_info.pBlockGrab = pBlockGrab;
-
-					m_info.fTimerDriftChange = 0.7f;
-				}
-			}
-		}
+		// ’Í‚ŞƒuƒƒbƒN‚Ì’T’m
+		SarchGrab();
 	}
 
 	if (CInputKeyboard::GetInstance() != nullptr)
@@ -590,6 +396,274 @@ void CPlayer::InputWire(void)
 
 	CDebugProc::GetInstance()->Print("\n’Í‚ñ‚Å‚éƒuƒƒbƒN‚Í‚ ‚éH[%d]", m_info.pBlockGrab != nullptr);
 	CDebugProc::GetInstance()->Print("\nƒƒbƒNƒIƒ“•ûŒü[%f]", fAngleInput);
+}
+
+//=====================================================
+// ƒƒCƒ„[‚É‰ˆ‚Á‚Äi‚ß‚é
+//=====================================================
+void CPlayer::ForwardFollowWire(float vecLength,D3DXVECTOR3 vecDiff)
+{
+	D3DXVECTOR3 move = GetMove();
+
+	if (vecLength < 1000.0f && m_info.fLengthDrift < 500.0f)
+	{
+		move -= vecDiff * 0.1f;
+	}
+	else
+	{
+		move += vecDiff;
+	}
+
+	SetMove(move);
+}
+
+//=====================================================
+// ƒhƒŠƒtƒg‚ğ•Ï‚¦‚é‚©‚Ì”»’è
+//=====================================================
+void CPlayer::JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength)
+{
+	CInputJoypad* pJoypad = CInputJoypad::GetInstance();
+
+	if (pJoypad == nullptr)
+		return;
+
+	if (m_info.fTimerDriftChange > 0.0f)
+	{
+		m_info.fTimerDriftChange -= CManager::GetDeltaTime();
+
+		if (pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_DOWN, 0) ||
+			pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_LEFT, 0) ||
+			pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_UP, 0) ||
+			pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_RIGHT, 0))
+		{// ’e‚¢‚½uŠÔ
+			m_info.fTimerFlip = 0.8f;
+
+			m_info.nCntFlip++;
+
+			float fDiffInput = fAngle - fAngleDiff;
+
+			m_info.fAngleDrift = 0.29f;
+
+			Blur::AddParameter(5.0f, 0.5f, 15.0f, 0.0f, 0.7f);
+		}
+		else
+		{
+			if (m_info.fTimerFlip > 0.0f)
+			{// ’e‚«ƒ^ƒCƒ}[Œ¸Z
+				m_info.fTimerFlip -= CManager::GetDeltaTime();
+			}
+			else
+			{// —P—\ŠÔ‚ª‰ß‚¬‚é‚Æ’e‚«ƒJƒEƒ“ƒ^[ƒŠƒZƒbƒg
+				if (fLength <= 0.5f)
+				{// ‰½‚à’Í‚ñ‚Å‚¢‚È‚¯‚ê‚ÎƒŠƒZƒbƒg
+					m_info.nCntFlip = 0;
+				}
+			}
+		}
+	}
+}
+
+//=====================================================
+// ƒuƒƒbƒN‚ğ’Í‚ñ‚Å‚é‚Æ‚«‚Ì‰ñ“]§Œä
+//=====================================================
+void CPlayer::ManageRotateGrab(float fAngleDiff)
+{
+	D3DXVECTOR3 rot = GetRotation();
+
+	float fDiff = rot.y - fAngleDiff;
+
+	universal::LimitRot(&fDiff);
+
+	D3DXVECTOR3 rotDest = rot;
+
+	if (fDiff > 0.0f)
+	{
+		rotDest.y = fAngleDiff + D3DX_PI * m_info.fAngleDrift;
+
+		// ƒJƒƒ‰ƒ[ƒ‹
+		Camera::ControlRoll(0.3f, 0.04f);
+	}
+	else
+	{
+		rotDest.y = fAngleDiff - D3DX_PI * m_info.fAngleDrift;
+
+		// ƒJƒƒ‰ƒ[ƒ‹
+		Camera::ControlRoll(-0.3f, 0.04f);
+	}
+
+	universal::LimitRot(&rotDest.y);
+
+	universal::FactingRot(&rot.y, rotDest.y, 0.15f);
+
+	SetRotation(rot);
+}
+
+//=====================================================
+// ƒƒCƒ„[‚ğŠO‚·‚©‚Ì”»’è
+//=====================================================
+void CPlayer::JudgeRemoveWire(float fLength)
+{
+	// ƒuƒƒbƒN‚ÌƒGƒŠƒA“à‚©‚Ì”»’è
+	D3DXVECTOR3 posPlayer = GetPosition();
+	bool bGrab = m_info.pBlockGrab->CanGrab(posPlayer);
+
+	if (m_info.bManual)
+	{
+		if (fLength <= 0.5f)
+		{// ƒXƒeƒBƒbƒN‚ğ—£‚µ‚½‚çƒƒCƒ„[‚ğŠO‚·
+			RemoveWire();
+		}
+	}
+	else
+	{
+		if (m_info.bGrabOld && !bGrab)
+		{// ƒuƒƒbƒNw’è‚ÌƒGƒŠƒA‚ğ‰ñ‚èØ‚Á‚½‚çƒƒCƒ„[‚ğŠO‚·
+			RemoveWire();
+		}
+	}
+
+	// Œ»İ‚ÌƒGƒŠƒA“à‚©‚Ì”»’è‚ğ•Û‘¶
+	m_info.bGrabOld = bGrab;
+}
+
+//=====================================================
+// ƒ[ƒv‚Ì§Œä
+//=====================================================
+void CPlayer::ControlRoap(void)
+{
+	if (m_info.pRoap != nullptr && m_info.pBlockGrab != nullptr)
+	{
+		D3DXVECTOR3 posPlayer = GetPosition();
+		D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
+		D3DXVECTOR3 vecDiff = posBlock - posPlayer;
+
+		LPDIRECT3DVERTEXBUFFER9 pVtxBuff = m_info.pRoap->GetVtxBuff();
+
+		//’¸“_î•ñ‚Ìƒ|ƒCƒ“ƒ^
+		VERTEX_3D *pVtx;
+
+		//’¸“_ƒoƒbƒtƒ@‚ğƒƒbƒN‚µA’¸“_î•ñ‚Ö‚Ìƒ|ƒCƒ“ƒ^‚ğæ“¾
+		pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		//’¸“_À•W‚Ìİ’è
+		float fHeight = 100.0f;
+
+		D3DXVECTOR3 vec = { vecDiff.z, 0.0f, -vecDiff.x };
+
+		D3DXVec3Normalize(&vec, &vec);
+
+		pVtx[0].pos = D3DXVECTOR3(posBlock.x - vec.x * 20.0f, fHeight, posBlock.z);
+		pVtx[1].pos = D3DXVECTOR3(posBlock.x + vec.x * 20.0f, fHeight, posBlock.z);
+		pVtx[2].pos = D3DXVECTOR3(posPlayer.x - vec.x * 20.0f, fHeight, posPlayer.z);
+		pVtx[3].pos = D3DXVECTOR3(posPlayer.x + vec.x * 20.0f, fHeight, posPlayer.z);
+
+		//’¸“_ƒoƒbƒtƒ@‚ğƒAƒ“ƒƒbƒN
+		pVtxBuff->Unlock();
+	}
+}
+
+//=====================================================
+// ’Í‚ŞƒuƒƒbƒN‚Ì’T’m
+//=====================================================
+void CPlayer::SarchGrab(void)
+{
+	CInputJoypad* pJoypad = CInputJoypad::GetInstance();
+
+	if (pJoypad == nullptr)
+		return;
+
+	// “ü—ÍŠp“x‚ÌŒvZ
+	D3DXVECTOR2 vecStickR =
+	{
+		pJoypad->GetJoyStickRX(0),
+		pJoypad->GetJoyStickRY(0)
+	};
+
+	float fAngleInput = atan2f(vecStickR.x, vecStickR.y);
+
+	// ƒuƒƒbƒNƒ}ƒl[ƒWƒƒ[‚Ìæ“¾
+	CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+	// ŒvZ—p•Ï”
+	CBlockGrab *pBlockGrab = nullptr;	
+	CBlockGrab* pBlockMin = nullptr;
+	float fLengthMin = 0.0f;
+	float fAngleMin = D3DX_PI;
+
+	// ƒuƒƒbƒNƒŠƒXƒgæ“¾
+	std::list<CBlockGrab*> *pListGrab = pBlockManager->GetListGrab();
+
+	for (CBlockGrab *pBlock : *pListGrab)
+	{
+		D3DXVECTOR3 posPlayer = GetPosition();
+		D3DXVECTOR3 rotPlayer = GetRotation();
+		D3DXVECTOR3 posBlock = pBlock->GetPosition();
+		D3DXVECTOR3 vecBlockDiff = posBlock - posPlayer;
+		float fAngleDiff = atan2f(vecBlockDiff.x, vecBlockDiff.z) - rotPlayer.y;
+		float fDiff = fabs(fAngleInput - fAngleDiff);
+
+		universal::LimitRot(&fDiff);
+		pBlock->EnableCurrent(false);
+
+		if (fDiff < D3DX_PI * 0.5f && fDiff > -D3DX_PI * 0.5f)
+		{
+			float fLengthDiff = sqrtf(vecBlockDiff.x * vecBlockDiff.x + vecBlockDiff.z * vecBlockDiff.z);
+
+			if (fLengthDiff <= DIST_LIMIT && (pBlockMin == nullptr || fLengthMin > fLengthDiff))
+			{
+				pBlockMin = pBlock;
+
+				fAngleMin = fDiff;
+
+				fLengthMin = fLengthDiff;
+			}
+		}
+	}
+
+	if (pBlockMin != nullptr)
+	{
+		pBlockGrab = pBlockMin;
+
+		m_info.fLengthDrift = fLengthMin;
+
+		if (fLengthMin < 500.0f)
+		{
+			m_info.fAngleDrift = 0.4f;
+		}
+		else
+		{
+			m_info.fAngleDrift = 0.4f;
+		}
+	}
+
+	if (pBlockGrab != nullptr)
+	{
+		if (pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_DOWN, 0) ||
+			pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_LEFT, 0) ||
+			pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_UP, 0) ||
+			pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_RIGHT, 0))
+		{// ’e‚¢‚½uŠÔ
+			m_info.pBlockGrab = pBlockGrab;
+
+			m_info.fTimerDriftChange = 0.7f;
+		}
+	}
+}
+
+//=====================================================
+// ƒƒCƒ„[‚ğŠO‚·
+//=====================================================
+void CPlayer::RemoveWire(void)
+{
+	m_info.nCntFlip = 0;
+	m_info.fCntAngle = 0.0f;
+
+	m_info.pBlockGrab = nullptr;
+
+	m_info.fLengthDrift = 0.0f;
+
+	// ƒuƒ‰[‚ğ–ß‚·
+	Blur::ResetBlur();
 }
 
 //=====================================================
@@ -628,6 +702,93 @@ void CPlayer::LimitDrift(float fLength)
 	{
 		m_info.fAngleHandle = 0.0f;
 	}*/
+}
+
+//=====================================================
+// “–‚½‚è”»’èˆ—
+//=====================================================
+void CPlayer::Collision(void)
+{
+	// ‘O‰ñ‚ÌˆÊ’u‚ğ•Û‘¶
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 posCol = GetPosition();
+	D3DXVECTOR3 move = GetMove();
+	D3DXVECTOR3 rot = GetRotation();
+	D3DXVECTOR3 posParts[2];
+	D3DXVECTOR3 posOldParts[2];
+	D3DXVECTOR3 posDef;
+	bool bRoad[2];
+
+	// ƒ^ƒCƒ„‚ÌˆÊ’u•Û‘¶
+	posParts[0].x = GetParts(2)->pParts->GetMatrix()->_41 + (pos.x - GetPositionOld().x);
+	posParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y) - 41.05f;
+	posParts[0].z = GetParts(2)->pParts->GetMatrix()->_43 + (pos.z - GetPositionOld().z);
+	posParts[1].x = GetParts(3)->pParts->GetMatrix()->_41 + (pos.x - GetPositionOld().x);
+	posParts[1].y = GetParts(3)->pParts->GetMatrix()->_42 + (pos.y - GetPositionOld().y) - 41.1f;
+	posParts[1].z = GetParts(3)->pParts->GetMatrix()->_43 + (pos.z - GetPositionOld().z);
+
+	// ƒ^ƒCƒ„‚Ì‰ß‹ˆÊ’u•Û‘¶
+	posOldParts[0].x = GetParts(2)->pParts->GetMatrix()->_41;
+	posOldParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 - 41.05f;
+	posOldParts[0].z = GetParts(2)->pParts->GetMatrix()->_43;
+	posOldParts[1].x = GetParts(3)->pParts->GetMatrix()->_41;
+	posOldParts[1].y = GetParts(3)->pParts->GetMatrix()->_42 - 41.1f;
+	posOldParts[1].z = GetParts(3)->pParts->GetMatrix()->_43;
+
+	// ƒ^ƒCƒ„‚Ì’†“_‚ğŒvZ
+	posDef = posParts[0] + posParts[1] * 0.5f;
+
+	// ƒ^ƒCƒ„‚»‚ê‚¼‚ê‚Å“–‚½‚è”»’è‚ğ‚Æ‚é
+	bRoad[0] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[0], posOldParts[0]);
+	bRoad[1] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[1], posOldParts[1]);
+
+	// ƒvƒŒƒCƒ„[‚Ì‚‚³‚ğ’²®
+	pos.y += (posParts[0] + posParts[1] * 0.5f).y - posDef.y;
+
+	// ƒ^ƒCƒ„‚ÌˆÊ’uŠÖŒW‚©‚çŠp“x‚ğŒvZ
+	if ((posParts[0].y - posParts[1].y) < D3DXVec3Length(&(posParts[0] - posParts[1])))
+		rot.x = asinf((posParts[0].y - posParts[1].y) / D3DXVec3Length(&(posParts[0] - posParts[1])));
+
+	if (bRoad[0] && bRoad[1])
+	{// ƒ^ƒCƒ„‚ª—¼•û“¹‚ÉG‚ê‚Ä‚¢‚é‚Æ‚«
+
+		// Šp“x‚É‚æ‚Á‚Äd—Í•ÏX
+		if (rot.x > 0.0f)
+		{
+			move.y = -20.0f;
+		}
+		else
+		{
+			move.y = -0.1f;
+		}
+	}
+	else if (bRoad[0])
+	{// ƒ^ƒCƒ„‚ª•Ğ•û‚¾‚¯“¹‚ÉG‚ê‚Ä‚¢‚é‚Æ‚«
+		rot.x += 0.01f;
+	}
+	else if (bRoad[1])
+	{// ƒ^ƒCƒ„‚ª•Ğ•û‚¾‚¯“¹‚ÉG‚ê‚Ä‚¢‚é‚Æ‚«
+		rot.x -= 0.01f;
+	}
+	else
+	{// ƒ^ƒCƒ„‚ª‚Ç‚¿‚ç‚à“¹‚ÉG‚ê‚Ä‚¢‚È‚¢‚Æ‚«
+		rot.x += 0.01f;
+	}
+
+	if (CInputKeyboard::GetInstance() != nullptr)
+	{
+		if (CInputKeyboard::GetInstance()->GetPress(DIK_SPACE))
+		{// ‘€ì•û–@•ÏX
+			pos.y += 10.0f;
+			move.y = 0.0f;
+			rot.x = 0.0f;
+		}
+	}
+
+	// ˆÊ’u‚ÆˆÚ“®—Ê‚ÆŠp“x‚ğ‘ã“ü
+	SetPosition(pos);
+	SetMove(move);
+	SetRotation(rot);
 }
 
 //=====================================================
@@ -683,7 +844,11 @@ void CPlayer::ManageSpeed(void)
 	D3DXVECTOR3 vecForward = universal::PolarCoordinates(rot);
 
 	// Œ»İ‚ÌƒXƒs[ƒh‚Æ‘O•ûƒxƒNƒgƒ‹‚ğ‚©‚¯‚ÄˆÚ“®—Ê‚É“K—p
-	move = vecForward * m_info.fSpeed;
+	move.x = vecForward.x * m_info.fSpeed;
+	move.z = vecForward.z * m_info.fSpeed;
+
+	// ˆÚ“®—Ê‚Éd—Í‚ğ“K—p
+	move.y += -0.6f;
 
 	SetMove(move);
 }
@@ -750,8 +915,20 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 //=====================================================
 void CPlayer::Draw(void)
 {
+	CBlur *pBlur = CBlur::GetInstance();
+
+	if (pBlur != nullptr)
+	{
+		pBlur->SetRenderToNotBlur();
+	}
+
 	// Œp³ƒNƒ‰ƒX‚Ì•`‰æ
 	CMotion::Draw();
+
+	if (pBlur != nullptr)
+	{
+		pBlur->ChangeTarget();
+	}
 }
 
 //=====================================================
@@ -787,4 +964,26 @@ void CPlayer::Debug(void)
 	pDebugProc->Print("\nŒ»İ‚Ì‘¬“x[%f]", m_info.fSpeed);
 	pDebugProc->Print("\n’e‚«ƒJƒEƒ“ƒ^[[%d]", m_info.nCntFlip);
 	pDebugProc->Print("\nŠp“xƒJƒEƒ“ƒ^[[%f]", m_info.fCntAngle);
+	pDebugProc->Print("\nƒuƒ‰[‚ÌƒTƒCƒY[%f]", m_info.fSizeBlurDrift);
+	pDebugProc->Print("\nƒuƒ‰[‚Ì”Z‚³[%f]", m_info.fDesityBlurDrift);
+
+	// ƒuƒ‰[‚ÌƒTƒCƒY’²®
+	if (CInputKeyboard::GetInstance()->GetPress(DIK_UP))
+	{
+		m_info.fSizeBlurDrift += 0.3f;
+	}
+	else if (CInputKeyboard::GetInstance()->GetPress(DIK_DOWN))
+	{
+		m_info.fSizeBlurDrift -= 0.3f;
+	}
+
+	// ƒuƒ‰[‚Ì”Z‚³’²®
+	if (CInputKeyboard::GetInstance()->GetPress(DIK_LEFT))
+	{
+		m_info.fDesityBlurDrift += 0.03f;
+	}
+	else if (CInputKeyboard::GetInstance()->GetPress(DIK_RIGHT))
+	{
+		m_info.fDesityBlurDrift -= 0.03f;
+	}
 }

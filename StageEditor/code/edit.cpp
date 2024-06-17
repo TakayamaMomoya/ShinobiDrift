@@ -56,7 +56,10 @@ void CEdit::Uninit(void)
 //=====================================================
 void CEdit::Update(void)
 {
+	// è„ãÛÇÃÉJÉÅÉâà íuÇÃê›íË
 	D3DXVECTOR3 pos = GetPosition();
+
+	ImGui::Text("[PosCameraAbove]");
 
 	ImGui::DragFloat("POS.X", &pos.x, SPEED_MOVE, -FLT_MAX, FLT_MAX);
 	ImGui::DragFloat("POS.Y", &pos.y, SPEED_MOVE, -FLT_MAX, FLT_MAX);

@@ -69,8 +69,6 @@ void CCamera::Update(void)
 	{
 		m_pBehavior->Update(this);
 	}
-
-	//Quake();	// カメラ揺れ
 }
 
 //====================================================
@@ -192,6 +190,7 @@ void CCamera::SetCamera(void)
 	CDebugProc::GetInstance()->Print("\n視点の位置：[%f,%f,%f]", m_camera.posV.x, m_camera.posV.y, m_camera.posV.z);
 	CDebugProc::GetInstance()->Print("\n注視点の位置：[%f,%f,%f]", m_camera.posR.x, m_camera.posR.y, m_camera.posR.z);
 	CDebugProc::GetInstance()->Print("\nカメラの向き：[%f,%f,%f]", m_camera.rot.x, m_camera.rot.y, m_camera.rot.z);
+	CDebugProc::GetInstance()->Print("\nVecU：[%f,%f,%f]", m_camera.vecU.x, m_camera.vecU.y, m_camera.vecU.z);
 	CDebugProc::GetInstance()->Print("\nカメラ距離：[%f]", m_camera.fLength);
 #endif
 }

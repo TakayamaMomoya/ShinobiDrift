@@ -11,6 +11,7 @@
 #include "main.h"
 #include "block.h"
 #include "edit.h"
+#include <list>
 
 //*****************************************************
 // 前方宣言
@@ -79,9 +80,16 @@ public:
 	CStateEditGrabBlock() {};
 	virtual ~CStateEditGrabBlock() {};
 
+	// メンバ関数
 	void Init(CEditBlock *pEdit) override;
 	void Uninit(CEditBlock *pEdit) override;
 	void Update(CEditBlock *pEdit) override;
 
 private:
+	// メンバ関数
+	void SelectGrabBlock(void);
+	void EditGrabBlock(void);
+
+	// メンバ変数
+	std::list<CBlockGrab*>::iterator m_it;	// イテレーター
 };

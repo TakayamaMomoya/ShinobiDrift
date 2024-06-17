@@ -27,7 +27,6 @@
     <ClCompile Include="code\light.cpp" />
     <ClCompile Include="code\main.cpp" />
     <ClCompile Include="code\manager.cpp" />
-    <ClCompile Include="code\meshcylinder.cpp" />
     <ClCompile Include="code\model.cpp" />
     <ClCompile Include="code\motion.cpp" />
     <ClCompile Include="code\number.cpp" />
@@ -91,6 +90,12 @@
       <Filter>meshedit</Filter>
     </ClCompile>
     <ClCompile Include="code\fan.cpp" />
+    <ClCompile Include="code\tunnel.cpp">
+      <Filter>meshedit</Filter>
+    </ClCompile>
+    <ClCompile Include="code\meshcylinder.cpp">
+      <Filter>meshedit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\anim3D.h" />
@@ -119,7 +124,6 @@
     <ClInclude Include="code\light.h" />
     <ClInclude Include="code\main.h" />
     <ClInclude Include="code\manager.h" />
-    <ClInclude Include="code\meshcylinder.h" />
     <ClInclude Include="code\model.h" />
     <ClInclude Include="code\motion.h" />
     <ClInclude Include="code\number.h" />
@@ -192,6 +196,12 @@
       <Filter>meshedit</Filter>
     </ClInclude>
     <ClInclude Include="code\fan.h" />
+    <ClInclude Include="code\tunnel.h">
+      <Filter>meshedit</Filter>
+    </ClInclude>
+    <ClInclude Include="code\meshcylinder.h">
+      <Filter>meshedit</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="code\backends\imgui_impl_metal.mm">

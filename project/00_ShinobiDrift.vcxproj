@@ -169,6 +169,7 @@
     <ClCompile Include="code\billboard.cpp" />
     <ClCompile Include="code\block.cpp" />
     <ClCompile Include="code\blockManager.cpp" />
+    <ClCompile Include="code\blur.cpp" />
     <ClCompile Include="code\camera.cpp" />
     <ClCompile Include="code\cameraState.cpp" />
     <ClCompile Include="code\character.cpp" />
@@ -240,6 +241,7 @@
     <ClInclude Include="code\billboard.h" />
     <ClInclude Include="code\block.h" />
     <ClInclude Include="code\blockManager.h" />
+    <ClInclude Include="code\blur.h" />
     <ClInclude Include="code\camera.h" />
     <ClInclude Include="code\cameraState.h" />
     <ClInclude Include="code\character.h" />

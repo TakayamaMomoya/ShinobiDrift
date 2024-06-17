@@ -47,7 +47,7 @@ public:
 	CBlock(int nPriority = 3);	// コンストラクタ
 	~CBlock();	// デストラクタ
 
-	static CBlock *Create(int nIdxModel,BEHAVIOUR behaviour = BEHAVIOUR_NORMAL);
+	static CBlock *Create(BEHAVIOUR behaviour = BEHAVIOUR_NORMAL);
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
@@ -59,6 +59,8 @@ public:
 	CBlock *GetNext(void) { return m_pNext; }
 	static int GetNumAll(void) { return m_nNumAll; }
 	void SetPosition(D3DXVECTOR3 pos);
+	virtual void Save(FILE *pFile);	// 保存処理
+	virtual void Load(FILE *pFile, char* pTemp);	// 読込処理
 
 private:
 	static int m_nNumAll;	// 総数
@@ -84,13 +86,15 @@ public:
 	void Update(void);
 	void Draw(void);
 	bool CanGrab(D3DXVECTOR3 pos);
+	void Save(FILE *pFile) override;	// 保存処理
+	void Load(FILE *pFile, char* pTemp) override;	// 読込処理
 
 	// 変数取得・設定
 	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }	// 選択フラグ
 	bool IsCurrent(void) { return m_bCurrent; }
 	float GetRadiusOffset(void) { return m_fRadiusOffset; }	// オフセット半径
 	void SetRadiusOffset(float fRadius) { m_fRadiusOffset = fRadius; }
-	float GeAngleOffset(int nIdx) { return m_afAngleOffset[nIdx]; }	// オフセット角度
+	float GetAngleOffset(int nIdx) { return m_afAngleOffset[nIdx]; }	// オフセット角度
 	void SetAngleOffset(float fAngle, int nIdx) { m_afAngleOffset[nIdx] = fAngle; }
 
 private:

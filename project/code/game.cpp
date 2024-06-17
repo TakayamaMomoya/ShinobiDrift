@@ -77,7 +77,7 @@ HRESULT CGame::Init(void)
 	// ３Dアニメーション管理の生成
 	CAnimEffect3D::Create();
 
-	Sound::Play(CSound::LABEL_BGM_GAME);
+	Sound::Play(CSound::LABEL_BGM_GAME01);
 
 	// フォグをかける
 	CRenderer *pRenderer = CRenderer::GetInstance();
@@ -198,23 +198,6 @@ void CGame::ManageState(void)
 		break;
 	default:
 		break;
-	}
-}
-
-//=====================================================
-// イベントカメラの設定
-//=====================================================
-void CGame::SetEventCamera(float fTime, D3DXVECTOR3 posRDest, D3DXVECTOR3 posVDest)
-{
-	CCamera *pCamera = CManager::GetCamera();
-
-	if (pCamera != nullptr)
-	{
-		pCamera->SetEventTimer(fTime);
-		pCamera->SetPosRDest(posRDest);
-		pCamera->SetPosVDest(posVDest);
-
-		EnableStop(true);
 	}
 }
 

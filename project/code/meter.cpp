@@ -169,11 +169,11 @@ void CMeter::Acceleration()
 	float fMaxSpeed = m_pPlayer->GetParam().fSpeedMax;
 
 	// 速度取得
-	m_NowMeter = fPlayerSpeed;
+	m_NowMeter = (int)fPlayerSpeed;
 
 	if (m_NowMeter >= fMaxSpeed)
 	{// プレイヤーパラメーターの速度を超えないように
-		m_NowMeter = fMaxSpeed;
+		m_NowMeter = (int)fMaxSpeed;
 	}
 
 	// メーター値の計算

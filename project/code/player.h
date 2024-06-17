@@ -80,15 +80,26 @@ private:
 		float fCntAngle;	// アングルのカウンター
 		bool bGrabOld;
 		bool bManual;		// マニュアル操作
+		bool bAir;			// マニュアル操作
 		float fLengthDrift;
 		float fTimerDriftChange;
+		float fSizeBlurDrift;	// ドリフト時のブラーの強さ
+		float fDesityBlurDrift;	// ドリフト時のブラーの濃さ
 	};
 
 	void Load(void);
 	void Input(void);
+	void Collision(void);
 	void InputMove(void);
 	void InputCamera(void);
 	void InputWire(void);
+	void ForwardFollowWire(float vecLength, D3DXVECTOR3 vecDiff);	// ワイヤーに沿って進める
+	void JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength);	// ドリフト変化の判定
+	void ControlRoap(void);	// ロープの制御
+	void SarchGrab(void);	// 掴むブロックの探知
+	void ManageRotateGrab(float fAngleDiff);	// 掴んでいるときの回転制御
+	void JudgeRemoveWire(float fLength);	// ワイヤーを外すかの判定
+	void RemoveWire(void);	// ワイヤーを外す処理
 	void LimitDrift(float fLength);
 	void ManageSpeed(void);
 	void ManageState(void);
