@@ -137,7 +137,7 @@ void CCamera::Control(void)
 
 	float fMove = MOVE_SPEED;
 
-	if (pKeyboard->GetTrigger(DIK_F))
+	if(pKeyboard->GetTrigger(DIK_F))
 		m_bAbove = m_bAbove ? false : true;
 
 	if (m_bAbove)
@@ -147,8 +147,8 @@ void CCamera::Control(void)
 
 		if (pMouse->GetPress(CInputMouse::BUTTON_RMB))
 		{// 右クリック中、移動可能
-			m_posAbove.x -= pMouse->GetMoveIX() * (SPEED_MOVE_ABOVE + m_posAbove.y * 0.001f);
-			m_posAbove.z += pMouse->GetMoveIY() * (SPEED_MOVE_ABOVE + m_posAbove.y * 0.001f);
+			m_posAbove.x -= pMouse->GetMoveIX() * SPEED_MOVE_ABOVE;
+			m_posAbove.z += pMouse->GetMoveIY() * SPEED_MOVE_ABOVE;
 		}
 
 		m_posAbove.y += pMouse->GetMoveIZ() * SPEED_ZOOM_ABOVE;
@@ -224,17 +224,6 @@ void CCamera::Control(void)
 
 	universal::LimitRot(&m_camera.rot.x);
 	universal::LimitRot(&m_camera.rot.y);
-
-	// 上空のカメラ位置の設定
-	D3DXVECTOR3 pos = m_posAbove;
-
-	ImGui::Text("[PosCameraAbove]");
-
-	ImGui::DragFloat("POS.X", &pos.x, SPEED_MOVE_ABOVE, -FLT_MAX, FLT_MAX);
-	ImGui::DragFloat("POS.Y", &pos.y, SPEED_MOVE_ABOVE, -FLT_MAX, FLT_MAX);
-	ImGui::DragFloat("POS.Z", &pos.z, SPEED_MOVE_ABOVE, -FLT_MAX, FLT_MAX);
-
-	m_posAbove = pos;
 }
 
 //====================================================
