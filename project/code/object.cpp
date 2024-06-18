@@ -399,6 +399,7 @@ void CObject::DrawObject(bool bBlur)
 				pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 			}
 
+	
 			// アルファテストの有効化
 			pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
@@ -420,11 +421,6 @@ void CObject::DrawObject(bool bBlur)
 			{
 				// 描画処理
 				pObject->Draw();
-
-				if (!bBlur)
-				{
-					int n = 0;
-				}
 			}
 
 			if (pObject->m_bBlur == false)

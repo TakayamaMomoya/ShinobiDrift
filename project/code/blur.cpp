@@ -495,11 +495,10 @@ void CBlur::ClearNotBlur(void)
 }
 
 //=====================================================
-// ブラーするターゲットに戻す
+// ブラーターゲットへの変更
 //=====================================================
 void CBlur::RestoreTargetBlur(void)
 {
-    // デバイスの取得
     LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();
 
     pDevice->SetRenderTarget(0, m_apRenderMT[0]);
