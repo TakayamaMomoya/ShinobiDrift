@@ -228,6 +228,7 @@
     <ClCompile Include="code\texture.cpp" />
     <ClCompile Include="code\timer.cpp" />
     <ClCompile Include="code\title.cpp" />
+    <ClCompile Include="code\tunnel.cpp" />
     <ClCompile Include="code\tutorial.cpp" />
     <ClCompile Include="code\UI.cpp" />
     <ClCompile Include="code\UIManager.cpp" />
@@ -297,6 +298,7 @@
     <ClInclude Include="code\texture.h" />
     <ClInclude Include="code\timer.h" />
     <ClInclude Include="code\title.h" />
+    <ClInclude Include="code\tunnel.h" />
     <ClInclude Include="code\tutorial.h" />
     <ClInclude Include="code\UI.h" />
     <ClInclude Include="code\UIManager.h" />
