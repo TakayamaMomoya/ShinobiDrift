@@ -416,8 +416,11 @@ void CObject::DrawObject(bool bBlur)
 				}
 			}
 
-			// •`‰æˆ—
-			pObject->Draw();
+			if (pObject->m_bBlur == bBlur)
+			{
+				// •`‰æˆ—
+				pObject->Draw();
+			}
 
 			if (pBlur != nullptr)
 			{
