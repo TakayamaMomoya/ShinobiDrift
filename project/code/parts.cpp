@@ -81,7 +81,8 @@ void CParts::Update(void)
 	btRigidBody* fallRigidBody = btRigidBody::upcast(obj);
 
 	if (fallRigidBody && fallRigidBody->getMotionState())
-	{
+	{// ’Ê‚Á‚¿‚á‚Á‚½‚Ë...//
+
 		fallRigidBody->activate(true);
 		fallRigidBody->getMotionState()->getWorldTransform(trans);
 

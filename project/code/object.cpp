@@ -331,8 +331,6 @@ void CObject::DrawAll(void)
 	// オブジェクトの描画
 	DrawObject(true);
 
-	DrawObject(false);
-
 	if (CManager::GetMyEffekseer() != nullptr)
 	{// エフェクシアの更新
 		CManager::GetMyEffekseer()->Update();
@@ -399,6 +397,7 @@ void CObject::DrawObject(bool bBlur)
 				pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 			}
 
+	
 			// アルファテストの有効化
 			pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
@@ -406,7 +405,7 @@ void CObject::DrawObject(bool bBlur)
 
 			pDevice->SetRenderState(D3DRS_FOGENABLE, pObject->m_bFog && CRenderer::GetInstance()->IsFog());
 
-			CBlur *pBlur = CBlur::GetInstance();
+
 
 			if (pObject->m_bBlur == false)
 			{// ブラーを無効化
@@ -420,12 +419,16 @@ void CObject::DrawObject(bool bBlur)
 			{
 				// 描画処理
 				pObject->Draw();
+			}
 
-				if (!bBlur)
+			if (pObject->m_bBlur == false)
+			{// ブラーを戻す
+				if (pBlur != nullptr)
 				{
-					int n = 0;
+					pBlur->RestoreTargetBlur();
 				}
 			}
+
 
 			if (pObject->m_bBlur == false)
 			{// ブラーを戻す
