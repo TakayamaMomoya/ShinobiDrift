@@ -48,7 +48,7 @@ public:
     void SwapBuffer(void);  // バッファーの入れ替え
     void SetRenderToNotBlur(void);  // ブラーしないレンダーへの変更
     void ClearNotBlur(void);    // ブラーしないレンダーのクリア
-    void RestoreTargetBlur(void);   // ブラーを元に戻す
+    void RestoreTargetBlur(void); // ブラーするレンダーへの変更
 
     // 変数取得・設定関数
     D3DXCOLOR GetPolygonColor(void) { return m_colPolygon; }    // ポリゴンの色

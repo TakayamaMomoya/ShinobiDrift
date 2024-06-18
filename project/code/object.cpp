@@ -399,8 +399,7 @@ void CObject::DrawObject(bool bBlur)
 				pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 			}
 
-	
-			// アルファテストの有効化
+			//アルファテストの有効化
 			pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 			pDevice->SetRenderState(D3DRS_ALPHAREF, pObject->m_dAlpha);
@@ -409,26 +408,20 @@ void CObject::DrawObject(bool bBlur)
 
 			CBlur *pBlur = CBlur::GetInstance();
 
-			if (pObject->m_bBlur == false)
-			{// ブラーを無効化
+			if (pObject->m_bBlur != bBlur)
+			{
 				if (pBlur != nullptr)
 				{
 					pBlur->SetRenderToNotBlur();
 				}
 			}
 
-			if (pObject->m_bBlur == bBlur)
-			{
-				// 描画処理
-				pObject->Draw();
-			}
+			// 描画処理
+			pObject->Draw();
 
-			if (pObject->m_bBlur == false)
-			{// ブラーを戻す
-				if (pBlur != nullptr)
-				{
-					pBlur->RestoreTargetBlur();
-				}
+			if (pBlur != nullptr)
+			{
+				pBlur->RestoreTargetBlur();
 			}
 
 			if (pObject->m_bWire)

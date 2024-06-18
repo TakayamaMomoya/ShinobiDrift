@@ -18,6 +18,7 @@
 //*****************************************************
 class CBlockGrab;
 class CObject3D;
+class CPlayerNinja;
 
 //*****************************************************
 // クラスの定義
@@ -110,6 +111,7 @@ private:
 	SInfo m_info;	// 自身の情報
 	SParam m_param;	// パラメータ情報
 	SFragMotion m_fragMotion;	// モーションのフラグ
+	CMotion* m_pPlayerNinja;  // バイクに乗っている忍者
 
 	static CPlayer *m_pPlayer;	// 自身のポインタ
 };

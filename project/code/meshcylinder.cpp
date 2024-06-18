@@ -1,7 +1,7 @@
 //*****************************************************
 //
-//meshcylinder.cpp
-//Author:髙山桃也
+// メッシュシリンダーの処理[meshcylinder.cpp]
+// Author:髙山桃也
 //
 //*****************************************************
 
@@ -12,7 +12,6 @@
 #include "manager.h"
 #include "renderer.h"
 #include "game.h"
-#include "player.h"
 #include "debugproc.h"
 #include "universal.h"
 #include "texture.h"
@@ -324,8 +323,6 @@ void CMeshCylinder::Draw(void)
 
 	D3DXMATRIX mtxRot, mtxTrans;
 
-	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-
 	// カリングを無効化
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
@@ -380,8 +377,6 @@ void CMeshCylinder::Draw(void)
 
 	// カリングを有効化
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-
-	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
 }
 
 //=====================================================
