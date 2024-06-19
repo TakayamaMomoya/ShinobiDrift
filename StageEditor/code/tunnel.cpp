@@ -46,14 +46,17 @@ CTunnel *CTunnel::Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStar
 {
 	CTunnel *pTunnel = nullptr;
 
-	pTunnel = new CTunnel;
-
-	if (pTunnel != nullptr)
+	if (pTunnel == nullptr)
 	{
-		pTunnel->m_itStart = itStart;
-		pTunnel->m_itEnd = itEnd;
+		pTunnel = new CTunnel;
 
-		pTunnel->Init();
+		if (pTunnel != nullptr)
+		{
+			pTunnel->m_itStart = itStart;
+			pTunnel->m_itEnd = itEnd;
+
+			pTunnel->Init();
+		}
 	}
 
 	return pTunnel;
