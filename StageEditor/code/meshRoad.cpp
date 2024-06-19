@@ -724,4 +724,8 @@ void CMeshRoad::Load(void)
 	inputFile.close();
 
 	CreateVtxBuffEdge();
+	
+	if(!inputFile.eof())
+		return;
+
 }

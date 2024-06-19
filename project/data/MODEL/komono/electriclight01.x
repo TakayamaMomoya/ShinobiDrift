@@ -543,7 +543,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\ÉNÉçÅ[Éì\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\metal_00003.jpg";
+    "data\\TEXTURE\\MATERIAL\\metal_00003.jpg";
    }
   }
   Material {
