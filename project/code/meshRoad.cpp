@@ -688,7 +688,7 @@ void CMeshRoad::Load(void)
 
 	m_aTunnel.resize(size);
 
-	for (int i = 0; i < size; i++)
+	for (size_t i = 0; i < size; i++)
 	{
 		int nDistStart;
 		int nDistEnd;
