@@ -51,7 +51,7 @@ public:
 private:
 	void UpdateCamera(void);
 	void ManageState(void);
-	void ChangeEditer(CEdit *pEdit);
+	void ChangeEdit(CEdit *pEdit);
 	void Debug(void);
 
 	static STATE m_state;	// èÛë‘
