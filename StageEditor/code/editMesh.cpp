@@ -298,7 +298,19 @@ void CStateEditMeshCreateTunnel::SetTunnel(std::vector<CMeshRoad::SInfoRoadPoint
 		m_itEnd = it;
 
 		// ƒgƒ“ƒlƒ‹‚Ì¶¬
-		CTunnel::Create(m_itStart, m_itEnd);
+		CTunnel *pTunnel = CTunnel::Create(m_itStart, m_itEnd);
+
+		CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
+
+		if (pMeshRoad != nullptr)
+		{
+			std::vector<CTunnel*> *paTunnel = pMeshRoad->GetArrayTunnnel();
+
+			if (paTunnel != nullptr)
+			{
+				paTunnel->push_back(pTunnel);
+			}
+		}
 	}
 }
 

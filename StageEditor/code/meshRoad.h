@@ -53,6 +53,7 @@ public:
 
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectRoadPoint(void);
 	std::vector<SInfoRoadPoint> *GetList(void) { return &m_aRoadPoint; }
+	std::vector<CTunnel*> *GetArrayTunnnel(void) { return &m_aTunnel; }
 	void DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void ResetIterator(void);
 
