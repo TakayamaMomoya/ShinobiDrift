@@ -29,6 +29,10 @@
 #include <map>
 #include <locale>
 #include <codecvt>
+#include "imgui.h"
+#include "imconfig.h"
+#include "backends/imgui_impl_win32.h"
+#include "backends/imgui_impl_dx9.h"
 
 //========================================
 // UsingéŒ¾

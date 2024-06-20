@@ -65,10 +65,10 @@ CMeshRoad *CMeshRoad::Create(void)
 
 		if (pMeshRoad != nullptr)
 		{
+			m_pMeshRoad = pMeshRoad;
+
 			// 初期化処理
 			pMeshRoad->Init();
-
-			m_pMeshRoad = pMeshRoad;
 		}
 	}
 
@@ -438,8 +438,8 @@ void CMeshRoad::SetNormal(VERTEX_3D *pVtx)
 	D3DXVec3Normalize(&nor, &nor);	// 法線を正規化
 
 	// 法線を適用
-	pVtx[0].nor = { 0.0f,1.0f,0.0f };
-	pVtx[1].nor = { 0.0f,1.0f,0.0f };
+	pVtx[0].nor = nor;
+	pVtx[1].nor = nor;
 }
 
 //=====================================================
@@ -674,8 +674,6 @@ void CMeshRoad::Save(void)
 	// リストの情報保存
 	outputFile.write(reinterpret_cast<char*>(m_aRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
 
-	outputFile.close();
-
 	// トンネル情報保存
 	size = m_aTunnel.size();	// トンネル数保存
 	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
@@ -724,7 +722,10 @@ void CMeshRoad::Load(void)
 
 	CreateVtxBuffEdge();
 	
-	if(!inputFile.eof())
+	// トンネル数読み込み
+	inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+
+	if(inputFile.eof())
 		return;
 
 	m_aTunnel.resize(size);

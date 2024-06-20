@@ -87,7 +87,7 @@ HRESULT CMeshCylinder::Init(void)
 	float fRadius = m_meshCylinder.fRadius;
 	float fHeight = m_meshCylinder.fHeight;
 
-	//頂点バッファの生成
+	// 頂点バッファの生成
 	pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * (nMeshU + 1) * (nMeshV + 1),
 		D3DUSAGE_WRITEONLY,
 		FVF_VERTEX_3D,
@@ -95,7 +95,7 @@ HRESULT CMeshCylinder::Init(void)
 		&m_pVtxBuff,
 		NULL);
 
-	//インデックスバッファの生成
+	// インデックスバッファの生成
 	pDevice->CreateIndexBuffer(sizeof(WORD) * ((nMeshU + 1) * (nMeshV + 1) + ((nMeshV + 1) - 2) * (nMeshU + 1) + (((nMeshV + 1) - 2) * 2)),
 		D3DUSAGE_WRITEONLY,
 		D3DFMT_INDEX16,
@@ -112,38 +112,38 @@ HRESULT CMeshCylinder::Init(void)
 		SetIdxTexture(nIdx);
 	}
 
-	//頂点情報のポインタ
+	// 頂点情報のポインタ
 	VERTEX_3D *pVtx;
 
-	//頂点バッファをロックし、頂点情報へのポインタを取得
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	//インデックスバッファへのポインタ
+	// インデックスバッファへのポインタ
 	WORD *pIdx;
 
-	//インデックスバッファをロックし、頂点番号へのポインタを取得
+	// インデックスバッファをロックし、頂点番号へのポインタを取得
 	m_pIdxBuff->Lock(0, 0, (void**)&pIdx, 0);
 
-	//最大頂点数計算
+	// 最大頂点数計算
 	m_meshCylinder.nNumVtx = (nMeshU + 1) * (nMeshV + 1);
 
-	//計算用変数
+	// 計算用変数
 	float fRot;
 	D3DXVECTOR3 VecRot;
 
-	//頂点情報==================================================================================
+	// 頂点情報==================================================================================
 	for (int nCountV = 0; nCountV < nMeshV + 1; nCountV++)
-	{//頂点座標の設定
+	{// 頂点座標の設定
 		for (int nCountU = 0; nCountU < nMeshU + 1; nCountU++)
 		{
-			//角度算出
+			// 角度算出
 			fRot = nCountU * (D3DX_PI / nMeshU) * 2;
 
 			pVtx[nCountV * (nMeshU + 1) + nCountU].pos.x = (float)sin(fRot) * fRadius;
 			pVtx[nCountV * (nMeshU + 1) + nCountU].pos.y = (nMeshV - nCountV) * fHeight;
 			pVtx[nCountV * (nMeshU + 1) + nCountU].pos.z = cosf(fRot) * fRadius;
 
-			//テクスチャ座標
+			// テクスチャ座標
 			pVtx[nCountV * (nMeshU + 1) + nCountU].tex = D3DXVECTOR2
 			(
 				((float)nTexU / nMeshU) * nCountU,
@@ -157,25 +157,25 @@ HRESULT CMeshCylinder::Init(void)
 				pVtx[nCountV * (nMeshU + 1) + nCountU].pos.z
 			);
 
-			//ベクトル正規化
+			// ベクトル正規化
 			D3DXVec3Normalize(&VecRot, &VecRot);
 
-			//法線ベクトルの設定
+			// 法線ベクトルの設定
 			pVtx[nCountV * (nMeshU + 1) + nCountU].nor = VecRot;
 		}
 	}
 
 	for (int nCnt = 0; nCnt < m_meshCylinder.nNumVtx; nCnt++)
 	{
-		//頂点カラーの設定
+		// 頂点カラーの設定
 		pVtx[nCnt].col = D3DCOLOR_RGBA(255, 255, 255, 255);
 	}
 
-	//インデックス==================================================================================
+	// インデックス==================================================================================
 	m_meshCylinder.nNumIdx = (nMeshU + 1) * (nMeshV + 1) + ((nMeshV + 1) - 2) * (nMeshU + 1) + (((nMeshV + 1) - 2) * 2);
 
 	for (int nCount = 0; nCount < m_meshCylinder.nNumIdx / 2; nCount++)
-	{//インデックス決定
+	{// インデックス決定
 		if (
 			nCount % ((nMeshU + 1) + (nMeshU + 2) * (nCount / (nMeshU + 2))) == 0
 			&& nCount != 0
@@ -193,10 +193,10 @@ HRESULT CMeshCylinder::Init(void)
 		}
 	}
 
-	//頂点バッファをアンロック
+	// 頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
 
-	//インデックスバッファをアンロック
+	// インデックスバッファをアンロック
 	m_pIdxBuff->Unlock();
 
 	return S_OK;
@@ -208,13 +208,13 @@ HRESULT CMeshCylinder::Init(void)
 void CMeshCylinder::Uninit(void)
 {
 	if (m_pVtxBuff != NULL)
-	{//頂点バッファポインタの破棄
+	{// 頂点バッファポインタの破棄
 		m_pVtxBuff->Release();
 		m_pVtxBuff = NULL;
 	}
 
 	if (m_pIdxBuff != NULL)
-	{//インデックスバッファポインタの破棄
+	{// インデックスバッファポインタの破棄
 		m_pIdxBuff->Release();
 		m_pIdxBuff = NULL;
 	}
@@ -242,24 +242,24 @@ void CMeshCylinder::SetVtx(void)
 	float fRadius = m_meshCylinder.fRadius;
 	float fHeight = m_meshCylinder.fHeight;
 
-	//頂点情報のポインタ
+	// 頂点情報のポインタ
 	VERTEX_3D *pVtx;
 
-	//頂点バッファをロックし、頂点情報へのポインタを取得
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	for (int nCountV = 0; nCountV < nMeshV + 1; nCountV++)
 	{//頂点座標の設定
 		for (int nCountU = 0; nCountU < nMeshU + 1; nCountU++)
 		{
-			//角度算出
+			// 角度算出
 			float fRot = nCountU * (D3DX_PI / nMeshU) * 2;
 
 			pVtx[nCountV * (nMeshU + 1) + nCountU].pos.x = (float)sin(fRot) * fRadius;
 			pVtx[nCountV * (nMeshU + 1) + nCountU].pos.y = (nMeshV - nCountV) * fHeight;
 			pVtx[nCountV * (nMeshU + 1) + nCountU].pos.z = cosf(fRot) * fRadius;
 
-			//テクスチャ座標
+			// テクスチャ座標
 			pVtx[nCountV * (nMeshU + 1) + nCountU].tex = D3DXVECTOR2
 			(
 				((float)nTexU / nMeshU) * nCountU,
@@ -273,15 +273,15 @@ void CMeshCylinder::SetVtx(void)
 				pVtx[nCountV * (nMeshU + 1) + nCountU].pos.z
 			);
 
-			//ベクトル正規化
+			// ベクトル正規化
 			D3DXVec3Normalize(&VecRot, &VecRot);
 
-			//法線ベクトルの設定
+			// 法線ベクトルの設定
 			pVtx[nCountV * (nMeshU + 1) + nCountU].nor = VecRot;
 		}
 	}
 
-	//頂点バッファをアンロック
+	// 頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
 }
 
@@ -297,19 +297,19 @@ void CMeshCylinder::SetCol(D3DXCOLOR col)
 
 	m_col = col;
 
-	//頂点情報のポインタ
+	// 頂点情報のポインタ
 	VERTEX_3D *pVtx;
 
-	//頂点バッファをロックし、頂点情報へのポインタを取得
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	for (int nCnt = 0; nCnt < m_meshCylinder.nNumVtx; nCnt++)
 	{
-		//頂点カラーの設定
+		// 頂点カラーの設定
 		pVtx[nCnt].col = m_col;
 	}
 
-	//頂点バッファをアンロック
+	// 頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
 }
 
@@ -326,29 +326,29 @@ void CMeshCylinder::Draw(void)
 	// カリングを無効化
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
-	//ワールドマトリックス初期化
+	// ワールドマトリックス初期化
 	D3DXMatrixIdentity(&m_meshCylinder.mtxWorld);
 
-	//向きを反映
+	// 向きを反映
 	D3DXMatrixRotationYawPitchRoll(&mtxRot,
 		m_meshCylinder.rot.y, m_meshCylinder.rot.x, m_meshCylinder.rot.z);
 	D3DXMatrixMultiply(&m_meshCylinder.mtxWorld, &m_meshCylinder.mtxWorld, &mtxRot);
 
-	//位置を反映
+	// 位置を反映
 	D3DXMatrixTranslation(&mtxTrans,
 		m_meshCylinder.pos.x, m_meshCylinder.pos.y, m_meshCylinder.pos.z);
 	D3DXMatrixMultiply(&m_meshCylinder.mtxWorld, &m_meshCylinder.mtxWorld, &mtxTrans);
 
-	//ワールドマトリックス設定
+	// ワールドマトリックス設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_meshCylinder.mtxWorld);
 
-	//頂点バッファをデータストリームに設定
+	// 頂点バッファをデータストリームに設定
 	pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_3D));
 
-	//インデックスバッファをデータストリームに設定
+	// インデックスバッファをデータストリームに設定
 	pDevice->SetIndices(m_pIdxBuff);
 
-	//頂点フォーマットの設定
+	// 頂点フォーマットの設定
 	pDevice->SetFVF(FVF_VERTEX_3D);
 
 	// テクスチャ取得
@@ -361,10 +361,10 @@ void CMeshCylinder::Draw(void)
 		pTexture = pTextureManager->GetAddress(m_nIdxTexture);
 	}
 
-	//テクスチャ設定
+	// テクスチャ設定
 	pDevice->SetTexture(0, pTexture);
 
-	//ポリゴン描画
+	// ポリゴン描画
 	pDevice->DrawIndexedPrimitive
 	(
 		D3DPT_TRIANGLESTRIP,

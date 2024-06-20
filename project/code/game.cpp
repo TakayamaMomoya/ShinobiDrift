@@ -137,9 +137,6 @@ void CGame::Update(void)
 		CScene::Update();
 
 		//CParticle::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), CParticle::TYPE::TYPE_BEAM_BLADE);
-
-		// カーソルを中心に固定
-		SetCursorPos((int)(SCREEN_WIDTH * 0.5f), (int)(SCREEN_HEIGHT * 0.5f));
 	}
 	else
 	{
