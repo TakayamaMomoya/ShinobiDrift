@@ -558,17 +558,30 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 	{
 		for (int i = 0; i < MeshRoad::NUM_EDGE_IN_ROADPOINT; i++)
 		{
-			// ポリゴンの上に乗っているか判定する
-			if (universal::IsOnPolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
+			// ポリゴンの下に入っているか判定する
+			if (!universal::IsOnSquare(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
 			{// 当たっていたら
-
-				if (fHeightDef > fHeight || !bColRoad)
-				{
-					fHeightDef = fHeight;
-				}
-
-				bColRoad = true;
+				continue;
 			}
+
+			// 高さが一定の高さ以内か判定する
+			if (100.0f < fHeight - pPos->y)
+			{
+				continue;
+			}
+
+			// 高さが一番高い場所で判定する
+			if (fHeightDef < fHeight || !bColRoad)
+			{
+				fHeightDef = fHeight;
+			}
+
+			// 判定をtrueにする
+			bColRoad = true;
+
+			// 道から落ちないようにする
+			/*universal::LineCrossProduct(pVtx[2].pos, pVtx[0].pos, pPos, posOld);
+			universal::LineCrossProduct(pVtx[1].pos, pVtx[3].pos, pPos, posOld);*/
 			
 #ifdef _DEBUG
 			// デバッグ用のエフェクト
