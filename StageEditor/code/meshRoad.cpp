@@ -13,6 +13,7 @@
 #include "texture.h"
 #include "effect3D.h"
 #include "myLib.h"
+#include "tunnel.h"
 #include <fstream>
 
 //*****************************************************
@@ -721,11 +722,35 @@ void CMeshRoad::Load(void)
 	// ï”ÉfÅ[É^ì«Ç›çûÇ›
 	inputFile.read(reinterpret_cast<char*>(m_aRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
 
-	inputFile.close();
-
 	CreateVtxBuffEdge();
 	
 	if(!inputFile.eof())
 		return;
 
+	m_aTunnel.resize(size);
+
+	for (int i = 0; i < size; i++)
+	{
+		int nDistStart;
+		int nDistEnd;
+
+		inputFile.read(reinterpret_cast<char*>(&nDistStart), sizeof(int));
+		inputFile.read(reinterpret_cast<char*>(&nDistEnd), sizeof(int));
+
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator it;
+
+		it = m_aRoadPoint.begin();
+		std::advance(it, nDistStart);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart = it;
+
+		it = m_aRoadPoint.begin();
+		std::advance(it, nDistEnd);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd = it;
+
+		CTunnel *pTunnel = CTunnel::Create(itStart, itEnd);
+
+		m_aTunnel.push_back(pTunnel);
+	}
+
+	inputFile.close();
 }

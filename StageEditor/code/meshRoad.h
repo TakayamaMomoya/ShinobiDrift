@@ -18,7 +18,7 @@
 //*****************************************************
 // 前方定義
 //*****************************************************
-class CSpline;
+class CTunnel;
 class CCutMullSpline;
 
 //*****************************************************
@@ -70,6 +70,7 @@ private:
 	CCutMullSpline *m_pSpline;	// スプライン
 	CCutMullSpline *m_pSplineL;	// 左側のスプライン
 	CCutMullSpline *m_pSplineR;	// 右側のスプライン
+	std::vector<CTunnel*> m_aTunnel;	// トンネルのポインタの配列
 
 	int m_effectNum;
 	static CMeshRoad *m_pMeshRoad;	// 自身のポインタ
