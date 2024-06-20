@@ -99,6 +99,9 @@ void CParts::Update(void)
 
 	// 移動量を加算
 	m_pos += m_move;
+
+	// 前回のマトリックスを保存
+	m_mtxWorldOld = m_mtxWorld;
 }
 
 //====================================================
