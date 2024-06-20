@@ -438,8 +438,8 @@ void CMeshRoad::SetNormal(VERTEX_3D *pVtx)
 	D3DXVec3Normalize(&nor, &nor);	// 法線を正規化
 
 	// 法線を適用
-	pVtx[0].nor = { 0.0f,1.0f,0.0f };
-	pVtx[1].nor = { 0.0f,1.0f,0.0f };
+	pVtx[0].nor = nor;
+	pVtx[1].nor = nor;
 }
 
 //=====================================================

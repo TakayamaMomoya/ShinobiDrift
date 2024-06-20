@@ -382,9 +382,24 @@ void CMeshRoad::SetNormal(VERTEX_3D *pVtx)
 	if (pVtx == nullptr)
 		return;
 
+	// 頂点位置
+	D3DXVECTOR3 vtxLu = pVtx[-MeshRoad::NUM_VTX_IN_EDGE].pos;
+	D3DXVECTOR3 vtxRu = pVtx[0].pos;
+	D3DXVECTOR3 vtxRd = pVtx[1].pos;
+
+	// 頂点どうしの差分ベクトルから辺を算出
+	D3DXVECTOR3 edge1 = vtxLu - vtxRu;
+	D3DXVECTOR3 edge2 = vtxRd - vtxRu;
+
+	// 二辺の外積から法線を算出
+	D3DXVECTOR3 nor;
+	D3DXVec3Cross(&nor, &edge1, &edge2);
+
+	D3DXVec3Normalize(&nor, &nor);	// 法線を正規化
+
 	// 法線を適用
-	pVtx[0].nor = { 0.0f,1.0f,0.0f };
-	pVtx[1].nor = { 0.0f,1.0f,0.0f };
+	pVtx[0].nor = nor;
+	pVtx[1].nor = nor;
 }
 
 //=====================================================
