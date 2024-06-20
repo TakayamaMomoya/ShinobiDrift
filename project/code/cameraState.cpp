@@ -66,7 +66,7 @@ void CFollowPlayer::Update(CCamera *pCamera)
 		return;
 	}
 
-	pInfoCamera->fLength = 2500.0f;
+	pInfoCamera->fLength = 1000.0f;
 
 	D3DXVECTOR3 pos = pPlayer->GetMtxPos(2);
 
@@ -102,7 +102,6 @@ void CFollowPlayer::Update(CCamera *pCamera)
 		float fTime = m_fTimerPosR / 1.0f;
 		universal::LimitValue(&fTime, 1.0f, 0.0f);
 
-		//pInfoCamera->posVDest = universal::Lerp(posOld, posDest, fTime);
 		pInfoCamera->posVDest = pos + vecPole * pInfoCamera->fLength;
 
 		// 注視点の設定
@@ -113,10 +112,6 @@ void CFollowPlayer::Update(CCamera *pCamera)
 		// 目標位置に補正
 		pInfoCamera->posV += (pInfoCamera->posVDest - pInfoCamera->posV) * 0.2f;
 		pInfoCamera->posR += (pInfoCamera->posRDest - pInfoCamera->posR) * 0.3f;
-		//pInfoCamera->posV = pInfoCamera->posVDest;
-		//pInfoCamera->posR = pInfoCamera->posRDest;
-
-		                                                                                                                                                //pInfoCamera->posR.y = 200.0f;
 	}
 	else
 	{
@@ -136,9 +131,6 @@ void CFollowPlayer::Update(CCamera *pCamera)
 
 		m_rotROld = pInfoCamera->rot;
 	}
-
-	// 視点の位置をプレイヤー中心の球に補正
-	//universal::LimitDistSphereInSide(pInfoCamera->fLength, &pInfoCamera->posV, pPlayer->GetMtxPos(2));
 
 #ifdef _DEBUG
 	CEffect3D::Create(pInfoCamera->posRDest, 20.0f, 1, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
