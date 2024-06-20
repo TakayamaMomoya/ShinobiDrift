@@ -38,8 +38,8 @@ HRESULT CSkybox::Init(void)
 
 	// ÉÇÉfÉãÇÃì«çû
 	int nIdx = CModel::Load("data\\MODEL\\skybox\\sky00.x");
-	SetIdxModel(nIdx);
 	BindModel(nIdx);
+
 	EnableLighting(true);
 	EnableFog(false);
 
