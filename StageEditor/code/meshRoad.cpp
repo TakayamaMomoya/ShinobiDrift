@@ -65,10 +65,10 @@ CMeshRoad *CMeshRoad::Create(void)
 
 		if (pMeshRoad != nullptr)
 		{
+			m_pMeshRoad = pMeshRoad;
+
 			// 初期化処理
 			pMeshRoad->Init();
-
-			m_pMeshRoad = pMeshRoad;
 		}
 	}
 
@@ -674,8 +674,6 @@ void CMeshRoad::Save(void)
 	// リストの情報保存
 	outputFile.write(reinterpret_cast<char*>(m_aRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
 
-	outputFile.close();
-
 	// トンネル情報保存
 	size = m_aTunnel.size();	// トンネル数保存
 	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
@@ -724,7 +722,10 @@ void CMeshRoad::Load(void)
 
 	CreateVtxBuffEdge();
 	
-	if(!inputFile.eof())
+	// トンネル数読み込み
+	inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+
+	if(inputFile.eof())
 		return;
 
 	m_aTunnel.resize(size);

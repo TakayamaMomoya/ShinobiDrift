@@ -39,8 +39,10 @@ private:
 	// メンバ関数
 	void CreateVtx(void);	// 頂点の生成
 	void VtxFollowRoad(void);	// 頂点を道に沿わせる
+	void DetectionPlayer(void);	// プレイヤーの検知
 
 	// メンバ変数
+	bool m_bInPlayer;	// プレイヤーが入っているかどうか
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itStart;	// 開始イテレイター
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// 終了イテレイター
 };

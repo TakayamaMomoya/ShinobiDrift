@@ -53,16 +53,10 @@
     <ClCompile Include="code\imgui.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="code\imgui_demo.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
     <ClCompile Include="code\imgui_draw.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="code\backends\imgui_impl_dx9.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="code\backends\imgui_impl_win32.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="code\imgui_tables.cpp">
@@ -95,6 +89,9 @@
     </ClCompile>
     <ClCompile Include="code\meshcylinder.cpp">
       <Filter>meshedit</Filter>
+    </ClCompile>
+    <ClCompile Include="code\backends\imgui_impl_win32.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -156,18 +153,6 @@
     <ClInclude Include="code\backends\imgui_impl_dx9.h">
       <Filter>imgui</Filter>
     </ClInclude>
-    <ClInclude Include="code\backends\imgui_impl_metal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="code\backends\imgui_impl_osx.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="code\backends\imgui_impl_win32.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="code\imgui_internal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
     <ClInclude Include="code\imstb_rectpack.h">
       <Filter>imgui</Filter>
     </ClInclude>
@@ -202,14 +187,12 @@
     <ClInclude Include="code\meshcylinder.h">
       <Filter>meshedit</Filter>
     </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="code\backends\imgui_impl_metal.mm">
+    <ClInclude Include="code\backends\imgui_impl_win32.h">
       <Filter>imgui</Filter>
-    </None>
-    <None Include="code\backends\imgui_impl_osx.mm">
+    </ClInclude>
+    <ClInclude Include="code\imgui_internal.h">
       <Filter>imgui</Filter>
-    </None>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
