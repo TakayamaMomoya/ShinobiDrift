@@ -93,7 +93,7 @@ HRESULT CMeshRoad::Init(void)
 
 	m_it = m_aRoadPoint.begin();
 
-	EnableWire(true);
+	//EnableWire(true);
 
 	return S_OK;
 }
@@ -132,11 +132,6 @@ void CMeshRoad::Update(void)
 #ifdef _DEBUG
 	for (SInfoRoadPoint info : m_aRoadPoint)
 		CEffect3D::Create(info.pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-
-	if(CInputKeyboard::GetInstance()->GetTrigger(DIK_UP))
-		m_effectNum++;
-	if (CInputKeyboard::GetInstance()->GetTrigger(DIK_DOWN))
-		m_effectNum--;
 #endif // _DEBUG
 }
 
@@ -564,6 +559,7 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 	float fHeight = pPos->y;
 	float fHeightDef = pPos->y;
 	bool bColRoad = false;
+	D3DXVECTOR3 posOldRoadPoint = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -571,19 +567,27 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 
 	for (auto itRoadPoint : m_aRoadPoint)
 	{
+		if (D3DXVec3Dot(&(itRoadPoint.pos - posOldRoadPoint), &(*pPos - posOldRoadPoint)) < 0.0f)
+		{
+			posOldRoadPoint = itRoadPoint.pos;
+			pVtx += MeshRoad::NUM_VTX_IN_EDGE * MeshRoad::NUM_EDGE_IN_ROADPOINT;
+			continue;
+		}
+		posOldRoadPoint = itRoadPoint.pos;
+
 		for (int i = 0; i < MeshRoad::NUM_EDGE_IN_ROADPOINT; i++)
 		{
+			pVtx += MeshRoad::NUM_VTX_IN_EDGE;
+
 			// ポリゴンの下に入っているか判定する
 			if (!universal::IsOnSquare(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
 			{// 当たっていたら
-				pVtx += MeshRoad::NUM_VTX_IN_EDGE;
 				continue;
 			}
 
 			// 高さが一定の高さ以内か判定する
 			if (100.0f < fHeight - pPos->y)
 			{
-				pVtx += MeshRoad::NUM_VTX_IN_EDGE;
 				continue;
 			}
 
@@ -599,25 +603,6 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 			// 道から落ちないようにする
 			/*universal::LineCrossProduct(pVtx[2].pos, pVtx[0].pos, pPos, posOld);
 			universal::LineCrossProduct(pVtx[1].pos, pVtx[3].pos, pPos, posOld);*/
-
-#ifdef _DEBUG
-			// デバッグ用のエフェクト
-			if (m_effectNum == effectNum)
-			{
-				CEffect3D::Create(pVtx[0].pos, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
-				CEffect3D::Create(pVtx[1].pos, 50.0f, 5, D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.5f));
-				CEffect3D::Create(pVtx[2].pos, 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
-				CEffect3D::Create(pVtx[3].pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
-
-				CEffect3D::Create(pVtx[0].pos + (pVtx[0].nor * 100.0f), 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
-				CEffect3D::Create(pVtx[1].pos + (pVtx[1].nor * 100.0f), 50.0f, 5, D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.5f));
-				CEffect3D::Create(pVtx[2].pos + (pVtx[2].nor * 100.0f), 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
-				CEffect3D::Create(pVtx[3].pos + (pVtx[3].nor * 100.0f), 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
-			}
-			effectNum++;
-#endif
-
-			pVtx += MeshRoad::NUM_VTX_IN_EDGE;
 		}
 	}
 
