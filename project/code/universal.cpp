@@ -452,9 +452,9 @@ bool IsOnTriangle(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECT
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx1 - vtx3))->y < 0)
 	{
 		// y軸法線が0ではないか判定
-		if (vtxNor.y != 0.0f)
+		if (vtxNor.y == 0.0f)
 		{
-			return false; // 無効
+			return false;
 		}
 
 		// 角から目標位置へのベクトル

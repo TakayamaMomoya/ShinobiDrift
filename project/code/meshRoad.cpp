@@ -576,12 +576,14 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 			// ポリゴンの下に入っているか判定する
 			if (!universal::IsOnSquare(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
 			{// 当たっていたら
+				pVtx += MeshRoad::NUM_VTX_IN_EDGE;
 				continue;
 			}
 
 			// 高さが一定の高さ以内か判定する
 			if (100.0f < fHeight - pPos->y)
 			{
+				pVtx += MeshRoad::NUM_VTX_IN_EDGE;
 				continue;
 			}
 
@@ -597,7 +599,7 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 			// 道から落ちないようにする
 			/*universal::LineCrossProduct(pVtx[2].pos, pVtx[0].pos, pPos, posOld);
 			universal::LineCrossProduct(pVtx[1].pos, pVtx[3].pos, pPos, posOld);*/
-			
+
 #ifdef _DEBUG
 			// デバッグ用のエフェクト
 			if (m_effectNum == effectNum)
