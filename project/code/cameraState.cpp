@@ -25,33 +25,30 @@ namespace
 {
 const float MOVE_SPEED = 3.0f;	//移動スピード
 const float ROLL_SPEED = 0.02f;	//回転スピード
-const float DIST_CAMERA = 400.0f;	// カメラの距離
 const float FACT_CORRECT_POS = 0.2f;	// 位置補正係数
+const float LENGTH_FOLLOW = 1500.0f;	// 追従時のカメラ距離
 }
 
-//=====================================================
-// 出現時のカメラの動き
-//=====================================================
-void CApperPlayer::Update(CCamera *pCamera)
-{
-	CPlayer *pPlayer = CPlayer::GetInstance();
-
-	if (pPlayer == nullptr)
-		return;
-
-	D3DXVECTOR3 posPlayer = pPlayer->GetMtxPos(1);
-
-	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
-
-	pInfoCamera->posRDest = posPlayer;
-
-	pInfoCamera->posV = posPlayer;
-	pInfoCamera->posV.y = 10.0f;
-	pInfoCamera->posV.x += 100.0f;
-}
-
-//=====================================================
+//***********************************************************************************
 // プレイヤーの追従
+//***********************************************************************************
+//=====================================================
+// コンストラクタ
+//=====================================================
+CFollowPlayer::CFollowPlayer() : m_fTimerPosR(0.0f) 
+{
+	CCamera *pCamera = CManager::GetCamera();
+
+	if (pCamera != nullptr)
+	{
+		CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+
+		pInfoCamera->fLength = LENGTH_FOLLOW;
+	}
+}
+
+//=====================================================
+// 更新
 //=====================================================
 void CFollowPlayer::Update(CCamera *pCamera)
 {
@@ -65,8 +62,6 @@ void CFollowPlayer::Update(CCamera *pCamera)
 	{
 		return;
 	}
-
-	pInfoCamera->fLength = 1000.0f;
 
 	D3DXVECTOR3 pos = pPlayer->GetMtxPos(2);
 
@@ -136,6 +131,16 @@ void CFollowPlayer::Update(CCamera *pCamera)
 	CEffect3D::Create(pInfoCamera->posRDest, 20.0f, 1, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 	CDebugProc::GetInstance()->Print("\nカメラはプレイヤー追従です");
+
+	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+
+	if (pKeyboard != nullptr)
+	{
+		if (pKeyboard->GetPress(DIK_U))
+			pInfoCamera->fLength += 5.5f;
+		if (pKeyboard->GetPress(DIK_J))
+			pInfoCamera->fLength -= 5.5f;
+	}
 #endif
 }
 
