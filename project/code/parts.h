@@ -53,6 +53,7 @@ public:
 	void SetRadius(void);
 	float GetRadius(void) { return m_fRadius; }
 	D3DXMATRIX *GetMatrix(void) { return &m_mtxWorld; }
+	D3DXMATRIX* GetMatrixOld(void) { return &m_mtxWorldOld; }
 	void SetMatrix(void);
 	CModel::Model *GetModel(void) { return m_pModel; }
 	void SetModel(CModel::Model *pModel) { m_pModel = pModel; }
@@ -70,6 +71,7 @@ private:
 	D3DXVECTOR3 m_vtxMin;	                        // 最小頂点
 	D3DXCOLOR m_col;	                            // 色
 	D3DXMATRIX m_mtxWorld;							// ワールドマトリックス
+	D3DXMATRIX m_mtxWorldOld;						// 前回のワールドマトリックス
 	CModel::Model *m_pModel;	                    // モデル情報
 	int m_IdxModel;	                                // モデルの番号
 	float m_fRadius;	                            // モデルの半径
