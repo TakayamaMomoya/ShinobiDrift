@@ -61,7 +61,6 @@ public:
 	virtual void SetPosition(D3DXVECTOR3 pos) {};	// 設定処理
 	virtual D3DXVECTOR3 GetPosition(void) { return D3DXVECTOR3(); }	// 位置取得処理
 	virtual D3DXVECTOR3 GetPositionOld(void) { return D3DXVECTOR3(); }	// 位置取得処理
-	virtual D3DXVECTOR3 GetRotation() { return D3DXVECTOR3(); }	// 向き取得処理
 	virtual float GetWidth(void) { return 0.0f; };	// サイズ取得
 	virtual float GetHeight(void) { return 0.0f; }	// サイズ取得
 	void EnableWire(bool bWire) { m_bWire = bWire; }

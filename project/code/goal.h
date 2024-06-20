@@ -32,9 +32,14 @@ public:
 	void Update();
 	void Draw();
 
+	float GetRotation() { return m_rot; }	// 向き取得処理
+
 private:
 	//メンバ変数
 	int m_nTransitionTime = 0;		// 遷移時間
+
+	D3DXVECTOR3 m_pos;		// 位置
+	float m_rot;		// 向き
 
 	CPlayer* m_pPlayer;		// プレイヤーのポインタ
 	CObject3D* m_pObj3D;	// オブジェクト3Dのポインタ
