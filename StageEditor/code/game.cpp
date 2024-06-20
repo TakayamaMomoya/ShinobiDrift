@@ -165,7 +165,7 @@ void CGame::Update(void)
 	if (ImGui::Button("Mesh", ImVec2(70, 30)))	// メッシュエディット
 		ChangeEdit(new CEditMesh);
 
-	if (ImGui::Button("Mesh", ImVec2(70, 30)))	// ブロックエディット
+	if (ImGui::Button("Block", ImVec2(70, 30)))	// ブロックエディット
 		ChangeEdit(new CEditBlock);
 
 #ifdef _DEBUG
