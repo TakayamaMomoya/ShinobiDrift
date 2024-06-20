@@ -228,9 +228,6 @@
     <ClCompile Include="code\fan.cpp">
       <Filter>ソース ファイル\mesh</Filter>
     </ClCompile>
-    <ClCompile Include="code\myLib.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="code\physics.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -263,6 +260,9 @@
     </ClCompile>
     <ClCompile Include="code\imgui_widgets.cpp">
       <Filter>ソース ファイル\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="code\myLib.cpp">
+      <Filter>ソース ファイル\base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
