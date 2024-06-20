@@ -93,7 +93,7 @@ HRESULT CMeshRoad::Init(void)
 
 	m_it = m_aRoadPoint.begin();
 
-	//EnableWire(true);
+	EnableWire(true);
 
 	return S_OK;
 }
@@ -579,10 +579,10 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 				CEffect3D::Create(pVtx[2].pos, 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
 				CEffect3D::Create(pVtx[3].pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
 
-				CEffect3D::Create(pVtx[0].pos + (pVtx[0].nor * 50.0f), 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
-				CEffect3D::Create(pVtx[1].pos + (pVtx[1].nor * 50.0f), 50.0f, 5, D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.5f));
-				CEffect3D::Create(pVtx[2].pos + (pVtx[2].nor * 50.0f), 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
-				CEffect3D::Create(pVtx[3].pos + (pVtx[3].nor * 50.0f), 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
+				CEffect3D::Create(pVtx[0].pos + (pVtx[0].nor * 100.0f), 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
+				CEffect3D::Create(pVtx[1].pos + (pVtx[1].nor * 100.0f), 50.0f, 5, D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.5f));
+				CEffect3D::Create(pVtx[2].pos + (pVtx[2].nor * 100.0f), 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
+				CEffect3D::Create(pVtx[3].pos + (pVtx[3].nor * 100.0f), 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
 			}
 			effectNum++;
 #endif
@@ -667,6 +667,10 @@ void CMeshRoad::Load(void)
 
 	// ÉgÉìÉlÉãÇÃê∂ê¨
 	inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+
+	if (inputFile.eof())
+		return;
+
 	m_aTunnel.resize(size);
 
 	for (int i = 0; i < size; i++)

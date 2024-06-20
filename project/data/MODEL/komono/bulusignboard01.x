@@ -313,11 +313,11 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\rds_057.png";
+    "data\\TEXTURE\\MATERIAL\\rds_057.png";
    }
   }
   Material {
-   0.800000;0.053600;0.000000;1.000000;;
+   0.800000;0.053333;0.000000;1.000000;;
    5.000000;
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
@@ -328,7 +328,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\yazirusi01.png";
+    "data\\TEXTURE\\MATERIAL\\yazirusi01.png";
    }
   }
   Material {

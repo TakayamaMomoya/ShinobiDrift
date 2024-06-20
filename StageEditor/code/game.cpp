@@ -160,31 +160,13 @@ void CGame::Update(void)
 	// 状態管理
 	ManageState();
 
-	if (CInputKeyboard::GetInstance()->GetTrigger(DIK_G))
-	{
-		if (m_pEdit != nullptr)
-		{
-			m_pEdit->Uninit();
-			delete m_pEdit;
-			m_pEdit = nullptr;
-		}
+	ImGui::Text("[EditMode]");
 
-		if (m_bBlock)
-		{
-			m_pEdit = new CEditMesh;
+	if (ImGui::Button("Mesh", ImVec2(70, 30)))	// メッシュエディット
+		ChangeEdit(new CEditMesh);
 
-			m_bBlock = false;
-		}
-		else
-		{
-			m_pEdit = new CEditBlock;
-
-			m_bBlock = true;
-		}
-
-		if (m_pEdit != nullptr)
-			m_pEdit->Init();
-	}
+	if (ImGui::Button("Mesh", ImVec2(70, 30)))	// ブロックエディット
+		ChangeEdit(new CEditBlock);
 
 #ifdef _DEBUG
 	Debug();
@@ -232,6 +214,26 @@ void CGame::ManageState(void)
 		break;
 	default:
 		break;
+	}
+}
+
+//=====================================================
+// エディターの変更
+//=====================================================
+void CGame::ChangeEdit(CEdit *pEdit)
+{
+	if (m_pEdit != nullptr)
+	{
+		m_pEdit->Uninit();
+		delete m_pEdit;
+		m_pEdit = nullptr;
+	}
+
+	m_pEdit = pEdit;
+
+	if (m_pEdit != nullptr)
+	{
+		m_pEdit->Init();
 	}
 }
 

@@ -332,7 +332,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\クローン\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\5226.png";
+    "data\\TEXTURE\\MATERIAL\\5226.png";
    }
   }
   Material {
@@ -347,7 +347,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.150000;0.150000;0.150000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\クローン\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\metal_00003.jpg";
+    "data\\TEXTURE\\MATERIAL\\metal_00003.jpg";
    }
   }
  }

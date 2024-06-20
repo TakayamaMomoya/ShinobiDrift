@@ -25,7 +25,7 @@ MODEL_FILENAME = data/MODEL/bike/03_Wheel_Rear.x
 CHARACTERSET
     NUM_PARTS = 4
 
-   PARTSSET
+    PARTSSET
         INDEX = 0
         PARENT = -1
         POS = 0.0 150.0 0.0
@@ -34,19 +34,19 @@ CHARACTERSET
     PARTSSET
         INDEX = 1
         PARENT = 0
-        POS = 0.0 60.7 -105.8
+        POS = 0.0 60.7 124.1
         ROT = 0.0 0.0 0.0
     END_PARTSSET
     PARTSSET
         INDEX = 2
         PARENT = 1
-        POS = 0.0 -128.6 -39.3
+        POS = 0.0 -127.6 23.6
         ROT = 0.0 0.0 0.0
     END_PARTSSET
     PARTSSET
         INDEX = 3
         PARENT = 0
-        POS = 0.0 -67.8 109.4
+        POS = 0.0 -68.4 -109.5
         ROT = 0.0 0.0 0.0
     END_PARTSSET
 END_CHARACTERSET

@@ -333,7 +333,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.150000;0.150000;0.150000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\metal_00003.jpg";
+    "data\\TEXTURE\\MATERIAL\\metal_00003.jpg";
    }
   }
   Material {
@@ -342,7 +342,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\22924199.png";
+    "data\\TEXTURE\\MATERIAL\\sika.png";
    }
   }
   Material {
