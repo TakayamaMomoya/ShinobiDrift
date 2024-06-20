@@ -105,6 +105,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 #endif	
 	}
 
+#ifdef _DEBUG
 	// Imguiの初期化
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -122,6 +123,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 	ImGui_ImplDX9_Init(pDevice);
 	ImGui_ImplWin32_Init(hWnd);
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+#endif
 
 	//分解能を設定
 	timeBeginPeriod(1);
@@ -178,19 +180,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 					// ティックの設定
 					CManager::SetTick(fDeltaTime);
 
-					ImGui_ImplDX9_NewFrame();
-					ImGui::NewFrame();
-
-					ImGui::SetNextWindowPos(ImVec2(720, 60), ImGuiCond_Appearing);
-
-					ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_Appearing);
-
-					ImGui::Begin("Edit");
-
 					// 更新処理
 					pManager->Update();
-
-					ImGui::End();
 
 					// 描画処理
 					pManager->Draw();
@@ -204,10 +195,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 
 	if (pManager != nullptr)
 	{
+#ifdef _DEBUG
 		// imgui終了
 		ImGui_ImplWin32_Shutdown();
 		ImGui_ImplDX9_Shutdown();
 		ImGui::DestroyContext();
+#endif
 
 		// 終了処理
 		pManager->Uninit();
@@ -271,6 +264,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		break;
 	}
+
+	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

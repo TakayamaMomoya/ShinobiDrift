@@ -277,9 +277,11 @@ void CRenderer::Draw(void)
 			pBlur->ClearNotBlur();
 		}
 
+#ifdef _DEBUG
 		// imgui•`‰æ
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+#endif
 
 		// •`‰æI—¹
 		m_pD3DDevice->EndScene();
