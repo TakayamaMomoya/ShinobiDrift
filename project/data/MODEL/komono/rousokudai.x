@@ -537,7 +537,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\wood00.jpg";
+    "data\\TEXTURE\\MATERIAL\\wood00.jpg";
    }
   }
   Material {
@@ -546,7 +546,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\p0451_s.jpg";
+    "data\\TEXTURE\\MATERIAL\\green.jpg";
    }
   }
   Material {
@@ -555,7 +555,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\japanese-paper01.jpg";
+    "data\\TEXTURE\\MATERIAL\\japanese-paper01.jpg";
    }
   }
  }

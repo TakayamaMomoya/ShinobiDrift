@@ -13,6 +13,7 @@
 #include "texture.h"
 #include "effect3D.h"
 #include "myLib.h"
+#include "tunnel.h"
 #include <fstream>
 
 //*****************************************************
@@ -674,6 +675,25 @@ void CMeshRoad::Save(void)
 	outputFile.write(reinterpret_cast<char*>(m_aRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
 
 	outputFile.close();
+
+	// トンネル情報保存
+	size = m_aTunnel.size();	// トンネル数保存
+	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+	// イテレーターの終始端を保存
+	for (auto it : m_aTunnel)
+	{
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart = it->GetItStart();
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd = it->GetItEnd();
+
+		int nDist = std::distance(m_aRoadPoint.begin(), itStart);
+		outputFile.write(reinterpret_cast<char*>(&nDist), sizeof(int));
+
+		nDist = std::distance(m_aRoadPoint.begin(), itEnd);
+		outputFile.write(reinterpret_cast<char*>(&nDist), sizeof(int));
+	}
+
+	outputFile.close();
 }
 
 //=====================================================
@@ -702,7 +722,35 @@ void CMeshRoad::Load(void)
 	// 辺データ読み込み
 	inputFile.read(reinterpret_cast<char*>(m_aRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
 
-	inputFile.close();
-
 	CreateVtxBuffEdge();
+	
+	if(!inputFile.eof())
+		return;
+
+	m_aTunnel.resize(size);
+
+	for (int i = 0; i < size; i++)
+	{
+		int nDistStart;
+		int nDistEnd;
+
+		inputFile.read(reinterpret_cast<char*>(&nDistStart), sizeof(int));
+		inputFile.read(reinterpret_cast<char*>(&nDistEnd), sizeof(int));
+
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator it;
+
+		it = m_aRoadPoint.begin();
+		std::advance(it, nDistStart);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart = it;
+
+		it = m_aRoadPoint.begin();
+		std::advance(it, nDistEnd);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd = it;
+
+		CTunnel *pTunnel = CTunnel::Create(itStart, itEnd);
+
+		m_aTunnel.push_back(pTunnel);
+	}
+
+	inputFile.close();
 }

@@ -667,6 +667,10 @@ void CMeshRoad::Load(void)
 
 	// ƒgƒ“ƒlƒ‹‚Ì¶¬
 	inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+
+	if (inputFile.eof())
+		return;
+
 	m_aTunnel.resize(size);
 
 	for (int i = 0; i < size; i++)
