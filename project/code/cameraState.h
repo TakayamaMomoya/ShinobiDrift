@@ -37,6 +37,7 @@ private:
 	float m_fTimerPosR;
 	float m_fLengthPosR;
 	D3DXVECTOR3 m_rotROld;
+	bool m_bDebug;
 };
 
 // ëÄçÏ
