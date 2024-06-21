@@ -756,14 +756,14 @@ void CPlayer::Collision(void)
 	posOldParts[1].z = GetParts(3)->pParts->GetMatrixOld()->_43 + (pos.z - posOld.z);
 
 	//// タイヤの中点を計算
-	posDef = posParts[0] + posParts[1] * 0.5f;
+	posDef = (posParts[0] + posParts[1]) * 0.5f;
 
 	// タイヤそれぞれで当たり判定をとる
 	bRoad[0] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[0], posOldParts[0]);
 	bRoad[1] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[1], posOldParts[1]);
 
 	// プレイヤーの高さを調整
-	pos.y += (posParts[0] + posParts[1] * 0.5f).y - posDef.y;
+	pos.y += ((posParts[0] + posParts[1]) * 0.5f).y - posDef.y;
 
 	// タイヤの位置関係から角度を計算
 	if ((posParts[1].y - posParts[0].y) < D3DXVec3Length(&(posParts[0] - posParts[1])))
