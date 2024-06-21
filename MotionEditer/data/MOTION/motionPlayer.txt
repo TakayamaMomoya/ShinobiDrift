@@ -9,7 +9,7 @@ SCRIPT
 #====================================================================
 # モデル数
 #====================================================================
-NUM_MODEL = 15
+NUM_MODEL = 16
 
 #====================================================================
 # モデルファイル名
@@ -29,12 +29,13 @@ MODEL_FILENAME = data/MODEL/Player/11_shooes_r.x
 MODEL_FILENAME = data/MODEL/Player/12_thingth_l.x
 MODEL_FILENAME = data/MODEL/Player/13_shin_l.x
 MODEL_FILENAME = data/MODEL/Player/14_shooes_l.x
+MODEL_FILENAME = data/MODEL/Player/sword.x
 
 #====================================================================
 # キャラクター情報
 #====================================================================
 CHARACTERSET
-    NUM_PARTS = 15
+    NUM_PARTS = 16
 
     PARTSSET
         INDEX = 0
@@ -124,6 +125,12 @@ CHARACTERSET
         INDEX = 14
         PARENT = 13
         POS = 0.0 -61.2 0.0
+        ROT = 0.0 0.0 0.0
+    END_PARTSSET
+       PARTSSET
+        INDEX = 15
+        PARENT = 1
+        POS = -29.7 62.4 -18.2
         ROT = 0.0 0.0 0.0
     END_PARTSSET
 END_CHARACTERSET

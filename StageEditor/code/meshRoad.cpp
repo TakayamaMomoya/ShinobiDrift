@@ -92,7 +92,9 @@ HRESULT CMeshRoad::Init(void)
 
 	m_it = m_aRoadPoint.begin();
 
-	//EnableWire(true);
+#ifdef _DEBUG
+	EnableWire(true);
+#endif
 
 	return S_OK;
 }
