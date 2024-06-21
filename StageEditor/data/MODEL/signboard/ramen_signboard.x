@@ -177,7 +177,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Downloads\\PNG-20240620T001508Z-001\\PNG\\Neon_Ramen.png";
+    "data\\TEXTURE\\MATERIAL\\Neon_Ramen.png";
    }
   }
   Material {
