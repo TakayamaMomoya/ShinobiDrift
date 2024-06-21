@@ -34,6 +34,12 @@
     <Filter Include="ソース ファイル\imgui">
       <UniqueIdentifier>{c130dcf7-147f-46b5-a707-9bb1a60e9d6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ソース ファイル\edit">
+      <UniqueIdentifier>{e43a5043-1d89-42bc-9f4e-0770f7b56d9f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\lib">
+      <UniqueIdentifier>{7a9f491c-a4b4-4271-853a-7d91d2787b77}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="code\block.cpp">
@@ -207,9 +213,6 @@
     <ClCompile Include="code\number3D.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
-    <ClCompile Include="code\effekseer.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="code\precompile.cpp">
       <Filter>ソース ファイル\base</Filter>
     </ClCompile>
@@ -221,9 +224,6 @@
     </ClCompile>
     <ClCompile Include="code\meshRoad.cpp">
       <Filter>ソース ファイル\mesh</Filter>
-    </ClCompile>
-    <ClCompile Include="code\physics.cpp">
-      <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="code\fan.cpp">
       <Filter>ソース ファイル\mesh</Filter>
@@ -263,6 +263,21 @@
     </ClCompile>
     <ClCompile Include="code\myLib.cpp">
       <Filter>ソース ファイル\base</Filter>
+    </ClCompile>
+    <ClCompile Include="code\edit.cpp">
+      <Filter>ソース ファイル\edit</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editBlock.cpp">
+      <Filter>ソース ファイル\edit</Filter>
+    </ClCompile>
+    <ClCompile Include="code\editMesh.cpp">
+      <Filter>ソース ファイル\edit</Filter>
+    </ClCompile>
+    <ClCompile Include="code\physics.cpp">
+      <Filter>ソース ファイル\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="code\effekseer.cpp">
+      <Filter>ソース ファイル\lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -437,9 +452,6 @@
     <ClInclude Include="code\number3D.h">
       <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
-    <ClInclude Include="code\effekseer.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="code\precompile.h">
       <Filter>ソース ファイル\base</Filter>
     </ClInclude>
@@ -454,9 +466,6 @@
     </ClInclude>
     <ClInclude Include="code\myLib.h">
       <Filter>ソース ファイル\base</Filter>
-    </ClInclude>
-    <ClInclude Include="code\physics.h">
-      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="code\fan.h">
       <Filter>ソース ファイル\mesh</Filter>
@@ -496,6 +505,21 @@
     </ClInclude>
     <ClInclude Include="code\imstb_truetype.h">
       <Filter>ソース ファイル\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="code\edit.h">
+      <Filter>ソース ファイル\edit</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editBlock.h">
+      <Filter>ソース ファイル\edit</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editMesh.h">
+      <Filter>ソース ファイル\edit</Filter>
+    </ClInclude>
+    <ClInclude Include="code\effekseer.h">
+      <Filter>ソース ファイル\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="code\physics.h">
+      <Filter>ソース ファイル\lib</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

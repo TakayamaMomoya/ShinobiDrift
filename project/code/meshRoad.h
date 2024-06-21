@@ -51,9 +51,10 @@ public:
 	void Save(void);	// エディターのみ。ゲームでは消してね
 	void Load(void);	// エディターのみ。ゲームでは消してね
 
-	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectEdge(void);
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectRoadPoint(void);
 	std::vector<SInfoRoadPoint> *GetList(void) { return &m_aRoadPoint; }
-	void DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
+	std::vector<CTunnel*> *GetArrayTunnnel(void) { return &m_aTunnel; }
+	void DeleteRoadPoint(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void ResetIterator(void);
 
 private:
