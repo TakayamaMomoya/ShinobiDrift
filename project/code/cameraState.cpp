@@ -35,7 +35,7 @@ const float LENGTH_FOLLOW = 1500.0f;	// 追従時のカメラ距離
 //=====================================================
 // コンストラクタ
 //=====================================================
-CFollowPlayer::CFollowPlayer() : m_fTimerPosR(0.0f) 
+CFollowPlayer::CFollowPlayer() : m_fTimerPosR(0.0f), m_fLengthPosR(0.0f)
 {
 	CCamera *pCamera = CManager::GetCamera();
 
@@ -45,6 +45,8 @@ CFollowPlayer::CFollowPlayer() : m_fTimerPosR(0.0f)
 
 		pInfoCamera->fLength = LENGTH_FOLLOW;
 	}
+
+	m_fLengthPosR = 1000.0f;
 }
 
 //=====================================================
@@ -116,9 +118,13 @@ void CFollowPlayer::Update(CCamera *pCamera)
 
 		universal::LimitRot(&pInfoCamera->rot.y);
 
-		pInfoCamera->posRDest = pos;
+		D3DXMATRIX *pMtx = pPlayer->GetMatrix();
 
-		//目標の視点設定
+		D3DXVECTOR3 vecAddPosR = { pMtx->_31, pMtx->_32, pMtx->_33 };
+
+		pInfoCamera->posRDest = pos + vecAddPosR * m_fLengthPosR;
+
+		// 目標の視点設定
 		D3DXVECTOR3 vecPole = universal::PolarCoordinates(pInfoCamera->rot);
 		pInfoCamera->posVDest = pos + vecPole * pInfoCamera->fLength;
 
@@ -137,9 +143,9 @@ void CFollowPlayer::Update(CCamera *pCamera)
 	if (pKeyboard != nullptr)
 	{
 		if (pKeyboard->GetPress(DIK_U))
-			pInfoCamera->fLength += 5.5f;
+			pInfoCamera->fViewAngle += 5.5f;
 		if (pKeyboard->GetPress(DIK_J))
-			pInfoCamera->fLength -= 5.5f;
+			pInfoCamera->fViewAngle -= 5.5f;
 	}
 #endif
 }

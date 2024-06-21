@@ -192,9 +192,42 @@ void CMeshRoad::Draw(void)
 }
 
 //=====================================================
+// ロードポイントの選択
+//=====================================================
+std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void)
+{
+	ImGui::Text("[SelectRoadPoint]");
+
+	int nDist = std::distance(m_aRoadPoint.begin(), m_it);
+	int nSize = m_aRoadPoint.size();
+
+	if (ImGui::DragInt("Index", &nDist, 1.0f, 0, nSize - 1))
+	{
+		// イテレータを再初期化して指定番号の要素に移動
+		m_it = m_aRoadPoint.begin();
+		std::advance(m_it, nDist);
+	}
+
+	if (ImGui::Button("NextEdge", ImVec2(70, 30)))
+	{
+		if (m_it != m_aRoadPoint.end() && std::next(m_it) != m_aRoadPoint.end())
+			std::advance(m_it, 1);
+	}
+	if (ImGui::Button("PrevEdge", ImVec2(70, 30)))
+	{
+		if (m_it != m_aRoadPoint.begin())
+			std::advance(m_it, -1);
+	}
+
+	CEffect3D::Create(m_it->pos, 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+
+	return m_it;
+}
+
+//=====================================================
 // ロードポイントの削除
 //=====================================================
-void CMeshRoad::DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
+void CMeshRoad::DeleteRoadPoint(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
 {
 	m_aRoadPoint.erase(it);
 
