@@ -42,6 +42,7 @@ CScene *CManager::m_pScene = nullptr;	// シーンへのポインタ
 CScene::MODE CManager::m_mode = CScene::MODE_GAME;	// 現在のモード
 int CManager::m_nScore = 0;	// スコア保存用
 float CManager::m_fDeltaTime = 0.0f;	// 前回のフレームから経過した時間
+CManager *CManager::m_pManager = nullptr;	// 自身のポインタ
 
 //=====================================================
 // コンストラクタ
@@ -247,6 +248,17 @@ void CManager::Uninit(void)
 //=====================================================
 void CManager::Update(void)
 {
+#ifdef _DEBUG
+	ImGui_ImplDX9_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::SetNextWindowPos(ImVec2(50000, 60), ImGuiCond_Appearing);
+
+	ImGui::SetNextWindowSize(ImVec2(500, 500), ImGuiCond_Appearing);
+
+	ImGui::Begin("Edit");
+#endif
+
 	// フェード更新
 	CFade *pFade = CFade::GetInstance();
 
@@ -296,6 +308,10 @@ void CManager::Update(void)
 			CManager::SetMode(CScene::MODE_TITLE);
 		}
 	}
+
+#ifdef _DEBUG
+	ImGui::End();
+#endif
 }
 
 //=====================================================

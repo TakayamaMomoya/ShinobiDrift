@@ -39,6 +39,10 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw();
+
+	static CManager *Create(void);
+	static CManager *GetInstance(void) { return m_pManager; }
+
 	static CCamera *GetCamera(void) { return m_pCamera; }
 	static CLight *GetLight(void) { return m_pLight; }
 	static CEffekseer* GetMyEffekseer(void) { return m_pMyEffekseer; }
@@ -59,6 +63,7 @@ private:
 	static CScene::MODE m_mode;	// 現在のモード
 	static int m_nScore;	// スコア
 	static float m_fDeltaTime;	// 前回のフレームから経過した秒数
+	static CManager *m_pManager;	// 自身のポインタ
 };
 
 #endif

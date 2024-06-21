@@ -1,0 +1,190 @@
+#====================================================================
+#
+# マップのブロック配置情報[map.txt]
+# Author：Momoya Takayama
+#
+#====================================================================
+SCRIPT
+
+#====================================================================
+# モデル数
+#====================================================================
+NUM_BLOCK = 15
+
+#0番目のブロック
+INFOBLOCK
+ TAG = wall00
+ MODEL = data\\MODEL\\BLOCK\\wall00.x
+ SNAG = 1
+END_INFOBLOCK
+
+#1番目のブロック
+INFOBLOCK
+ TAG = wall01
+ MODEL = data\\MODEL\\BLOCK\\wall01.x
+ SNAG = 1
+END_INFOBLOCK
+
+#2番目のブロック
+INFOBLOCK
+ TAG = bill00
+ MODEL = data\\MODEL\\BLOCK\\bill00.x
+ SNAG = 1
+END_INFOBLOCK
+
+#3番目のブロック
+INFOBLOCK
+ TAG = bill01
+ MODEL = data\\MODEL\\BLOCK\\bill01.x
+ SNAG = 1
+END_INFOBLOCK
+
+#4番目のブロック
+INFOBLOCK
+ TAG = tree00
+ MODEL = data\\MODEL\\BLOCK\\tree00.x
+ SNAG = 0
+END_INFOBLOCK
+
+#5番目のブロック
+INFOBLOCK
+ TAG = car00
+ MODEL = data\\MODEL\\BLOCK\\car00.x
+ SNAG = 0
+END_INFOBLOCK
+
+#6番目のブロック
+INFOBLOCK
+ TAG = car01
+ MODEL = data\\MODEL\\BLOCK\\car01.x
+ SNAG = 0
+END_INFOBLOCK
+
+#7番目のブロック
+INFOBLOCK
+ TAG = car02
+ MODEL = data\\MODEL\\BLOCK\\car02.x
+ SNAG = 0
+END_INFOBLOCK
+
+#8番目のブロック
+INFOBLOCK
+ TAG = road00
+ MODEL = data\\MODEL\\BLOCK\\road00.x
+ SNAG = 0
+END_INFOBLOCK
+
+#9番目のブロック
+INFOBLOCK
+ TAG = curve
+ MODEL = data\\MODEL\\BLOCK\\road01.x
+ SNAG = 0
+END_INFOBLOCK
+
+#10番目のブロック
+INFOBLOCK
+ TAG = crossroad
+ MODEL = data\\MODEL\\BLOCK\\road02.x
+ SNAG = 0
+END_INFOBLOCK
+
+#11番目のブロック
+INFOBLOCK
+ TAG = longroad
+ MODEL = data\\MODEL\\BLOCK\\road03.x
+ SNAG = 0
+END_INFOBLOCK
+
+#12番目のブロック
+INFOBLOCK
+ TAG = roadset
+ MODEL = data\\MODEL\\BLOCK\\road04.x
+ SNAG = 0
+END_INFOBLOCK
+
+#13番目のブロック
+INFOBLOCK
+ TAG = HighBill
+ MODEL = data\\MODEL\\BLOCK\\bill03.x
+ SNAG = 0
+END_INFOBLOCK
+
+#14番目のブロック
+INFOBLOCK
+ TAG = warehouse
+ MODEL = data\\MODEL\\BLOCK\\bill02.x
+ SNAG = 0
+END_INFOBLOCK
+
+#====================================================================
+# 配置情報
+#====================================================================
+SETBLOCK
+ IDX = 0
+ POS = 4580.00 0.00 -177.00
+ ROT = 0.00 3.14 0.00
+END_SETBLOCK
+
+SETGRABBLOCK
+ IDX = 0
+ POS = 0.00 0.00 0.00
+ ROT = 0.00 0.00 0.00
+ ANGLE_OFFSET = -2.79 -3.74
+ RADIUS_OFFSET = 1000.00
+END_SETBLOCK
+
+SETBLOCK
+ IDX = 0
+ POS = 3567.00 0.00 -1704.00
+ ROT = 0.00 0.00 0.00
+END_SETBLOCK
+
+SETGRABBLOCK
+ IDX = 0
+ POS = 3567.00 0.00 -1704.00
+ ROT = 0.00 0.00 0.00
+ ANGLE_OFFSET = 1.19 -0.61
+ RADIUS_OFFSET = 1000.00
+END_SETBLOCK
+
+SETGRABBLOCK
+ IDX = 0
+ POS = 7166.01 439.00 -5164.46
+ ROT = 0.00 0.82 0.00
+ ANGLE_OFFSET = -2.36 -3.14
+ RADIUS_OFFSET = 1000.00
+END_SETBLOCK
+
+SETGRABBLOCK
+ IDX = 0
+ POS = 7506.69 439.00 -4982.84
+ ROT = 0.00 0.49 0.00
+ ANGLE_OFFSET = -2.21 -3.09
+ RADIUS_OFFSET = 1000.00
+END_SETBLOCK
+
+SETGRABBLOCK
+ IDX = 0
+ POS = 12557.43 650.00 -7105.17
+ ROT = 0.00 0.00 0.00
+ ANGLE_OFFSET = 2.00 -0.35
+ RADIUS_OFFSET = 1000.00
+END_SETBLOCK
+
+SETGRABBLOCK
+ IDX = 0
+ POS = 4162.02 843.00 361.60
+ ROT = 0.00 0.00 0.00
+ ANGLE_OFFSET = 4.99 0.85
+ RADIUS_OFFSET = 1000.00
+END_SETBLOCK
+
+SETGRABBLOCK
+ IDX = 0
+ POS = 3855.17 320.00 1959.79
+ ROT = 0.00 0.00 0.00
+ ANGLE_OFFSET = 7.74 -1.20
+ RADIUS_OFFSET = 1000.00
+END_SETBLOCK
+
+END_SCRIPT

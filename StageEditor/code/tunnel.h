@@ -28,6 +28,10 @@ public:
 	void Update(void);
 	void Draw(void);
 
+	// •Ï”æ“¾Eİ’èŠÖ”
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItStart(void) { return m_itStart; }
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItEnd(void) { return m_itEnd; }
+
 	// Ã“Iƒƒ“ƒoŠÖ”
 	static CTunnel *Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart, std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd);
 

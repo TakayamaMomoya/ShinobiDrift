@@ -12,6 +12,7 @@
 #include "manager.h"
 #include "inputkeyboard.h"
 #include "object.h"
+#include "renderer.h"
 
 //*****************************************************
 // マクロ定義
@@ -36,8 +37,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 {
 	//乱数シード値の設定
 	srand((unsigned int)time(0));
-
-	ShowCursor(false);
 
 	// マネージャーの宣言
 	CManager *pManager = nullptr;
@@ -98,19 +97,33 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 		pManager = new CManager;
 
 #ifdef _DEBUG
-
 		// マネージャーの初期化
 		pManager->Init(hInstance, hWnd, TRUE);
-
 #else 
-
 		// マネージャーの初期化
 		pManager->Init(hInstance, hWnd, FALSE);
-
-#endif
-
-		
+#endif	
 	}
+
+#ifdef _DEBUG
+	// Imguiの初期化
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+	io.DisplaySize = ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT);
+	bool bDisp = false;
+
+	// imgui設定
+	ImGui::StyleColorsDark();
+
+	LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();;
+
+	ImGui_ImplDX9_Init(pDevice);
+	ImGui_ImplWin32_Init(hWnd);
+	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+#endif
 
 	//分解能を設定
 	timeBeginPeriod(1);
@@ -182,6 +195,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 
 	if (pManager != nullptr)
 	{
+#ifdef _DEBUG
+		// imgui終了
+		ImGui_ImplWin32_Shutdown();
+		ImGui_ImplDX9_Shutdown();
+		ImGui::DestroyContext();
+#endif
+
 		// 終了処理
 		pManager->Uninit();
 
@@ -244,6 +264,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		break;
 	}
+
+	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

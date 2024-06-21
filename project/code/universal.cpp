@@ -439,85 +439,113 @@ bool IsInTriangle(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECT
 }
 
 //========================================
-// 三角形の上にいるかの判定
+// 三角形の下にいるかの判定
 //========================================
-bool IsOnPolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR3 vtx4, D3DXVECTOR3 vtxNor1, D3DXVECTOR3 vtxNor2, D3DXVECTOR3 posTarget, D3DXVECTOR3 posOldTarget, float& rHeight)
+bool IsOnTriangle(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR3 vtxNor, D3DXVECTOR3 posTarget, float& rHeight)
 {
-	D3DXVECTOR3 vecP, vecPOld, vecTemp;
-	float fHeight, fHeightOld;
+	D3DXVECTOR3 vecP, vecTemp;
+	float fHeight, fDot;
 
-	// 1つ目のポリゴンと内外判定
+	// ポリゴンと内外判定
 	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &(vtx2 - vtx1))->y < 0 &&
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &(vtx3 - vtx2))->y <= 0 &&
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx1 - vtx3))->y < 0)
 	{
+		// y軸法線が0ではないか判定
+		if (vtxNor.y == 0.0f)
+		{
+			return false;
+		}
+
 		// 角から目標位置へのベクトル
 		vecP = posTarget - vtx1;
-		vecPOld = posOldTarget - vtx1;
 
-		// y軸法線が0ではないか判定
-		if (vtxNor1.y != 0.0f)
+		// 内積を計算
+		fDot = (vtxNor.x * vecP.x) + (vtxNor.z * vecP.z);
+
+		// 内積を用いて高さを計算
+		fHeight = -(fDot / vtxNor.y) + vtx1.y;
+
+		// 高さが目標位置より高いか判定
+		if (fHeight > posTarget.y)
 		{
-			// 内積を用いて高さを計算
-			fHeight = -(((vtxNor1.x * vecP.x) + (vtxNor1.z * vecP.z)) / vtxNor1.y) + vtx1.y;
-			fHeightOld = -(((vtxNor1.x * vecPOld.x) + (vtxNor1.z * vecPOld.z)) / vtxNor1.y) + vtx1.y;
-
-			// 高さが目標位置より高いか判定
-			if (fHeight > posTarget.y)
-			{
-				// 高さ代入
-				rHeight = fHeight;
-				return true;
-			}
-
-			if (D3DXVec3Cross(&vecTemp, &(posOldTarget - vtx4), &(vtx3 - vtx4))->y < 0 &&
-				D3DXVec3Cross(&vecTemp, &(posOldTarget - vtx3), &(vtx2 - vtx3))->y <= 0 &&
-				D3DXVec3Cross(&vecTemp, &(posOldTarget - vtx2), &(vtx4 - vtx2))->y < 0)
-			{
-				if (fHeight > posTarget.y)
-				{
-					rHeight = fHeight;
-					return true;
-				}
-			}
+			// 高さ代入
+			rHeight = fHeight;
+			return true;
 		}
 	}
 
+	return false;
+}
+
+//========================================
+// ポリゴンの下にいるかの判定
+//========================================
+bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR3 vtx4, D3DXVECTOR3 vtxNor1, D3DXVECTOR3 vtxNor2, D3DXVECTOR3 posTarget, D3DXVECTOR3 posOldTarget, float& rHeight)
+{
+	// 1つ目のポリゴンと内外判定
+	if (IsOnTriangle(vtx1, vtx2, vtx3, vtxNor1, posTarget, rHeight))
+		return true;
+
 	// 2つ目のポリゴンと内外判定
-	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx4), &(vtx3 - vtx4))->y < 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx2 - vtx3))->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &(vtx4 - vtx2))->y < 0)
+	if (IsOnTriangle(vtx4, vtx3, vtx2, vtxNor2, posTarget, rHeight))
+		return true;
+	
+	return false;
+}
+
+//========================================
+// 線に対する外積の押し戻し判定
+//========================================
+bool LineCrossProduct(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3* pos, D3DXVECTOR3 posOld)
+{
+	D3DXVECTOR3 vecMove, vecLine, vecToPos, vecToPosOld;
+	float fRate, fOutUnit, fOutRate;
+
+	// 角ベクトル計算
+	vecMove = *pos - posOld;
+	vecLine = vtx1 - vtx2;
+	vecToPos = *pos - vtx2;
+	vecToPosOld = posOld - vtx2;
+
+	// y方向を0にする
+	vecMove.y = 0.0f;
+	vecLine.y = 0.0f;
+	vecToPos.y = 0.0f;
+	vecToPosOld.y = 0.0f;
+
+	// 交点倍率計算
+	fOutUnit = CrossProduct(vecLine, vecMove);
+	fOutRate = CrossProduct(vecToPos, vecMove);
+	fRate = fOutRate / fOutUnit;
+
+	// 線分上をまたいでいるか判定
+	if (CrossProduct(vecLine, vecToPos) > 0.0f && 
+		CrossProduct(vecLine, vecToPosOld) < 0.0f && 
+		fRate > 0.0f && fRate < 1.0f)
 	{
-		// 角から目標位置へのベクトル
-		vecP = posTarget - vtx4;
-		vecPOld = posOldTarget - vtx4;
+		D3DXVECTOR3 vecNor, posCross;
+		float fDot;
 
-		// y軸法線が0ではないか判定
-		if (vtxNor2.y != 0.0f)
-		{
-			// 内積を用いて高さを計算
-			fHeight = -(((vtxNor2.x * vecP.x) + (vtxNor2.z * vecP.z)) / vtxNor2.y) + vtx4.y;
-			fHeightOld = -(((vtxNor1.x * vecPOld.x) + (vtxNor1.z * vecPOld.z)) / vtxNor1.y) + vtx4.y;
+		//法線ベクトル計算
+		vecNor.x = -vecLine.z;
+		vecNor.y = 0.0f;
+		vecNor.z = vecLine.x;
 
-			// 高さが目標位置より高いか判定
-			if (fHeight > posTarget.y)
-			{
-				// 高さ代入
-				rHeight = fHeight;
-				return true;
-			}
+		//法線ベクトル単位化
+		D3DXVec3Normalize(&vecNor, &vecNor);
 
-			if (D3DXVec3Cross(&vecTemp, &(posOldTarget - vtx1), &(vtx2 - vtx1))->y < 0 &&
-				D3DXVec3Cross(&vecTemp, &(posOldTarget - vtx2), &(vtx3 - vtx2))->y <= 0 &&
-				D3DXVec3Cross(&vecTemp, &(posOldTarget - vtx3), &(vtx1 - vtx3))->y < 0)
-			{
-				if (fHeight > posTarget.y)
-				{
-					rHeight = fHeight;
-					return true;
-				}
-			}
-		}
+		//交点計算
+		posCross = vtx2 + (vecLine * fRate);
+		vecMove = *pos - posCross;
+		vecMove.y = 0.0f;
+
+		//水平方向大きさ
+		fDot = D3DXVec3Dot(&-vecMove, &vecNor);
+
+		*pos = posCross + (vecMove + (vecNor * fDot));
+
+		return true;
 	}
 
 	return false;

@@ -132,11 +132,6 @@ void CMeshRoad::Update(void)
 #ifdef _DEBUG
 	for (SInfoRoadPoint info : m_aRoadPoint)
 		CEffect3D::Create(info.pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-
-	if(CInputKeyboard::GetInstance()->GetTrigger(DIK_UP))
-		m_effectNum++;
-	if (CInputKeyboard::GetInstance()->GetTrigger(DIK_DOWN))
-		m_effectNum--;
 #endif // _DEBUG
 }
 
@@ -197,9 +192,42 @@ void CMeshRoad::Draw(void)
 }
 
 //=====================================================
+// ロードポイントの選択
+//=====================================================
+std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void)
+{
+	ImGui::Text("[SelectRoadPoint]");
+
+	int nDist = std::distance(m_aRoadPoint.begin(), m_it);
+	int nSize = m_aRoadPoint.size();
+
+	if (ImGui::DragInt("Index", &nDist, 1.0f, 0, nSize - 1))
+	{
+		// イテレータを再初期化して指定番号の要素に移動
+		m_it = m_aRoadPoint.begin();
+		std::advance(m_it, nDist);
+	}
+
+	if (ImGui::Button("NextEdge", ImVec2(70, 30)))
+	{
+		if (m_it != m_aRoadPoint.end() && std::next(m_it) != m_aRoadPoint.end())
+			std::advance(m_it, 1);
+	}
+	if (ImGui::Button("PrevEdge", ImVec2(70, 30)))
+	{
+		if (m_it != m_aRoadPoint.begin())
+			std::advance(m_it, -1);
+	}
+
+	CEffect3D::Create(m_it->pos, 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+
+	return m_it;
+}
+
+//=====================================================
 // ロードポイントの削除
 //=====================================================
-void CMeshRoad::DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
+void CMeshRoad::DeleteRoadPoint(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
 {
 	m_aRoadPoint.erase(it);
 
@@ -382,9 +410,24 @@ void CMeshRoad::SetNormal(VERTEX_3D *pVtx)
 	if (pVtx == nullptr)
 		return;
 
+	// 頂点位置
+	D3DXVECTOR3 vtxLu = pVtx[-MeshRoad::NUM_VTX_IN_EDGE].pos;
+	D3DXVECTOR3 vtxRu = pVtx[0].pos;
+	D3DXVECTOR3 vtxRd = pVtx[1].pos;
+
+	// 頂点どうしの差分ベクトルから辺を算出
+	D3DXVECTOR3 edge1 = vtxLu - vtxRu;
+	D3DXVECTOR3 edge2 = vtxRd - vtxRu;
+
+	// 二辺の外積から法線を算出
+	D3DXVECTOR3 nor;
+	D3DXVec3Cross(&nor, &edge1, &edge2);
+
+	D3DXVec3Normalize(&nor, &nor);	// 法線を正規化
+
 	// 法線を適用
-	pVtx[0].nor = { 0.0f,1.0f,0.0f };
-	pVtx[1].nor = { 0.0f,1.0f,0.0f };
+	pVtx[0].nor = nor;
+	pVtx[1].nor = nor;
 }
 
 //=====================================================
@@ -549,6 +592,7 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 	float fHeight = pPos->y;
 	float fHeightDef = pPos->y;
 	bool bColRoad = false;
+	D3DXVECTOR3 posOldRoadPoint = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
@@ -556,38 +600,42 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 
 	for (auto itRoadPoint : m_aRoadPoint)
 	{
+		if (D3DXVec3Dot(&(itRoadPoint.pos - posOldRoadPoint), &(*pPos - posOldRoadPoint)) < 0.0f)
+		{
+			posOldRoadPoint = itRoadPoint.pos;
+			pVtx += MeshRoad::NUM_VTX_IN_EDGE * MeshRoad::NUM_EDGE_IN_ROADPOINT;
+			continue;
+		}
+		posOldRoadPoint = itRoadPoint.pos;
+
 		for (int i = 0; i < MeshRoad::NUM_EDGE_IN_ROADPOINT; i++)
 		{
-			// ポリゴンの上に乗っているか判定する
-			if (universal::IsOnPolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
-			{// 当たっていたら
-
-				if (fHeightDef > fHeight || !bColRoad)
-				{
-					fHeightDef = fHeight;
-				}
-
-				bColRoad = true;
-			}
-			
-#ifdef _DEBUG
-			// デバッグ用のエフェクト
-			if (m_effectNum == effectNum)
-			{
-				CEffect3D::Create(pVtx[0].pos, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
-				CEffect3D::Create(pVtx[1].pos, 50.0f, 5, D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.5f));
-				CEffect3D::Create(pVtx[2].pos, 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
-				CEffect3D::Create(pVtx[3].pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
-
-				CEffect3D::Create(pVtx[0].pos + (pVtx[0].nor * 50.0f), 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.5f));
-				CEffect3D::Create(pVtx[1].pos + (pVtx[1].nor * 50.0f), 50.0f, 5, D3DXCOLOR(0.0f, 1.0f, 0.0f, 0.5f));
-				CEffect3D::Create(pVtx[2].pos + (pVtx[2].nor * 50.0f), 50.0f, 5, D3DXCOLOR(0.0f, 0.0f, 1.0f, 0.5f));
-				CEffect3D::Create(pVtx[3].pos + (pVtx[3].nor * 50.0f), 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.5f));
-			}
-			effectNum++;
-#endif
-
 			pVtx += MeshRoad::NUM_VTX_IN_EDGE;
+
+			// ポリゴンの下に入っているか判定する
+			if (!universal::IsOnSquare(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
+			{// 当たっていたら
+				continue;
+			}
+
+			// 高さが一定の高さ以内か判定する
+			if (100.0f < fHeight - pPos->y)
+			{
+				continue;
+			}
+
+			// 高さが一番高い場所で判定する
+			if (fHeightDef < fHeight || !bColRoad)
+			{
+				fHeightDef = fHeight;
+			}
+
+			// 判定をtrueにする
+			bColRoad = true;
+
+			// 道から落ちないようにする
+			/*universal::LineCrossProduct(pVtx[2].pos, pVtx[0].pos, pPos, posOld);
+			universal::LineCrossProduct(pVtx[1].pos, pVtx[3].pos, pPos, posOld);*/
 		}
 	}
 
@@ -667,9 +715,13 @@ void CMeshRoad::Load(void)
 
 	// トンネルの生成
 	inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+
+	if (inputFile.eof())
+		return;
+
 	m_aTunnel.resize(size);
 
-	for (int i = 0; i < size; i++)
+	for (size_t i = 0; i < size; i++)
 	{
 		int nDistStart;
 		int nDistEnd;

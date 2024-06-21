@@ -26,26 +26,18 @@ public:
 private:
 };
 
-// 出現カメラ
-class CApperPlayer : public CCameraState
-{
-public:
-	CApperPlayer() {};
-	void Update(CCamera *pCamera) override;
-
-private:
-};
-
 // プレイヤー追従
 class CFollowPlayer : public CCameraState
 {
 public:
-	CFollowPlayer() : m_fTimerPosR(0.0f) {};
+	CFollowPlayer();
 	void Update(CCamera *pCamera) override;
 
 private:
 	float m_fTimerPosR;
+	float m_fLengthPosR;
 	D3DXVECTOR3 m_rotROld;
+	bool m_bDebug;
 };
 
 // 操作

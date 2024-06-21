@@ -51,9 +51,10 @@ public:
 	void Save(void);	// エディターのみ。ゲームでは消してね
 	void Load(void);	// エディターのみ。ゲームでは消してね
 
-	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectEdge(void);
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectRoadPoint(void);
 	std::vector<SInfoRoadPoint> *GetList(void) { return &m_aRoadPoint; }
-	void DeleteEdge(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
+	std::vector<CTunnel*> *GetArrayTunnnel(void) { return &m_aTunnel; }
+	void DeleteRoadPoint(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void ResetIterator(void);
 
 private:
@@ -72,13 +73,12 @@ private:
 	CCutMullSpline *m_pSplineR;	// 右側のスプライン
 	std::vector<CTunnel*> m_aTunnel;	// トンネルのポインタの配列
 
-	int m_effectNum;
 	static CMeshRoad *m_pMeshRoad;
 };
 
 namespace MeshRoad
 {
-const int NUM_EDGE_IN_ROADPOINT = 10;	// ロードポイント一つにつき、ある辺の数
+const int NUM_EDGE_IN_ROADPOINT = 20;	// ロードポイント一つにつき、ある辺の数
 const int NUM_VTX_IN_EDGE = 2;	// 一辺にある頂点数
 
 CMeshRoad *GetInstance(void);

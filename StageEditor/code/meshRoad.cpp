@@ -13,6 +13,7 @@
 #include "texture.h"
 #include "effect3D.h"
 #include "myLib.h"
+#include "tunnel.h"
 #include <fstream>
 
 //*****************************************************
@@ -64,10 +65,10 @@ CMeshRoad *CMeshRoad::Create(void)
 
 		if (pMeshRoad != nullptr)
 		{
+			m_pMeshRoad = pMeshRoad;
+
 			// 初期化処理
 			pMeshRoad->Init();
-
-			m_pMeshRoad = pMeshRoad;
 		}
 	}
 
@@ -91,7 +92,9 @@ HRESULT CMeshRoad::Init(void)
 
 	m_it = m_aRoadPoint.begin();
 
-	//EnableWire(true);
+#ifdef _DEBUG
+	EnableWire(true);
+#endif
 
 	return S_OK;
 }
@@ -437,8 +440,8 @@ void CMeshRoad::SetNormal(VERTEX_3D *pVtx)
 	D3DXVec3Normalize(&nor, &nor);	// 法線を正規化
 
 	// 法線を適用
-	pVtx[0].nor = { 0.0f,1.0f,0.0f };
-	pVtx[1].nor = { 0.0f,1.0f,0.0f };
+	pVtx[0].nor = nor;
+	pVtx[1].nor = nor;
 }
 
 //=====================================================
@@ -673,6 +676,23 @@ void CMeshRoad::Save(void)
 	// リストの情報保存
 	outputFile.write(reinterpret_cast<char*>(m_aRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
 
+	// トンネル情報保存
+	size = m_aTunnel.size();	// トンネル数保存
+	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+	// イテレーターの終始端を保存
+	for (auto it : m_aTunnel)
+	{
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart = it->GetItStart();
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd = it->GetItEnd();
+
+		int nDist = std::distance(m_aRoadPoint.begin(), itStart);
+		outputFile.write(reinterpret_cast<char*>(&nDist), sizeof(int));
+
+		nDist = std::distance(m_aRoadPoint.begin(), itEnd);
+		outputFile.write(reinterpret_cast<char*>(&nDist), sizeof(int));
+	}
+
 	outputFile.close();
 }
 
@@ -702,7 +722,38 @@ void CMeshRoad::Load(void)
 	// 辺データ読み込み
 	inputFile.read(reinterpret_cast<char*>(m_aRoadPoint.data()), sizeof(SInfoRoadPoint) * size);
 
-	inputFile.close();
-
 	CreateVtxBuffEdge();
+	
+	// トンネル数読み込み
+	inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+
+	if(inputFile.eof())
+		return;
+
+	m_aTunnel.resize(size);
+
+	for (int i = 0; i < size; i++)
+	{
+		int nDistStart;
+		int nDistEnd;
+
+		inputFile.read(reinterpret_cast<char*>(&nDistStart), sizeof(int));
+		inputFile.read(reinterpret_cast<char*>(&nDistEnd), sizeof(int));
+
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator it;
+
+		it = m_aRoadPoint.begin();
+		std::advance(it, nDistStart);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart = it;
+
+		it = m_aRoadPoint.begin();
+		std::advance(it, nDistEnd);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd = it;
+
+		CTunnel *pTunnel = CTunnel::Create(itStart, itEnd);
+
+		m_aTunnel.push_back(pTunnel);
+	}
+
+	inputFile.close();
 }

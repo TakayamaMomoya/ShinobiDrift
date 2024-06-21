@@ -19,7 +19,8 @@ namespace
 {
 	const int Transition = 120;		// 画面遷移するまでの時間
 	const float MOVESPEED = 4.0f;	// 移動速度
-	const D3DXVECTOR3 STARTPOS = D3DXVECTOR3(15000.0f, 00.0f, -15000.0f);		// 始点の位置
+	float LENGTHGOAL = 1000.0f;		// ゴールの長さ
+	const D3DXVECTOR3 STARTPOS = D3DXVECTOR3(3000.0f, 00.0f, -9500.0f);		// 始点の位置
 	const D3DXVECTOR3 ENDPOS = D3DXVECTOR3(17000.0f, 00.0f, -12000.0f);		// 終点の位置
 }
 
@@ -28,8 +29,13 @@ namespace
 //=====================================================
 CGoal::CGoal(int nPriority)
 {
-	m_pPlayer = nullptr;
-	m_pObj3D = nullptr;
+	m_nTransitionTime = 0;		//遷移カウンター
+	m_pos = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// 位置
+	m_fPosX = 0.0f;		// x座標
+	m_fPosZ = 0.0f;		// z座標
+	m_fRot = 0.0f;		// 向き
+	m_pPlayer = nullptr;	// プレイヤーのポインタ
+	m_pObj3D = nullptr;		// オブジェクト3Dのポインタ
 }
 
 //=====================================================
@@ -57,6 +63,13 @@ CGoal* CGoal::Create()
 //=====================================================
 HRESULT CGoal::Init()
 {
+	// 位置・向きの設定
+	m_pos = GetPosition();
+	m_fRot = GetRotation();
+
+	m_fPosX = STARTPOS.x;
+	m_fPosZ = STARTPOS.z;
+
 	// 生成
 	m_pObj3D = CObject3D::Create(STARTPOS);
 
@@ -66,7 +79,11 @@ HRESULT CGoal::Init()
 	// サイズ設定
 	m_pObj3D->SetSize(2000.0f, 100.0f);
 
-	// ベクトル
+	// 長さを求める
+	m_fPosX += sinf(m_fRot + D3DX_PI) * LENGTHGOAL;
+	m_fPosZ += cosf(m_fRot + D3DX_PI) * LENGTHGOAL;
+
+	// ベクトル差分
 	D3DXVECTOR3 vec = ENDPOS - STARTPOS;
 
 	// 位置設定
@@ -97,12 +114,6 @@ void CGoal::Uninit()
 //=====================================================
 void CGoal::Update()
 {
-	// 確認用変数
-	int n = 0;
-
-	// 交点の割合
-	float fCross = 0.0f;
-
 	// プレイヤー情報取得
 	CPlayer* pPlayer = CPlayer::GetInstance();
 
@@ -115,6 +126,9 @@ void CGoal::Update()
 	// 移動量取得
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
 
+	// 交点の割合
+	float fCross = 0.0f;
+
 	// 外積の判定
 	if (universal::IsCross(posPlayer,		// プレイヤーの位置
 		STARTPOS,		// ゴールの始点
@@ -124,8 +138,6 @@ void CGoal::Update()
 	{
 		if (fCross > 0.0f && fCross < 1.0f)
 		{// 始点と終点の間を通った時
-			n = 1;
-
 			// カウント加算
 			m_nTransitionTime++;
 
@@ -147,7 +159,6 @@ void CGoal::Update()
 	CEffect3D::Create(ENDPOS, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif
 
-	CDebugProc::GetInstance()->Print("\nnの値[%d]", n);
 	CDebugProc::GetInstance()->Print("\nfCrossの値[%f]", fCross);
 	CDebugProc::GetInstance()->Print("\nstartPosの位置[%f, %f, %f]", STARTPOS.x, STARTPOS.y, STARTPOS.z);
 	CDebugProc::GetInstance()->Print("\nendPosの位置[%f, %f, %f]", ENDPOS.x, ENDPOS.y, ENDPOS.z);
@@ -158,5 +169,9 @@ void CGoal::Update()
 //=====================================================
 void CGoal::Draw()
 {
-	m_pObj3D->Draw();
+	if (m_pObj3D != nullptr)
+	{
+		// オブジェクト3Dの描画
+		m_pObj3D->Draw();
+	}
 }

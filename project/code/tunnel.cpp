@@ -11,6 +11,7 @@
 #include "tunnel.h"
 #include "texture.h"
 #include "effect3D.h"
+#include "player.h"
 
 //*****************************************************
 // 定数定義
@@ -26,7 +27,7 @@ const int NUM_VTX_IN_EDGE = 5;	// 辺の中にある頂点数
 //=====================================================
 // コンストラクタ
 //=====================================================
-CTunnel::CTunnel(int nPriority) : CMeshCylinder(nPriority)
+CTunnel::CTunnel(int nPriority) : CMeshCylinder(nPriority),m_bInPlayer(false)
 {
 
 }
@@ -215,7 +216,32 @@ void CTunnel::Uninit(void)
 //=====================================================
 void CTunnel::Update(void)
 {
+	// プレイヤーの検知
+	DetectionPlayer();
+
 	CMeshCylinder::Update();
+}
+
+//=====================================================
+// プレイヤーの検知
+//=====================================================
+void CTunnel::DetectionPlayer(void)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer == nullptr)
+		return;
+
+	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+
+	if (m_bInPlayer)
+	{
+		// プレイヤーが入ってきた判定
+	}
+	else
+	{
+		// プレイヤーが出ていった判定
+	}
 }
 
 //=====================================================

@@ -179,7 +179,6 @@
     <ClCompile Include="code\fan3D.cpp" />
     <ClCompile Include="code\game.cpp" />
     <ClCompile Include="code\imgui.cpp" />
-    <ClCompile Include="code\imgui_demo.cpp" />
     <ClCompile Include="code\imgui_draw.cpp" />
     <ClCompile Include="code\imgui_tables.cpp" />
     <ClCompile Include="code\imgui_widgets.cpp" />
@@ -226,8 +225,6 @@
     <ClInclude Include="code\animation2D.h" />
     <ClInclude Include="code\animEffect3D.h" />
     <ClInclude Include="code\backends\imgui_impl_dx9.h" />
-    <ClInclude Include="code\backends\imgui_impl_metal.h" />
-    <ClInclude Include="code\backends\imgui_impl_osx.h" />
     <ClInclude Include="code\backends\imgui_impl_win32.h" />
     <ClInclude Include="code\billboard.h" />
     <ClInclude Include="code\block.h" />
@@ -290,10 +287,6 @@
     <ClInclude Include="code\UI.h" />
     <ClInclude Include="code\UIManager.h" />
     <ClInclude Include="code\universal.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="code\backends\imgui_impl_metal.mm" />
-    <None Include="code\backends\imgui_impl_osx.mm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
