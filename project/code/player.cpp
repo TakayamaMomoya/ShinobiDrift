@@ -773,15 +773,33 @@ void CPlayer::Collision(void)
 
 	if (bRoad[0] && bRoad[1])
 	{// タイヤが両方道に触れているとき
-		move.y = -20.0f;
+		move.y = -10.0f;
+
+		if (pInputManager != nullptr)
+		{
+			// ハンドルの操作
+			CInputManager::SAxis axis = pInputManager->GetAxis();
+
+			if (axis.axisMove.z > 0.0f)
+				rot.x += 0.04f;
+			else if (axis.axisMove.z < 0.0f)
+				rot.x -= 0.04f;
+		}
 	}
-	else if (bRoad[0])
+	else if (bRoad[0] || bRoad[1])
 	{// タイヤが片方だけ道に触れているとき
 		move.y = -10.0f;
-	}
-	else if (bRoad[1])
-	{// タイヤが片方だけ道に触れているとき
-		move.y = -10.0f;
+
+		if (pInputManager != nullptr)
+		{
+			// ハンドルの操作
+			CInputManager::SAxis axis = pInputManager->GetAxis();
+
+			if (axis.axisMove.z > 0.0f)
+				rot.x += 0.04f;
+			else if (axis.axisMove.z < 0.0f)
+				rot.x -= 0.04f;
+		}
 	}
 	else
 	{// タイヤがどちらも道に触れていないとき
@@ -792,24 +810,21 @@ void CPlayer::Collision(void)
 			CInputManager::SAxis axis = pInputManager->GetAxis();
 
 			if (axis.axisMove.z > 0.0f)
-				rot.x += 0.02f;
+				rot.x += 0.015f;
 			else if (axis.axisMove.z < 0.0f)
-				rot.x -= 0.02f;
+				rot.x -= 0.015f;
 			else
 			{
-				if (rot.x >= 0.0f)
-					rot.x += 0.01f;
-				else
-					rot.x -= 0.01f;
+				rot.x += 0.01f;
 			}
 		}
-
-		if (rot.x > 1.50f)
-			rot.x = 1.50f;
-
-		if (rot.x < -1.50f)
-			rot.x = -1.50f;
 	}
+
+	if (rot.x > 1.50f)
+		rot.x = 1.50f;
+
+	if (rot.x < -1.35f)
+		rot.x = -1.35f;
 
 	if (CInputKeyboard::GetInstance() != nullptr)
 	{
@@ -884,7 +899,7 @@ void CPlayer::ManageSpeed(void)
 	move.z = vecForward.z * m_info.fSpeed;
 
 	// 移動量に重力を適用
-	move.y += -0.6f;
+	move.y += -0.3f;
 
 	SetMove(move);
 }
