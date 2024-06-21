@@ -737,22 +737,24 @@ void CPlayer::Collision(void)
 	D3DXVECTOR3 posParts[2];
 	D3DXVECTOR3 posOldParts[2];
 	D3DXVECTOR3 posDef, posDefOld;
+	D3DXVECTOR3 vecTire = pos - posParts[0];
 	bool bRoad[2];
+	CInputManager* pInputManager = CInputManager::GetInstance();
 
 	// タイヤの位置保存
 	posParts[0].x = GetParts(2)->pParts->GetMatrix()->_41 + (pos.x - posOld.x);
-	posParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 + (pos.y - posOld.y) - 41.05f;
+	posParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 + (pos.y - posOld.y) - 55.0f;
 	posParts[0].z = GetParts(2)->pParts->GetMatrix()->_43 + (pos.z - posOld.z);
 	posParts[1].x = GetParts(3)->pParts->GetMatrix()->_41 + (pos.x - posOld.x);
-	posParts[1].y = GetParts(3)->pParts->GetMatrix()->_42 + (pos.y - posOld.y) - 41.1f;
+	posParts[1].y = GetParts(3)->pParts->GetMatrix()->_42 + (pos.y - posOld.y) - 65.0f;
 	posParts[1].z = GetParts(3)->pParts->GetMatrix()->_43 + (pos.z - posOld.z);
 
 	// タイヤの過去位置保存
 	posOldParts[0].x = GetParts(2)->pParts->GetMatrixOld()->_41 + (pos.x - posOld.x);
-	posOldParts[0].y = GetParts(2)->pParts->GetMatrixOld()->_42 + (pos.y - posOld.y) - 41.05f;
+	posOldParts[0].y = GetParts(2)->pParts->GetMatrixOld()->_42 + (pos.y - posOld.y) - 55.0f;
 	posOldParts[0].z = GetParts(2)->pParts->GetMatrixOld()->_43 + (pos.z - posOld.z);
 	posOldParts[1].x = GetParts(3)->pParts->GetMatrixOld()->_41 + (pos.x - posOld.x);
-	posOldParts[1].y = GetParts(3)->pParts->GetMatrixOld()->_42 + (pos.y - posOld.y) - 41.1f;
+	posOldParts[1].y = GetParts(3)->pParts->GetMatrixOld()->_42 + (pos.y - posOld.y) - 65.0f;
 	posOldParts[1].z = GetParts(3)->pParts->GetMatrixOld()->_43 + (pos.z - posOld.z);
 
 	//// タイヤの中点を計算
@@ -766,40 +768,54 @@ void CPlayer::Collision(void)
 	pos.y += ((posParts[0] + posParts[1]) * 0.5f).y - posDef.y;
 
 	// タイヤの位置関係から角度を計算
-	if ((posParts[1].y - posParts[0].y) < D3DXVec3Length(&(posParts[0] - posParts[1])))
+	if ((posParts[1].y - posParts[0].y) < D3DXVec3Length(&(posParts[0] - posParts[1])) && (bRoad[0] || bRoad[1]))
 		rot.x = asinf((posParts[1].y - posParts[0].y) / D3DXVec3Length(&(posParts[0] - posParts[1])));
 
 	if (bRoad[0] && bRoad[1])
 	{// タイヤが両方道に触れているとき
-
-		// 角度によって重力変更
-		if (rot.x < 0.0f)
-		{
-			move.y = -20.0f;
-		}
-		else
-		{
-			move.y = -20.0f;
-		}
+		move.y = -20.0f;
 	}
 	else if (bRoad[0])
 	{// タイヤが片方だけ道に触れているとき
-		rot.x -= 0.01f;
+		move.y = -10.0f;
 	}
 	else if (bRoad[1])
 	{// タイヤが片方だけ道に触れているとき
-		rot.x += 0.01f;
+		move.y = -10.0f;
 	}
 	else
 	{// タイヤがどちらも道に触れていないとき
-		rot.x += 0.015f;
+
+		if (pInputManager != nullptr)
+		{
+			// ハンドルの操作
+			CInputManager::SAxis axis = pInputManager->GetAxis();
+
+			if (axis.axisMove.z > 0.0f)
+				rot.x += 0.02f;
+			else if (axis.axisMove.z < 0.0f)
+				rot.x -= 0.02f;
+			else
+			{
+				if (rot.x >= 0.0f)
+					rot.x += 0.01f;
+				else
+					rot.x -= 0.01f;
+			}
+		}
+
+		if (rot.x > 1.50f)
+			rot.x = 1.50f;
+
+		if (rot.x < -1.50f)
+			rot.x = -1.50f;
 	}
 
 	if (CInputKeyboard::GetInstance() != nullptr)
 	{
 		if (CInputKeyboard::GetInstance()->GetPress(DIK_SPACE))
 		{// 操作方法変更
-			pos.y += 15.0f;
+			pos.y += 30.0f;
 			move.y = 0.0f;
 			rot.x = 0.0f;
 		}
