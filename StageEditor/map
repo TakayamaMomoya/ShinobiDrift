@@ -9,7 +9,7 @@ SCRIPT
 #====================================================================
 # モデル数
 #====================================================================
-NUM_BLOCK = 27
+NUM_BLOCK = 15
 
 #0番目のブロック
 INFOBLOCK
@@ -116,90 +116,6 @@ INFOBLOCK
  SNAG = 0
 END_INFOBLOCK
 
-#15番目のブロック
-INFOBLOCK
- TAG = FeatureNeonBill
- MODEL = data\\MODEL\\bill\\bill04.x
- SNAG = 0
-END_INFOBLOCK
-
-#16番目のブロック
-INFOBLOCK
- TAG = OrangeNeonBill
- MODEL = data\\MODEL\\bill\\bill05.x
- SNAG = 0
-END_INFOBLOCKa
-
-#17番目のブロック
-INFOBLOCK
- TAG = PurpleNeonBill
- MODEL = data\\MODEL\\bill\\bill06.x
- SNAG = 0
-END_INFOBLOCK
-
-#18番目のブロック
-INFOBLOCK
- TAG = GreenNeonBill
- MODEL = data\\MODEL\\bill\\bill07.x
- SNAG = 0
-END_INFOBLOCK
-
-#19番目のブロック
-INFOBLOCK
- TAG = ClownBill
- MODEL = data\\MODEL\\bill\\bill08.x
- SNAG = 0
-END_INFOBLOCK
-
-#20番目のブロック
-INFOBLOCK
- TAG = NeonBill
- MODEL = data\\MODEL\\bill\\bill09.x
- SNAG = 0
-END_INFOBLOCK
-
-#21番目のブロック
-INFOBLOCK
- TAG = JobiSignBoard
- MODEL = data\\MODEL\\signboard\\jobi_signboard.x
- SNAG = 0
-END_INFOBLOCK
-
-#22番目のブロック
-INFOBLOCK
- TAG = KaraokeSignBoard
- MODEL = data\\MODEL\\signboard\\karaoke_signboard.x
- SNAG = 0
-END_INFOBLOCK
-
-#23番目のブロック
-INFOBLOCK
- TAG = NeonSignBoard
- MODEL = data\\MODEL\\signboard\\neon_signboard.x
- SNAG = 0
-END_INFOBLOCK
-
-#24番目のブロック
-INFOBLOCK
- TAG = OpenSignBoard
- MODEL = data\\MODEL\\signboard\\open_signboard.x
- SNAG = 0
-END_INFOBLOCK
-
-#25番目のブロック
-INFOBLOCK
- TAG = ramenSignBoard
- MODEL = data\\MODEL\\signboard\\ramen_signboard.x
- SNAG = 0
-END_INFOBLOCK
-
-#26番目のブロック
-INFOBLOCK
- TAG = welcomeSignBoard
- MODEL = data\\MODEL\\signboard\\welcome_signboard.x
- SNAG = 0
-END_INFOBLOCK
-
 #====================================================================
 # 配置情報
 #====================================================================
@@ -252,6 +168,22 @@ SETGRABBLOCK
  POS = 12557.43 650.00 -7105.17
  ROT = 0.00 0.00 0.00
  ANGLE_OFFSET = 2.00 -0.35
+ RADIUS_OFFSET = 1000.00
+END_SETBLOCK
+
+SETGRABBLOCK
+ IDX = 0
+ POS = 4162.02 843.00 361.60
+ ROT = 0.00 0.00 0.00
+ ANGLE_OFFSET = 4.99 0.85
+ RADIUS_OFFSET = 1000.00
+END_SETBLOCK
+
+SETGRABBLOCK
+ IDX = 0
+ POS = 3855.17 320.00 1959.79
+ ROT = 0.00 0.00 0.00
+ ANGLE_OFFSET = 7.74 -1.20
  RADIUS_OFFSET = 1000.00
 END_SETBLOCK
 
