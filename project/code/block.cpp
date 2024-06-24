@@ -339,6 +339,9 @@ HRESULT CBlockGrab::Init(void)
 		{
 			m_pFan->SetRotation(D3DXVECTOR3(D3DX_PI * 0.5f, 0.0f, 0.0f));
 			m_pFan->SetRadius(400.0f);
+			m_pFan->SetVtx();
+
+			SetFan();
 		}
 	}
 #endif
@@ -366,53 +369,10 @@ void CBlockGrab::Uninit(void)
 //=====================================================
 void CBlockGrab::Update(void)
 {
-	if (m_bCurrent)
-	{
-		CEffect3D::Create(GetPosition(), 200.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-	}
-
 	CBlock::Update();
 
 #ifdef _DEBUG
-	// オフセットの設定
-	D3DXMATRIX mtxVec1;
-	D3DXMATRIX mtxVec2;
-	D3DXMATRIX mtx = *GetMatrix();
-
-	D3DXVECTOR3 offset1 = { sinf(m_afAngleOffset[0]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[0]) * m_fRadiusOffset };
-	D3DXVECTOR3 offset2 = { sinf(m_afAngleOffset[1]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[1]) * m_fRadiusOffset };
-
-	universal::SetOffSet(&mtxVec1, mtx, offset1);
-	universal::SetOffSet(&mtxVec2, mtx, offset2);
-
-	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
-	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
-
-	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
-	CEffect3D::Create(posMtx2, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-
-	// 扇の角度の設定
-	if (m_pFan != nullptr)
-	{
-		D3DXVECTOR3 pos = GetPosition();
-
-		float fAngleOffset1 = atan2f(posMtx1.x - pos.x, posMtx1.z - pos.z);
-		float fAngleOffset2 = atan2f(posMtx2.x - pos.x, posMtx2.z - pos.z);
-
-		float fDiff = fAngleOffset1 - fAngleOffset2;
-
-		float fRate = fDiff / (D3DX_PI * 2.0f);
-
-		if (fRate < 0)
-			fRate = 1.0f + fRate;
-
-		m_pFan->SetRateAngle(fRate);
-
-		pos.y += 10.0f;
-		m_pFan->SetPosition(pos);
-		m_pFan->SetRotation(D3DXVECTOR3(D3DX_PI * 0.5f, fAngleOffset2, 0.0f));
-		m_pFan->SetVtx();
-	}
+	SetFan();	// 扇ポリゴンの設定
 #endif
 }
 
@@ -421,6 +381,11 @@ void CBlockGrab::Update(void)
 //=====================================================
 void CBlockGrab::Draw(void)
 {
+	if (m_bCurrent)
+	{
+		CEffect3D::Create(GetPosition(), 200.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+
 	CBlock::Draw();
 }
 
@@ -478,6 +443,86 @@ bool CBlockGrab::CanGrab(D3DXVECTOR3 pos)
 #endif
 
 	return bOK;
+}
+
+//=====================================================
+// 扇ポリゴンの設定
+//=====================================================
+void CBlockGrab::SetFan(void)
+{
+	// オフセットの設定
+	D3DXMATRIX mtxVec1;
+	D3DXMATRIX mtxVec2;
+	D3DXMATRIX mtx = *GetMatrix();
+
+	D3DXVECTOR3 offset1 = { sinf(m_afAngleOffset[0]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[0]) * m_fRadiusOffset };
+	D3DXVECTOR3 offset2 = { sinf(m_afAngleOffset[1]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[1]) * m_fRadiusOffset };
+
+	universal::SetOffSet(&mtxVec1, mtx, offset1);
+	universal::SetOffSet(&mtxVec2, mtx, offset2);
+
+	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
+	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
+
+	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(posMtx2, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	// 扇の角度の設定
+	if (m_pFan != nullptr)
+	{
+		D3DXVECTOR3 pos = GetPosition();
+
+		float fAngleOffset1 = atan2f(posMtx1.x - pos.x, posMtx1.z - pos.z);
+		float fAngleOffset2 = atan2f(posMtx2.x - pos.x, posMtx2.z - pos.z);
+
+		float fDiff = fAngleOffset1 - fAngleOffset2;
+
+		float fRate = fDiff / (D3DX_PI * 2.0f);
+
+		if (fRate < 0)
+			fRate = 1.0f + fRate;
+
+		m_pFan->SetRateAngle(fRate);
+
+		pos.y += 10.0f;
+		m_pFan->SetPosition(pos);
+		m_pFan->SetRotation(D3DXVECTOR3(D3DX_PI * 0.5f, fAngleOffset2, 0.0f));
+		m_pFan->SetVtx();
+	}
+}
+
+//=====================================================
+// 位置設定
+//=====================================================
+void CBlockGrab::SetPosition(D3DXVECTOR3 pos)
+{
+	CBlock::SetPosition(pos);
+
+#ifdef _DEBUG
+	Draw();
+
+	if (m_pFan != nullptr)
+	{
+		SetFan();
+	}
+#endif
+}
+
+//=====================================================
+// 向きの設定
+//=====================================================
+void CBlockGrab::SetRotation(D3DXVECTOR3 rot)
+{
+	CBlock::SetRotation(rot);
+
+#ifdef _DEBUG
+	Draw();
+
+	if (m_pFan != nullptr)
+	{
+		SetFan();
+	}
+#endif
 }
 
 //=====================================================

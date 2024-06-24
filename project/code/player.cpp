@@ -24,6 +24,7 @@
 #include "blur.h"
 #include "renderer.h"
 #include "meshRoad.h"
+#include "game.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -203,6 +204,11 @@ void CPlayer::Uninit(void)
 //=====================================================
 void CPlayer::Update(void)
 {
+#ifdef _DEBUG
+	if (CGame::GetInstance()->GetStop())
+		return;
+#endif
+
 	// “ü—Í
 	Input();
 

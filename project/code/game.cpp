@@ -141,18 +141,8 @@ void CGame::Update(void)
 	CInputManager *pInputManager = CInputManager::GetInstance();
 	CSound* pSound = CSound::GetInstance();
 
-	if (m_bStop == false)
-	{
-		// シーンの更新
-		CScene::Update();
-
-		//CParticle::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), CParticle::TYPE::TYPE_BEAM_BLADE);
-	}
-	else
-	{
-		// 停止しないオブジェクトの更新
-		CObject::UpdateNotStop();
-	}
+	// シーンの更新
+	CScene::Update();
 
 	// カメラ更新
 	UpdateCamera();

@@ -471,6 +471,7 @@ void CStateEditGrabBlock::SelectGrabBlock(void)
 	}
 
 	CEffect3D::Create((*m_it)->GetPosition(), 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+
 }
 
 //=====================================================
@@ -488,4 +489,6 @@ void CStateEditGrabBlock::EditGrabBlock(void)
 
 	(*m_it)->SetAngleOffset(fAngle1, 0);
 	(*m_it)->SetAngleOffset(fAngle2, 1);
+
+	(*m_it)->SetFan();
 }

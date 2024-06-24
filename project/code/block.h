@@ -86,8 +86,11 @@ public:
 	bool CanGrab(D3DXVECTOR3 pos);
 	void Save(FILE *pFile) override;	// 保存処理
 	void Load(FILE *pFile, char* pTemp) override;	// 読込処理
+	void SetFan(void);	// 扇ポリゴンの設定
 
 	// 変数取得・設定
+	void SetPosition(D3DXVECTOR3 pos);	// 位置の設定
+	void SetRotation(D3DXVECTOR3 rot);	// 向きの設定
 	void EnableCurrent(bool bCurrent) { m_bCurrent = bCurrent; }	// 選択フラグ
 	bool IsCurrent(void) { return m_bCurrent; }
 	float GetRadiusOffset(void) { return m_fRadiusOffset; }	// オフセット半径
