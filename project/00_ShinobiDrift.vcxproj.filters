@@ -279,6 +279,9 @@
     <ClCompile Include="code\effekseer.cpp">
       <Filter>ソース ファイル\lib</Filter>
     </ClCompile>
+    <ClCompile Include="code\editGoal.cpp">
+      <Filter>ソース ファイル\edit</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\block.h">
@@ -520,6 +523,9 @@
     </ClInclude>
     <ClInclude Include="code\physics.h">
       <Filter>ソース ファイル\lib</Filter>
+    </ClInclude>
+    <ClInclude Include="code\editGoal.h">
+      <Filter>ソース ファイル\edit</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
