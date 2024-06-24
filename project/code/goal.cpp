@@ -143,7 +143,7 @@ void CGoal::Update()
 			if (m_nTransitionTime >= Transition)
 			{
 				// 画面遷移
-				//pFade->SetFade(CScene::MODE_RESULT);
+				pFade->SetFade(CScene::MODE_RESULT);
 
 				// カウントリセット
 				m_nTransitionTime = 0;

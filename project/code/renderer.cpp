@@ -16,6 +16,7 @@
 #include "block.h"
 #include "blur.h"
 #include "player.h"
+#include "inputkeyboard.h"
 
 //*****************************************************
 // 静的メンバ変数宣言
@@ -31,6 +32,7 @@ CRenderer::CRenderer()
 	m_pD3D = nullptr;
 	m_pD3DDevice = nullptr;
 	ZeroMemory(&m_fogInfo, sizeof(SInfoFog));
+	m_bDispimGui = false;
 }
 
 //=====================================================
@@ -180,6 +182,12 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	// ブラーの生成
 	CBlur::Create();
 
+#ifdef _DEBUG
+	m_bDispimGui = true;
+#else
+	m_bDispimGui = false;
+#endif
+
 	return S_OK;
 }
 
@@ -222,6 +230,18 @@ void CRenderer::Update(void)
 {
 	// オブジェクトの更新
 	CObject::UpdateAll();
+
+#ifdef _DEBUG
+	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+
+	if (pKeyboard != nullptr)
+	{
+		if (pKeyboard->GetTrigger(DIK_F4))
+		{
+			m_bDispimGui = m_bDispimGui ? false : true;
+		}
+	}
+#endif
 }
 
 //=====================================================
@@ -280,7 +300,9 @@ void CRenderer::Draw(void)
 #ifdef _DEBUG
 		// imgui描画
 		ImGui::Render();
-		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+
+		if(m_bDispimGui)
+			ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 #endif
 
 		// 描画終了

@@ -46,6 +46,7 @@ private:
 	LPDIRECT3D9 m_pD3D;	// オブジェクトの生成
 	LPDIRECT3DDEVICE9 m_pD3DDevice;	// デバイス
 	SInfoFog m_fogInfo;	// フォグの情報
+	bool m_bDispimGui;	// imGuiの表示切り替え
 
 	static CRenderer *m_pRenderer;	// 自身のポインタ
 };
