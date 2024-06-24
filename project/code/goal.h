@@ -25,7 +25,6 @@ public:
 	~CGoal();	//	デストラクタ
 
 	// メンバ関数
-	static CGoal* Create(D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f },float fRot = 0.0f,float fLength = 1000.0f);	// 生成
 
 	HRESULT Init();
 	void Uninit();
@@ -35,18 +34,22 @@ public:
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }	// 位置取得
 	float GetRotation() { return m_fRot; }	// 向き取得処理
 
+	// 静的メンバ関数
+	static CGoal* Create(D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f }, float fRot = 0.0f, float fLength = 1000.0f);	// 生成
+	static CGoal *GetInstance(void) { return m_pGoal; }
+
 private:
 	//メンバ変数
 	int m_nTransitionTime;		// 遷移時間
-
 	D3DXVECTOR3 m_pos;		// 位置
 	D3DXVECTOR3 m_posStart;	// ゴールの始点
 	D3DXVECTOR3 m_posEnd;	// ゴールの終点
 	float m_fRot;		// 向き
 	float m_fLength;	// 長さ
-
-	CPlayer* m_pPlayer;		// プレイヤーのポインタ
 	CObject3D* m_pObj3D;	// オブジェクト3Dのポインタ
+
+	// 静的メンバ変数
+	static CGoal *m_pGoal;	// 自身のポインタ
 };
 
 #endif

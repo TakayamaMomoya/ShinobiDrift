@@ -5,6 +5,9 @@
 //
 //*****************************************************
 
+//*****************************************************
+// インクルード
+//*****************************************************
 #include "goal.h"
 #include "universal.h"
 #include "debugproc.h"
@@ -22,6 +25,11 @@ namespace
 	const float WIDTH_GOAL = 100.0f;	// ゴールの幅
 }
 
+//*****************************************************
+// 静的メンバ変数
+//*****************************************************
+CGoal *CGoal::m_pGoal = nullptr;	// 自身のポインタ
+
 //=====================================================
 // コンストラクタ
 //=====================================================
@@ -32,7 +40,6 @@ CGoal::CGoal(int nPriority)
 	m_posStart = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ゴールの始点
 	m_posEnd = D3DXVECTOR3(0.0f, 0.0f, 0.0f);		// ゴールの終点
 	m_fRot = 0.0f;		// 向き
-	m_pPlayer = nullptr;	// プレイヤーのポインタ
 	m_pObj3D = nullptr;		// オブジェクト3Dのポインタ
 }
 
@@ -48,19 +55,22 @@ CGoal::~CGoal()
 //=====================================================
 CGoal* CGoal::Create(D3DXVECTOR3 pos,float fRot, float fLength)
 {
-	CGoal* pGoal = new CGoal;
+	if (m_pGoal != nullptr)
+		return m_pGoal;
 
-	if (pGoal != nullptr)
+	m_pGoal = new CGoal;
+
+	if (m_pGoal != nullptr)
 	{
-		pGoal->m_pos = pos;
-		pGoal->m_fRot = fRot;
-		pGoal->m_fLength = fLength;
+		m_pGoal->m_pos = pos;
+		m_pGoal->m_fRot = fRot;
+		m_pGoal->m_fLength = fLength;
 
 		// 初期化
-		pGoal->Init();
+		m_pGoal->Init();
 	}
 
-	return pGoal;
+	return m_pGoal;
 }
 
 //=====================================================
@@ -99,6 +109,8 @@ HRESULT CGoal::Init()
 //=====================================================
 void CGoal::Uninit()
 {
+	m_pGoal = nullptr;
+
 	if (m_pObj3D != nullptr)
 	{
 		m_pObj3D = nullptr;

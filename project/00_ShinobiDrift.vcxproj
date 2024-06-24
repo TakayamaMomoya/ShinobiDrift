@@ -180,6 +180,7 @@
     <ClCompile Include="code\debugproc.cpp" />
     <ClCompile Include="code\edit.cpp" />
     <ClCompile Include="code\editBlock.cpp" />
+    <ClCompile Include="code\editGoal.cpp" />
     <ClCompile Include="code\editMesh.cpp" />
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
@@ -262,6 +263,7 @@
     <ClInclude Include="code\debugproc.h" />
     <ClInclude Include="code\edit.h" />
     <ClInclude Include="code\editBlock.h" />
+    <ClInclude Include="code\editGoal.h" />
     <ClInclude Include="code\editMesh.h" />
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
