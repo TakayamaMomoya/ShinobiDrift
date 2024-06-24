@@ -14,6 +14,7 @@
 #include "effect3D.h"
 #include "fade.h"
 #include "object3D.h"
+#include "game.h"
 
 //*****************************************************
 // 定数定義
@@ -78,17 +79,25 @@ CGoal* CGoal::Create(D3DXVECTOR3 pos,float fRot, float fLength)
 //=====================================================
 HRESULT CGoal::Init()
 {
-	// 始点・終点の計算
-	m_posStart.x = sinf(m_fRot) * m_fLength;
-	m_posStart.z = cosf(m_fRot) * m_fLength;
-
-	m_posEnd = -m_posStart;
-
-	m_posStart += m_pos;
-	m_posEnd += m_pos;
-
 	// ゴールテープの生成
 	m_pObj3D = CObject3D::Create(m_pos);
+
+	// ゴールの設定
+	SetGoal();
+
+	return S_OK;
+}
+
+//=====================================================
+// ゴールの設定
+//=====================================================
+void CGoal::SetGoal(void)
+{
+	// 始点・終点の計算
+	D3DXVECTOR3 vec = { sinf(m_fRot) * m_fLength ,0.0f,cosf(m_fRot) * m_fLength };
+
+	m_posStart = m_pos + vec;
+	m_posEnd = m_pos - vec;
 
 	if (m_pObj3D != nullptr)
 	{
@@ -99,9 +108,8 @@ HRESULT CGoal::Init()
 		m_pObj3D->SetSize(WIDTH_GOAL, m_fLength);
 
 		m_pObj3D->SetRotation(D3DXVECTOR3(0.0f, m_fRot, 0.0f));
+		m_pObj3D->SetPosition(m_pos);
 	}
-
-	return S_OK;
 }
 
 //=====================================================
@@ -145,21 +153,11 @@ void CGoal::Update()
 		m_posStart,		// ゴールの始点
 		m_posEnd,			// ゴールの終点
 		&fCross,		// 交点の割合
-		movePlayer))	// プレイヤーの移動量
+		posPlayer + movePlayer))	// プレイヤーの移動量
 	{
-		if (fCross > 0.0f && fCross < 1.0f)
+		if (fCross >= 0.0f && fCross <= 1.0f)
 		{// 始点と終点の間を通った時
-			// カウント加算
-			m_nTransitionTime++;
-
-			if (m_nTransitionTime >= Transition)
-			{
-				// 画面遷移
-				pFade->SetFade(CScene::MODE_RESULT);
-
-				// カウントリセット
-				m_nTransitionTime = 0;
-			}
+			CGame::SetState(CGame::STATE::STATE_END);
 
 			CDebugProc::GetInstance()->Print("\nゴールした");
 		}

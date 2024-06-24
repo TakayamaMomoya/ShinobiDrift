@@ -39,11 +39,12 @@
 #include "edit.h"
 #include "editMesh.h"
 #include "editBlock.h"
+#include "editGoal.h"
 
 //*****************************************************
 // マクロ定義
 //*****************************************************
-#define TRANS_TIME	(300)	// 終了までの余韻のフレーム数
+#define TRANS_TIME	(100)	// 終了までの余韻のフレーム数
 
 //*****************************************************
 // 静的メンバ変数宣言
@@ -106,7 +107,7 @@ HRESULT CGame::Init(void)
 	//CMeter::Create();
 
 	// ゴール生成
-	CGoal::Create();
+	CGoal::Create(D3DXVECTOR3(60970.0f, 1540.0f, 6480.0f), 2.82f);
 
 	// メッシュロード生成
 	CMeshRoad::Create();
@@ -265,6 +266,9 @@ void CGame::Debug(void)
 
 	if (ImGui::Button("Block", ImVec2(70, 30)))	// ブロックエディット
 		ChangeEdit(new CEditBlock);
+
+	if (ImGui::Button("Goal", ImVec2(70, 30)))	// ゴールエディット
+		ChangeEdit(new CEditGoal);
 
 	if (m_pEdit != nullptr)
 		m_pEdit->Update();

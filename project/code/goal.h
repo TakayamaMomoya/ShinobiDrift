@@ -30,8 +30,11 @@ public:
 	void Uninit();
 	void Update();
 	void Draw();
+	void SetGoal(void);	// ゴールの設定
 
+	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }	// 位置設定
 	D3DXVECTOR3 GetPosition(void) { return m_pos; }	// 位置取得
+	void SetRotation(float fRot) { m_fRot = fRot; }	// 向き取得設定
 	float GetRotation() { return m_fRot; }	// 向き取得処理
 
 	// 静的メンバ関数
