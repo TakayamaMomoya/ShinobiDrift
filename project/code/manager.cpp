@@ -65,6 +65,8 @@ CManager::~CManager()
 //=====================================================
 HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 {
+	m_pManager = this;
+
 	// ƒŒƒ“ƒ_ƒ‰[‚Ì¶¬
 	CRenderer::Create(hWnd, bWindow);
 
@@ -145,6 +147,8 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 //=====================================================
 void CManager::Uninit(void)
 {
+	m_pManager = nullptr;
+
 	if (m_pScene != nullptr)
 	{
 		m_pScene->Uninit();
