@@ -25,13 +25,14 @@ public:
 	~CGoal();	//	デストラクタ
 
 	// メンバ関数
-	static CGoal* Create();	// 生成
+	static CGoal* Create(D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f },float fRot = 0.0f,float fLength = 1000.0f);	// 生成
 
 	HRESULT Init();
 	void Uninit();
 	void Update();
 	void Draw();
 
+	D3DXVECTOR3 GetPosition(void) { return m_pos; }	// 位置取得
 	float GetRotation() { return m_fRot; }	// 向き取得処理
 
 private:
@@ -39,9 +40,10 @@ private:
 	int m_nTransitionTime;		// 遷移時間
 
 	D3DXVECTOR3 m_pos;		// 位置
-	float m_fPosX;		// X座標
-	float m_fPosZ;		// Z座標
+	D3DXVECTOR3 m_posStart;	// ゴールの始点
+	D3DXVECTOR3 m_posEnd;	// ゴールの終点
 	float m_fRot;		// 向き
+	float m_fLength;	// 長さ
 
 	CPlayer* m_pPlayer;		// プレイヤーのポインタ
 	CObject3D* m_pObj3D;	// オブジェクト3Dのポインタ

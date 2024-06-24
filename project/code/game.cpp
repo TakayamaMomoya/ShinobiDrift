@@ -106,7 +106,7 @@ HRESULT CGame::Init(void)
 	//CMeter::Create();
 
 	// ゴール生成
-	//CGoal::Create();
+	CGoal::Create();
 
 	// メッシュロード生成
 	CMeshRoad::Create();
