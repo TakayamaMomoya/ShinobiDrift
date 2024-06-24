@@ -36,6 +36,9 @@
 #include "meter.h"
 #include "meshRoad.h"
 #include "goal.h"
+#include "edit.h"
+#include "editMesh.h"
+#include "editBlock.h"
 
 //*****************************************************
 // マクロ定義
@@ -53,9 +56,9 @@ CGame *CGame::m_pGame = nullptr;	// 自身のポインタ
 //=====================================================
 CGame::CGame()
 {
-	m_nAddReward = 0;
 	m_nCntState = 0;
 	m_bStop = false;
+	m_pEdit = nullptr;
 }
 
 //=====================================================
@@ -116,6 +119,13 @@ HRESULT CGame::Init(void)
 //=====================================================
 void CGame::Uninit(void)
 {
+	if (m_pEdit != nullptr)
+	{
+		m_pEdit->Uninit();
+		delete m_pEdit;
+		m_pEdit = nullptr;
+	}
+
 	// オブジェクト全棄
 	CObject::ReleaseAll();
 
@@ -199,6 +209,43 @@ void CGame::ManageState(void)
 }
 
 //=====================================================
+// 停止状態の切り替え
+//=====================================================
+void CGame::ToggleStop(void)
+{
+	m_bStop = m_bStop ? false : true;
+
+	if (m_bStop)
+	{
+		Camera::ChangeState(new CMoveControl);
+	}
+	else
+	{
+		Camera::ChangeState(new CFollowPlayer);
+	}
+}
+
+//=====================================================
+// エディターの変更
+//=====================================================
+void CGame::ChangeEdit(CEdit *pEdit)
+{
+	if (m_pEdit != nullptr)
+	{
+		m_pEdit->Uninit();
+		delete m_pEdit;
+		m_pEdit = nullptr;
+	}
+
+	m_pEdit = pEdit;
+
+	if (m_pEdit != nullptr)
+	{
+		m_pEdit->Init();
+	}
+}
+
+//=====================================================
 // デバッグ処理
 //=====================================================
 void CGame::Debug(void)
@@ -212,18 +259,25 @@ void CGame::Debug(void)
 	}
 
 	if (pKeyboard->GetTrigger(DIK_F))
-	{
-		m_bStop = m_bStop ? false : true;
-
-		if (m_bStop)
-		{
-			Camera::ChangeState(new CMoveControl);
-		}
-		else
-		{
-			Camera::ChangeState(new CFollowPlayer);
-		}
+	{// 停止状態の切り替え
+		ToggleStop();
 	}
+
+	if (pKeyboard->GetTrigger(DIK_F2))
+	{// エディット削除
+		ToggleStop();
+	}
+
+	ImGui::Text("[EditMode]");
+
+	if (ImGui::Button("Mesh", ImVec2(70, 30)))	// メッシュエディット
+		ChangeEdit(new CEditMesh);
+
+	if (ImGui::Button("Block", ImVec2(70, 30)))	// ブロックエディット
+		ChangeEdit(new CEditBlock);
+
+	if (m_pEdit != nullptr)
+		m_pEdit->Update();
 }
 
 //=====================================================

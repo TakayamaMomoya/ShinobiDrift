@@ -52,8 +52,11 @@ CBlockManager *CBlockManager::Create(void)
 	{// インスタンス生成
 		m_pBlockManager = new CBlockManager;
 
-		// 初期化処理
-		m_pBlockManager->Init();
+		if (m_pBlockManager != nullptr)
+		{
+			// 初期化処理
+			m_pBlockManager->Init();
+		}
 	}
 
 	return m_pBlockManager;
