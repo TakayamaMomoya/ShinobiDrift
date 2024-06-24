@@ -93,7 +93,9 @@ HRESULT CMeshRoad::Init(void)
 
 	m_it = m_aRoadPoint.begin();
 
+#ifdef _DEBUG
 	//EnableWire(true);
+#endif // _DEBUG
 
 	return S_OK;
 }
@@ -634,8 +636,8 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 			bColRoad = true;
 
 			// “¹‚©‚ç—Ž‚¿‚È‚¢‚æ‚¤‚É‚·‚é
-			/*universal::LineCrossProduct(pVtx[2].pos, pVtx[0].pos, pPos, posOld);
-			universal::LineCrossProduct(pVtx[1].pos, pVtx[3].pos, pPos, posOld);*/
+			universal::LineCrossProduct(pVtx[2].pos, pVtx[0].pos, pPos, posOld);
+			universal::LineCrossProduct(pVtx[1].pos, pVtx[3].pos, pPos, posOld);
 		}
 	}
 
