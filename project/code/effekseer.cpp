@@ -13,14 +13,13 @@
 #include "renderer.h"
 #include "effekseer.h"
 #include "camera.h"
+#include "debugproc.h"
 
 // エフェクトの名前
 const char* CEffekseer::m_apEfkName[CEffekseer::TYPE_MAX] =
 {
 	"",                               // なんもない
-	"data\\EFFEKSEER\\Effect\\orbit.efkefc",           // 軌跡
- 	"data\\EFFEKSEER\\Effect\\impact.efkefc",          // 衝撃波
-	"data\\EFFEKSEER\\Effect\\hit.efkefc",             // ヒット
+	"data\\EFFEKSEER\\Effect\\drift.efkefc",  // ドリフト時の火花と煙
 };
 
 //===========================================================
@@ -105,8 +104,6 @@ void CEffekseer::Update(void)
 	{
 		if (m_Info[i].effect != nullptr)
 		{
-			m_Info[i].pos = m_efkManager->GetLocation(m_Info[i].efkHandle);
-			
 			// Move the effect
 			// エフェクトの移動
 			m_efkManager->AddLocation(m_Info[i].efkHandle, ::Effekseer::Vector3D(0.0f, 0.0f, 0.0f));
@@ -204,7 +201,7 @@ void CEffekseer::Set(const char *FileName, ::Effekseer::Vector3D pos, ::Effeksee
 			std::u16string string16t = converter.from_bytes(FileName);
 
 			m_Info[i].pos = pos;
-			m_Info[i].rot = rot;
+ 			m_Info[i].rot = rot;
 			m_Info[i].scale = scale;
 			m_Info[i].time = 0;
 
@@ -219,7 +216,7 @@ void CEffekseer::Set(const char *FileName, ::Effekseer::Vector3D pos, ::Effeksee
 
 			// 位置、向き、大きさ設定
 			m_efkManager->SetLocation(m_Info[i].efkHandle, m_Info[i].pos);
-			m_efkManager->SetRotation(m_Info[i].efkHandle, m_Info[i].rot, 0.1f);
+			m_efkManager->SetRotation(m_Info[i].efkHandle, {0.0f, 1.0f, 0.0f}, rot.Y);
 			m_efkManager->SetScale(m_Info[i].efkHandle, m_Info[i].scale.X, m_Info[i].scale.Y, m_Info[i].scale.Z);
 			
 			break;

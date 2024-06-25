@@ -25,6 +25,7 @@
 #include "renderer.h"
 #include "meshRoad.h"
 #include "game.h"
+#include "effekseer.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -402,6 +403,18 @@ void CPlayer::InputWire(void)
 
 		// ƒ[ƒv‚Ì§Œä
 		ControlRoap();
+
+		CEffekseer* pEffekseer = CManager::GetMyEffekseer();
+
+		float PosX = GetParts(3)->pParts->GetMatrix()->_41;
+		float PosY = GetParts(3)->pParts->GetMatrix()->_42;
+		float PosZ = GetParts(3)->pParts->GetMatrix()->_43;
+
+		float PlayerY = GetRotation().y;
+
+		if (pEffekseer != nullptr)
+			pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_DRIFT], ::Effekseer::Vector3D(PosX, PosY, PosZ),
+				::Effekseer::Vector3D(0.0f, PlayerY, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
 	}
 	else
 	{
