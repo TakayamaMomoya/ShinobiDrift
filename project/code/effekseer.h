@@ -19,9 +19,8 @@ public:
 	enum TYPE
 	{
 		TYPE_NONE = 0,  // なんもない
-		TYPE_ORBIT,     // 軌跡
-		TYPE_IMPACT,    // 衝撃波
-		TYPE_HIT,       // ヒット
+		TYPE_DRIFT,     // ドリフト時の火花と煙
+		TYPE_SPARK,     // 火花
 		TYPE_MAX
 	};
 
