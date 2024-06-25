@@ -2,10 +2,10 @@ Metasequoia Document
 Format Text Ver 1.0
 
 Scene {
-	pos -4205.8647 -9455.6660 100000.0000
+	pos -20822.1445 -9826.7861 100000.0000
 	lookat 0.0000 0.0000 0.0000
-	head -17.5739
-	pich 0.2492
+	head -15.5139
+	pich 0.0392
 	bank -0.0000
 	ortho 0
 	zoom2 0.0750
@@ -17,9 +17,10 @@ Scene {
 		}
 	}
 }
-Material 2 {
-	"window2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\jpeg-20240620T002139Z-001\jpeg\bill_window.jpg")
-	"conc_flore" col(1.000 1.000 1.000 1.000) dif(0.800) amb(1.000) emi(0.000) spc(0.000) power(0.00) tex("C:\Users\student\Downloads\jpeg-20240620T002139Z-001\jpeg\conc_flore.jpg")
+Material 3 {
+	"window2" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Documents\éˆã∆óp\ëççáââèK\3îNgroupêßçÏ\ShinobiDrift\project\data\TEXTURE\MATERIAL\bill_window.jpg")
+	"conc_flore" col(1.000 1.000 1.000 1.000) dif(0.800) amb(1.000) emi(0.000) spc(0.000) power(0.00) tex("C:\Users\student\Documents\éˆã∆óp\ëççáââèK\3îNgroupêßçÏ\ShinobiDrift\project\data\TEXTURE\MATERIAL\conc_flore.jpg")
+	"lambert15SG" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("arms_01.png")
 }
 Object "bill4ç\ë¢ÇP" {
 	visible 15
@@ -29,14 +30,14 @@ Object "bill4ç\ë¢ÇP" {
 	color 0.898 0.498 0.698
 	color_type 0
 	vertex 8 {
-		-15561.6074 60232.7617 15561.6074
-		-15561.6074 -21.5273 15561.6074
-		15561.6074 60232.7617 15561.6074
-		15561.6074 -21.5273 15561.6074
-		15561.6074 60232.7617 -15561.6074
-		15561.6074 -21.5273 -15561.6074
-		-15561.6074 60232.7617 -15561.6074
-		-15561.6074 -21.5273 -15561.6074
+		-25370.4961 79222.6250 25281.5332
+		-25370.4961 -19011.4062 25281.5332
+		25370.4961 79222.6250 25281.5332
+		25370.4961 -19011.4062 25281.5332
+		25370.4961 79222.6250 -25459.4766
+		25370.4961 -19011.4062 -25459.4766
+		-25370.4961 79222.6250 -25459.4766
+		-25370.4961 -19011.4062 -25459.4766
 	}
 	face 6 {
 		4 V(0 2 3 1) M(0) UV(-0.56181 -2.06057 1.56181 -2.06057 1.56181 2.05074 -0.56181 2.05074)
