@@ -24,7 +24,7 @@
 //*****************************************************
 // マクロ定義
 //*****************************************************
-#define SPEED_MOVE	(1.0f)	// 移動速度
+#define SPEED_MOVE	(3.0f)	// 移動速度
 #define SPEED_ROTATION	(0.01f)	// 回転
 
 //=====================================================
@@ -211,23 +211,23 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 		// ブロック移動
 		if (pKeyboard->GetPress(DIK_A) == true)
 		{// 左移動
-			pos.x += sinf(rotCamera.y - D3DX_PI * 0.5f) * fMove;
-			pos.z += cosf(rotCamera.y - D3DX_PI * 0.5f) * fMove;
+			pos.x -= sinf(rotCamera.y - D3DX_PI * 0.5f) * fMove;
+			pos.z -= cosf(rotCamera.y - D3DX_PI * 0.5f) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_D) == true)
 		{// 右移動
-			pos.x += sinf(rotCamera.y - D3DX_PI * -0.5f) * fMove;
-			pos.z += cosf(rotCamera.y - D3DX_PI * -0.5f) * fMove;
+			pos.x -= sinf(rotCamera.y - D3DX_PI * -0.5f) * fMove;
+			pos.z -= cosf(rotCamera.y - D3DX_PI * -0.5f) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_W) == true)
 		{// 前移動
-			pos.x += sinf(D3DX_PI * 0.5f) * sinf(rotCamera.y) * fMove;
-			pos.z += sinf(D3DX_PI * 0.5f) * cosf(rotCamera.y) * fMove;
+			pos.x -= sinf(D3DX_PI * 0.5f) * sinf(rotCamera.y) * fMove;
+			pos.z -= sinf(D3DX_PI * 0.5f) * cosf(rotCamera.y) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_S) == true)
 		{// 後移動
-			pos.x += sinf(-D3DX_PI * 0.5f) * sinf(rotCamera.y) * fMove;
-			pos.z += sinf(-D3DX_PI * 0.5f) * cosf(rotCamera.y) * fMove;
+			pos.x -= sinf(-D3DX_PI * 0.5f) * sinf(rotCamera.y) * fMove;
+			pos.z -= sinf(-D3DX_PI * 0.5f) * cosf(rotCamera.y) * fMove;
 		}
 		if (pKeyboard->GetPress(DIK_E) == true)
 		{// 上昇
@@ -471,6 +471,7 @@ void CStateEditGrabBlock::SelectGrabBlock(void)
 	}
 
 	CEffect3D::Create((*m_it)->GetPosition(), 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+
 }
 
 //=====================================================
@@ -488,4 +489,6 @@ void CStateEditGrabBlock::EditGrabBlock(void)
 
 	(*m_it)->SetAngleOffset(fAngle1, 0);
 	(*m_it)->SetAngleOffset(fAngle2, 1);
+
+	(*m_it)->SetFan();
 }

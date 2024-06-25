@@ -54,7 +54,7 @@ namespace
 	const btScalar GRAVITY = -100;  // 重力
 	const btVector3 WORLDMIN = btVector3(-10000, -10000, -10000);  // ワールドの広さ
 	const btVector3 WORLDMAX = btVector3(10000, 10000, 10000);     // ワールドの広さ
-	const int MAXPROXIES = 1024;  // プロキシの最大数(衝突物体のようなものらしい)
+	const int MAXPROXIES = 1024;  // プロキシの最大数
 }
 
 /// This is a Hello World program for running a basic Bullet physics simulation
@@ -167,52 +167,5 @@ void CPhysics::Uninit(void)
 //================================================================
 void CPhysics::Draw(void)
 {
-	// 箱の位置姿勢情報の取得
-	btTransform trans;
 
-	int i = 1;
-
-	//if (m_pDynamicsWorld != nullptr)
-	//{// 使用されてるってマ!?
-
-	//	// シミュレーションを進める。間隔は60Hz
-	//	m_pDynamicsWorld->stepSimulation(1 / 60.f, 10);
-
-	//	// 先頭取得
-	//	CObjectX* pObjectX = CObjectX::GetTop();
-
-	//	while (pObjectX != nullptr)
-	//	{
-	//		// 次取得
-	//		CObjectX* pObjectXNext = pObjectX->GetNext();
-
-	//		btCollisionObject* obj = m_pDynamicsWorld->getCollisionObjectArray()[i];
-	//		btRigidBody* fallRigidBody = btRigidBody::upcast(obj);
-
-	//		//obj->activate(true);
-
-	//		fallRigidBody->activate(true);
-
-	//		if (fallRigidBody && fallRigidBody->getMotionState())
-	//		{// どうやら通るらしい
-
-	//			fallRigidBody->getMotionState()->getWorldTransform(trans);
-
-	//			// 位置取得
-	//			pObjectX->SetPosition(D3DXVECTOR3(trans.getOrigin().x(), trans.getOrigin().y(), trans.getOrigin().z()));
-
-	//			//fallRigidBody->getMotionState()->setWorldTransform(trans);
-	//			btQuaternion Q = trans.getRotation();
-
-	//			// 角度取得
-	//			btMatrix3x3 rot = trans.getBasis();
-	//			btVector3 euler;
-	//			rot.getEulerZYX(euler[2], euler[1], euler[0]);
-	//			pObjectX->SetRotition(D3DXVECTOR3(euler[0], euler[1], euler[2]));
-	//		}
-
-	//		pObjectX = pObjectXNext;
-	//		i++;
-	//	}
-	//}
 }

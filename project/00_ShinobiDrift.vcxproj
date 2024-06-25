@@ -180,6 +180,7 @@
     <ClCompile Include="code\debugproc.cpp" />
     <ClCompile Include="code\edit.cpp" />
     <ClCompile Include="code\editBlock.cpp" />
+    <ClCompile Include="code\editGoal.cpp" />
     <ClCompile Include="code\editMesh.cpp" />
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
@@ -190,6 +191,7 @@
     <ClCompile Include="code\fan3D.cpp" />
     <ClCompile Include="code\game.cpp" />
     <ClCompile Include="code\goal.cpp" />
+    <ClCompile Include="code\guardRail.cpp" />
     <ClCompile Include="code\imgui.cpp" />
     <ClCompile Include="code\imgui_draw.cpp" />
     <ClCompile Include="code\imgui_tables.cpp" />
@@ -262,6 +264,7 @@
     <ClInclude Include="code\debugproc.h" />
     <ClInclude Include="code\edit.h" />
     <ClInclude Include="code\editBlock.h" />
+    <ClInclude Include="code\editGoal.h" />
     <ClInclude Include="code\editMesh.h" />
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
@@ -272,6 +275,7 @@
     <ClInclude Include="code\fan3D.h" />
     <ClInclude Include="code\game.h" />
     <ClInclude Include="code\goal.h" />
+    <ClInclude Include="code\guardRail.h" />
     <ClInclude Include="code\imconfig.h" />
     <ClInclude Include="code\imgui.h" />
     <ClInclude Include="code\imgui_internal.h" />

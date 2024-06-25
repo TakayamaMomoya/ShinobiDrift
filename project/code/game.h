@@ -18,6 +18,7 @@
 //*****************************************************
 class CGame;
 class CPlayer;
+class CEdit;
 
 //*****************************************************
 // クラスの定義
@@ -45,22 +46,20 @@ public:
 	static STATE GetState(void) { return m_state; }
 	void EnableStop(bool bStop) { m_bStop = bStop; }
 	bool GetStop(void) { return m_bStop; }
-	int GetAddReward(void) { return m_nAddReward; }
-	void AddReward(int nValue) { m_nAddReward += nValue; }
-	void SetAddReward(int nValue) { m_nAddReward = nValue; }
-	void SetEventCamera(float fTime, D3DXVECTOR3 posRDest, D3DXVECTOR3 posVDest);
 
 private:
 	void UpdateCamera(void);
 	void ManageState(void);
+	void ToggleStop(void);
 	void Debug(void);
+	void ChangeEdit(CEdit *pEdit);
 
 	static STATE m_state;	// 状態
 	static CGame *m_pGame;	// 自身のポインタ
 
-	int m_nAddReward;	// 加算報酬
 	int m_nCntState;	// 状態遷移カウンター
 	bool m_bStop;	// 停止状態
+	CEdit *m_pEdit;	// エディットのポインタ
 };
 
 #endif

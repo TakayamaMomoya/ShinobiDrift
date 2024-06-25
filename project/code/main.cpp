@@ -84,8 +84,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		SCREEN_WIDTH,
-		SCREEN_HEIGHT,
+		rect.right - rect.left,  // 調整された幅
+		rect.bottom - rect.top,  // 調整された高さ
 		nullptr,
 		nullptr,
 		hInstance,
@@ -105,25 +105,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 #endif	
 	}
 
-#ifdef _DEBUG
-	// Imguiの初期化
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-	io.DisplaySize = ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT);
-	bool bDisp = false;
-
-	// imgui設定
-	ImGui::StyleColorsDark();
-
-	LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();;
-
-	ImGui_ImplDX9_Init(pDevice);
-	ImGui_ImplWin32_Init(hWnd);
-	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-#endif
+	//RECT size;
+	//RECT wndsize;
+	//GetClientRect(hWnd, &size);
+	//GetWindowRect(hWnd, &wndsize);
+	//wndsize.right = wndsize.right - wndsize.left;
+	//wndsize.bottom = wndsize.bottom - wndsize.top;
+	//SetWindowPos(hWnd, NULL, 0, 0, SCREEN_WIDTH + wndsize.right - size.right, SCREEN_HEIGHT + wndsize.bottom - size.bottom, SWP_NOMOVE | SWP_NOREPOSITION | SWP_NOZORDER);
 
 	//分解能を設定
 	timeBeginPeriod(1);
@@ -133,6 +121,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 	// ウィンドウの表示
 	ShowWindow(hWnd, nCmdShow);
 	UpdateWindow(hWnd);
+
+#ifdef _DEBUG
+	// Imguiの初期化
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.DisplaySize = ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	// imgui設定
+	ImGui::StyleColorsDark();
+
+	LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();
+
+	ImGui_ImplDX9_Init(pDevice);
+	ImGui_ImplWin32_Init(hWnd);
+	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+#endif
 
 	// メッセージループ
 	while(true)
@@ -151,7 +157,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 			}
 		}
 		else
-		{// DeirectXの処理
+		{// DirectXの処理
 			
 			if ((dwCurrentTime - dwFPSLastTime) >= 500)
 			{//0.5秒経過
@@ -223,6 +229,9 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	int nID;
 
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam))
+		return true;
+
 	switch (uMsg)
 	{
 		// ウィンドウ破棄メッセージを受け取った場合
@@ -264,8 +273,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 		break;
 	}
-
-	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

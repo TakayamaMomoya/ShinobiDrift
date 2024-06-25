@@ -36,11 +36,15 @@
 #include "meter.h"
 #include "meshRoad.h"
 #include "goal.h"
+#include "edit.h"
+#include "editMesh.h"
+#include "editBlock.h"
+#include "editGoal.h"
 
 //*****************************************************
 // マクロ定義
 //*****************************************************
-#define TRANS_TIME	(300)	// 終了までの余韻のフレーム数
+#define TRANS_TIME	(100)	// 終了までの余韻のフレーム数
 
 //*****************************************************
 // 静的メンバ変数宣言
@@ -53,9 +57,9 @@ CGame *CGame::m_pGame = nullptr;	// 自身のポインタ
 //=====================================================
 CGame::CGame()
 {
-	m_nAddReward = 0;
 	m_nCntState = 0;
 	m_bStop = false;
+	m_pEdit = nullptr;
 }
 
 //=====================================================
@@ -103,7 +107,7 @@ HRESULT CGame::Init(void)
 	//CMeter::Create();
 
 	// ゴール生成
-	//CGoal::Create();
+	CGoal::Create(D3DXVECTOR3(60970.0f, 1540.0f, 3980.0f), 3.07f);
 
 	// メッシュロード生成
 	CMeshRoad::Create();
@@ -116,6 +120,13 @@ HRESULT CGame::Init(void)
 //=====================================================
 void CGame::Uninit(void)
 {
+	if (m_pEdit != nullptr)
+	{
+		m_pEdit->Uninit();
+		delete m_pEdit;
+		m_pEdit = nullptr;
+	}
+
 	// オブジェクト全棄
 	CObject::ReleaseAll();
 
@@ -131,18 +142,8 @@ void CGame::Update(void)
 	CInputManager *pInputManager = CInputManager::GetInstance();
 	CSound* pSound = CSound::GetInstance();
 
-	if (m_bStop == false)
-	{
-		// シーンの更新
-		CScene::Update();
-
-		//CParticle::Create(D3DXVECTOR3(0.0f,0.0f,0.0f), CParticle::TYPE::TYPE_BEAM_BLADE);
-	}
-	else
-	{
-		// 停止しないオブジェクトの更新
-		CObject::UpdateNotStop();
-	}
+	// シーンの更新
+	CScene::Update();
 
 	// カメラ更新
 	UpdateCamera();
@@ -199,6 +200,43 @@ void CGame::ManageState(void)
 }
 
 //=====================================================
+// 停止状態の切り替え
+//=====================================================
+void CGame::ToggleStop(void)
+{
+	m_bStop = m_bStop ? false : true;
+
+	if (m_bStop)
+	{
+		Camera::ChangeState(new CMoveControl);
+	}
+	else
+	{
+		Camera::ChangeState(new CFollowPlayer);
+	}
+}
+
+//=====================================================
+// エディターの変更
+//=====================================================
+void CGame::ChangeEdit(CEdit *pEdit)
+{
+	if (m_pEdit != nullptr)
+	{
+		m_pEdit->Uninit();
+		delete m_pEdit;
+		m_pEdit = nullptr;
+	}
+
+	m_pEdit = pEdit;
+
+	if (m_pEdit != nullptr)
+	{
+		m_pEdit->Init();
+	}
+}
+
+//=====================================================
 // デバッグ処理
 //=====================================================
 void CGame::Debug(void)
@@ -212,18 +250,28 @@ void CGame::Debug(void)
 	}
 
 	if (pKeyboard->GetTrigger(DIK_F))
-	{
-		m_bStop = m_bStop ? false : true;
-
-		if (m_bStop)
-		{
-			Camera::ChangeState(new CMoveControl);
-		}
-		else
-		{
-			Camera::ChangeState(new CFollowPlayer);
-		}
+	{// 停止状態の切り替え
+		ToggleStop();
 	}
+
+	if (pKeyboard->GetTrigger(DIK_F2))
+	{// エディット削除
+		ToggleStop();
+	}
+
+	ImGui::Text("[EditMode]");
+
+	if (ImGui::Button("Mesh", ImVec2(70, 30)))	// メッシュエディット
+		ChangeEdit(new CEditMesh);
+
+	if (ImGui::Button("Block", ImVec2(70, 30)))	// ブロックエディット
+		ChangeEdit(new CEditBlock);
+
+	if (ImGui::Button("Goal", ImVec2(70, 30)))	// ゴールエディット
+		ChangeEdit(new CEditGoal);
+
+	if (m_pEdit != nullptr)
+		m_pEdit->Update();
 }
 
 //=====================================================
