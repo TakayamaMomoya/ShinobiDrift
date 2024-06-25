@@ -39,8 +39,10 @@ private:
 	// メンバ関数
 	void CreateVtx(void);	// 頂点の生成
 	void VtxFollowRoad(void);	// 頂点を道に沿わせる
+	void SetNormal(VERTEX_3D *pVtx);	// 法線の設定
 
 	// メンバ変数
+	int m_nNumVtx;	// 頂点数
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itStart;	// 開始イテレイター
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// 終了イテレイター
 };

@@ -11,6 +11,7 @@
 #include "guardRail.h"
 #include "texture.h"
 #include "effect3D.h"
+#include "renderer.h"
 
 //*****************************************************
 // 定数定義
@@ -19,12 +20,14 @@ namespace
 {
 const char* TEX_PATH = "data\\TEXTURE\\MATERIAL\\concrete.jpg";	// テクスチャパス
 const int NUM_VTX_ON_POINT = 2;	// メッシュロードの頂点上にある頂点数
+const float HEIGHT_GR = 600.0f;	// ガードレールの高さ
+const int NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
 }
 
 //=====================================================
 // コンストラクタ
 //=====================================================
-CGuardRail::CGuardRail(int nPriority) : CObject3D(nPriority)
+CGuardRail::CGuardRail(int nPriority) : CObject3D(nPriority), m_nNumVtx(0)
 {
 
 }
@@ -77,10 +80,10 @@ HRESULT CGuardRail::Init(void)
 void CGuardRail::CreateVtx(void)
 {
 	int nDistIt = std::distance(m_itStart, m_itEnd);
-	int nNumVtx = nDistIt * NUM_VTX_ON_POINT;
+	m_nNumVtx = nDistIt * NUM_VTX_ON_POINT * MeshRoad::NUM_EDGE_IN_ROADPOINT;
 
 	// 頂点生成
-	CreateVtxBuff(nNumVtx);
+	CreateVtxBuff(m_nNumVtx);
 
 	// テクスチャの読込
 	CTexture *pTexture = CTexture::GetInstance();
@@ -150,10 +153,60 @@ void CGuardRail::VtxFollowRoad(void)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
+	for (size_t i = 0; i < vectorPosEdge.size(); i++)
+	{
+		// 位置の決定
+		pVtx[0].pos = vectorPosEdge[i];
+		pVtx[1].pos = pVtx[0].pos;
 
+		pVtx[1].pos.y += HEIGHT_GR;
+
+		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+		// 法線の設定
+		pVtx[0].nor = { 0.0f,0.0f,1.0f };
+		pVtx[1].nor = { 0.0f,0.0f,1.0f };
+
+		// テクスチャ座標の設定
+		if (i > 0)
+		{
+			SetNormal(pVtx);
+		}
+
+		pVtx += NUM_VTX_ON_POINT;
+	}
 
 	// 頂点バッファをアンロック
 	pVtxBuff->Unlock();
+}
+
+//=====================================================
+// 法線の設定
+//=====================================================
+void CGuardRail::SetNormal(VERTEX_3D *pVtx)
+{
+	if (pVtx == nullptr)
+		return;
+
+	// 頂点位置
+	D3DXVECTOR3 vtxLu = pVtx[-MeshRoad::NUM_VTX_IN_EDGE].pos;
+	D3DXVECTOR3 vtxRu = pVtx[0].pos;
+	D3DXVECTOR3 vtxRd = pVtx[1].pos;
+
+	// 頂点どうしの差分ベクトルから辺を算出
+	D3DXVECTOR3 edge1 = vtxLu - vtxRu;
+	D3DXVECTOR3 edge2 = vtxRd - vtxRu;
+
+	// 二辺の外積から法線を算出
+	D3DXVECTOR3 nor;
+	D3DXVec3Cross(&nor, &edge1, &edge2);
+
+	D3DXVec3Normalize(&nor, &nor);	// 法線を正規化
+
+	// 法線を適用
+	pVtx[0].nor = nor;
+	pVtx[1].nor = nor;
 }
 
 //=====================================================
@@ -177,5 +230,53 @@ void CGuardRail::Update(void)
 //=====================================================
 void CGuardRail::Draw(void)
 {
-	CObject3D::Draw();
+	if (m_nNumVtx < NUMVTX_NOTDRAW)	// 描画制限
+		return;
+
+	// デバイスの取得
+	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
+
+	D3DXMATRIX *pMtx = GetMatrix();
+
+	// ワールドマトリックス初期化
+	D3DXMatrixIdentity(pMtx);
+
+	D3DXMATRIX mtxRot, mtxTrans;
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
+
+	// 向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot,
+		rot.y, rot.x, rot.z);
+	D3DXMatrixMultiply(pMtx, pMtx, &mtxRot);
+
+	// 位置を反映
+	D3DXMatrixTranslation(&mtxTrans,
+		pos.x, pos.y, pos.z);
+	D3DXMatrixMultiply(pMtx, pMtx, &mtxTrans);
+
+	// ワールドマトリックス設定
+	pDevice->SetTransform(D3DTS_WORLD, pMtx);
+
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
+
+	// 頂点バッファをデータストリームに設定
+	pDevice->SetStreamSource(0, pVtxBuff, 0, sizeof(VERTEX_3D));
+
+	// 頂点フォーマットの設定
+	pDevice->SetFVF(FVF_VERTEX_3D);
+
+	// テクスチャ設定
+	int nIdxTexture = GetIdxTexture();
+	LPDIRECT3DTEXTURE9 pTexture = Texture::GetTexture(nIdxTexture);
+	pDevice->SetTexture(0, pTexture);
+
+	// カリングを無効化
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+
+	// 描画
+	pDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, m_nNumVtx - 2);
+
+	// カリングを有効化
+	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 }
