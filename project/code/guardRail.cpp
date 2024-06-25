@@ -1,6 +1,6 @@
 //*****************************************************
 //
-// トンネルの処理[tunnel.cpp]
+// ガードレールの処理[guardRail.cpp]
 // Author:髙山桃也
 //
 //*****************************************************
@@ -18,7 +18,7 @@
 //*****************************************************
 namespace
 {
-const char* TEX_PATH = "data\\TEXTURE\\MATERIAL\\concrete.jpg";	// テクスチャパス
+const char* TEX_PATH = "data\\TEXTURE\\MATERIAL\\wall00.jpeg";	// テクスチャパス
 const int NUM_VTX_ON_POINT = 2;	// メッシュロードの頂点上にある頂点数
 const float HEIGHT_GR = 600.0f;	// ガードレールの高さ
 const int NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
@@ -27,7 +27,7 @@ const int NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
 //=====================================================
 // コンストラクタ
 //=====================================================
-CGuardRail::CGuardRail(int nPriority) : CObject3D(nPriority), m_nNumVtx(0)
+CGuardRail::CGuardRail(int nPriority) : CObject3D(nPriority), m_nNumVtx(0), m_fHeight(0.0f), m_bLeft(false)
 {
 
 }
@@ -43,7 +43,7 @@ CGuardRail::~CGuardRail()
 //=====================================================
 // 生成処理
 //=====================================================
-CGuardRail *CGuardRail::Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart, std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd)
+CGuardRail *CGuardRail::Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart, std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd, bool bLeft, float fHeight)
 {
 	CGuardRail *pGuardRail = nullptr;
 
@@ -51,6 +51,8 @@ CGuardRail *CGuardRail::Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator 
 
 	if (pGuardRail != nullptr)
 	{
+		pGuardRail->m_fHeight = fHeight;
+		pGuardRail->m_bLeft = bLeft;
 		pGuardRail->m_itStart = itStart;
 		pGuardRail->m_itEnd = itEnd;
 
@@ -129,9 +131,9 @@ void CGuardRail::VtxFollowRoad(void)
 
 		for (int i = 0; i < nDistBetween; i++)
 		{
-			CEffect3D::Create(pVtx[0].pos, 20.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+			CEffect3D::Create(pVtx[m_bLeft].pos, 20.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 
-			vectorPosEdge.push_back(pVtx[0].pos);
+			vectorPosEdge.push_back(pVtx[m_bLeft].pos);
 
 			pVtx += 2;
 		}
@@ -159,19 +161,27 @@ void CGuardRail::VtxFollowRoad(void)
 		pVtx[0].pos = vectorPosEdge[i];
 		pVtx[1].pos = pVtx[0].pos;
 
-		pVtx[1].pos.y += HEIGHT_GR;
+		pVtx[1].pos.y += m_fHeight;
 
 		pVtx[0].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 		pVtx[1].col = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
 		// 法線の設定
-		pVtx[0].nor = { 0.0f,0.0f,1.0f };
-		pVtx[1].nor = { 0.0f,0.0f,1.0f };
-
-		// テクスチャ座標の設定
 		if (i > 0)
 		{
 			SetNormal(pVtx);
+		}
+
+		// テクスチャ座標の設定
+		if (i % 2 == 0)
+		{
+			pVtx[0].tex = { 0.0f,0.0f };
+			pVtx[1].tex = { 1.0f,0.0f };
+		}
+		else
+		{
+			pVtx[0].tex = { 0.0f,1.0f };
+			pVtx[1].tex = { 1.0f,1.0f };
 		}
 
 		pVtx += NUM_VTX_ON_POINT;

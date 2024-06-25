@@ -29,11 +29,13 @@ public:
 	void Draw(void);
 
 	// 変数取得・設定関数
-	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItStart(void) { return m_itStart; }
-	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItEnd(void) { return m_itEnd; }
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItStart(void) { return m_itStart; }	// 開始イテレーター
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItEnd(void) { return m_itEnd; }	// 終了イテレーター
+	bool IsLeft(void) { return m_bLeft; }	// 左にするかどうか
+	void EnableLeft(bool bLeft) { m_bLeft = bLeft; }
 
 	// 静的メンバ関数
-	static CGuardRail *Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart, std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd);
+	static CGuardRail *Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart, std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd,bool bLeft = false,float fHeight = 600.0f);
 
 private:
 	// メンバ関数
@@ -43,6 +45,8 @@ private:
 
 	// メンバ変数
 	int m_nNumVtx;	// 頂点数
+	float m_fHeight;	// 高さ
+	bool m_bLeft;	// 左側にするかどうか
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itStart;	// 開始イテレイター
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// 終了イテレイター
 };

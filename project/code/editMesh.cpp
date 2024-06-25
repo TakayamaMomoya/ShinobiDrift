@@ -378,7 +378,7 @@ void CStateEditMeshCreateGR::SetGR(std::vector<CMeshRoad::SInfoRoadPoint>::itera
 		m_itEnd = it;
 
 		// ガードレールの生成
-		CGuardRail *pGR = CGuardRail::Create(m_itStart, m_itEnd);
+		CGuardRail *pGR = CGuardRail::Create(m_itStart, m_itEnd,true);
 
 		// 配列に保存
 		//CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
