@@ -81,6 +81,25 @@ private:
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// トンネルの終了イテレイター
 };
 
+class CStateEditMeshCreateGR : public CStateEditMesh
+{// ガードレールの生成
+public:
+	CStateEditMeshCreateGR();	// コンストラクタ
+	virtual ~CStateEditMeshCreateGR() {};	// デストラクタ
+
+	// メンバ関数
+	void Update(CEditMesh *pEdit) override;	// 更新処理
+
+private:
+	// メンバ関数
+	void SetGR(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
+
+	// メンバ変数
+	bool m_bEnd;	// スタートの選択かどうか
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itStart;	// 開始イテレイター
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// 終了イテレイター
+};
+
 class CStateEditMeshAdjustRoadPoint : public CStateEditMesh
 {// ロードポイントの調節
 public:

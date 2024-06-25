@@ -107,7 +107,7 @@ HRESULT CGame::Init(void)
 	//CMeter::Create();
 
 	// ゴール生成
-	CGoal::Create(D3DXVECTOR3(60970.0f, 1540.0f, 6480.0f), 2.82f);
+	CGoal::Create(D3DXVECTOR3(60970.0f, 1540.0f, 3980.0f), 3.07f);
 
 	// メッシュロード生成
 	CMeshRoad::Create();

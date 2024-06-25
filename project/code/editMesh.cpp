@@ -18,6 +18,7 @@
 #include "camera.h"
 #include "manager.h"
 #include "tunnel.h"
+#include "guardRail.h"
 
 //*****************************************************
 // 定数定義
@@ -110,6 +111,9 @@ void CEditMesh::Update(void)
 
 	if (ImGui::Button("CreateTunnel", ImVec2(70, 30)))	// トンネルの生成
 		ChangeState(new CStateEditMeshCreateTunnel);
+
+	if (ImGui::Button("CreateGR", ImVec2(70, 30)))	// ガードレールの生成
+		ChangeState(new CStateEditMeshCreateGR);
 
 	if (ImGui::Button("AdjustRoadPoint", ImVec2(70, 30)))	// ロードポイントの調節
 		ChangeState(new CStateEditMeshAdjustRoadPoint);
@@ -311,6 +315,83 @@ void CStateEditMeshCreateTunnel::SetTunnel(std::vector<CMeshRoad::SInfoRoadPoint
 				paTunnel->push_back(pTunnel);
 			}
 		}
+	}
+}
+
+//****************************************************************************************
+// ガードレールの生成
+//****************************************************************************************
+//=====================================================
+// コンストラクタ
+//=====================================================
+CStateEditMeshCreateGR::CStateEditMeshCreateGR() : m_bEnd(false)
+{
+	CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
+	pMeshRoad->ResetIterator();
+}
+
+//=====================================================
+// 更新処理
+//=====================================================
+void CStateEditMeshCreateGR::Update(CEditMesh *pEdit)
+{
+	CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+
+	if (pKeyboard == nullptr || pMesh == nullptr)
+		return;
+
+	// ロードポイントの選択
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator it = pMesh->SelectRoadPoint();
+
+	if (pKeyboard->GetTrigger(DIK_SPACE))
+	{// ロードポイントの決定
+		SetGR(it);
+	}
+
+	if (pKeyboard->GetTrigger(DIK_R))
+	{// 選択の撤回
+		m_bEnd = false;
+	}
+
+	if (m_bEnd)
+	{// 選択したロードポイントにエフェクトを出す
+		D3DXVECTOR3 pos = m_itStart->pos;
+		pos.y += 100.0f;
+		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+}
+
+//=====================================================
+// ガードレールの設置
+//=====================================================
+void CStateEditMeshCreateGR::SetGR(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
+{// 最初と最後の辺の設定
+	if (!m_bEnd)
+	{// 最初の辺設定
+		m_itStart = it;
+		m_bEnd = true;
+	}
+	else if (m_bEnd)
+	{// 最後の辺を設定
+		m_itEnd = it;
+
+		// ガードレールの生成
+		CGuardRail *pGR = CGuardRail::Create(m_itStart, m_itEnd,true);
+
+		// 配列に保存
+		//CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
+
+		//if (pMeshRoad != nullptr)
+		//{
+		//	//std::vector<CTunnel*> *paTunnel = pMeshRoad->GetArrayTunnnel();
+
+		//	if (pGR != nullptr)
+		//	{
+		//		pGR->push_back(pTunnel);
+		//	}
+		//}
 	}
 }
 
