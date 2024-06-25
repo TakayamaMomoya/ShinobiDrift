@@ -81,7 +81,7 @@ private:
 		float fCntAngle;	// アングルのカウンター
 		bool bGrabOld;
 		bool bManual;		// マニュアル操作
-		bool bAir;			// マニュアル操作
+		bool bAir;			// 空中にいるかどうか
 		float fLengthDrift;
 		float fTimerDriftChange;
 		float fSizeBlurDrift;	// ドリフト時のブラーの強さ

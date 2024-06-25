@@ -521,8 +521,8 @@ bool LineCrossProduct(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3* pos, D3DX
 
 	// ü•ªã‚ð‚Ü‚½‚¢‚Å‚¢‚é‚©”»’è
 	if (CrossProduct(vecLine, vecToPos) > 0.0f && 
-		CrossProduct(vecLine, vecToPosOld) < 0.0f && 
-		fRate > 0.0f && fRate < 1.0f)
+		CrossProduct(vecLine, vecToPosOld) <= 0.0f && 
+		fRate >= 0.0f && fRate < 1.0f)
 	{
 		D3DXVECTOR3 vecNor, posCross;
 		float fDot;
@@ -539,6 +539,7 @@ bool LineCrossProduct(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3* pos, D3DX
 		posCross = vtx2 + (vecLine * fRate);
 		vecMove = *pos - posCross;
 		vecMove.y = 0.0f;
+		posCross.y = 0.0f;
 
 		//…•½•ûŒü‘å‚«‚³
 		fDot = D3DXVec3Dot(&-vecMove, &vecNor);

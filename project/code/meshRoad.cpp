@@ -634,14 +634,56 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 
 			// 判定をtrueにする
 			bColRoad = true;
-
-			// 道から落ちないようにする
-			universal::LineCrossProduct(pVtx[2].pos, pVtx[0].pos, pPos, posOld);
-			universal::LineCrossProduct(pVtx[1].pos, pVtx[3].pos, pPos, posOld);
 		}
 	}
 
 	pPos->y = fHeightDef;
+
+	// 頂点バッファをアンロック
+	pVtxBuff->Unlock();
+
+	return bColRoad;
+}
+
+//=====================================================
+// 道側面との当たり判定処理
+//=====================================================
+bool  CMeshRoad::CollisionRoadSide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
+{
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
+	VERTEX_3D* pVtx;
+	bool bColRoad = false;
+	D3DXVECTOR3 posOldRoadPoint = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+	int effectNum = 0;
+
+	for (auto itRoadPoint : m_aRoadPoint)
+	{
+		if (D3DXVec3Dot(&(itRoadPoint.pos - posOldRoadPoint), &(*pPos - posOldRoadPoint)) < 0.0f)
+		{
+			posOldRoadPoint = itRoadPoint.pos;
+			pVtx += MeshRoad::NUM_VTX_IN_EDGE * MeshRoad::NUM_EDGE_IN_ROADPOINT;
+			continue;
+		}
+		posOldRoadPoint = itRoadPoint.pos;
+
+		for (int i = 0; i < MeshRoad::NUM_EDGE_IN_ROADPOINT; i++)
+		{
+			pVtx += MeshRoad::NUM_VTX_IN_EDGE;
+
+			// 道から落ちないようにする
+			if (D3DXVec3Dot(&(posOld - pVtx[0].pos), &pVtx[0].nor) >= 0.0f)
+				universal::LineCrossProduct(pVtx[2].pos, pVtx[0].pos, pPos, posOld);
+
+			if (D3DXVec3Dot(&(posOld - pVtx[3].pos), &pVtx[3].nor) >= 0.0f)
+				universal::LineCrossProduct(pVtx[1].pos, pVtx[3].pos, pPos, posOld);
+
+			// 判定をtrueにする
+			bColRoad = true;
+		}
+	}
 
 	// 頂点バッファをアンロック
 	pVtxBuff->Unlock();
