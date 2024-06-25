@@ -114,7 +114,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 
 		// ‰Šú‰»
 		m_pMyEffekseer->Init();
-		m_pMyEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_IMPACT], ::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
 	}
 
 	if (m_pPhysics == nullptr)
