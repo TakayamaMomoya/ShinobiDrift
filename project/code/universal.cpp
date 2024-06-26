@@ -572,6 +572,7 @@ bool LineCrossProduct(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3* pos, D3DX
 //========================================
 bool CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 posPlane, D3DXVECTOR3 vecNorPlane)
 {
+	// 各方向軸ベクトル計算
 	D3DXVECTOR3 axis1 = D3DXVECTOR3(vecAxial.x, 0.0f, 0.0f);
 	D3DXVECTOR3 axis2 = D3DXVECTOR3(0.0f, vecAxial.y, 0.0f);
 	D3DXVECTOR3 axis3 = D3DXVECTOR3(0.0f, 0.0f, vecAxial.z);
