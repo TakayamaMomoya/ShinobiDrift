@@ -411,17 +411,18 @@ void CPlayer::InputWire(void)
 		// ロープの制御
 		ControlRoap();
 
+		// エフェクシア取得
 		CEffekseer* pEffekseer = CManager::GetMyEffekseer();
 
+		// 後輪の位置取得
 		float PosX = GetParts(3)->pParts->GetMatrix()->_41;
 		float PosY = GetParts(3)->pParts->GetMatrix()->_42;
 		float PosZ = GetParts(3)->pParts->GetMatrix()->_43;
 
-		float PlayerY = GetRotation().y;
-
+		// エフェクトの再生
 		if (pEffekseer != nullptr)
 			pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_DRIFT], ::Effekseer::Vector3D(PosX, PosY, PosZ),
-				::Effekseer::Vector3D(0.0f, PlayerY, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
+				::Effekseer::Vector3D(0.0f, fAngleDiff, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
 	}
 	else
 	{

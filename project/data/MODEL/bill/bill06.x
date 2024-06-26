@@ -163,14 +163,14 @@ Mesh {
  4;18,19,6,15;;
  
  MeshMaterialList {
-  2;
+  3;
   6;
   0,
   0,
   0,
   0,
-  1,
-  1;;
+  2,
+  2;;
   Material {
    0.800000;0.800000;0.800000;1.000000;;
    5.000000;
@@ -178,6 +178,15 @@ Mesh {
    0.000000;0.000000;0.000000;;
    TextureFilename {
     "data\\TEXTURE\\MATERIAL\\Bill002.png";
+   }
+  }
+  Material {
+   0.800000;0.800000;0.800000;1.000000;;
+   5.000000;
+   0.000000;0.000000;0.000000;;
+   0.000000;0.000000;0.000000;;
+   TextureFilename {
+    "data\\TEXTURE\\MATERIAL\\arms_01.png";
    }
   }
   Material {
