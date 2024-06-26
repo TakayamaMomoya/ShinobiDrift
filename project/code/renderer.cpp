@@ -261,7 +261,7 @@ void CRenderer::Draw(void)
 	float fEnd = 20000;
 
 	// フォグを有効化
-	m_pD3DDevice->SetRenderState(D3DRS_FOGENABLE, m_fogInfo.bEnable);
+	//m_pD3DDevice->SetRenderState(D3DRS_FOGENABLE, m_fogInfo.bEnable);
 
 	// フォグの色を設定
 	m_pD3DDevice->SetRenderState(D3DRS_FOGCOLOR, D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f));
