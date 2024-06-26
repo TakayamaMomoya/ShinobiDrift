@@ -2,10 +2,10 @@ Metasequoia Document
 Format Text Ver 1.0
 
 Scene {
-	pos -1977.2754 -9471.7422 100000.0000
+	pos -1750.4941 -5976.7153 100000.0000
 	lookat 0.0000 0.0000 0.0000
-	head -12.8136
-	pich -0.9108
+	head -9.7835
+	pich 0.0992
 	bank 0.0000
 	ortho 0
 	zoom2 0.0750
@@ -17,8 +17,9 @@ Scene {
 		}
 	}
 }
-Material 1 {
-	"ビル3" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Downloads\PNG-20240620T001508Z-001\PNG\Bill001.png")
+Material 2 {
+	"ビル3" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Documents\授業用\総合演習\3年group制作\ShinobiDrift\project\data\TEXTURE\MATERIAL\Bill001.png")
+	"lambert15SG" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("arms_01.png")
 }
 Object "obj2" {
 	visible 15
