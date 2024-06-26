@@ -191,6 +191,11 @@ void CPlayer::Load(void)
 				iss >> m_param.fAngleMaxCurve;
 			}
 
+			if (key == "COLLIDER_SIZE")
+			{// プレイヤー当たり判定サイズ
+				iss >> m_param.sizeCollider.x >> m_param.sizeCollider.y >> m_param.sizeCollider.z;
+			}
+
 			if (file.eof())
 			{// 読み込み終了
 				break;
@@ -824,34 +829,34 @@ void CPlayer::Collision(void)
 	D3DXVECTOR3 move = GetMove();
 	D3DXVECTOR3 rot = GetRotation();
 	D3DXVECTOR3 posParts[2];
+	D3DXVECTOR3 posPartsDef[2];
 	D3DXVECTOR3 posOldParts[2];
 	D3DXVECTOR3 posDef, posDefOld;
 	D3DXVECTOR3 vecTire = pos - posParts[0];
 	bool bRoad[2];
 	CInputManager* pInputManager = CInputManager::GetInstance();
 
+	// ガードレールとの当たり判定
+
+
 	// タイヤの位置保存
-	posParts[0].x = GetParts(2)->pParts->GetMatrix()->_41 + (pos.x - posOld.x);
-	posParts[0].y = GetParts(2)->pParts->GetMatrix()->_42 + (pos.y - posOld.y) - 55.0f;
-	posParts[0].z = GetParts(2)->pParts->GetMatrix()->_43 + (pos.z - posOld.z);
-	posParts[1].x = GetParts(3)->pParts->GetMatrix()->_41 + (pos.x - posOld.x);
-	posParts[1].y = GetParts(3)->pParts->GetMatrix()->_42 + (pos.y - posOld.y) - 65.0f;
-	posParts[1].z = GetParts(3)->pParts->GetMatrix()->_43 + (pos.z - posOld.z);
+	posParts[0] = universal::GetMtxPos(*GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
+	posParts[0].y -= 55.0f;
+	posParts[1] = universal::GetMtxPos(*GetParts(3)->pParts->GetMatrix()) + (pos - posOld);
+	posParts[1].y -= 65.0f;
 
 	// タイヤの過去位置保存
-	posOldParts[0].x = GetParts(2)->pParts->GetMatrixOld()->_41 + (pos.x - posOld.x);
-	posOldParts[0].y = GetParts(2)->pParts->GetMatrixOld()->_42 + (pos.y - posOld.y) - 55.0f;
-	posOldParts[0].z = GetParts(2)->pParts->GetMatrixOld()->_43 + (pos.z - posOld.z);
-	posOldParts[1].x = GetParts(3)->pParts->GetMatrixOld()->_41 + (pos.x - posOld.x);
-	posOldParts[1].y = GetParts(3)->pParts->GetMatrixOld()->_42 + (pos.y - posOld.y) - 65.0f;
-	posOldParts[1].z = GetParts(3)->pParts->GetMatrixOld()->_43 + (pos.z - posOld.z);
+	posOldParts[0] = universal::GetMtxPos(*GetParts(2)->pParts->GetMatrixOld()) + (pos - posOld);
+	posOldParts[0].y -= 55.0f;
+	posOldParts[1] = universal::GetMtxPos(*GetParts(3)->pParts->GetMatrixOld()) + (pos - posOld);
+	posOldParts[1].y -= 65.0f;
 
-	//// タイヤの中点を計算
+	// タイヤの中点を計算
 	posDef = (posParts[0] + posParts[1]) * 0.5f;
 
 	// タイヤそれぞれで当たり判定をとる
-	bRoad[0] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[0], posOldParts[0]);
-	bRoad[1] = CMeshRoad::GetInstance()->CollisionRoad(&posParts[1], posOldParts[1]);
+	bRoad[0] = CMeshRoad::GetInstance()->CollideRoad(&posParts[0], posOldParts[0]);
+	bRoad[1] = CMeshRoad::GetInstance()->CollideRoad(&posParts[1], posOldParts[1]);
 
 	// プレイヤーの高さを調整
 	pos.y += ((posParts[0] + posParts[1]) * 0.5f).y - posDef.y;
@@ -862,33 +867,15 @@ void CPlayer::Collision(void)
 
 	if (bRoad[0] && bRoad[1])
 	{// タイヤが両方道に触れているとき
-		move.y = -10.0f;
+		move.y = -20.0f;
 
-		if (pInputManager != nullptr)
-		{
-			// ハンドルの操作
-			CInputManager::SAxis axis = pInputManager->GetAxis();
-
-			if (axis.axisMove.z > 0.0f)
-				rot.x += 0.04f;
-			else if (axis.axisMove.z < 0.0f)
-				rot.x -= 0.04f;
-		}
+		m_info.bAir = false;
 	}
 	else if (bRoad[0] || bRoad[1])
 	{// タイヤが片方だけ道に触れているとき
-		move.y = -10.0f;
+		move.y = -20.0f;
 
-		if (pInputManager != nullptr)
-		{
-			// ハンドルの操作
-			CInputManager::SAxis axis = pInputManager->GetAxis();
-
-			if (axis.axisMove.z > 0.0f)
-				rot.x += 0.04f;
-			else if (axis.axisMove.z < 0.0f)
-				rot.x -= 0.04f;
-		}
+		m_info.bAir = true;
 	}
 	else
 	{// タイヤがどちらも道に触れていないとき
@@ -907,8 +894,11 @@ void CPlayer::Collision(void)
 				rot.x += 0.01f;
 			}
 		}
+
+		m_info.bAir = true;
 	}
 
+	// 角度制限
 	if (rot.x > 1.50f)
 		rot.x = 1.50f;
 
@@ -992,6 +982,8 @@ void CPlayer::ManageSpeed(void)
 
 	// 現在のスピードと前方ベクトルをかけて移動量に適用
 	move.x = vecForward.x * m_info.fSpeed;
+	if(!m_info.bAir)
+		move.y = vecForward.y * m_info.fSpeed;
 	move.z = vecForward.z * m_info.fSpeed;
 
 	// 移動量に重力を適用
