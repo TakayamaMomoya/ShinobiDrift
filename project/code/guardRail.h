@@ -33,6 +33,8 @@ public:
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItEnd(void) { return m_itEnd; }	// 終了イテレーター
 	bool IsLeft(void) { return m_bLeft; }	// 左にするかどうか
 	void EnableLeft(bool bLeft) { m_bLeft = bLeft; }
+	float GetHeight(void) { return m_fHeight; }	// 高さ
+	void SetHeight(float fHeight) { m_fHeight = fHeight; }
 
 	// 静的メンバ関数
 	static CGuardRail *Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart, std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd,bool bLeft = false,float fHeight = 600.0f);
