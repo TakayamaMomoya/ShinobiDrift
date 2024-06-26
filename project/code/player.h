@@ -46,6 +46,7 @@ public:
 		float fFactAttenu;	// 減速係数
 		float fFactBrake;	// ブレーキ減速係数
 		float fAngleMaxCurve;	// カーブの最大角度
+		D3DXVECTOR3 sizeCollider;	// コライダーのサイズ
 	};
 
 	CPlayer(int nPriority = 4);	// コンストラクタ
@@ -81,7 +82,7 @@ private:
 		float fCntAngle;	// アングルのカウンター
 		bool bGrabOld;
 		bool bManual;		// マニュアル操作
-		bool bAir;			// マニュアル操作
+		bool bAir;			// 空中にいるかどうか
 		float fLengthDrift;
 		float fTimerDriftChange;
 		float fSizeBlurDrift;	// ドリフト時のブラーの強さ

@@ -290,3 +290,39 @@ void CGuardRail::Draw(void)
 	// カリングを有効化
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 }
+
+//=====================================================
+// 当たり判定処理
+//=====================================================
+bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial)
+{
+	// 頂点を道に沿わせる========================================
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
+
+	// 頂点情報のポインタ
+	VERTEX_3D* pVtx;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	// 頂点数の計算
+	int nDistBetween = std::distance(m_itStart, m_itEnd);
+	nDistBetween *= MeshRoad::NUM_EDGE_IN_ROADPOINT;
+
+	for (int i = 0; i < m_nNumVtx - 2; i++)
+	{
+		// ガードレールの高さ以内で判定する
+		if (m_fHeight > pos->y - pVtx[0].pos.y)
+			continue;
+
+		if (D3DXVec3Dot(&(*pos - pVtx[0].pos), &(pVtx[2].pos - pVtx[0].pos)) < 0.0f &&
+			D3DXVec3Dot(&(*pos - pVtx[2].pos), &(pVtx[0].pos - pVtx[2].pos)) >= 0.0f)
+			continue;
+
+		universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, pVtx[0].nor);
+
+		pVtx += NUM_VTX_ON_POINT;
+	}
+
+	return false;
+}

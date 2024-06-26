@@ -588,7 +588,7 @@ void CMeshRoad::CreateSideSpline(void)
 //=====================================================
 // ìñÇΩÇËîªíËèàóù
 //=====================================================
-bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
+bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 {
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 	VERTEX_3D* pVtx;
@@ -635,10 +635,6 @@ bool CMeshRoad::CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 
 			// îªíËÇtrueÇ…Ç∑ÇÈ
 			bColRoad = true;
-
-			// ìπÇ©ÇÁóéÇøÇ»Ç¢ÇÊÇ§Ç…Ç∑ÇÈ
-			universal::LineCrossProduct(pVtx[2].pos, pVtx[0].pos, pPos, posOld);
-			universal::LineCrossProduct(pVtx[1].pos, pVtx[3].pos, pPos, posOld);
 		}
 	}
 

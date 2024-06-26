@@ -47,7 +47,7 @@ public:
 	void AddRoadPoint(D3DXVECTOR3 pos,bool bReCreateVtx = false);
 	void CreateVtxBuffEdge(void);	// エッジ数に応じて頂点を生成する
 
-	bool CollisionRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld);
+	bool CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld);
 
 	void Save(void);	// エディターのみ。ゲームでは消してね
 	void Load(void);	// エディターのみ。ゲームでは消してね
@@ -81,7 +81,7 @@ private:
 
 namespace MeshRoad
 {
-const int NUM_EDGE_IN_ROADPOINT = 20;	// ロードポイント一つにつき、ある辺の数
+const int NUM_EDGE_IN_ROADPOINT = 10;	// ロードポイント一つにつき、ある辺の数
 const int NUM_VTX_IN_EDGE = 2;	// 一辺にある頂点数
 
 CMeshRoad *GetInstance(void);
