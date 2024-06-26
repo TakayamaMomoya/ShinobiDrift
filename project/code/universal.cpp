@@ -335,6 +335,21 @@ D3DXVECTOR3 VecToRot(D3DXVECTOR3 vec)
 }
 
 //========================================
+// マトリックスから位置の取得
+//========================================
+D3DXVECTOR3 GetMtxPos(D3DXMATRIX mtx)
+{
+	D3DXVECTOR3 pos =
+	{
+		mtx._41,
+		mtx._42,
+		mtx._43
+	};
+
+	return pos;
+}
+
+//========================================
 // 距離の比較
 //========================================
 bool DistCmp(D3DXVECTOR3 posOwn, D3DXVECTOR3 posTarget, float fLengthMax, float *fDiff)
@@ -521,8 +536,8 @@ bool LineCrossProduct(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3* pos, D3DX
 
 	// 線分上をまたいでいるか判定
 	if (CrossProduct(vecLine, vecToPos) > 0.0f && 
-		CrossProduct(vecLine, vecToPosOld) < 0.0f && 
-		fRate > 0.0f && fRate < 1.0f)
+		CrossProduct(vecLine, vecToPosOld) <= 0.0f && 
+		fRate >= 0.0f && fRate < 1.0f)
 	{
 		D3DXVECTOR3 vecNor, posCross;
 		float fDot;
@@ -539,6 +554,7 @@ bool LineCrossProduct(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3* pos, D3DX
 		posCross = vtx2 + (vecLine * fRate);
 		vecMove = *pos - posCross;
 		vecMove.y = 0.0f;
+		posCross.y = 0.0f;
 
 		//水平方向大きさ
 		fDot = D3DXVec3Dot(&-vecMove, &vecNor);
@@ -549,6 +565,35 @@ bool LineCrossProduct(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3* pos, D3DX
 	}
 
 	return false;
+}
+
+//========================================
+// OBBの平面に対する押し戻し判定処理
+//========================================
+bool CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 posPlane, D3DXVECTOR3 vecNorPlane)
+{
+	// 各方向軸ベクトル計算
+	D3DXVECTOR3 axis1 = D3DXVECTOR3(vecAxial.x, 0.0f, 0.0f);
+	D3DXVECTOR3 axis2 = D3DXVECTOR3(0.0f, vecAxial.y, 0.0f);
+	D3DXVECTOR3 axis3 = D3DXVECTOR3(0.0f, 0.0f, vecAxial.z);
+
+	// 射影線の長さを計算
+	float lenProjection = lengthAxis(vecNorPlane, axis1, axis2, axis3);
+
+	// 線分とターゲットの位置関係を計算
+	float lenPos = D3DXVec3Dot(&(*posOBB - posPlane), &vecNorPlane);
+
+	// めり込んでいる
+	if (lenProjection < fabs(lenPos))
+		return false;
+
+	// めり込み具合で戻す距離を変える
+	if (lenPos >= 0.0f)
+		*posOBB += vecNorPlane * (lenProjection - lenPos);
+	else
+		*posOBB += vecNorPlane * (lenProjection + lenPos);
+
+	return true;
 }
 
 //========================================
@@ -751,5 +796,19 @@ D3DXVECTOR3 Lerp(D3DXVECTOR3 start, D3DXVECTOR3 end, float fTime)
 	pos += vecDiff * fTime;
 
 	return pos;
+}
+
+//========================================
+// 線分に対するの射影変換
+//========================================
+float lengthAxis(D3DXVECTOR3 sep, D3DXVECTOR3 e1, D3DXVECTOR3 e2, D3DXVECTOR3 e3)
+{
+	float length1, length2, length3;
+
+	length1 = fabs(D3DXVec3Dot(&sep, &e1));
+	length2 = fabs(D3DXVec3Dot(&sep, &e2));
+	length3 = fabs(D3DXVec3Dot(&sep, &e3));
+
+	return length1 + length2 + length3;
 }
 }	// namespace universal

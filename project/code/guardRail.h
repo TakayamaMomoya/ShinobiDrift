@@ -36,6 +36,8 @@ public:
 	float GetHeight(void) { return m_fHeight; }	// ‚‚³
 	void SetHeight(float fHeight) { m_fHeight = fHeight; }
 
+	bool CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial);
+
 	// Ã“Iƒƒ“ƒoŠÖ”
 	static CGuardRail *Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart, std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd,bool bLeft = false,float fHeight = 600.0f);
 
