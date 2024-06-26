@@ -142,6 +142,7 @@ void CEditBlock::ChangeState(CStateEditBlock *pState)
 void CStateCreateBlockNormal::Init(CEditBlock *pEdit)
 {
 	m_nIdxObject = 0;
+	m_pBlockCurrent = nullptr;
 
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
@@ -252,10 +253,10 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 	int nNumBlock = pBlockManager->GetNumBlock();
 	CBlockManager::SInfoBlock *pInfoBlock = pBlockManager->GetInfoBlock();
 
-	if (ImGui::TreeNode("SelectBlock"))
+	if (ImGui::TreeNode("SelectBlockType"))
 	{
 		for (int i = 0; i < nNumBlock; i++)
-		{// ブロック選択
+		{// ブロックの種類選択
 			if (ImGui::Button(&pInfoBlock[i].aTag[0], ImVec2(50.0f, 20.0f)))
 			{
 				m_nIdxObject = i;
@@ -263,6 +264,14 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 				m_pObjectCursor->BindModel(pInfoBlock[i].nIdxModel);
 			}
 		}
+
+		ImGui::TreePop();
+	}
+
+	if (ImGui::TreeNode("SelectBlock"))
+	{
+		// ブロック選択
+		SelectBlock();
 
 		ImGui::TreePop();
 	}
@@ -310,6 +319,50 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 		m_pObjectCursor->SetPosition(pos);
 		m_pObjectCursor->SetRotation(rot);
 	}
+}
+
+//=====================================================
+// ブロックの選択
+//=====================================================
+void CStateCreateBlockNormal::SelectBlock(void)
+{
+	CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+	if (pBlockManager == nullptr)
+		return;
+
+	if (m_pBlockCurrent != nullptr)
+		m_pBlockCurrent->ResetColor();
+
+	if (ImGui::Button("NextBlock", ImVec2(70, 30)))
+	{
+		if (m_pBlockCurrent == nullptr)
+			m_pBlockCurrent = pBlockManager->GetHead();
+
+		if (m_pBlockCurrent == nullptr)
+			return;
+
+		CBlock *pNext = m_pBlockCurrent->GetNext();
+
+		if (pNext != nullptr)
+			m_pBlockCurrent = pNext;
+	}
+	if (ImGui::Button("PrevBlock", ImVec2(70, 30)))
+	{
+		if (m_pBlockCurrent == nullptr)
+			m_pBlockCurrent = pBlockManager->GetHead();
+
+		if (m_pBlockCurrent == nullptr)
+			return;
+
+		CBlock *pPrev = m_pBlockCurrent->GetPrev();
+
+		if (pPrev != nullptr)
+			m_pBlockCurrent = pPrev;
+	}
+
+	if (m_pBlockCurrent != nullptr)
+		m_pBlockCurrent->SetEmissiveCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 }
 
 //=====================================================

@@ -55,6 +55,7 @@ public:
 	int GetIdx(void) { return m_nIdx; }
 	void SetIdx(int nIdx) { m_nIdx = nIdx; }
 	CBlock *GetNext(void) { return m_pNext; }
+	CBlock *GetPrev(void) { return m_pPrev; }
 	static int GetNumAll(void) { return m_nNumAll; }
 	void SetPosition(D3DXVECTOR3 pos);
 	virtual void Save(FILE *pFile);	// ï€ë∂èàóù
