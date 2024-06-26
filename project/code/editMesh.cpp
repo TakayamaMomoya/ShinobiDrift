@@ -468,6 +468,17 @@ void CStateEditMeshSelectGR::Update(CEditMesh *pEdit)
 			std::advance(m_it, -1);
 	}
 
+	if (ImGui::Button("DeleteGR", ImVec2(70, 30)))
+	{
+		if ((*m_it) == nullptr)
+			return;
+
+		(*m_it)->Uninit();
+		paGR->erase(m_it);
+
+		m_it = paGR->begin();
+	}
+
 	// 選択したガードレールの表示
 	(*m_it)->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 }
