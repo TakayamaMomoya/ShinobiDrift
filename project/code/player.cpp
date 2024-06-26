@@ -338,15 +338,21 @@ void CPlayer::InputMove(void)
 	{
 		// アクセルSEからエンジンSEへ変更
 		if (pSound != nullptr)
-			pSound->SetFade(pSound->LABEL_SE_ACCELERATOR, pSound->LABEL_SE_ENGIN, 0.1f);
-		
+		{
+			pSound->Play(pSound->LABEL_SE_ENGIN);
+			pSound->Stop(pSound->LABEL_SE_ACCELERATOR);
+		}
+
 		m_bMove = false;
 	}
 	else if (m_info.fSpeed >= SE_CHANGE_SPEED && !m_bMove)
 	{
 		// エンジンSEからアクセルSEへ変更
 		if (pSound != nullptr)
-			pSound->SetFade(pSound->LABEL_SE_ENGIN, pSound->LABEL_SE_ACCELERATOR, 0.1f);
+		{
+			pSound->Play(pSound->LABEL_SE_ACCELERATOR);
+			pSound->Stop(pSound->LABEL_SE_ENGIN);
+		}
 
 		m_bMove = true;
 	}
