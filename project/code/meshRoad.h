@@ -79,7 +79,7 @@ private:
 
 namespace MeshRoad
 {
-const int NUM_EDGE_IN_ROADPOINT = 20;	// ロードポイント一つにつき、ある辺の数
+const int NUM_EDGE_IN_ROADPOINT = 10;	// ロードポイント一つにつき、ある辺の数
 const int NUM_VTX_IN_EDGE = 2;	// 一辺にある頂点数
 
 CMeshRoad *GetInstance(void);
