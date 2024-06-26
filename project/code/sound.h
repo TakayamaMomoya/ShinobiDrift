@@ -40,6 +40,7 @@ public:
 
 		LABEL_SE_ENGIN,					// エンジン音
 		LABEL_SE_ACCELERATOR,			// アクセル音
+		LABEL_SE_DRIFT,                 // ドリフト音
 
 		LABEL_SE_PAUSE_MENU,			// ポーズ
 		LABEL_SE_PAUSE_ARROW,			// ポーズ移動
@@ -119,6 +120,7 @@ private:
 
 		{ "data/SOUND/SE/SE_Engin.wav",-1 },			// エンジン音
 		{ "data/SOUND/SE/SE_Accelerator.wav",-1 },		// アクセル音
+		{ "data/SOUND/SE/SE_Drift.wav",-1 },		    // ドリフト音
 
 		{ "data/SOUND/SE/pause.wav",0 },				// ポーズ
 		{ "data/SOUND/SE/pause_arrow.wav",0 },			// 選択

@@ -334,18 +334,18 @@ void CPlayer::InputMove(void)
 
 	m_info.fSpeed += (0.0f - m_info.fSpeed) * m_param.fFactBrake * fBrake;
 
-	if (m_info.fSpeed < SE_CHANGE_SPEED)
+	if (m_info.fSpeed < SE_CHANGE_SPEED && m_bMove)
 	{
-		// エンジンのSE再生
-		if (pSound != nullptr && m_bMove)
+		// アクセルSEからエンジンSEへ変更
+		if (pSound != nullptr)
 			pSound->SetFade(pSound->LABEL_SE_ACCELERATOR, pSound->LABEL_SE_ENGIN, 0.1f);
 		
 		m_bMove = false;
 	}
-	else if (m_info.fSpeed >= SE_CHANGE_SPEED)
+	else if (m_info.fSpeed >= SE_CHANGE_SPEED && !m_bMove)
 	{
-		// エンジンのSE停止
-		if (pSound != nullptr && !m_bMove)
+		// エンジンSEからアクセルSEへ変更
+		if (pSound != nullptr)
 			pSound->SetFade(pSound->LABEL_SE_ENGIN, pSound->LABEL_SE_ACCELERATOR, 0.1f);
 
 		m_bMove = true;
@@ -464,6 +464,16 @@ void CPlayer::InputWire(void)
 		if (pEffekseer != nullptr)
 			pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_DRIFT], ::Effekseer::Vector3D(PosX, PosY, PosZ),
 				::Effekseer::Vector3D(0.0f, fAngleDiff, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
+
+		// サウンドインスタンスの取得
+		CSound* pSound = CSound::GetInstance();
+
+		// ドリフトSEの再生
+		if (pSound != nullptr && !m_bDrift)
+			pSound->Play(pSound->LABEL_SE_DRIFT);
+
+		// ドリフトしている
+		m_bDrift = true;
 	}
 	else
 	{
@@ -472,6 +482,16 @@ void CPlayer::InputWire(void)
 
 		// 掴むブロックの探知
 		SarchGrab();
+
+		// サウンドインスタンスの取得
+		CSound* pSound = CSound::GetInstance();
+
+		// ドリフトSEの停止
+		if (pSound != nullptr && m_bDrift)
+			pSound->Stop(pSound->LABEL_SE_DRIFT);
+
+		// ドリフトしていない
+		m_bDrift = false;
 	}
 
 	if (CInputKeyboard::GetInstance() != nullptr)
