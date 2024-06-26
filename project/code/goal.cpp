@@ -21,7 +21,6 @@
 //*****************************************************
 namespace
 {
-	const int Transition = 120;		// ‰æ–Ê‘JˆÚ‚·‚é‚Ü‚Å‚ÌŠÔ
 	const float MOVESPEED = 4.0f;	// ˆÚ“®‘¬“x
 	const float WIDTH_GOAL = 100.0f;	// ƒS[ƒ‹‚Ì•
 }

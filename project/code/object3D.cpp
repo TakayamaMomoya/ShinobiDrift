@@ -15,6 +15,14 @@
 #include "debugproc.h"
 #include "camera.h"
 
+//*****************************************************
+// 定数定義
+//*****************************************************
+namespace
+{
+const int NUM_VTX_DEFAULT = 4;	// デフォルトの頂点数
+}
+
 //=====================================================
 // コンストラクタ
 //=====================================================
@@ -29,6 +37,7 @@ CObject3D::CObject3D(int nPriority) : CObject(nPriority)
 	m_fFactSB = 0.0f;
 	m_pVtxBuff = nullptr;
 	m_nIdxTexture = -1;
+	m_nNumVtx = 0;
 }
 
 //=====================================================
@@ -47,10 +56,12 @@ HRESULT CObject3D::Init(void)
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
 
+	m_nNumVtx = NUM_VTX_DEFAULT;
+
 	if (m_pVtxBuff == nullptr)
 	{
 		//頂点バッファの生成
-		pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * 4,
+		pDevice->CreateVertexBuffer(sizeof(VERTEX_3D) * NUM_VTX_DEFAULT,
 			D3DUSAGE_WRITEONLY,
 			FVF_VERTEX_3D,
 			D3DPOOL_MANAGED,
@@ -118,6 +129,8 @@ LPDIRECT3DVERTEXBUFFER9 CObject3D::CreateVtxBuff(int nNumVtx)
 		m_pVtxBuff->Release();
 		m_pVtxBuff = nullptr;
 	}
+
+	m_nNumVtx = nNumVtx;
 
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
 
@@ -479,11 +492,10 @@ void CObject3D::SetColor(D3DXCOLOR col)
 	//頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	//頂点カラーの設定
-	pVtx[0].col = m_col;
-	pVtx[1].col = m_col;
-	pVtx[2].col = m_col;
-	pVtx[3].col = m_col;
+	for (int i = 0; i < m_nNumVtx; i++)
+	{
+		pVtx[i].col = m_col;
+	}
 
 	//頂点バッファをアンロック
 	m_pVtxBuff->Unlock();

@@ -812,7 +812,7 @@ void CMeshRoad::Load(void)
 
 		CGuardRail *pGR = CGuardRail::Create(itStart, itEnd, bLeft, fHeight);
 
-		m_aGR.push_back(pGR);
+		m_aGR[i] = pGR;
 	}
 
 	inputFile.close();
