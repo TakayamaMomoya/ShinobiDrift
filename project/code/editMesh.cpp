@@ -27,6 +27,7 @@ namespace
 {
 const float SPEED_MOVE = 5.0f;	// 移動速度
 const float SPEED_ROLL = 0.05f;	// 回転速度
+const float DEFAULT_HEIGHT_GR = 600.0f;	// ガードレールのデフォルト高さ
 }
 
 //=====================================================
@@ -324,10 +325,12 @@ void CStateEditMeshCreateTunnel::SetTunnel(std::vector<CMeshRoad::SInfoRoadPoint
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateEditMeshCreateGR::CStateEditMeshCreateGR() : m_bEnd(false)
+CStateEditMeshCreateGR::CStateEditMeshCreateGR() : m_bEnd(false), m_bLeft(false), m_fHeight(0.0f)
 {
 	CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
 	pMeshRoad->ResetIterator();
+
+	m_fHeight = DEFAULT_HEIGHT_GR;
 }
 
 //=====================================================
@@ -355,6 +358,25 @@ void CStateEditMeshCreateGR::Update(CEditMesh *pEdit)
 		m_bEnd = false;
 	}
 
+	ImGui::Text("[GuardRail]");
+
+	const char* aText[2] =
+	{
+		"Right",
+		"Left"
+	};
+
+	// 左右切り替え
+	if (ImGui::Button(aText[(int)m_bLeft], ImVec2(70, 20)))
+		m_bLeft = m_bLeft ? false : true;
+
+	// 高さ切り替え
+	ImGui::DragFloat("Height", &m_fHeight, 2.0f, -FLT_MAX, FLT_MAX);
+
+	D3DXVECTOR3 posHeight = it->pos;	// 高さの見本エフェクト
+	posHeight.y += m_fHeight;
+	CEffect3D::Create(posHeight, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
 	if (m_bEnd)
 	{// 選択したロードポイントにエフェクトを出す
 		D3DXVECTOR3 pos = m_itStart->pos;
@@ -378,7 +400,7 @@ void CStateEditMeshCreateGR::SetGR(std::vector<CMeshRoad::SInfoRoadPoint>::itera
 		m_itEnd = it;
 
 		// ガードレールの生成
-		CGuardRail *pGR = CGuardRail::Create(m_itStart, m_itEnd,true);
+		CGuardRail *pGR = CGuardRail::Create(m_itStart, m_itEnd, m_bLeft, m_fHeight);
 
 		// 配列に保存
 		//CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();

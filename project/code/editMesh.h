@@ -96,6 +96,8 @@ private:
 
 	// メンバ変数
 	bool m_bEnd;	// スタートの選択かどうか
+	float m_fHeight;	// 高さ
+	float m_bLeft;	// 左側にするかどうか
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itStart;	// 開始イテレイター
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// 終了イテレイター
 };
