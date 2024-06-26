@@ -38,6 +38,8 @@ const float DIST_LIMIT = 3000.0f;	// ワイヤー制限距離
 const float LINE_CORRECT_DRIFT = 40.0f;	// ドリフト補正のしきい値
 const float SIZE_BLUR = -20.0f;	// ブラーのサイズ
 const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
+const D3DXVECTOR3 DEFAULT_POS = { -4331.0f,-12.4f,21389.0f };	// 初期位置
+const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,2.0f,0.0f };	// 初期向き
 }
 
 //*****************************************************
@@ -120,10 +122,15 @@ HRESULT CPlayer::Init(void)
 
 	m_info.pRoap = CObject3D::Create(GetPosition());
 
+	// デフォルト値設定
 	m_info.fLengthDrift = 1500.0f;
 	m_info.bGrabOld = true;
 	m_info.fDesityBlurDrift = DENSITY_BLUR;
 	m_info.fSizeBlurDrift = SIZE_BLUR;
+
+	// 初期トランスフォームの設定
+	SetPosition(DEFAULT_POS);
+	SetRotation(DEFAULT_ROT);
 
 	return S_OK;
 }

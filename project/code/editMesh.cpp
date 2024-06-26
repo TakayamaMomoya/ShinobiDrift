@@ -403,17 +403,17 @@ void CStateEditMeshCreateGR::SetGR(std::vector<CMeshRoad::SInfoRoadPoint>::itera
 		CGuardRail *pGR = CGuardRail::Create(m_itStart, m_itEnd, m_bLeft, m_fHeight);
 
 		// ”z—ñ‚É•Û‘¶
-		//CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
+		CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
 
-		//if (pMeshRoad != nullptr)
-		//{
-		//	//std::vector<CTunnel*> *paTunnel = pMeshRoad->GetArrayTunnnel();
+		if (pMeshRoad != nullptr)
+		{
+			std::vector<CGuardRail*> *paGR = pMeshRoad->GetArrayGR();
 
-		//	if (pGR != nullptr)
-		//	{
-		//		pGR->push_back(pTunnel);
-		//	}
-		//}
+			if (pGR != nullptr)
+			{
+				paGR->push_back(pGR);
+			}
+		}
 	}
 }
 

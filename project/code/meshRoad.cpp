@@ -15,6 +15,7 @@
 #include "myLib.h"
 #include "tunnel.h"
 #include "inputkeyboard.h"
+#include "guardRail.h"
 #include <fstream>
 
 //*****************************************************
@@ -684,6 +685,33 @@ void CMeshRoad::Save(void)
 		outputFile.write(reinterpret_cast<char*>(&nDist), sizeof(int));
 	}
 
+	// ガードレール情報保存
+	size = m_aGR.size();	// 総数保存
+	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
+
+	// イテレーターの終始端を保存
+	for (auto it : m_aGR)
+	{
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart = it->GetItStart();
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd = it->GetItEnd();
+
+		// 始点距離保存
+		int nDist = std::distance(m_aRoadPoint.begin(), itStart);
+		outputFile.write(reinterpret_cast<char*>(&nDist), sizeof(int));
+
+		// 終点距離保存
+		nDist = std::distance(m_aRoadPoint.begin(), itEnd);
+		outputFile.write(reinterpret_cast<char*>(&nDist), sizeof(int));
+
+		// 左かどうか保存
+		bool bLeft = it->IsLeft();
+		outputFile.write(reinterpret_cast<char*>(&bLeft), sizeof(bool));
+
+		// 高さ保存
+		float fHeight = it->GetHeight();
+		outputFile.write(reinterpret_cast<char*>(&fHeight), sizeof(float));
+	}
+
 	outputFile.close();
 }
 
@@ -719,7 +747,7 @@ void CMeshRoad::Load(void)
 	inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
 
 	if (inputFile.eof())
-		return;
+		return;	// ファイルの終了チェック
 
 	m_aTunnel.resize(size);
 
@@ -744,6 +772,47 @@ void CMeshRoad::Load(void)
 		CTunnel *pTunnel = CTunnel::Create(itStart, itEnd);
 
 		m_aTunnel.push_back(pTunnel);
+	}
+
+	// ガードレールの生成
+	inputFile.read(reinterpret_cast<char*>(&size), sizeof(size));
+
+	if (inputFile.eof())
+		return;	// ファイルの終了チェック
+
+	m_aGR.resize(size);
+
+	for (size_t i = 0; i < size; i++)
+	{
+		int nDistStart;
+		int nDistEnd;
+
+		inputFile.read(reinterpret_cast<char*>(&nDistStart), sizeof(int));
+		inputFile.read(reinterpret_cast<char*>(&nDistEnd), sizeof(int));
+
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator it;
+
+		// 始点距離取得
+		it = m_aRoadPoint.begin();
+		std::advance(it, nDistStart);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart = it;
+
+		// 終点距離取得
+		it = m_aRoadPoint.begin();
+		std::advance(it, nDistEnd);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd = it;
+
+		// 左かどうか取得
+		bool bLeft = false;
+		inputFile.read(reinterpret_cast<char*>(&bLeft), sizeof(bool));
+
+		// 高さ取得
+		float fHeight = 0.0f;
+		inputFile.read(reinterpret_cast<char*>(&fHeight), sizeof(float));
+
+		CGuardRail *pGR = CGuardRail::Create(itStart, itEnd, bLeft, fHeight);
+
+		m_aGR.push_back(pGR);
 	}
 
 	inputFile.close();
