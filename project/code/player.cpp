@@ -26,6 +26,7 @@
 #include "meshRoad.h"
 #include "game.h"
 #include "effekseer.h"
+#include "sound.h"
 
 //*****************************************************
 // 定数定義
@@ -38,6 +39,7 @@ const float DIST_LIMIT = 3000.0f;	// ワイヤー制限距離
 const float LINE_CORRECT_DRIFT = 40.0f;	// ドリフト補正のしきい値
 const float SIZE_BLUR = -20.0f;	// ブラーのサイズ
 const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
+const float SE_CHANGE_SPEED = 10.0f;  // エンジン音とアクセル音が切り替わる速度の値
 }
 
 //*****************************************************
@@ -125,6 +127,13 @@ HRESULT CPlayer::Init(void)
 	m_info.fDesityBlurDrift = DENSITY_BLUR;
 	m_info.fSizeBlurDrift = SIZE_BLUR;
 
+	// サウンドインスタンスの取得
+	CSound* pSound = CSound::GetInstance();
+
+	// エンジンのSE再生
+	if (pSound != nullptr)
+		pSound->Play(pSound->LABEL_SE_ENGIN);
+
 	return S_OK;
 }
 
@@ -198,6 +207,13 @@ void CPlayer::Uninit(void)
 
 	// 継承クラスの終了
 	CMotion::Uninit();
+
+	// サウンドの停止
+	// サウンドインスタンスの取得
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound != nullptr)
+		pSound->Stop();
 }
 
 //=====================================================
@@ -279,6 +295,9 @@ void CPlayer::InputMove(void)
 	CSlow *pSlow = CSlow::GetInstance();
 	CInputManager *pInputManager = CInputManager::GetInstance();
 
+	// サウンドインスタンスの取得
+	CSound* pSound = CSound::GetInstance();
+
 	if (pInputManager == nullptr)
 	{
 		return;
@@ -302,6 +321,23 @@ void CPlayer::InputMove(void)
 	float fBrake = pInputManager->GetBrake();
 
 	m_info.fSpeed += (0.0f - m_info.fSpeed) * m_param.fFactBrake * fBrake;
+
+	if (m_info.fSpeed < SE_CHANGE_SPEED)
+	{
+		// エンジンのSE再生
+		if (pSound != nullptr && m_bMove)
+			pSound->SetFade(pSound->LABEL_SE_ACCELERATOR, pSound->LABEL_SE_ENGIN, 0.1f);
+		
+		m_bMove = false;
+	}
+	else if (m_info.fSpeed >= SE_CHANGE_SPEED)
+	{
+		// エンジンのSE停止
+		if (pSound != nullptr && !m_bMove)
+			pSound->SetFade(pSound->LABEL_SE_ENGIN, pSound->LABEL_SE_ACCELERATOR, 0.1f);
+
+		m_bMove = true;
+	}
 
 	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
 }
@@ -875,6 +911,13 @@ void CPlayer::ManageSpeed(void)
 		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAccele;
 
 		CDebugProc::GetInstance()->Print("\n加速中");
+
+		//// サウンドインスタンスの取得
+		//CSound* pSound = CSound::GetInstance();
+
+		//// アクセルのSE再生
+		//if (pSound != nullptr)
+		//	pSound->Play(pSound->LABEL_SE_ACCELERATOR);
 	}
 	else
 	{// 減速しているとき
