@@ -65,11 +65,13 @@ private:
 	void ChangeBlockBehaviour(void);
 	void CreateBlock(D3DXVECTOR3 pos);
 	CBlock *CheckDelete(void);
+	void SelectBlock(void);
 
 	int m_nIdxObject;
 	CBlock::TYPE m_type;
 	CObjectX *m_pObjectCursor;	// カーソルの仮オブジェクト
 	CBlock::BEHAVIOUR m_behaviour;	// ブロックのビヘイビア
+	CBlock *m_pBlockCurrent;	// 選択しているブロックのポインタ
 };
 
 class CStateEditGrabBlock : public CStateEditBlock
