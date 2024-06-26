@@ -111,8 +111,6 @@ public:
 	void Update(CEditMesh *pEdit) override;	// 更新処理
 
 private:
-	// メンバ関数
-
 	// メンバ変数
 	std::vector<CGuardRail*>::iterator m_it;	// 選択イテレーター
 };
