@@ -112,7 +112,8 @@ private:
 	SParam m_param;	// パラメータ情報
 	SFragMotion m_fragMotion;	// モーションのフラグ
 	CMotion* m_pPlayerNinja;  // バイクに乗っている忍者
-	bool m_bMove = false;
+	bool m_bMove = false;     // 移動しているかどうか
+	bool m_bDrift = false;    // ドリフトしているかどうか
 
 	static CPlayer *m_pPlayer;	// 自身のポインタ
 };
