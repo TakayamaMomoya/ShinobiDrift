@@ -34,6 +34,8 @@ public:
 	bool IsLeft(void) { return m_bLeft; }	// ¶‚É‚·‚é‚©‚Ç‚¤‚©
 	void EnableLeft(bool bLeft) { m_bLeft = bLeft; }
 
+	bool CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial);
+
 	// Ã“Iƒƒ“ƒoŠÖ”
 	static CGuardRail *Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart, std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd,bool bLeft = false,float fHeight = 600.0f);
 

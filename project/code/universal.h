@@ -43,8 +43,10 @@ float Vec3Dot(D3DXVECTOR3 vec1, D3DXVECTOR3 vec2);
 //======================================
 D3DXCOLOR ConvertRGB(BYTE r, BYTE g, BYTE b, BYTE a);
 D3DXVECTOR3 VecToRot(D3DXVECTOR3 vec);
+D3DXVECTOR3 GetMtxPos(D3DXMATRIX mtx);
 int RandRange(int nMax, int nMin);
 void VecConvertLength(D3DXVECTOR3 *pVec, float fLength);
+float lengthAxis(D3DXVECTOR3 sep, D3DXVECTOR3 e1, D3DXVECTOR3 e2, D3DXVECTOR3 e3);
 
 //======================================
 // ”»’èŒn
@@ -60,6 +62,7 @@ bool CubeCrossProduct(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DX
 bool IsInScreen(const D3DXVECTOR3 pos, D3DXMATRIX mtx, D3DXVECTOR3 *pPos = nullptr);
 bool DistCmp(D3DXVECTOR3 posOwn, D3DXVECTOR3 posTarget, float fLengthMax, float *fDiff);
 bool DistCmpFlat(D3DXVECTOR3 posOwn, D3DXVECTOR3 posTarget, float fLengthMax, float *fDiff);
+bool CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 posPlane, D3DXVECTOR3 vecNorPlane);
 
 //======================================
 // •âŠ®Œn
