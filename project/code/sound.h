@@ -118,7 +118,7 @@ private:
 		{ "data/SOUND/BGM/BGM_Game18.wav",-1 },			// ゲーム画面BGM18
 
 		{ "data/SOUND/SE/SE_Engin.wav",-1 },			// エンジン音
-		{ "data/SOUND/SE/SE_Accelerator.wav",0 },		// アクセル音
+		{ "data/SOUND/SE/SE_Accelerator.wav",-1 },		// アクセル音
 
 		{ "data/SOUND/SE/pause.wav",0 },				// ポーズ
 		{ "data/SOUND/SE/pause_arrow.wav",0 },			// 選択

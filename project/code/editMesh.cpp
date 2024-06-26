@@ -116,6 +116,9 @@ void CEditMesh::Update(void)
 	if (ImGui::Button("CreateGR", ImVec2(70, 30)))	// ガードレールの生成
 		ChangeState(new CStateEditMeshCreateGR);
 
+	if (ImGui::Button("SelectGR", ImVec2(70, 30)))	// ガードレールの選択
+		ChangeState(new CStateEditMeshSelectGR);
+
 	if (ImGui::Button("AdjustRoadPoint", ImVec2(70, 30)))	// ロードポイントの調節
 		ChangeState(new CStateEditMeshAdjustRoadPoint);
 
@@ -202,9 +205,6 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 			rot.y -= SPEED_ROLL;
 		}
 
-		// 位置の制限
-		LimitPos(&pos);
-
 		pEdit->SetRotation(rot);
 		pEdit->SetPosition(pos);
 	}
@@ -222,24 +222,6 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 
 		if (pMesh != nullptr)
 			pMesh->Save();
-	}
-}
-
-void CStateEditMeshCreateMesh::LimitPos(D3DXVECTOR3 *pPos)
-{// 位置の制限
-	// リストの取得
-	CMeshRoad *pMesh = CMeshRoad::GetInstance();
-	
-	std::vector<CMeshRoad::SInfoRoadPoint> *pVectorRoadPoint = pMesh->GetList();
-	
-	if (!pVectorRoadPoint->empty())
-	{
-		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itLast = pVectorRoadPoint->end() - 1;
-
-		if (pPos->x <= itLast->pos.x)
-		{
-			pPos->x = itLast->pos.x;
-		}
 	}
 }
 
@@ -285,6 +267,14 @@ void CStateEditMeshCreateTunnel::Update(CEditMesh *pEdit)
 		D3DXVECTOR3 pos = m_itStart->pos;
 		pos.y += 100.0f;
 		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+
+	if (ImGui::Button("Save", ImVec2(100, 50)))
+	{// 保存
+		CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+		if (pMesh != nullptr)
+			pMesh->Save();
 	}
 }
 
@@ -383,6 +373,14 @@ void CStateEditMeshCreateGR::Update(CEditMesh *pEdit)
 		pos.y += 100.0f;
 		CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 	}
+
+	if (ImGui::Button("Save", ImVec2(100, 50)))
+	{// 保存
+		CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+		if (pMesh != nullptr)
+			pMesh->Save();
+	}
 }
 
 //=====================================================
@@ -403,18 +401,86 @@ void CStateEditMeshCreateGR::SetGR(std::vector<CMeshRoad::SInfoRoadPoint>::itera
 		CGuardRail *pGR = CGuardRail::Create(m_itStart, m_itEnd, m_bLeft, m_fHeight);
 
 		// 配列に保存
-		//CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
+		CMeshRoad *pMeshRoad = CMeshRoad::GetInstance();
 
-		//if (pMeshRoad != nullptr)
-		//{
-		//	//std::vector<CTunnel*> *paTunnel = pMeshRoad->GetArrayTunnnel();
+		if (pMeshRoad != nullptr)
+		{
+			std::vector<CGuardRail*> *paGR = pMeshRoad->GetArrayGR();
 
-		//	if (pGR != nullptr)
-		//	{
-		//		pGR->push_back(pTunnel);
-		//	}
-		//}
+			if (pGR != nullptr)
+			{
+				paGR->push_back(pGR);
+			}
+		}
 	}
+}
+
+//****************************************************************************************
+// ガードレールの選択
+//****************************************************************************************
+CStateEditMeshSelectGR::CStateEditMeshSelectGR()
+{// コンストラクタ
+	CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+	if (pMesh == nullptr)
+		return;
+
+	std::vector<CGuardRail*> *paGR = pMesh->GetArrayGR();
+
+	m_it = paGR->begin();
+}
+
+void CStateEditMeshSelectGR::Update(CEditMesh *pEdit)
+{
+	CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+	if (pMesh == nullptr)
+		return;	// メッシュのチェック
+
+	std::vector<CGuardRail*> *paGR = pMesh->GetArrayGR();
+
+	if (paGR->empty() || (*m_it) == nullptr)
+		return;	// 配列に中身あるかチェック
+
+	ImGui::Text("[SelectGuardRail]");
+
+	int nDist = std::distance(paGR->begin(), m_it);
+	int nSize = paGR->size();
+
+	// 選択したガードレールの表示
+	(*m_it)->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
+	if (ImGui::DragInt("Index", &nDist, 1.0f, 0, nSize - 1))
+	{
+		// イテレータを再初期化して指定番号の要素に移動
+		m_it = paGR->begin();
+		std::advance(m_it, nDist);
+	}
+
+	if (ImGui::Button("NextGR", ImVec2(70, 30)))
+	{
+		if (m_it != paGR->end() && std::next(m_it) != paGR->end())
+			std::advance(m_it, 1);
+	}
+	if (ImGui::Button("PrevGR", ImVec2(70, 30)))
+	{
+		if (m_it != paGR->begin())
+			std::advance(m_it, -1);
+	}
+
+	if (ImGui::Button("DeleteGR", ImVec2(70, 30)))
+	{
+		if ((*m_it) == nullptr)
+			return;
+
+		(*m_it)->Uninit();
+		paGR->erase(m_it);
+
+		m_it = paGR->begin();
+	}
+
+	// 選択したガードレールの表示
+	(*m_it)->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 }
 
 //****************************************************************************************
@@ -449,6 +515,14 @@ void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 	it->fWidth = fWidth;
 
 	pMesh->CreateVtxBuffEdge();
+
+	if (ImGui::Button("Save", ImVec2(100, 50)))
+	{// 保存
+		CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+		if (pMesh != nullptr)
+			pMesh->Save();
+	}
 }
 
 //****************************************************************************************
@@ -463,6 +537,14 @@ CStateEditMeshDeleteRoadPoint::CStateEditMeshDeleteRoadPoint()
 
 void CStateEditMeshDeleteRoadPoint::Update(CEditMesh *pEdit)
 {
+	if (ImGui::Button("Save", ImVec2(100, 50)))
+	{// 保存
+		CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+		if (pMesh != nullptr)
+			pMesh->Save();
+	}
+
 	CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 	// 辺の選択

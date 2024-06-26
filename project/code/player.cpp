@@ -26,6 +26,7 @@
 #include "meshRoad.h"
 #include "game.h"
 #include "effekseer.h"
+#include "sound.h"
 
 //*****************************************************
 // 定数定義
@@ -38,6 +39,9 @@ const float DIST_LIMIT = 3000.0f;	// ワイヤー制限距離
 const float LINE_CORRECT_DRIFT = 40.0f;	// ドリフト補正のしきい値
 const float SIZE_BLUR = -20.0f;	// ブラーのサイズ
 const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
+const D3DXVECTOR3 DEFAULT_POS = { -4331.0f,-12.4f,21389.0f };	// 初期位置
+const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,2.0f,0.0f };	// 初期向き
+const float SE_CHANGE_SPEED = 10.0f;  // エンジン音とアクセル音が切り替わる速度の値
 }
 
 //*****************************************************
@@ -120,10 +124,22 @@ HRESULT CPlayer::Init(void)
 
 	m_info.pRoap = CObject3D::Create(GetPosition());
 
+	// デフォルト値設定
 	m_info.fLengthDrift = 1500.0f;
 	m_info.bGrabOld = true;
 	m_info.fDesityBlurDrift = DENSITY_BLUR;
 	m_info.fSizeBlurDrift = SIZE_BLUR;
+
+	// 初期トランスフォームの設定
+	SetPosition(DEFAULT_POS);
+	SetRotation(DEFAULT_ROT);
+
+	// サウンドインスタンスの取得
+	CSound* pSound = CSound::GetInstance();
+
+	// エンジンのSE再生
+	if (pSound != nullptr)
+		pSound->Play(pSound->LABEL_SE_ENGIN);
 
 	return S_OK;
 }
@@ -203,6 +219,13 @@ void CPlayer::Uninit(void)
 
 	// 継承クラスの終了
 	CMotion::Uninit();
+
+	// サウンドの停止
+	// サウンドインスタンスの取得
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound != nullptr)
+		pSound->Stop();
 }
 
 //=====================================================
@@ -284,6 +307,9 @@ void CPlayer::InputMove(void)
 	CSlow *pSlow = CSlow::GetInstance();
 	CInputManager *pInputManager = CInputManager::GetInstance();
 
+	// サウンドインスタンスの取得
+	CSound* pSound = CSound::GetInstance();
+
 	if (pInputManager == nullptr)
 	{
 		return;
@@ -307,6 +333,23 @@ void CPlayer::InputMove(void)
 	float fBrake = pInputManager->GetBrake();
 
 	m_info.fSpeed += (0.0f - m_info.fSpeed) * m_param.fFactBrake * fBrake;
+
+	if (m_info.fSpeed < SE_CHANGE_SPEED)
+	{
+		// エンジンのSE再生
+		if (pSound != nullptr && m_bMove)
+			pSound->SetFade(pSound->LABEL_SE_ACCELERATOR, pSound->LABEL_SE_ENGIN, 0.1f);
+		
+		m_bMove = false;
+	}
+	else if (m_info.fSpeed >= SE_CHANGE_SPEED)
+	{
+		// エンジンのSE停止
+		if (pSound != nullptr && !m_bMove)
+			pSound->SetFade(pSound->LABEL_SE_ENGIN, pSound->LABEL_SE_ACCELERATOR, 0.1f);
+
+		m_bMove = true;
+	}
 
 	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
 }
@@ -409,17 +452,18 @@ void CPlayer::InputWire(void)
 		// ロープの制御
 		ControlRoap();
 
+		// エフェクシア取得
 		CEffekseer* pEffekseer = CManager::GetMyEffekseer();
 
+		// 後輪の位置取得
 		float PosX = GetParts(3)->pParts->GetMatrix()->_41;
 		float PosY = GetParts(3)->pParts->GetMatrix()->_42;
 		float PosZ = GetParts(3)->pParts->GetMatrix()->_43;
 
-		float PlayerY = GetRotation().y;
-
+		// エフェクトの再生
 		if (pEffekseer != nullptr)
 			pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_DRIFT], ::Effekseer::Vector3D(PosX, PosY, PosZ),
-				::Effekseer::Vector3D(0.0f, PlayerY, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
+				::Effekseer::Vector3D(0.0f, fAngleDiff, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
 	}
 	else
 	{
@@ -864,6 +908,13 @@ void CPlayer::ManageSpeed(void)
 		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAccele;
 
 		CDebugProc::GetInstance()->Print("\n加速中");
+
+		//// サウンドインスタンスの取得
+		//CSound* pSound = CSound::GetInstance();
+
+		//// アクセルのSE再生
+		//if (pSound != nullptr)
+		//	pSound->Play(pSound->LABEL_SE_ACCELERATOR);
 	}
 	else
 	{// 減速しているとき

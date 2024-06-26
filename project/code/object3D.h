@@ -73,6 +73,7 @@ private:
 	float m_heigth;	// 高さ
 	float m_fFactSB;	// ストレッチビルボードのときの見やすさの補正
 	int m_nIdxTexture;	// テクスチャの番号
+	int m_nNumVtx;	// 頂点数
 	MODE m_mode;	// モード
 };
 

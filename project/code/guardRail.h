@@ -33,6 +33,8 @@ public:
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItEnd(void) { return m_itEnd; }	// 終了イテレーター
 	bool IsLeft(void) { return m_bLeft; }	// 左にするかどうか
 	void EnableLeft(bool bLeft) { m_bLeft = bLeft; }
+	float GetHeight(void) { return m_fHeight; }	// 高さ
+	void SetHeight(float fHeight) { m_fHeight = fHeight; }
 
 	bool CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial);
 

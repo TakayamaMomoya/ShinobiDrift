@@ -59,7 +59,6 @@ public:
 	void Update(CEditMesh *pEdit) override;
 
 private:
-	void LimitPos(D3DXVECTOR3 *pPos);
 };
 
 class CStateEditMeshCreateTunnel : public CStateEditMesh
@@ -100,6 +99,20 @@ private:
 	float m_bLeft;	// 左側にするかどうか
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itStart;	// 開始イテレイター
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// 終了イテレイター
+};
+
+class CStateEditMeshSelectGR : public CStateEditMesh
+{// ガードレールの選択
+public:
+	CStateEditMeshSelectGR();	// コンストラクタ
+	virtual ~CStateEditMeshSelectGR() {};	// デストラクタ
+
+	// メンバ関数
+	void Update(CEditMesh *pEdit) override;	// 更新処理
+
+private:
+	// メンバ変数
+	std::vector<CGuardRail*>::iterator m_it;	// 選択イテレーター
 };
 
 class CStateEditMeshAdjustRoadPoint : public CStateEditMesh
