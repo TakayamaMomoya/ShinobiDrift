@@ -57,6 +57,8 @@ HRESULT CUI::Init(void)
 {
 	CObject2D::Init();
 
+	EnableBlur(false);
+
 	return S_OK;
 }
 
@@ -81,13 +83,6 @@ void CUI::Update(void)
 //=====================================================
 void CUI::Draw(void)
 {
-	CBlur *pBlur = CBlur::GetInstance();
-
-	if (pBlur != nullptr)
-	{
-		pBlur->SetRenderToNotBlur();
-	}
-
 	bool bDisp = true;
 
 	CUIManager *pUIManager = CUIManager::GetInstance();
@@ -100,10 +95,5 @@ void CUI::Draw(void)
 	if (bDisp)
 	{
 		CObject2D::Draw();
-	}
-
-	if (pBlur != nullptr)
-	{
-		pBlur->ChangeTarget();
 	}
 }

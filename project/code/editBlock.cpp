@@ -358,12 +358,18 @@ void CStateCreateBlockNormal::SelectBlock(void)
 		m_pBlockCurrent->SetEmissiveCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 		D3DXVECTOR3 pos = m_pBlockCurrent->GetPosition();
+		D3DXVECTOR3 rot = m_pBlockCurrent->GetRotation();
 
 		ImGui::DragFloat("PosSelectBlock.X", &pos.x, 10.0f, -FLT_MAX, FLT_MAX);
 		ImGui::DragFloat("PosSelectBlock.Y", &pos.y, 10.0f, -FLT_MAX, FLT_MAX);
 		ImGui::DragFloat("PosSelectBlock.Z", &pos.z, 10.0f, -FLT_MAX, FLT_MAX);
 
+		ImGui::DragFloat("RotSelectBlock.X", &rot.x, 0.03f, -D3DX_PI, D3DX_PI);
+		ImGui::DragFloat("RotSelectBlock.Y", &rot.y, 0.03f, -D3DX_PI, D3DX_PI);
+		ImGui::DragFloat("RotSelectBlock.Z", &rot.z, 0.03f, -D3DX_PI, D3DX_PI);
+
 		m_pBlockCurrent->SetPosition(pos);
+		m_pBlockCurrent->SetRotation(rot);
 	}
 
 	if (ImGui::Button("DeleteSelectBlock", ImVec2(70, 30)))

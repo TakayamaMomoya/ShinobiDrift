@@ -102,10 +102,10 @@ HRESULT CGame::Init(void)
 	CSlow::Create();
 
 	// タイマー生成
-	//CTimer::Create();
+	CTimer::Create();
 
 	// メーター生成
-	//CMeter::Create();
+	CMeter::Create();
 
 	// ゴール生成
 	CGoal::Create(D3DXVECTOR3(60970.0f, 1540.0f, 3980.0f), 3.07f);
