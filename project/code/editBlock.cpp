@@ -22,10 +22,13 @@
 #include <assert.h>
 
 //*****************************************************
-// マクロ定義
+// 定数定義
 //*****************************************************
-#define SPEED_MOVE	(3.0f)	// 移動速度
-#define SPEED_ROTATION	(0.01f)	// 回転
+namespace
+{
+const float SPEED_MOVE = 3.0f;	// 移動速度
+const float SPEED_ROTATION = 0.01f;	// 回転速度
+}
 
 //=====================================================
 // コンストラクタ
@@ -286,17 +289,6 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 		CreateBlock(m_pObjectCursor->GetPosition());
 	}
 
-	// 削除ブロック選択
-	CBlock *pBlock = CheckDelete();
-
-	if (ImGui::Button("Delete", ImVec2(60.0f, 20.0f)))
-	{// 削除
-		if (pBlock != nullptr)
-		{
-			pBlock->Uninit();
-		}
-	}
-
 	if (ImGui::Button("DeleteAll", ImVec2(80.0f, 20.0f)))
 	{// 全削除
 		CBlockManager *pBlockManager = CBlockManager::GetInstance();
@@ -362,7 +354,33 @@ void CStateCreateBlockNormal::SelectBlock(void)
 	}
 
 	if (m_pBlockCurrent != nullptr)
+	{
 		m_pBlockCurrent->SetEmissiveCol(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+		D3DXVECTOR3 pos = m_pBlockCurrent->GetPosition();
+		D3DXVECTOR3 rot = m_pBlockCurrent->GetRotation();
+
+		ImGui::DragFloat("PosSelectBlock.X", &pos.x, 10.0f, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat("PosSelectBlock.Y", &pos.y, 10.0f, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat("PosSelectBlock.Z", &pos.z, 10.0f, -FLT_MAX, FLT_MAX);
+
+		ImGui::DragFloat("RotSelectBlock.X", &rot.x, 0.03f, -D3DX_PI, D3DX_PI);
+		ImGui::DragFloat("RotSelectBlock.Y", &rot.y, 0.03f, -D3DX_PI, D3DX_PI);
+		ImGui::DragFloat("RotSelectBlock.Z", &rot.z, 0.03f, -D3DX_PI, D3DX_PI);
+
+		m_pBlockCurrent->SetPosition(pos);
+		m_pBlockCurrent->SetRotation(rot);
+	}
+
+	if (ImGui::Button("DeleteSelectBlock", ImVec2(70, 30)))
+	{
+		if (m_pBlockCurrent != nullptr)
+		{
+			m_pBlockCurrent->Uninit();
+
+			m_pBlockCurrent = pBlockManager->GetHead();
+		}
+	}
 }
 
 //=====================================================
