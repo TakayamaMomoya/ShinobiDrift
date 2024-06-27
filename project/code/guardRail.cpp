@@ -73,6 +73,10 @@ HRESULT CGuardRail::Init(void)
 	// 頂点を道に沿わせる
 	VtxFollowRoad();
 
+#ifdef _DEBUG
+	EnableWire(true);
+#endif // _DEBUG
+
 	return S_OK;
 }
 
@@ -296,7 +300,9 @@ void CGuardRail::Draw(void)
 //=====================================================
 bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial)
 {
-	// 頂点を道に沿わせる========================================
+	bool bCollision = false;
+
+	// 頂点バッファ取得
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 
 	// 頂点情報のポインタ
@@ -306,23 +312,28 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial)
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 頂点数の計算
-	int nDistBetween = std::distance(m_itStart, m_itEnd);
-	nDistBetween *= MeshRoad::NUM_EDGE_IN_ROADPOINT;
-
-	for (int i = 0; i < m_nNumVtx - 2; i++)
+	int size = CMeshRoad::GetInstance()->GetList()->size() * MeshRoad::NUM_EDGE_IN_ROADPOINT;
+	for (int i = 0; i < size; i++)
 	{
 		// ガードレールの高さ以内で判定する
-		if (m_fHeight > pos->y - pVtx[0].pos.y)
+		if (m_fHeight < pos->y - pVtx[0].pos.y)
 			continue;
 
 		if (D3DXVec3Dot(&(*pos - pVtx[0].pos), &(pVtx[2].pos - pVtx[0].pos)) < 0.0f &&
 			D3DXVec3Dot(&(*pos - pVtx[2].pos), &(pVtx[0].pos - pVtx[2].pos)) >= 0.0f)
 			continue;
 
-		universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, pVtx[0].nor);
+		if (universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, pVtx[0].nor))
+		{
+			bCollision = true;
+			break;
+		}
 
 		pVtx += NUM_VTX_ON_POINT;
 	}
 
-	return false;
+	// 頂点バッファをアンロック
+	pVtxBuff->Unlock();
+
+	return bCollision;
 }
