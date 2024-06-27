@@ -27,6 +27,7 @@
 #include "game.h"
 #include "effekseer.h"
 #include "sound.h"
+#include "guardRail.h"
 
 //*****************************************************
 // 定数定義
@@ -831,7 +832,14 @@ void CPlayer::Collision(void)
 	CInputManager* pInputManager = CInputManager::GetInstance();
 
 	// ガードレールとの当たり判定
+	std::vector<CGuardRail*> *aGuardRail = CMeshRoad::GetInstance()->GetArrayGR();
+	D3DXVECTOR3 vecAxial = universal::VecToOffset(*GetMatrix(), m_param.sizeCollider);
 
+	for(auto itGuardRail : *aGuardRail)
+	{
+		if (itGuardRail->CollideGuardRail(&pos, vecAxial))
+			break;
+	}
 
 	// タイヤの位置保存
 	posParts[0] = universal::GetMtxPos(*GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
