@@ -315,6 +315,13 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial)
 	int size = CMeshRoad::GetInstance()->GetList()->size() * MeshRoad::NUM_EDGE_IN_ROADPOINT;
 	for (int i = 0; i < size; i++)
 	{
+		// ガードレールの法線を計算する
+		D3DXVECTOR3 vecNor = pVtx[0].nor;
+		vecNor.y = 0.0f;
+		if (D3DXVec3Length(&vecNor) == 0.0f)
+			continue;
+		D3DXVec3Normalize(&vecNor, &vecNor);
+
 		// ガードレールの高さ以内で判定する
 		if (m_fHeight < pos->y - pVtx[0].pos.y)
 			continue;
@@ -323,7 +330,7 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial)
 			D3DXVec3Dot(&(*pos - pVtx[2].pos), &(pVtx[0].pos - pVtx[2].pos)) >= 0.0f)
 			continue;
 
-		if (universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, pVtx[0].nor))
+		if (universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, vecNor))
 		{
 			bCollision = true;
 			break;
