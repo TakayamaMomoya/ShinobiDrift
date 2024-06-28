@@ -839,13 +839,14 @@ void CPlayer::Collision(void)
 
 	// ガードレールとの当たり判定
 	std::vector<CGuardRail*> *aGuardRail = CMeshRoad::GetInstance()->GetArrayGR();
-	D3DXVECTOR3 vecAxial = universal::VecToOffset(*GetMatrix(), m_param.sizeCollider);
+	D3DXMATRIX* mtx = GetMatrix();
+	D3DXVECTOR3 vecAxial = universal::VecToOffset(*mtx, m_param.sizeCollider);
 
-	for(auto itGuardRail : *aGuardRail)
+	/*for(auto itGuardRail : *aGuardRail)
 	{
 		if (itGuardRail->CollideGuardRail(&pos, vecAxial))
 			break;
-	}
+	}*/
 
 	// タイヤの位置保存
 	posParts[0] = universal::GetMtxPos(*GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
