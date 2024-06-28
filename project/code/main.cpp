@@ -183,6 +183,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 
 				if (pManager != nullptr)
 				{
+#ifdef _DEBUG
+					RECT rect;
+					GetClientRect(hWnd, &rect);
+					float width = static_cast<float>(rect.right - rect.left);
+					float height = static_cast<float>(rect.bottom - rect.top);
+					io.DisplaySize = ImVec2(width, height);
+#endif
 					// ティックの設定
 					CManager::SetTick(fDeltaTime);
 

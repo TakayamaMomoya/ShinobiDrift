@@ -176,6 +176,15 @@ void CGuardRail::VtxFollowRoad(void)
 			SetNormal(pVtx);
 		}
 
+		if (i == 1)
+		{
+			pVtx[-2].nor = pVtx[0].nor;
+			pVtx[-1].nor = pVtx[1].nor;
+
+			CEffect3D::Create(pVtx[-2].pos + pVtx[-2].nor * 200.0f, 50.0f, 200000, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+			CEffect3D::Create(pVtx[-1].pos + pVtx[-1].nor * 200.0f, 50.0f, 200000, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		}
+
 		// テクスチャ座標の設定
 		if (i % 2 == 0)
 		{
@@ -187,6 +196,9 @@ void CGuardRail::VtxFollowRoad(void)
 			pVtx[0].tex = { 0.0f,1.0f };
 			pVtx[1].tex = { 1.0f,1.0f };
 		}
+
+		CEffect3D::Create(pVtx[0].pos + pVtx[0].nor * 200.0f, 50.0f, 20000, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		CEffect3D::Create(pVtx[1].pos + pVtx[1].nor * 200.0f, 50.0f, 20000, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 		pVtx += NUM_VTX_ON_POINT;
 	}
