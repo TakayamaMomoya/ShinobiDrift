@@ -313,8 +313,8 @@ void CBlur::ChangeTarget(void)
     D3DXMatrixPerspectiveFovLH(&mtxProj,
         D3DXToRadian(45.0f),
         fAspect,
-        0.0f,
-        1.0f);
+        MIN_DRAW,
+        MAX_DRAW);
 
     //マトリックス設定
     pDevice->SetTransform(D3DTS_PROJECTION, &mtxProj);
@@ -389,8 +389,8 @@ void CBlur::RestoreTarget(void)
     pDevice->SetRenderTarget(0, m_pRenderDef);
     pDevice->SetDepthStencilSurface(m_pZBuffDef);
     pDevice->SetViewport(&m_viewportDef);
-    pDevice->SetTransform(D3DTS_VIEW, &m_mtxViewDef);
-    pDevice->SetTransform(D3DTS_PROJECTION, &m_mtxProjDef);
+    //pDevice->SetTransform(D3DTS_VIEW, &m_mtxViewDef);
+    //pDevice->SetTransform(D3DTS_PROJECTION, &m_mtxProjDef);
 }
 
 //=====================================================
