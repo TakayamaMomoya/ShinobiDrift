@@ -33,9 +33,18 @@ public:
 	void ChangeState(CStateEditMesh *pState);
 
 private:
+	// メンバ関数
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectIterator(void);	// イテレーターの選択
+	void MoveCurrentRP(void);	// 選択ロードポイントの移動
+	void CollideRPRay(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it, D3DXVECTOR3 posFar, D3DXVECTOR3 posNear, D3DXVECTOR3 vecDiff);	// ロードポイントとレイの判定
+
+	// メンバ変数
 	CObject3D *m_pMesh;	// メッシュのポインタ
 	CObjectX *m_pManipulator;	// マニピュレーター
 	CStateEditMesh *m_pState;	// ステイト
+	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itCurrent;	// 選択してるイテレイター
+	bool m_bCurrent;	// 選択フラグ
+	D3DXVECTOR3 m_posCurrent;	// 選択ブロック位置
 };
 
 //*****************************************************

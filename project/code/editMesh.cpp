@@ -38,6 +38,7 @@ CEditMesh::CEditMesh()
 	m_pMesh = nullptr;
 	m_pManipulator = nullptr;
 	m_pState = nullptr;
+	m_bCurrent = false;
 }
 
 //=====================================================
@@ -72,6 +73,8 @@ HRESULT CEditMesh::Init(void)
 //=====================================================
 void CEditMesh::Uninit(void)
 {
+	m_itCurrent = std::vector<CMeshRoad::SInfoRoadPoint>::iterator();
+
 	if (m_pState != nullptr)
 	{
 		delete m_pState;
@@ -124,6 +127,9 @@ void CEditMesh::Update(void)
 
 	if (ImGui::Button("DeleteRoadPoint", ImVec2(70, 30)))	// 辺の削除
 		ChangeState(new CStateEditMeshDeleteRoadPoint);
+
+	// イテレイター選択
+	SelectIterator();
 }
 
 //=====================================================
@@ -138,6 +144,149 @@ void CEditMesh::ChangeState(CStateEditMesh *pState)
 	}
 
 	m_pState = pState;
+}
+
+//=====================================================
+// ロードポイントの選択
+//=====================================================
+std::vector<CMeshRoad::SInfoRoadPoint>::iterator CEditMesh::SelectIterator(void)
+{
+	CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+	if (pMesh == nullptr)
+		return std::vector<CMeshRoad::SInfoRoadPoint>::iterator();
+
+	std::vector<CMeshRoad::SInfoRoadPoint> *paRP = pMesh->GetArrayRP();
+
+	D3DXVECTOR3 posHit;
+	D3DXVECTOR3 posNear;
+	D3DXVECTOR3 posFar;
+	D3DXVECTOR3 vecDiff;
+
+	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
+
+	if (!m_bCurrent)
+	{// ブロックを探している状態
+		for (auto it = paRP->begin();it != paRP->end();)
+		{
+			// ロードポイントごとのレイとの判定
+			CollideRPRay(it, posFar, posNear, vecDiff);
+
+			if (m_bCurrent)
+				break;
+
+			it++;
+		}
+	}
+	else
+	{// ブロックを動かす
+		MoveCurrentRP();
+
+		// 道の調整
+		pMesh->CreateVtxBuffEdge();
+	}
+
+	return m_itCurrent;
+}
+
+//=====================================================
+// ロードポイントのレイの判定
+//=====================================================
+void CEditMesh::CollideRPRay(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it, D3DXVECTOR3 posFar, D3DXVECTOR3 posNear, D3DXVECTOR3 vecDiff)
+{
+	CInputMouse *pMouse = CInputMouse::GetInstance();
+	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+
+	if (m_bCurrent || pMouse == nullptr || pKeyboard == nullptr)
+		return;
+
+	D3DXVECTOR3 posRP = it->pos;
+
+	bool bHit = universal::CalcRaySphere(posNear, vecDiff, posRP, 200.0f);
+
+	if (bHit)
+	{
+		CEffect3D::Create(posRP, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	}
+
+	if (pMouse->GetTrigger(CInputMouse::BUTTON_LMB))
+	{
+		if (bHit)
+		{
+			m_bCurrent = true;
+
+			m_itCurrent = it;
+
+			m_posCurrent = it->pos;
+
+			return;
+		}
+	}
+}
+
+//=====================================================
+// 選択したロードポイントの移動
+//=====================================================
+void CEditMesh::MoveCurrentRP(void)
+{
+	CInputMouse *pMouse = CInputMouse::GetInstance();
+	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+
+	if (pMouse == nullptr || pKeyboard == nullptr || !m_bCurrent)
+		return;
+
+	D3DXVECTOR3 posHit;
+	D3DXVECTOR3 posNear;
+	D3DXVECTOR3 posFar;
+	D3DXVECTOR3 vecDiff;
+
+	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
+
+	universal::CalcRayFlat(m_posCurrent, D3DXVECTOR3(0.0f, 1.0f, 0.0f), posNear, posFar, &posHit);
+
+	if (pKeyboard->GetRelease(DIK_C))
+	{
+		m_bCurrent = false;
+	}
+	else if (pKeyboard->GetRelease(DIK_V))
+	{
+		m_bCurrent = false;
+	}
+	else
+	{// 移動
+		if (pKeyboard->GetPress(DIK_V))
+		{// 上下移動
+			CCamera *pCamera = CManager::GetCamera();
+
+			if (pCamera == nullptr)
+				return;
+
+			CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+
+			// カメラとブロックの平面差分ベクトルを法線にする
+			D3DXVECTOR3 posCamera = { pInfoCamera->posV.x,0.0f, pInfoCamera->posV.z };
+			D3DXVECTOR3 posBlock = { m_posCurrent.x,0.0f,m_posCurrent.z };
+			D3DXVECTOR3 vecDiff = posCamera - posBlock;
+
+			D3DXVec3Normalize(&vecDiff, &vecDiff);
+
+			universal::CalcRayFlat(m_posCurrent, vecDiff, posNear, posFar, &posHit);
+
+			// y軸以外は固定する
+			posHit.x = m_posCurrent.x;
+			posHit.z = m_posCurrent.z;
+		}
+
+		m_itCurrent->pos = posHit;
+
+		m_posCurrent.x = posHit.x;
+		m_posCurrent.z = posHit.z;
+	}
+
+	if (pMouse->GetRelease(CInputMouse::BUTTON_LMB))
+	{
+		m_bCurrent = false;
+	}
 }
 
 //****************************************************************************************
