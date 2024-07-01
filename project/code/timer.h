@@ -34,12 +34,15 @@ public:
 	HRESULT Init();
 	void Uninit();
 	void Update();
-	void Sub(int nTime) { m_nSeconds -= nTime; }
+
+	static CTimer* GetInstance() { return m_pTimer; }	// 自身の情報取得
 
 private:
 	//メンバ変数
 	int m_nSeconds;		// 現在の時間
 	int m_nCntSeconds;	// カウント加算
 	CNumber* m_pNumber;	// ナンバーのポインタ
+
+	static CTimer* m_pTimer;	// 自身のポインタ
 };
 #endif

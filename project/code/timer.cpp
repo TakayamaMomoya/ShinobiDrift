@@ -17,10 +17,11 @@
 //*****************************************************
 namespace
 {
-	const int VALUE = 120;			// 値
-	const int PLACE = 3;			// 桁数
-	const float WIDTH = SCREEN_WIDTH * 0.5f;		// 幅
-	const float HEIGHT = SCREEN_HEIGHT * 0.5f;		// 高さ
+const int VALUE = 120;			// 値
+const int PLACE = 4;			// 桁数
+const int TIME_LIMIT = 300;		// タイマーの上限値
+const float WIDTH = SCREEN_WIDTH * 0.5f;		// 幅
+const float HEIGHT = SCREEN_HEIGHT * 0.5f;		// 高さ
 }
 
 //*****************************************************
@@ -101,24 +102,22 @@ void CTimer::Update(void)
 
 	if (m_nCntSeconds > 60)
 	{
-		m_nCntSeconds = 0;
-
+		// タイマー加算
 		if (m_nSeconds >= 1)
-		{
-			m_nSeconds--;
-		}
+			m_nSeconds++;
+
+		// カウンターリセット
+		m_nCntSeconds = 0;
 	}
 
 	// 秒の計算
 	int nSecond = m_nSeconds % VALUE;
 
+	// 秒表示の制御
 	if (m_pNumber != nullptr)
-	{// 秒表示の制御
 		m_pNumber->SetValue(nSecond, PLACE);
-	}
 
-	if (m_nSeconds <= 0)
-	{
-		m_nSeconds = 0;
-	}
+	// タイマーの上限値超えないように
+	if (nSecond > TIME_LIMIT)
+		m_nSeconds = TIME_LIMIT;
 }
