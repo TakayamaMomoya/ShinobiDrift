@@ -21,6 +21,7 @@ const char* CEffekseer::m_apEfkName[CEffekseer::TYPE_MAX] =
 	"",                               // なんもない
 	"data\\EFFEKSEER\\Effect\\drift.efkefc",  // ドリフト時の火花と煙
 	"data\\EFFEKSEER\\Effect\\spark.efkefc",  // 壁衝突時の火花
+	"data\\EFFEKSEER\\Effect\\bikefire.efkefc",  // 排気口の火
 };
 
 //===========================================================

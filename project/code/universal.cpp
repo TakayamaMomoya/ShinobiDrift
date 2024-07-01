@@ -356,6 +356,38 @@ D3DXVECTOR3 CalcScreenToWorld(D3DXVECTOR3 posScreen)
 }
 
 //========================================
+// スクリーン座標を3Dに変換
+//========================================
+void ConvertScreenPosTo3D(D3DXVECTOR3 *pPosNear, D3DXVECTOR3 *pPosFar, D3DXVECTOR3 *pVecDiff)
+{
+	HWND hWnd = FindWindow(CLASS_NAME, WINDOW_NAME);
+
+	if (!hWnd)
+	{
+		assert(("ウィンドウ見つからないよ！", false));
+	}
+
+	POINT posCursor;
+
+	GetCursorPos(&posCursor);
+
+	CDebugProc::GetInstance()->Print("\n変換前[%d,%d]", posCursor.x, posCursor.y);
+
+	ScreenToClient(hWnd, &posCursor);
+
+	CDebugProc::GetInstance()->Print("\n変換後[%d,%d]", posCursor.x, posCursor.y);
+
+	*pPosNear = universal::CalcScreenToWorld(D3DXVECTOR3((float)posCursor.x, (float)posCursor.y, 0.0f));
+	*pPosFar = universal::CalcScreenToWorld(D3DXVECTOR3((float)posCursor.x, (float)posCursor.y, 1.0f));
+
+	if (pVecDiff != nullptr)
+	{
+		*pVecDiff = *pPosFar - *pPosNear;
+		D3DXVec3Normalize(pVecDiff, pVecDiff);
+	}
+}
+
+//========================================
 // オフセット設定処理
 //========================================
 void SetOffSet(D3DXMATRIX *pMtxWorldOffset, D3DXMATRIX mtxWorldOwner, D3DXVECTOR3 posOffset, D3DXVECTOR3 rot)

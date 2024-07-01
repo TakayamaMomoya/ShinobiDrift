@@ -116,7 +116,7 @@ void CTunnel::VtxFollowRoad(void)
 	if (pMesh != nullptr)
 	{
 		// 開始地点を算出
-		std::vector<CMeshRoad::SInfoRoadPoint> *pList = pMesh->GetList();
+		std::vector<CMeshRoad::SInfoRoadPoint> *pList = pMesh->GetArrayRP();
 
 		int nDistStart = std::distance(pList->begin(), m_itStart) + 1;
 
