@@ -181,59 +181,52 @@ void CEditBlock::Update(void)
 // レイでのブロックの選択
 //=====================================================
 void CEditBlock::RaySelectBlock(void)
-{	
+{
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
 	if (pBlockManager == nullptr)
 		return;
 
-HWND hWnd = FindWindow(CLASS_NAME, WINDOW_NAME);
+	D3DXVECTOR3 posNear;
+	D3DXVECTOR3 posFar;
+	D3DXVECTOR3 vecDiff;
 
-if (!hWnd)
-{
-	assert(("ウィンドウ見つからないよ！", false));
-}
+	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
 
-POINT posCursor;
+	CDebugProc::GetInstance()->Print("\nPosNear[%f,%f,%f]", posNear.x, posNear.y, posNear.z);
+	CDebugProc::GetInstance()->Print("\nPosFar[%f,%f,%f]", posFar.x, posFar.y, posFar.z);
 
-GetCursorPos(&posCursor);
+	if (m_pCurrentBlock == nullptr)
+	{// ブロックを探している状態
+		CBlock *pBlock = pBlockManager->GetHead();
 
-CDebugProc::GetInstance()->Print("\n変換前[%d,%d]", posCursor.x, posCursor.y);
+		while (pBlock != nullptr)
+		{
+			CBlock *pBlockNext = pBlock->GetNext();
 
-ScreenToClient(hWnd, &posCursor);
+			CollideBlockRay(pBlock, posFar, posNear, vecDiff);
 
-CDebugProc::GetInstance()->Print("\n変換後[%d,%d]", posCursor.x, posCursor.y);
+			if (m_pCurrentBlock != nullptr)
+			{// ブロックが選べたらwhileを抜ける
+				break;
+			}
 
-D3DXVECTOR3 posNear = universal::CalcScreenToWorld(D3DXVECTOR3((float)posCursor.x, (float)posCursor.y, 0.0f));
-D3DXVECTOR3 posFar = universal::CalcScreenToWorld(D3DXVECTOR3((float)posCursor.x, (float)posCursor.y, 1.0f));
-D3DXVECTOR3 vecDiff = posFar - posNear;
-D3DXVec3Normalize(&vecDiff, &vecDiff);
-
-CDebugProc::GetInstance()->Print("\nPosNear[%f,%f,%f]", posNear.x, posNear.y, posNear.z);
-CDebugProc::GetInstance()->Print("\nPosFar[%f,%f,%f]", posFar.x, posFar.y, posFar.z);
-
-if (m_pCurrentBlock == nullptr)
-{// ブロックを探している状態
-	CBlock *pBlock = pBlockManager->GetHead();
-
-	while (pBlock != nullptr)
-	{
-		CBlock *pBlockNext = pBlock->GetNext();
-
-		CollideBlockRay(pBlock, posFar, posNear, vecDiff);
-
-		if (m_pCurrentBlock != nullptr)
-		{// ブロックが選べたらwhileを抜ける
-			break;
+			pBlock = pBlockNext;
 		}
 
-		pBlock = pBlockNext;
+		if (m_pCurrentBlock == nullptr)
+		{
+			D3DXVECTOR3 posHit;
+
+			universal::CalcRayFlat(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 1.0f, 0.0f), posNear, posFar, &posHit);
+
+			
+		}
 	}
-}
-else
-{// ブロックを動かす
-	MoveCurrentBlock(posFar, posNear);
-}
+	else
+	{// ブロックを動かす
+		MoveCurrentBlock(posFar, posNear);
+	}
 }
 
 //=====================================================
@@ -484,6 +477,17 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 		}
 	}
 
+	D3DXVECTOR3 posNear;
+	D3DXVECTOR3 posFar;
+	D3DXVECTOR3 vecDiff;
+
+	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
+
+	D3DXVECTOR3 posHit;
+	universal::CalcRayFlat(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 1.0f, 0.0f), posNear, posFar, &posHit);
+
+	pos = posHit;
+
 	if (ImGui::TreeNode("ROT"))
 	{
 		// ブロック向き
@@ -525,7 +529,7 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 
 	ImGui::Text("[Action]");
 
-	if (ImGui::Button("Create", ImVec2(50.0f, 20.0f)))
+	if (pKeyboard->GetTrigger(DIK_SPACE))
 	{// ブロック生成
 		CreateBlock(m_pObjectCursor->GetPosition(),pEdit);
 	}
