@@ -12,6 +12,7 @@
 #include "texture.h"
 #include "effect3D.h"
 #include "player.h"
+#include "debugproc.h"
 
 //*****************************************************
 // 定数定義
@@ -29,7 +30,7 @@ const int NUM_VTX_IN_EDGE = 5;	// 辺の中にある頂点数
 //=====================================================
 CTunnel::CTunnel(int nPriority) : CMeshCylinder(nPriority),m_bInPlayer(false)
 {
-
+	m_bInPlayer = false;
 }
 
 //=====================================================
@@ -234,13 +235,123 @@ void CTunnel::DetectionPlayer(void)
 
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 
-	if (m_bInPlayer)
-	{
-		// プレイヤーが入ってきた判定
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
+
+	// 頂点情報のポインタ
+	VERTEX_3D *pVtx;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	if (!m_bInPlayer)
+	{// プレイヤーが入ってきた判定
+		CollidePlayerEnter(pVtx);
 	}
 	else
-	{
-		// プレイヤーが出ていった判定
+	{// プレイヤーが出ていった判定
+		CollidePlayerExit(pVtx);
+	}
+
+	// 頂点バッファをアンロック
+	pVtxBuff->Unlock();
+}
+
+//=====================================================
+// プレイヤー入ってくる判定
+//=====================================================
+void CTunnel::CollidePlayerEnter(VERTEX_3D *pVtx)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pVtx == nullptr || pPlayer == nullptr)
+		return;
+
+	// 入口
+	D3DXVECTOR3 pos1 = pVtx[0].pos;
+	D3DXVECTOR3 pos2 = pVtx[MESH_U / 2].pos;
+
+	CEffect3D::Create(pos1, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(pos2, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	// 出口
+	int nNumVtx = GetNumVtx();
+
+	D3DXVECTOR3 pos3 = pVtx[nNumVtx - MESH_U / 2 - 1].pos;
+	D3DXVECTOR3 pos4 = pVtx[nNumVtx - 1].pos;
+
+	CEffect3D::Create(pos3, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(pos4, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	// 外積でのトリガー判定
+	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
+	float fRate;
+
+	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate);
+
+	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate);
+
+#ifdef _DEBUG
+	CDebugProc::GetInstance()->Print("\nヒット１[%d]ヒット２[%d]プレイヤー[%d]", bHit1, bHit2,m_bInPlayer);
+#endif
+
+	if (fRate > 1.0f || fRate < 0.0f)
+		return;
+
+	if (!m_bInPlayer && bHit1 && bHit2)
+	{// 入った判定
+		m_bInPlayer = true;
+	}
+}
+
+//=====================================================
+// プレイヤー出ていく判定
+//=====================================================
+void CTunnel::CollidePlayerExit(VERTEX_3D *pVtx)
+{
+	if (pVtx == nullptr)
+		return;
+
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pVtx == nullptr || pPlayer == nullptr)
+		return;
+
+	// 入口
+	D3DXVECTOR3 pos1 = pVtx[0].pos;
+	D3DXVECTOR3 pos2 = pVtx[MESH_U / 2].pos;
+
+	CEffect3D::Create(pos1, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(pos2, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	// 出口
+	int nNumVtx = GetNumVtx();
+
+	D3DXVECTOR3 pos3 = pVtx[nNumVtx - MESH_U / 2 - 1].pos;
+	D3DXVECTOR3 pos4 = pVtx[nNumVtx - 1].pos;
+
+	CEffect3D::Create(pos3, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(pos4, 50.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	// 外積でのトリガー判定
+	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
+	float fRate;
+
+	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate);
+
+	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate);
+
+#ifdef _DEBUG
+	CDebugProc::GetInstance()->Print("\nヒット１[%d]ヒット２[%d]プレイヤー[%d]", bHit1, bHit2, m_bInPlayer);
+#endif
+
+	if (fRate > 1.0f || fRate < 0.0f)
+		return;
+
+	if (m_bInPlayer && (!bHit1 || !bHit2))
+	{// 入った判定
+		m_bInPlayer = false;
 	}
 }
 
