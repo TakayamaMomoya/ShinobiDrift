@@ -586,6 +586,17 @@ void CMeshRoad::CreateSideSpline(void)
 }
 
 //=====================================================
+// “¹ƒCƒxƒ“ƒg‚Ì’²®
+//=====================================================
+void CMeshRoad::AjustRoadEvent(void)
+{
+	for (auto it : m_aGR)
+	{
+		it->VtxFollowRoad();
+	}
+}
+
+//=====================================================
 // “–‚½‚è”»’èˆ—
 //=====================================================
 bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)

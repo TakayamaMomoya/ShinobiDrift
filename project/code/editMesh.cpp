@@ -523,6 +523,11 @@ void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 		if (pMesh != nullptr)
 			pMesh->Save();
 	}
+
+	if (ImGui::Button("AjustRoadEvent", ImVec2(100, 50)))
+	{// “¹ƒCƒxƒ“ƒg‚ð’²®
+		pMesh->AjustRoadEvent();
+	}
 }
 
 //****************************************************************************************
