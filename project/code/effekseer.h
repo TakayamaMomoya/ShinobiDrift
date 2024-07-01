@@ -21,6 +21,7 @@ public:
 		TYPE_NONE = 0,  // なんもない
 		TYPE_DRIFT,     // ドリフト時の火花と煙
 		TYPE_SPARK,     // 火花
+		TYPE_ENGINE,	// 排気口の火
 		TYPE_MAX
 	};
 
