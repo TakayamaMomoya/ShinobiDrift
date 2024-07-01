@@ -182,7 +182,7 @@ void CGuardRail::VtxFollowRoad(void)
 			pVtx[-1].nor = pVtx[1].nor;
 
 			CEffect3D::Create(pVtx[-2].pos + pVtx[-2].nor * 200.0f, 50.0f, 200000, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-			CEffect3D::Create(pVtx[-1].pos + pVtx[-1].nor * 200.0f, 50.0f, 200000, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+			CEffect3D::Create(pVtx[-1].pos + pVtx[-1].nor * 200.0f, 50.0f, 200000, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 		}
 
 		// テクスチャ座標の設定
@@ -197,8 +197,8 @@ void CGuardRail::VtxFollowRoad(void)
 			pVtx[1].tex = { 1.0f,1.0f };
 		}
 
-		CEffect3D::Create(pVtx[0].pos + pVtx[0].nor * 200.0f, 50.0f, 20000, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-		CEffect3D::Create(pVtx[1].pos + pVtx[1].nor * 200.0f, 50.0f, 20000, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		CEffect3D::Create(pVtx[0].pos + pVtx[0].nor * 200.0f, 50.0f, 20000, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+		CEffect3D::Create(pVtx[1].pos + pVtx[1].nor * 200.0f, 50.0f, 20000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 		pVtx += NUM_VTX_ON_POINT;
 	}
@@ -325,8 +325,21 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial)
 
 	// 頂点数の計算
 	int size = CMeshRoad::GetInstance()->GetList()->size() * MeshRoad::NUM_EDGE_IN_ROADPOINT;
-	for (int i = 0; i < size; i++)
+	for (int i = 0; i < m_nNumVtx; i+=2)
 	{
+		if(i != 0)
+			pVtx += NUM_VTX_ON_POINT;
+
+		if (i == 11)
+		{
+			CEffect3D::Create(pVtx[0].pos, 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+			CEffect3D::Create(pVtx[1].pos, 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+			CEffect3D::Create(pVtx[2].pos, 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		}
+
+		if (D3DXVec3Length(&pVtx[0].nor) == 0.0f)
+			continue;
+
 		// ガードレールの高さ以内で判定する
 		if (m_fHeight < pos->y - pVtx[0].pos.y)
 			continue;
@@ -340,8 +353,6 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial)
 			bCollision = true;
 			break;
 		}
-
-		pVtx += NUM_VTX_ON_POINT;
 	}
 
 	// 頂点バッファをアンロック
