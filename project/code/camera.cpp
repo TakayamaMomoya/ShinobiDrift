@@ -29,6 +29,7 @@ namespace
 const float MOVE_SPEED = 3.0f;	// 移動スピード
 const D3DXVECTOR3 INITIAL_ROT = { D3DX_PI * 0.4f,0.0f,0.0f };	// 初期角度
 const float INITIAL_DIST = 300.0f;	// 初期の距離（視点から注視点）
+const float ABOVE_DEFAULT = 10000.0f;	// デフォルトの上空視点の高さ
 }
 #define INITIAL_ANGLE	(93.0f)	// 初期の視野角
 #define HEIGHT_CAMERA (20.0f)	// カメラの高さ
@@ -48,6 +49,8 @@ HRESULT CCamera::Init(void)
 
 	// 自身のポインタをヌルにする
 	m_pBehavior = nullptr;
+
+	m_posAbove = { 0.0f,ABOVE_DEFAULT,0.0f };
 
 	return S_OK;
 }

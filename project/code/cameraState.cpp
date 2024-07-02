@@ -31,6 +31,8 @@ const float LENGTH_FOLLOW = 412.0f;	// 追従時のカメラ距離
 const float ANGLE_FOLLOW = 0.73f;	// 追従時のカメラ角度
 const float LENGTHPOSR_FOLLOW = 4126.0f;	// 追従時の先を見る距離
 const float FOV_FOLLOW = 93.0f;	// 追従時の視野角
+const float SPEED_MOVE_ABOVE = 20.0f;	// 上空視点時の移動速度
+const float SPEED_ZOOM_ABOVE = 10.0f;	// ズーム速度
 }
 
 //***********************************************************************************
@@ -218,67 +220,98 @@ void CMoveControl::Update(CCamera *pCamera)
 
 	float fMove = MOVE_SPEED;
 
-	//マウス操作======================================================
-	if (pMouse->GetPress(CInputMouse::BUTTON_RMB) == true)
-	{//右クリック中、視点旋回
-		D3DXVECTOR3 rot;
+	if (m_bAbove)
+	{
+		//マウス操作======================================================
+		if (pMouse->GetPress(CInputMouse::BUTTON_RMB) == true)
+		{//右クリック中、視点旋回
+			D3DXVECTOR3 rot;
 
-		//マウスの移動量代入
-		rot = { (float)pMouse->GetMoveIX() * ROLL_SPEED, (float)pMouse->GetMoveIY() * ROLL_SPEED, 0.0f };
+			//マウスの移動量代入
+			rot = { (float)pMouse->GetMoveIX() * ROLL_SPEED, (float)pMouse->GetMoveIY() * ROLL_SPEED, 0.0f };
 
-		D3DXVec3Normalize(&rot, &rot);
+			D3DXVec3Normalize(&rot, &rot);
 
-		//視点の旋回
-		pInfoCamera->rot.y += rot.x * ROLL_SPEED;
-		pInfoCamera->rot.x -= rot.y * ROLL_SPEED;
+			//視点の旋回
+			pInfoCamera->rot.y += rot.x * ROLL_SPEED;
+			pInfoCamera->rot.x -= rot.y * ROLL_SPEED;
 
-		if (pKeyboard->GetPress(DIK_LSHIFT) == true)
-		{//加速
-			fMove *= 5;
-		}
+			if (pKeyboard->GetPress(DIK_LSHIFT) == true)
+			{//加速
+				fMove *= 5;
+			}
 
-		D3DXVECTOR3 rotMove = pInfoCamera->rot;
-		D3DXVECTOR3 vecPole = { 0.0f,0.0f,0.0f };
+			D3DXVECTOR3 rotMove = pInfoCamera->rot;
+			D3DXVECTOR3 vecPole = { 0.0f,0.0f,0.0f };
 
-		// 視点移動===============================================
-		if (pKeyboard->GetPress(DIK_A) == true)
-		{// 左移動
-			pInfoCamera->posVDest.x -= sinf(pInfoCamera->rot.y - D3DX_PI * 0.5f) * fMove;
-			pInfoCamera->posVDest.z -= cosf(pInfoCamera->rot.y - D3DX_PI * 0.5f) * fMove;
+			// 視点移動===============================================
+			if (pKeyboard->GetPress(DIK_A) == true)
+			{// 左移動
+				pInfoCamera->posVDest.x -= sinf(pInfoCamera->rot.y - D3DX_PI * 0.5f) * fMove;
+				pInfoCamera->posVDest.z -= cosf(pInfoCamera->rot.y - D3DX_PI * 0.5f) * fMove;
+				pCamera->SetPosR();
+			}
+			if (pKeyboard->GetPress(DIK_D) == true)
+			{// 右移動
+				pInfoCamera->posVDest.x -= sinf(pInfoCamera->rot.y - D3DX_PI * -0.5f) * fMove;
+				pInfoCamera->posVDest.z -= cosf(pInfoCamera->rot.y - D3DX_PI * -0.5f) * fMove;
+				pCamera->SetPosR();
+			}
+			if (pKeyboard->GetPress(DIK_W) == true)
+			{// 前移動
+				pInfoCamera->posVDest.x += sinf(-pInfoCamera->rot.x) * sinf(pInfoCamera->rot.y) * fMove;
+				pInfoCamera->posVDest.y -= cosf(-pInfoCamera->rot.x) * MOVE_SPEED;
+				pInfoCamera->posVDest.z += sinf(-pInfoCamera->rot.x) * cosf(pInfoCamera->rot.y) * fMove;
+				pCamera->SetPosR();
+			}
+			if (pKeyboard->GetPress(DIK_S) == true)
+			{// 後移動
+				pInfoCamera->posVDest.x += sinf(-pInfoCamera->rot.x + D3DX_PI) * sinf(pInfoCamera->rot.y) * fMove;
+				pInfoCamera->posVDest.y -= cosf(-pInfoCamera->rot.x + D3DX_PI) * MOVE_SPEED;
+				pInfoCamera->posVDest.z += sinf(-pInfoCamera->rot.x + D3DX_PI) * cosf(pInfoCamera->rot.y) * fMove;
+				pCamera->SetPosR();
+			}
+			if (pKeyboard->GetPress(DIK_E) == true)
+			{// 上昇
+				pInfoCamera->posVDest.y += fMove;
+				pCamera->SetPosR();
+			}
+			if (pKeyboard->GetPress(DIK_Q) == true)
+			{// 下降
+				pInfoCamera->posVDest.y -= fMove;
+				pCamera->SetPosR();
+			}
+
 			pCamera->SetPosR();
 		}
-		if (pKeyboard->GetPress(DIK_D) == true)
-		{// 右移動
-			pInfoCamera->posVDest.x -= sinf(pInfoCamera->rot.y - D3DX_PI * -0.5f) * fMove;
-			pInfoCamera->posVDest.z -= cosf(pInfoCamera->rot.y - D3DX_PI * -0.5f) * fMove;
-			pCamera->SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_W) == true)
-		{// 前移動
-			pInfoCamera->posVDest.x += sinf(-pInfoCamera->rot.x) * sinf(pInfoCamera->rot.y) * fMove;
-			pInfoCamera->posVDest.y -= cosf(-pInfoCamera->rot.x) * MOVE_SPEED;
-			pInfoCamera->posVDest.z += sinf(-pInfoCamera->rot.x) * cosf(pInfoCamera->rot.y) * fMove;
-			pCamera->SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_S) == true)
-		{// 後移動
-			pInfoCamera->posVDest.x += sinf(-pInfoCamera->rot.x + D3DX_PI) * sinf(pInfoCamera->rot.y) * fMove;
-			pInfoCamera->posVDest.y -= cosf(-pInfoCamera->rot.x + D3DX_PI) * MOVE_SPEED;
-			pInfoCamera->posVDest.z += sinf(-pInfoCamera->rot.x + D3DX_PI) * cosf(pInfoCamera->rot.y) * fMove;
-			pCamera->SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_E) == true)
-		{// 上昇
-			pInfoCamera->posVDest.y += fMove;
-			pCamera->SetPosR();
-		}
-		if (pKeyboard->GetPress(DIK_Q) == true)
-		{// 下降
-			pInfoCamera->posVDest.y -= fMove;
-			pCamera->SetPosR();
+	}
+	else
+	{
+		CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+		D3DXVECTOR3 posAbove = pCamera->GetPosAbove();
+
+		pInfoCamera->posVDest = posAbove;
+		pInfoCamera->posRDest = { posAbove.x,0.0f,posAbove.z + 1.0f };
+
+		if (pMouse->GetPress(CInputMouse::BUTTON_RMB))
+		{// 右クリック中、移動可能
+			posAbove.x -= pMouse->GetMoveIX() * SPEED_MOVE_ABOVE * posAbove.y * 0.001f;
+			posAbove.z += pMouse->GetMoveIY() * SPEED_MOVE_ABOVE * posAbove.y * 0.001f;
 		}
 
-		pCamera->SetPosR();
+		posAbove.y += pMouse->GetMoveIZ() * SPEED_ZOOM_ABOVE;
+		pInfoCamera->posVDest.y = posAbove.y;
+
+		CDebugProc::GetInstance()->Print("\nマウス奥：[%f]", pMouse->GetMoveIZ());
+
+		universal::LimitValue(&posAbove.y, FLT_MAX, 1000.0f);
+
+		pCamera->SetPosAbove(posAbove);
+	}
+
+	if (pKeyboard->GetTrigger(DIK_G))
+	{
+		m_bAbove = m_bAbove ? false : true;
 	}
 
 	pCamera->MoveDist(FACT_CORRECT_CONTOROLLL);

@@ -9,6 +9,7 @@
 // インクルード
 //*****************************************************
 #include "edit.h"
+#include "debugproc.h"
 
 //*****************************************************
 // 定数定義
@@ -16,7 +17,14 @@
 namespace
 {
 const float SPEED_MOVE = 10.0f;	// 移動速度
+const float ABOVE_DEFAULT = 10000.0f;	// デフォルトの上空視点の高さ
 }
+
+//*****************************************************
+// 静的メンバ変数宣言
+//*****************************************************
+D3DXVECTOR3 CEdit::s_posAbove = { 0.0f,ABOVE_DEFAULT,0.0f };	// 上空視点のデフォルト位置
+bool CEdit::s_bAbove = false;	// 上空視点にするかどうか
 
 //=====================================================
 // コンストラクタ
@@ -57,7 +65,7 @@ void CEdit::Uninit(void)
 void CEdit::Update(void)
 {
 	// 上空のカメラ位置の設定
-	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 pos = s_posAbove;
 
 	ImGui::Text("[PosCameraAbove]");
 
@@ -65,5 +73,21 @@ void CEdit::Update(void)
 	ImGui::DragFloat("POS.Y", &pos.y, SPEED_MOVE, -FLT_MAX, FLT_MAX);
 	ImGui::DragFloat("POS.Z", &pos.z, SPEED_MOVE, -FLT_MAX, FLT_MAX);
 
-	SetPosition(pos);
+	s_posAbove = pos;
+}
+
+//=====================================================
+// 上空視点の操作
+//=====================================================
+void CEdit::InputAbove(void)
+{
+
+}
+
+//=====================================================
+// プレイヤーのテレポート
+//=====================================================
+void CEdit::TeleportPlayer(void)
+{
+
 }
