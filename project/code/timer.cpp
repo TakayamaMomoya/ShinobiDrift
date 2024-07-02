@@ -68,7 +68,7 @@ HRESULT CTimer::Init(void)
 	if(m_pNumber == nullptr)
 	m_pNumber = CNumber::Create(TIME_PLACE, TIME_LIMIT);
 
-	if (m_pNumber == nullptr)
+	if (m_pNumber != nullptr)
 	{
 		// ˆÊ’uÝ’è
 		m_pNumber->SetPosition(D3DXVECTOR3(TIME_WIDTH, 75.0f, 0.0f));
