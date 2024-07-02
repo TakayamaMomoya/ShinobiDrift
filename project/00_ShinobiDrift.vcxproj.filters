@@ -537,7 +537,7 @@
       <Filter>ソース ファイル\mesh</Filter>
     </ClInclude>
     <ClInclude Include="code\enemy.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

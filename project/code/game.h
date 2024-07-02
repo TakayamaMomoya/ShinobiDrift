@@ -46,6 +46,7 @@ public:
 	static STATE GetState(void) { return m_state; }
 	void EnableStop(bool bStop) { m_bStop = bStop; }
 	bool GetStop(void) { return m_bStop; }
+	CEdit *GetEdit(void) { return m_pEdit; }
 
 private:
 	void UpdateCamera(void);

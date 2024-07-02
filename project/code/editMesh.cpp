@@ -19,6 +19,7 @@
 #include "manager.h"
 #include "tunnel.h"
 #include "guardRail.h"
+#include "game.h"
 
 //*****************************************************
 // 定数定義
@@ -147,44 +148,44 @@ void CEditMesh::ChangeState(CStateEditMesh *pState)
 }
 
 //=====================================================
-// ロードポイントの選択
+// イテレイターの選択
 //=====================================================
 std::vector<CMeshRoad::SInfoRoadPoint>::iterator CEditMesh::SelectIterator(void)
 {
-	CMeshRoad *pMesh = CMeshRoad::GetInstance();
+	//CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
-	if (pMesh == nullptr)
-		return std::vector<CMeshRoad::SInfoRoadPoint>::iterator();
+	//if (pMesh == nullptr)
+	//	return std::vector<CMeshRoad::SInfoRoadPoint>::iterator();
 
-	std::vector<CMeshRoad::SInfoRoadPoint> *paRP = pMesh->GetArrayRP();
+	//std::vector<CMeshRoad::SInfoRoadPoint> *paRP = pMesh->GetArrayRP();
 
-	D3DXVECTOR3 posHit;
-	D3DXVECTOR3 posNear;
-	D3DXVECTOR3 posFar;
-	D3DXVECTOR3 vecDiff;
+	//D3DXVECTOR3 posHit;
+	//D3DXVECTOR3 posNear;
+	//D3DXVECTOR3 posFar;
+	//D3DXVECTOR3 vecDiff;
 
-	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
+	//universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
 
-	if (!m_bCurrent)
-	{// ブロックを探している状態
-		for (auto it = paRP->begin();it != paRP->end();)
-		{
-			// ロードポイントごとのレイとの判定
-			CollideRPRay(it, posFar, posNear, vecDiff);
+	//if (!m_bCurrent)
+	//{// ブロックを探している状態
+	//	for (auto it = paRP->begin();it != paRP->end() - 1;)
+	//	{
+	//		// ロードポイントごとのレイとの判定
+	//		CollideRPRay(it, posFar, posNear, vecDiff);
 
-			if (m_bCurrent)
-				break;
+	//		if (m_bCurrent)
+	//			break;
 
-			it++;
-		}
-	}
-	else
-	{// ブロックを動かす
-		MoveCurrentRP();
+	//		it++;
+	//	}
+	//}
+	//else
+	//{// ブロックを動かす
+	//	MoveCurrentRP();
 
-		// 道の調整
-		pMesh->CreateVtxBuffEdge();
-	}
+	//	// 道の調整
+	//	pMesh->CreateVtxBuffEdge();
+	//}
 
 	return m_itCurrent;
 }
@@ -358,11 +359,16 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 		pEdit->SetPosition(pos);
 	}
 
-	if (pKeyboard->GetTrigger(DIK_SPACE))
-	{// ロードポイントの追加
-		CMeshRoad *pMesh = CMeshRoad::GetInstance();
+	bool bStop = CGame::GetInstance()->GetStop();
 
-		pMesh->AddRoadPoint(pos, true);
+	if (bStop)
+	{
+		if (pKeyboard->GetTrigger(DIK_SPACE))
+		{// ロードポイントの追加
+			CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+			pMesh->AddRoadPoint(pos, true);
+		}
 	}
 	
 	if (ImGui::Button("Save", ImVec2(100, 50)))
