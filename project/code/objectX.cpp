@@ -36,6 +36,7 @@ CObjectX::CObjectX(int nPriority) : CObject(nPriority)
 	m_bChangeCol = false;
 	m_bShadow = false;
 	m_pModel = nullptr;
+	m_bDisp = true;
 }
 
 //====================================================
@@ -86,6 +87,9 @@ void CObjectX::Update(void)
 //====================================================
 void CObjectX::Draw(void)
 {
+	if (!m_bDisp)
+		return;
+
 	if (m_pModel != nullptr)
 	{
 		// デバイスの取得
@@ -171,6 +175,9 @@ void CObjectX::Draw(void)
 //====================================================
 void CObjectX::DrawShadow(void)
 {
+	if (!m_bDisp)
+		return;
+
 	if (m_pModel == nullptr)
 	{
 		return;
@@ -223,6 +230,9 @@ void CObjectX::DrawShadow(void)
 //=====================================================
 void CObjectX::JustDraw(void)
 {
+	if (!m_bDisp)
+		return;
+
 	if (m_pModel != nullptr)
 	{
 		// デバイスの取得
