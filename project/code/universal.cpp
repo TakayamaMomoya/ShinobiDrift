@@ -12,6 +12,7 @@
 #include "renderer.h"
 #include "universal.h"
 #include "debugproc.h"
+#include "blur.h"
 
 namespace universal
 {
@@ -246,6 +247,144 @@ float Vec3Dot(D3DXVECTOR3 vec1, D3DXVECTOR3 vec2)
 	fDot = vec1.x * vec2.x + vec1.y * vec2.y + vec1.z * vec2.z;
 
 	return fDot;
+}
+
+//========================================
+// レイと球の判定
+//========================================
+bool CalcRaySphere(D3DXVECTOR3 posStartRay, D3DXVECTOR3 vecRay, D3DXVECTOR3 posSphere, float fRadius, D3DXVECTOR3 *pPosStartHit, D3DXVECTOR3 *pPosEndHit)
+{
+	// 球の座標をレイの開始地点分戻す
+	posSphere -= posStartRay;
+
+	float A = vecRay.x * vecRay.x + vecRay.y * vecRay.y + vecRay.z * vecRay.z;
+	float B = vecRay.x * posSphere.x + vecRay.y * posSphere.y + vecRay.z * posSphere.z;
+	float C = posSphere.x * posSphere.x + posSphere.y * posSphere.y + posSphere.z * posSphere.z - fRadius * fRadius;
+
+	if (A == 0.0f)
+		return false; // レイの長さが0
+
+	float s = B * B - A * C;
+	if (s < 0.0f)
+		return false; // 衝突していない
+
+	s = sqrtf(s);
+	float a1 = (B - s) / A;
+	float a2 = (B + s) / A;
+
+	if (a1 < 0.0f || a2 < 0.0f)
+		return false; // レイの反対で衝突
+
+	if (pPosStartHit != nullptr)
+	{// 衝突しはじめたところ
+		*pPosStartHit = posStartRay + a1 * vecRay;
+	}
+
+	if (pPosEndHit != nullptr)
+	{// 衝突が終わったところ
+		*pPosStartHit = posStartRay + a2 * vecRay;
+	}
+
+	return true;
+}
+
+//========================================
+// レイと平面の判定
+//========================================
+bool CalcRayFlat(D3DXVECTOR3 posPlane, D3DXVECTOR3 nor, D3DXVECTOR3 srcRay, D3DXVECTOR3 endRay, D3DXVECTOR3 *pPosHit)
+{
+	D3DXVECTOR3 vecToSrc = srcRay - posPlane;
+	D3DXVECTOR3 vecToEnd = endRay - posPlane;
+
+	float fDotSrc = Vec3Dot(vecToSrc, nor);
+	float fDotEnd = Vec3Dot(vecToEnd, nor);
+
+	if (pPosHit != nullptr)
+	{// 衝突した座標の設定
+		D3DXVECTOR3 posHit;
+
+		if (fDotEnd < 0)
+			fDotEnd *= -1;
+		if (fDotSrc < 0)
+			fDotSrc *= -1;
+
+		float fDotMax = fDotSrc + fDotEnd;
+		float fRate = fDotSrc / fDotMax;
+
+		D3DXVECTOR3 vecDiff = endRay - srcRay;
+		posHit = srcRay + vecDiff * fRate;
+
+		*pPosHit = posHit;
+	}
+
+	return fDotSrc * fDotEnd <= 0;
+}
+
+//========================================
+// スクリーン座標をワールド座標に変換
+//========================================
+D3DXVECTOR3 CalcScreenToWorld(D3DXVECTOR3 posScreen)
+{
+	HWND hWnd = FindWindow(CLASS_NAME, WINDOW_NAME);
+
+	RECT rect;
+	GetClientRect(hWnd, &rect);
+	float fWidthScreen = static_cast<float>(rect.right - rect.left);
+	float fHeightScreen = static_cast<float>(rect.bottom - rect.top);
+
+	// 各行列の逆行列を算出
+	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
+
+	D3DXMATRIX InvView, InvPrj, VP, InvViewport, View, Prj;
+
+	pDevice->GetTransform(D3DTS_VIEW, &View);
+	pDevice->GetTransform(D3DTS_PROJECTION, &Prj);
+
+	D3DXMatrixInverse(&InvView, NULL, &View);
+	D3DXMatrixInverse(&InvPrj, NULL, &Prj);
+	D3DXMatrixIdentity(&VP);
+	VP._11 = fWidthScreen / 2.0f; VP._22 = -fHeightScreen / 2.0f;
+	VP._41 = fWidthScreen / 2.0f; VP._42 = fHeightScreen / 2.0f;
+	D3DXMatrixInverse(&InvViewport, NULL, &VP);
+
+	// 逆変換
+	D3DXMATRIX tmp = InvViewport * InvPrj * InvView;
+	D3DXVECTOR3 pOut;
+	D3DXVec3TransformCoord(&pOut, &D3DXVECTOR3(posScreen.x, posScreen.y, posScreen.z), &tmp);
+
+	return pOut;
+}
+
+//========================================
+// スクリーン座標を3Dに変換
+//========================================
+void ConvertScreenPosTo3D(D3DXVECTOR3 *pPosNear, D3DXVECTOR3 *pPosFar, D3DXVECTOR3 *pVecDiff)
+{
+	HWND hWnd = FindWindow(CLASS_NAME, WINDOW_NAME);
+
+	if (!hWnd)
+	{
+		assert(("ウィンドウ見つからないよ！", false));
+	}
+
+	POINT posCursor;
+
+	GetCursorPos(&posCursor);
+
+	CDebugProc::GetInstance()->Print("\n変換前[%d,%d]", posCursor.x, posCursor.y);
+
+	ScreenToClient(hWnd, &posCursor);
+
+	CDebugProc::GetInstance()->Print("\n変換後[%d,%d]", posCursor.x, posCursor.y);
+
+	*pPosNear = universal::CalcScreenToWorld(D3DXVECTOR3((float)posCursor.x, (float)posCursor.y, 0.0f));
+	*pPosFar = universal::CalcScreenToWorld(D3DXVECTOR3((float)posCursor.x, (float)posCursor.y, 1.0f));
+
+	if (pVecDiff != nullptr)
+	{
+		*pVecDiff = *pPosFar - *pPosNear;
+		D3DXVec3Normalize(pVecDiff, pVecDiff);
+	}
 }
 
 //========================================

@@ -19,6 +19,7 @@
 #include "effect3D.h"
 #include "manager.h"
 #include "camera.h"
+#include "texture.h"
 #include <assert.h>
 
 //*****************************************************
@@ -28,6 +29,8 @@ namespace
 {
 const float SPEED_MOVE = 3.0f;	// 移動速度
 const float SPEED_ROTATION = 0.01f;	// 回転速度
+const float SIZE_ICON = 200.0f;	// アイコンのサイズ
+const char* PATH_ICON = "data\\TEXTURE\\UI\\blockIcon.png";	// ブロックのアイコン
 }
 
 //=====================================================
@@ -36,6 +39,8 @@ const float SPEED_ROTATION = 0.01f;	// 回転速度
 CEditBlock::CEditBlock()
 {
 	ZeroMemory(&m_aPath[0], sizeof(m_aPath));
+	m_posCurrent = { 0.0f,0.0f,0.0f };
+	m_pCurrentBlock = nullptr;
 }
 
 //=====================================================
@@ -56,7 +61,60 @@ HRESULT CEditBlock::Init(void)
 
 	CEdit::Init();
 
+	// 全ブロックのアイコンをマップコンテナに格納
+	CreateBlockIconAll();
+
 	return S_OK;
+}
+
+//=====================================================
+// 全ブロックのアイコンをマップコンテナに格納
+//=====================================================
+void CEditBlock::CreateBlockIconAll(void)
+{
+	CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+	if (pBlockManager == nullptr)
+		return;
+
+	CBlock *pBlock = pBlockManager->GetHead();
+
+	while (pBlock != nullptr)
+	{
+		CBlock *pBlockNext = pBlock->GetNext();
+
+		AddBlockToMap(pBlock);
+
+		pBlock = pBlockNext;
+	}
+}
+
+//=====================================================
+// マップコンテナにブロックを追加
+//=====================================================
+void CEditBlock::AddBlockToMap(CBlock *pBlock)
+{
+	D3DXVECTOR3 pos = pBlock->GetPosition();
+
+	CObject3D *pIcon = CObject3D::Create(pos);
+
+	if (pIcon == nullptr)
+		return;
+
+	pIcon->SetPosition(pos);
+	pIcon->SetSize(SIZE_ICON, SIZE_ICON);
+	pIcon->SetMode(CObject3D::MODE::MODE_BILLBOARD);
+	pIcon->SetVtx();
+	pIcon->EnableZtest(true);
+	pIcon->EnableFog(false);
+	pIcon->EnableLighting(false);
+
+	int nIdx = Texture::GetIdx(PATH_ICON);
+	pIcon->SetIdxTexture(nIdx);
+
+
+
+	m_aIcon[pBlock] = pIcon;
 }
 
 //=====================================================
@@ -64,6 +122,9 @@ HRESULT CEditBlock::Init(void)
 //=====================================================
 void CEditBlock::Uninit(void)
 {
+	// 全アイコン削除
+	DeleteAllIcon();
+
 	if (m_pState != nullptr)
 	{
 		m_pState->Uninit(this);
@@ -72,6 +133,23 @@ void CEditBlock::Uninit(void)
 	}
 
 	CEdit::Uninit();
+}
+
+//=====================================================
+// 全アイコンの削除
+//=====================================================
+void CEditBlock::DeleteAllIcon(void)
+{
+	for (auto it = m_aIcon.begin(); it != m_aIcon.end();)
+	{
+		it->second->Uninit();
+
+		auto itNext = std::next(it);
+
+		m_aIcon.erase(it);
+
+		it = itNext;
+	}
 }
 
 //=====================================================
@@ -93,7 +171,163 @@ void CEditBlock::Update(void)
 	if (ImGui::Button("EditGrabBlock", ImVec2(70, 30)))	// 掴めるブロックの編集
 		ChangeState(new CStateEditGrabBlock);
 
+	// レイでのブロック選択
+	RaySelectBlock();
+
 	CEdit::Update();
+}
+
+//=====================================================
+// レイでのブロックの選択
+//=====================================================
+void CEditBlock::RaySelectBlock(void)
+{
+	CBlockManager *pBlockManager = CBlockManager::GetInstance();
+
+	if (pBlockManager == nullptr)
+		return;
+
+	D3DXVECTOR3 posNear;
+	D3DXVECTOR3 posFar;
+	D3DXVECTOR3 vecDiff;
+
+	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
+
+	CDebugProc::GetInstance()->Print("\nPosNear[%f,%f,%f]", posNear.x, posNear.y, posNear.z);
+	CDebugProc::GetInstance()->Print("\nPosFar[%f,%f,%f]", posFar.x, posFar.y, posFar.z);
+
+	if (m_pCurrentBlock == nullptr)
+	{// ブロックを探している状態
+		CBlock *pBlock = pBlockManager->GetHead();
+
+		while (pBlock != nullptr)
+		{
+			CBlock *pBlockNext = pBlock->GetNext();
+
+			CollideBlockRay(pBlock, posFar, posNear, vecDiff);
+
+			if (m_pCurrentBlock != nullptr)
+			{// ブロックが選べたらwhileを抜ける
+				break;
+			}
+
+			pBlock = pBlockNext;
+		}
+
+		if (m_pCurrentBlock == nullptr)
+		{
+			D3DXVECTOR3 posHit;
+
+			universal::CalcRayFlat(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 1.0f, 0.0f), posNear, posFar, &posHit);
+
+			
+		}
+	}
+	else
+	{// ブロックを動かす
+		MoveCurrentBlock(posFar, posNear);
+	}
+}
+
+//=====================================================
+// ブロックに対するレイの判定
+//=====================================================
+void CEditBlock::CollideBlockRay(CBlock *pBlock, D3DXVECTOR3 posFar, D3DXVECTOR3 posNear, D3DXVECTOR3 vecDiff)
+{
+	CInputMouse *pMouse = CInputMouse::GetInstance();
+	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+
+	if (pBlock == nullptr || pMouse == nullptr || pKeyboard == nullptr)
+		return;
+
+	D3DXVECTOR3 posBlock = pBlock->GetPosition();
+
+	bool bHit = universal::CalcRaySphere(posNear, vecDiff, posBlock, SIZE_ICON);
+
+	if (bHit)
+	{
+		CEffect3D::Create(posBlock, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+		if (pMouse->GetTrigger(CInputMouse::BUTTON_LMB))
+		{
+			m_pCurrentBlock = pBlock;
+
+			m_posCurrent = pBlock->GetPosition();
+
+			return;
+		}
+	}
+}
+
+//=====================================================
+// 選択したブロックの移動
+//=====================================================
+void CEditBlock::MoveCurrentBlock(D3DXVECTOR3 posFar, D3DXVECTOR3 posNear)
+{
+	CInputMouse *pMouse = CInputMouse::GetInstance();
+	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+
+	if (pMouse == nullptr || pKeyboard == nullptr || m_pCurrentBlock == nullptr)
+		return;
+
+	D3DXVECTOR3 posHit;
+
+	universal::CalcRayFlat(m_posCurrent, D3DXVECTOR3(0.0f, 1.0f, 0.0f), posNear, posFar, &posHit);
+
+	if (pKeyboard->GetRelease(DIK_C))
+	{
+		m_pCurrentBlock = nullptr;
+	}
+	else if(pKeyboard->GetRelease(DIK_V))
+	{
+		m_pCurrentBlock = nullptr;
+	}
+	else if (pKeyboard->GetPress(DIK_C))
+	{// 回転
+		D3DXVECTOR3 rot = m_pCurrentBlock->GetRotation();
+
+		D3DXVECTOR3 vecDiff = posHit - m_posCurrent;
+
+		rot.y = atan2f(vecDiff.x, vecDiff.z);
+
+		m_pCurrentBlock->SetRotation(rot);
+	}
+	else
+	{// 移動
+		if (pKeyboard->GetPress(DIK_V))
+		{// 上下移動
+			CCamera *pCamera = CManager::GetCamera();
+
+			if (pCamera == nullptr)
+				return;
+
+			CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+
+			// カメラとブロックの平面差分ベクトルを法線にする
+			D3DXVECTOR3 posCamera = { pInfoCamera->posV.x,0.0f, pInfoCamera->posV.z };
+			D3DXVECTOR3 posBlock = { m_posCurrent.x,0.0f,m_posCurrent.z };
+			D3DXVECTOR3 vecDiff = posCamera - posBlock;
+
+			D3DXVec3Normalize(&vecDiff, &vecDiff);
+
+			universal::CalcRayFlat(m_posCurrent, vecDiff, posNear, posFar, &posHit);
+
+			// y軸以外は固定する
+			posHit.x = m_posCurrent.x;
+			posHit.z = m_posCurrent.z;
+		}
+		
+		m_pCurrentBlock->SetPosition(posHit);
+		m_aIcon[m_pCurrentBlock]->SetPosition(posHit);
+
+		m_posCurrent.x = posHit.x;
+		m_posCurrent.z = posHit.z;
+	}
+
+	if (pMouse->GetRelease(CInputMouse::BUTTON_LMB))
+	{
+		m_pCurrentBlock = nullptr;
+	}
 }
 
 //=====================================================
@@ -243,6 +477,17 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 		}
 	}
 
+	D3DXVECTOR3 posNear;
+	D3DXVECTOR3 posFar;
+	D3DXVECTOR3 vecDiff;
+
+	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
+
+	D3DXVECTOR3 posHit;
+	universal::CalcRayFlat(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 1.0f, 0.0f), posNear, posFar, &posHit);
+
+	pos = posHit;
+
 	if (ImGui::TreeNode("ROT"))
 	{
 		// ブロック向き
@@ -284,9 +529,9 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 
 	ImGui::Text("[Action]");
 
-	if (ImGui::Button("Create", ImVec2(50.0f, 20.0f)))
+	if (pKeyboard->GetTrigger(DIK_SPACE))
 	{// ブロック生成
-		CreateBlock(m_pObjectCursor->GetPosition());
+		CreateBlock(m_pObjectCursor->GetPosition(),pEdit);
 	}
 
 	if (ImGui::Button("DeleteAll", ImVec2(80.0f, 20.0f)))
@@ -410,7 +655,7 @@ void CStateCreateBlockNormal::ChangeBlockBehaviour(void)
 //=====================================================
 // ブロックの生成
 //=====================================================
-void CStateCreateBlockNormal::CreateBlock(D3DXVECTOR3 pos)
+void CStateCreateBlockNormal::CreateBlock(D3DXVECTOR3 pos,CEditBlock *pEdit)
 {
 	CBlockManager *pBlockManager = CBlockManager::GetInstance();
 
@@ -429,6 +674,8 @@ void CStateCreateBlockNormal::CreateBlock(D3DXVECTOR3 pos)
 		pBlock->SetPosition(pos);
 		pBlock->SetRotation(m_pObjectCursor->GetRotation());
 		pBlock->SetIdx(m_nIdxObject);
+
+		pEdit->AddBlockToMap(pBlock);
 	}
 }
 

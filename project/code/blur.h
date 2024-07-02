@@ -55,6 +55,8 @@ public:
     void SetPolygonColor(D3DXCOLOR col) { m_colPolygon = col; }
     float GetAddSizePolygon(void) { return m_fAddSizePolygon; }    // ポリゴンの追加サイズ
     void SetAddSizePolygon(float fScale) { m_fAddSizePolygon = fScale; }
+    D3DXMATRIX GetViwDef(void) { return m_mtxViewDef; }    // 保存用のビューマトリックス
+    D3DXMATRIX GetProjDef(void) { return m_mtxProjDef; }    // 保存用のプロジェクションマトリックス
 
     // 静的メンバ関数
     static CBlur *Create(void);   // 生成

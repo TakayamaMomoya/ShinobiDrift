@@ -42,7 +42,7 @@ public:
 		TYPE_MAX
 	}TYPE;
 
-	CObject(int nPriority = 3);	// コンストラクタ
+	CObject(int nPriority = 4);	// コンストラクタ
 	virtual ~CObject();	//	デストラクタ
 
 	virtual HRESULT Init(void) = 0;	// 初期化処理

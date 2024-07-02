@@ -40,6 +40,8 @@ private:
 	void CreateVtx(void);	// 頂点の生成
 	void VtxFollowRoad(void);	// 頂点を道に沿わせる
 	void DetectionPlayer(void);	// プレイヤーの検知
+	void CollidePlayerEnter(VERTEX_3D *pVtx);	// プレイヤー入ってくる判定
+	void CollidePlayerExit(VERTEX_3D *pVtx);	// プレイヤー出ていく判定
 
 	// メンバ変数
 	bool m_bInPlayer;	// プレイヤーが入っているかどうか
