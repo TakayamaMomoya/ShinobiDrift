@@ -210,6 +210,14 @@ void CEditBlock::Update(void)
 
 			ImGui::TreePop();
 		}
+
+		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_BACKSPACE))
+		{
+			m_aIcon[m_pMoveBlock]->Uninit();
+			m_aIcon.erase(m_pMoveBlock);
+			m_pMoveBlock->Uninit();
+			m_pMoveBlock = nullptr;
+		}
 	}
 }
 
