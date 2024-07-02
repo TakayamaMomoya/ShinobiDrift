@@ -40,6 +40,7 @@
 #include "editMesh.h"
 #include "editBlock.h"
 #include "editGoal.h"
+#include "enemy.h"
 
 //*****************************************************
 // マクロ定義
@@ -112,6 +113,9 @@ HRESULT CGame::Init(void)
 
 	// メッシュロード生成
 	CMeshRoad::Create();
+
+	// 敵の生成
+	CEnemy::Create();
 
 	return S_OK;
 }

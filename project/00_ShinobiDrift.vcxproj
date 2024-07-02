@@ -185,6 +185,7 @@
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
     <ClCompile Include="code\effekseer.cpp" />
+    <ClCompile Include="code\enemy.cpp" />
     <ClCompile Include="code\fade.cpp" />
     <ClCompile Include="code\fan.cpp" />
     <ClCompile Include="code\fan2D.cpp" />
@@ -269,6 +270,7 @@
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
     <ClInclude Include="code\effekseer.h" />
+    <ClInclude Include="code\enemy.h" />
     <ClInclude Include="code\fade.h" />
     <ClInclude Include="code\fan.h" />
     <ClInclude Include="code\fan2D.h" />
