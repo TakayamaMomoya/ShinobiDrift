@@ -129,7 +129,7 @@ void CEditMesh::Update(void)
 		ChangeState(new CStateEditMeshDeleteRoadPoint);
 
 	// イテレイター選択
-	SelectIterator();
+	//SelectIterator();
 }
 
 //=====================================================

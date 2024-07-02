@@ -33,6 +33,7 @@ public:
 	void Save(void);
 	void ChangeState(CStateEditBlock *pState);
 	void AddBlockToMap(CBlock *pBlock);
+	void SetMoveBlock(CBlock *pBlock) { m_pMoveBlock = pBlock; }
 
 private:
 	void CreateBlockIconAll(void);
@@ -45,6 +46,7 @@ private:
 	CStateEditBlock *m_pState;	// ステイトのポインタ
 	D3DXVECTOR3 m_posCurrent;
 	CBlock *m_pCurrentBlock;	// 選択ブロック
+	CBlock *m_pMoveBlock;	// 動かすブロック
 	std::map<CBlock*, CObject3D*> m_aIcon;	// アイコンのポインタ
 };
 
