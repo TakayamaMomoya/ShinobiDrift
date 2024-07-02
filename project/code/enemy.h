@@ -1,6 +1,6 @@
 //*****************************************************
 //
-// 首都高を走る車の処理[car.h]
+// エネミーの処理[enemy.h]
 // Author:大原怜将
 //
 //*****************************************************
@@ -53,16 +53,18 @@ private:
 	// 情報
 	struct SInfo
 	{
-		STATE state;
-
+		STATE state;   // 状態
+		float fSpeed;  // 速さ
 	};
 
-	SInfo m_Info;               // 情報
-	static CEnemy *m_pEnemy;    // 自分自身のポインタ
-	CCutMullSpline *m_pSpline;	// スプライン
-	std::vector<SInfoRoadPoint> m_aRoadPoint;
+	SInfo m_Info;                     // 情報
+	static CEnemy *m_pEnemy;          // 自分自身のポインタ
+	CMotion* m_pEnemyNinja;          // バイクに乗っている忍者
+	CCutMullSpline *m_pSpline;	      // スプライン
+	std::vector<D3DXVECTOR3> m_vPos;  // データ点のベクター
 
 	int m_nIdx = 1;
+	int m_nSize = 0;
 	float m_t = 0.0f;
 };
 
