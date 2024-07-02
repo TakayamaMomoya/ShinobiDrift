@@ -20,6 +20,7 @@
 #include "manager.h"
 #include "camera.h"
 #include "texture.h"
+#include "game.h"
 #include <assert.h>
 
 //*****************************************************
@@ -563,9 +564,14 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 
 	ImGui::Text("[Action]");
 
-	if (pKeyboard->GetTrigger(DIK_SPACE))
-	{// ブロック生成
-		CreateBlock(m_pObjectCursor->GetPosition(),pEdit);
+	bool bStop = CGame::GetInstance()->GetStop();
+
+	if (bStop)
+	{
+		if (pKeyboard->GetTrigger(DIK_SPACE))
+		{// ブロック生成
+			CreateBlock(m_pObjectCursor->GetPosition(), pEdit);
+		}
 	}
 
 	if (ImGui::Button("DeleteAll", ImVec2(80.0f, 20.0f)))
