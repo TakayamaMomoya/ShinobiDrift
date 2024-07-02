@@ -597,6 +597,14 @@ void CMeshRoad::AjustRoadEvent(void)
 }
 
 //=====================================================
+// ƒXƒvƒ‰ƒCƒ“‚Ìæ“¾
+//=====================================================
+CCutMullSpline *CMeshRoad::GetCenterSpline(void)
+{
+	return m_pSpline;
+}
+
+//=====================================================
 // “–‚½‚è”»’èˆ—
 //=====================================================
 bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)

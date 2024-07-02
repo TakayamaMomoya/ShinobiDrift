@@ -59,6 +59,7 @@ public:
 	void DeleteRoadPoint(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void ResetIterator(void);
 	void AjustRoadEvent(void);	// 道イベントの調整
+	CCutMullSpline *GetCenterSpline(void);
 
 private:
 	void SetNormal(VERTEX_3D *pVtx);	// 法線の設定
