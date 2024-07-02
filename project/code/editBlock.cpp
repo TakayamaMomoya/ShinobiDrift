@@ -212,7 +212,7 @@ void CEditBlock::Update(void)
 			ImGui::TreePop();
 		}
 
-		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_BACKSPACE))
+		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_DELETE))
 		{
 			m_aIcon[m_pMoveBlock]->Uninit();
 			m_aIcon.erase(m_pMoveBlock);

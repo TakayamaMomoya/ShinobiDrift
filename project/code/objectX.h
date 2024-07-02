@@ -63,6 +63,8 @@ public:
 	float GetScale(void) { return m_fScale; }
 	void SetScale(float fScale) { m_fScale = fScale; }
 	void EnableShadow(bool bEnable) { m_bShadow = bEnable; }
+	bool IsDisp(void) { return m_bDisp; }
+	void EnableDisp(bool bDisp) { m_bDisp = bDisp; }
 
 private:
 	D3DXVECTOR3 m_pos;								//à íu
@@ -79,6 +81,7 @@ private:
 	D3DXVECTOR3 m_vtxMin;	// ç≈è¨í∏ì_
 	bool m_bChangeCol;
 	bool m_bShadow;
+	bool m_bDisp;	// ï`âÊÇ∑ÇÈÇ©Ç«Ç§Ç©
 };
 
 #endif
