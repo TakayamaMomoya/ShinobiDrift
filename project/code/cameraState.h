@@ -48,7 +48,7 @@ public:
 	void Update(CCamera *pCamera) override;
 
 private:
-	bool m_bAbove;	// ã‹ó‹“_‚©‚Ç‚¤‚©
+	bool m_bAbove = false;	// ã‹ó‹“_‚©‚Ç‚¤‚©
 };
 
 

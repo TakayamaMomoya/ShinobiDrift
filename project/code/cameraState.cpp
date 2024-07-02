@@ -23,10 +23,10 @@
 //*****************************************************
 namespace
 {
-const float MOVE_SPEED = 7.0f;	//移動スピード
+const float MOVE_SPEED = 21.0f;	//移動スピード
 const float ROLL_SPEED = 0.04f;	//回転スピード
 const float FACT_CORRECT_POS = 0.2f;	// 位置補正係数
-const float FACT_CORRECT_CONTOROLLL = 0.8f;	// 操作時の位置補正係数
+const float FACT_CORRECT_CONTOROLLL = 0.9f;	// 操作時の位置補正係数
 const float LENGTH_FOLLOW = 412.0f;	// 追従時のカメラ距離
 const float ANGLE_FOLLOW = 0.73f;	// 追従時のカメラ角度
 const float LENGTHPOSR_FOLLOW = 4126.0f;	// 追従時の先を見る距離
@@ -220,7 +220,7 @@ void CMoveControl::Update(CCamera *pCamera)
 
 	float fMove = MOVE_SPEED;
 
-	if (m_bAbove)
+	if (!m_bAbove)
 	{
 		//マウス操作======================================================
 		if (pMouse->GetPress(CInputMouse::BUTTON_RMB) == true)
@@ -238,7 +238,7 @@ void CMoveControl::Update(CCamera *pCamera)
 
 			if (pKeyboard->GetPress(DIK_LSHIFT) == true)
 			{//加速
-				fMove *= 5;
+				fMove *= 7;
 			}
 
 			D3DXVECTOR3 rotMove = pInfoCamera->rot;
@@ -307,12 +307,29 @@ void CMoveControl::Update(CCamera *pCamera)
 		universal::LimitValue(&posAbove.y, FLT_MAX, 1000.0f);
 
 		pCamera->SetPosAbove(posAbove);
+
+		if (pKeyboard->GetTrigger(DIK_R))
+		{// 位置を上空視点基準にしてみる
+			if (m_bAbove)
+			{
+				CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+
+				pInfoCamera->posVDest = posAbove;
+				pInfoCamera->posVDest.y = 5000.0f;
+				pInfoCamera->posRDest = pInfoCamera->posVDest;
+
+				pInfoCamera->posRDest.z += 500.0f;
+
+				m_bAbove = false;
+			}
+		}
 	}
 
 	if (pKeyboard->GetTrigger(DIK_G))
 	{
 		m_bAbove = m_bAbove ? false : true;
 	}
+
 
 	pCamera->MoveDist(FACT_CORRECT_CONTOROLLL);
 }
