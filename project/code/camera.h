@@ -67,10 +67,13 @@ public:
 	void SetPosR(void);
 	float GetRoll(void) { return m_camera.fRoll; }
 	void SetRoll(float fRoll) { m_camera.fRoll = fRoll; }
+	D3DXVECTOR3 GetPosAbove(void) { return m_posAbove; }
+	void SetPosAbove(D3DXVECTOR3 posAbove) { m_posAbove = posAbove; }
 
 private:
 	Camera m_camera;	// 構造体の情報
 	CCameraState *m_pBehavior;	// 行動のポインタ
+	D3DXVECTOR3 m_posAbove;	// 上空視点位置
 };
 
 namespace Camera

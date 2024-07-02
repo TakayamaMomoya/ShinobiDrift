@@ -9,6 +9,8 @@
 // インクルード
 //*****************************************************
 #include "edit.h"
+#include "debugproc.h"
+#include "player.h"
 
 //*****************************************************
 // 定数定義
@@ -16,7 +18,13 @@
 namespace
 {
 const float SPEED_MOVE = 10.0f;	// 移動速度
+const float ABOVE_DEFAULT = 10000.0f;	// デフォルトの上空視点の高さ
+const float SPEED_MOVE_PLAYER = 10.0f;	// プレイヤーの移動速度
 }
+
+//*****************************************************
+// 静的メンバ変数宣言
+//*****************************************************
 
 //=====================================================
 // コンストラクタ
@@ -56,14 +64,34 @@ void CEdit::Uninit(void)
 //=====================================================
 void CEdit::Update(void)
 {
-	// 上空のカメラ位置の設定
-	D3DXVECTOR3 pos = GetPosition();
+	// プレイヤーのテレポート
+	TeleportPlayer();
+}
 
-	ImGui::Text("[PosCameraAbove]");
+//=====================================================
+// プレイヤーのテレポート
+//=====================================================
+void CEdit::TeleportPlayer(void)
+{
+	if (ImGui::TreeNode("TeleportPlayer"))
+	{
+		CPlayer *pPlayer = CPlayer::GetInstance();
 
-	ImGui::DragFloat("POS.X", &pos.x, SPEED_MOVE, -FLT_MAX, FLT_MAX);
-	ImGui::DragFloat("POS.Y", &pos.y, SPEED_MOVE, -FLT_MAX, FLT_MAX);
-	ImGui::DragFloat("POS.Z", &pos.z, SPEED_MOVE, -FLT_MAX, FLT_MAX);
+		if (pPlayer == nullptr)
+			return;
 
-	SetPosition(pos);
+		D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+
+		// ImGuiによる位置の変更
+		ImGui::DragFloat("PosPlayer.X", &posPlayer.x, SPEED_MOVE_PLAYER, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat("PosPlayer.Y", &posPlayer.y, SPEED_MOVE_PLAYER, -FLT_MAX, FLT_MAX);
+		ImGui::DragFloat("PosPlayer.Z", &posPlayer.z, SPEED_MOVE_PLAYER, -FLT_MAX, FLT_MAX);
+
+		// マウスでの位置変更
+
+
+		pPlayer->SetPosition(posPlayer);
+
+		ImGui::TreePop();
+	}
 }

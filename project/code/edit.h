@@ -23,8 +23,12 @@ public:
 	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }
 	D3DXVECTOR3 GetRotation(void) { return m_rot; }
 	void SetRotation(D3DXVECTOR3 rot) { m_rot = rot; }
+	void TeleportPlayer(void);
 
 private:
+	// ƒƒ“ƒoŠÖ”
+
+	// ƒƒ“ƒo•Ï”
 	D3DXVECTOR3 m_pos;	// ˆÊ’u
 	D3DXVECTOR3 m_rot;	// Œü‚«
 };

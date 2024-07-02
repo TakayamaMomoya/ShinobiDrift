@@ -175,6 +175,42 @@ void CEditBlock::Update(void)
 	RaySelectBlock();
 
 	CEdit::Update();
+
+	if (m_pMoveBlock != nullptr)
+	{
+		CEffect3D::Create(m_pMoveBlock->GetPosition(), 100.0f, 4, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+		if (ImGui::TreeNode("TransformSelectBlock"))
+		{
+			D3DXVECTOR3 pos = m_pMoveBlock->GetPosition();
+			D3DXVECTOR3 rot = m_pMoveBlock->GetRotation();
+
+			if (ImGui::TreeNode("POS"))
+			{
+				ImGui::DragFloat("POS.X", &pos.x, 5.0f, -FLT_MAX, FLT_MAX);
+				ImGui::DragFloat("POS.Y", &pos.y, 5.0f, -FLT_MAX, FLT_MAX);
+				ImGui::DragFloat("POS.Z", &pos.z, 5.0f, -FLT_MAX, FLT_MAX);
+
+				ImGui::TreePop();
+			}
+			if (ImGui::TreeNode("ROT"))
+			{
+				// ブロック向き
+				ImGui::DragFloat("ROT.X", &rot.x, 0.01f, -D3DX_PI, D3DX_PI);
+				ImGui::DragFloat("ROT.Y", &rot.y, 0.01f, -D3DX_PI, D3DX_PI);
+				ImGui::DragFloat("ROT.Z", &rot.z, 0.01f, -D3DX_PI, D3DX_PI);
+
+				ImGui::TreePop();
+			}
+
+			m_pMoveBlock->SetPosition(pos);
+			m_pMoveBlock->SetRotation(rot);
+
+			m_aIcon[m_pMoveBlock]->SetPosition(pos);
+
+			ImGui::TreePop();
+		}
+	}
 }
 
 //=====================================================
@@ -219,8 +255,6 @@ void CEditBlock::RaySelectBlock(void)
 			D3DXVECTOR3 posHit;
 
 			universal::CalcRayFlat(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 1.0f, 0.0f), posNear, posFar, &posHit);
-
-			
 		}
 	}
 	else
@@ -253,6 +287,8 @@ void CEditBlock::CollideBlockRay(CBlock *pBlock, D3DXVECTOR3 posFar, D3DXVECTOR3
 			m_pCurrentBlock = pBlock;
 
 			m_posCurrent = pBlock->GetPosition();
+
+			m_pMoveBlock = pBlock;
 
 			return;
 		}
@@ -487,17 +523,7 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 	universal::CalcRayFlat(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, 1.0f, 0.0f), posNear, posFar, &posHit);
 
 	pos = posHit;
-
-	if (ImGui::TreeNode("ROT"))
-	{
-		// ブロック向き
-		ImGui::DragFloat("ROT.X", &rot.x, 0.01f, -D3DX_PI, D3DX_PI);
-		ImGui::DragFloat("ROT.Y", &rot.y, 0.01f, -D3DX_PI, D3DX_PI);
-		ImGui::DragFloat("ROT.Z", &rot.z, 0.01f, -D3DX_PI, D3DX_PI);
-
-		ImGui::TreePop();
-	}
-
+	
 	int nNumBlock = pBlockManager->GetNumBlock();
 	CBlockManager::SInfoBlock *pInfoBlock = pBlockManager->GetInfoBlock();
 
