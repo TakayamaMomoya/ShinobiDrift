@@ -33,6 +33,7 @@ public:
 	void Update(void);
 	void Draw(void);
 	void JustDraw(void);
+	void DrawShadow(void);
 	static CObjectX *Create(D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f }, D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f });
 	float GetWidth(void) { return 0.0f; }	// サイズ取得
 	float GetHeight(void) { return 0.0f; }	// サイズ取得
@@ -64,8 +65,6 @@ public:
 	void EnableShadow(bool bEnable) { m_bShadow = bEnable; }
 
 private:
-	void DrawShadow(void);
-
 	D3DXVECTOR3 m_pos;								//位置
 	D3DXVECTOR3 m_posOld;	// 前回の位置
 	D3DXVECTOR3 m_move;	// 移動量
