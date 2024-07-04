@@ -303,7 +303,4 @@ void CGame::Draw(void)
 		"NORMAL",
 		"END",
 	};
-
-	pDebugProc->Print("\nÉQÅ[ÉÄÇÃèÛë‘[%s]\n", apString[m_state]);
-	pDebugProc->Print("í‚é~[%d]\n", m_bStop);
 }

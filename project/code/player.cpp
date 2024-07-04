@@ -321,7 +321,9 @@ void CPlayer::InputMove(void)
 
 	m_info.fSpeedDest = fAccele * m_param.fSpeedMax;
 
+#if 0
 	CDebugProc::GetInstance()->Print("\nアクセル値[%f]", fAccele);
+#endif
 
 	if (m_info.pBlockGrab == nullptr)
 	{
@@ -358,7 +360,9 @@ void CPlayer::InputMove(void)
 		m_bMove = true;
 	}
 
+#if 0
 	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
+#endif
 }
 
 //=====================================================
@@ -508,9 +512,6 @@ void CPlayer::InputWire(void)
 			m_info.bManual = m_info.bManual ? false : true;
 		}
 	}
-
-	CDebugProc::GetInstance()->Print("\n掴んでるブロックはある？[%d]", m_info.pBlockGrab != nullptr);
-	CDebugProc::GetInstance()->Print("\nロックオン方向[%f]", fAngleInput);
 }
 
 //=====================================================
@@ -942,7 +943,9 @@ void CPlayer::ManageSpeed(void)
 	{// 加速しているとき
 		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAccele;
 
+#if 0
 		CDebugProc::GetInstance()->Print("\n加速中");
+#endif
 
 		//// サウンドインスタンスの取得
 		//CSound* pSound = CSound::GetInstance();
@@ -955,7 +958,9 @@ void CPlayer::ManageSpeed(void)
 	{// 減速しているとき
 		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAttenu;
 
+#if 0
 		CDebugProc::GetInstance()->Print("\n減速中");
+#endif
 	}
 
 	D3DXVECTOR3 pos = GetPosition();
@@ -1093,6 +1098,7 @@ void CPlayer::Debug(void)
 		return;
 	}
 
+#if 0
 	pDebugProc->Print("\nプレイヤーの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	pDebugProc->Print("\nプレイヤーの移動量[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
 	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);
@@ -1102,6 +1108,7 @@ void CPlayer::Debug(void)
 	pDebugProc->Print("\n角度カウンター[%f]", m_info.fCntAngle);
 	pDebugProc->Print("\nブラーのサイズ[%f]", m_info.fSizeBlurDrift);
 	pDebugProc->Print("\nブラーの濃さ[%f]", m_info.fDesityBlurDrift);
+#endif
 
 	// ブラーのサイズ調整
 	if (CInputKeyboard::GetInstance()->GetPress(DIK_UP))

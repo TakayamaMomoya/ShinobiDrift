@@ -238,9 +238,6 @@ void CEditBlock::RaySelectBlock(void)
 
 	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
 
-	CDebugProc::GetInstance()->Print("\nPosNear[%f,%f,%f]", posNear.x, posNear.y, posNear.z);
-	CDebugProc::GetInstance()->Print("\nPosFar[%f,%f,%f]", posFar.x, posFar.y, posFar.z);
-
 	if (m_pCurrentBlock == nullptr)
 	{// ƒuƒƒbƒN‚ğ’T‚µ‚Ä‚¢‚éó‘Ô
 		CBlock *pBlock = pBlockManager->GetHead();

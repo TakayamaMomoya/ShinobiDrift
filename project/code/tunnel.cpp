@@ -13,6 +13,7 @@
 #include "effect3D.h"
 #include "player.h"
 #include "debugproc.h"
+#include "blur.h"
 
 //*****************************************************
 // 定数定義
@@ -221,6 +222,11 @@ void CTunnel::Update(void)
 	DetectionPlayer();
 
 	CMeshCylinder::Update();
+
+	if (m_bInPlayer)
+	{// プレイヤーが内側にいるときの処理
+		Blur::SetBlur(10.0f, 0.5f);
+	}
 }
 
 //=====================================================
@@ -251,8 +257,6 @@ void CTunnel::DetectionPlayer(void)
 	{// プレイヤーが出ていった判定
 		CollidePlayerExit(pVtx);
 	}
-
-	CDebugProc::GetInstance()->Print("\nトンネル入ってるよ[%d]", m_bInPlayer);
 
 	// 頂点バッファをアンロック
 	pVtxBuff->Unlock();
@@ -290,24 +294,31 @@ void CTunnel::CollidePlayerEnter(VERTEX_3D *pVtx)
 	D3DXVECTOR3 posNext = posPlayer + movePlayer;
 	float fRate;
 
-	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate);
-	bool bHit1Next = universal::IsCross(posNext, pos2, pos1, &fRate);
+	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate, movePlayer);
+	bool bHit1Next = universal::IsCross(posNext, pos2, pos1, &fRate, movePlayer);
 
-	if (fRate > 1.0f || fRate < 0.0f)
-		return;
-
-	if (!m_bInPlayer && (!bHit1 && bHit1Next))
-	{// 入口から入った判定
-		m_bInPlayer = true;
+	if (fRate <= 1.0f && fRate >= 0.0f)
+	{
+		if (!m_bInPlayer && (!bHit1 && bHit1Next))
+		{// 入口から入った判定
+			m_bInPlayer = true;
+		}
 	}
 
-	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate);
-	bool bHit2Next = universal::IsCross(posNext, pos4, pos3, &fRate);
+	CDebugProc::GetInstance()->Print("\nInfRate1[%f]", fRate);
 
-	if (!m_bInPlayer && (!bHit2 && bHit2Next))
-	{// 出口から入った判定
-		m_bInPlayer = true;
+	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate, posPlayer);
+	bool bHit2Next = universal::IsCross(posNext, pos4, pos3, &fRate, posNext);
+
+	if (fRate <= 1.0f && fRate >= 0.0f)
+	{
+		if (!m_bInPlayer && (!bHit2 && bHit2Next))
+		{// 出口から入った判定
+			m_bInPlayer = true;
+		}
 	}
+
+	CDebugProc::GetInstance()->Print("\nInfRate2[%f]", fRate);
 }
 
 //=====================================================
@@ -345,24 +356,35 @@ void CTunnel::CollidePlayerExit(VERTEX_3D *pVtx)
 	D3DXVECTOR3 posNext = posPlayer + movePlayer;
 	float fRate;
 
-	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate);
-	bool bHit1Next = universal::IsCross(posNext, pos2, pos1, &fRate);
+	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate, posPlayer);
+	bool bHit1Next = universal::IsCross(posNext, pos2, pos1, &fRate, posNext);
 
-	if (fRate > 1.0f || fRate < 0.0f)
-		return;
+	if (fRate <= 1.0f && fRate >= 0.0f)
+	{
+		if (m_bInPlayer && (bHit1 && !bHit1Next))
+		{// 入口から出た判定
+			m_bInPlayer = false;
 
-	if (m_bInPlayer && (bHit1 && !bHit1Next))
-	{// 入口から入った判定
-		m_bInPlayer = false;
+			Blur::ResetBlur();
+		}
 	}
 
-	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate);
-	bool bHit2Next = universal::IsCross(posNext, pos4, pos3, &fRate);
+	CDebugProc::GetInstance()->Print("\nOutfRate1[%f]", fRate);
 
-	if (m_bInPlayer && (bHit2 && !bHit2Next))
-	{// 出口から入った判定
-		m_bInPlayer = false;
+	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate,posPlayer);
+	bool bHit2Next = universal::IsCross(posNext, pos4, pos3, &fRate, posNext);
+
+	if (fRate <= 1.0f && fRate >= 0.0f)
+	{
+		if (m_bInPlayer && (bHit2 && !bHit2Next))
+		{// 出口から出た判定
+			m_bInPlayer = false;
+
+			Blur::ResetBlur();
+		}
 	}
+
+	CDebugProc::GetInstance()->Print("\nOutfRate2[%f]", fRate);
 }
 
 //=====================================================

@@ -558,8 +558,9 @@ bool IsCross(D3DXVECTOR3 posTarget, D3DXVECTOR3 vecSorce, D3DXVECTOR3 vecDest, f
 		if (pRate != nullptr)
 		{
 			// äÑçáÇéZèo
-			float fAreaMax = (vecDest.z * move.x) - (vecDest.x * move.z);
-			fArea = (vecToPos.z * move.x) - (vecToPos.x * move.z);
+
+			float fAreaMax = CrossProduct(vecLine, move);
+			fArea = CrossProduct(vecToPos, move);
 
 			*pRate = fArea / fAreaMax;
 		}
