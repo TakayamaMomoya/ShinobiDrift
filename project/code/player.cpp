@@ -1083,11 +1083,19 @@ void CPlayer::ManageMotionNinja(void)
 
 	if (m_fragNinja.bSlashUp)
 	{
-		if (nMotion != MOTION_NINJA::MOTION_NINJA_SLASHUP)
-			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHUP);
+		if (nMotion == MOTION_NINJA::MOTION_NINJA_SLASHDOWN)
+		{// Ø‚è‰º‚ë‚µ‚ªI‚í‚Á‚Ä‚©‚çƒ‚[ƒVƒ‡ƒ“Ä¶
+			if(bFinish)
+				m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHUP);
+		}
+		else
+		{// Ø‚è‰º‚ë‚µ‚©‚ç‚Ì”h¶‚Å‚È‚¢ê‡
+			if (nMotion != MOTION_NINJA::MOTION_NINJA_SLASHUP)
+				m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHUP);
 
-		if (bFinish)
-			m_fragNinja.bSlashUp = false;
+			if (bFinish)
+				m_fragNinja.bSlashUp = false;
+		}
 	}
 	else if (m_fragNinja.bSlashDown)
 	{

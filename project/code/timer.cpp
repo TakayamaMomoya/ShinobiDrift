@@ -109,6 +109,8 @@ HRESULT CTimer::Init(void)
 //=====================================================
 void CTimer::Uninit(void)
 {
+	m_pTimer = nullptr;
+
 	if (m_pSecond != nullptr)
 	{
 		m_pSecond->Uninit();
