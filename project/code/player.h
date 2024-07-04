@@ -32,6 +32,13 @@ public:
 		MOTION_WALK_FRONT,	// 前歩
 		MOTION_MAX
 	};
+	enum MOTION_NINJA
+	{
+		MOTION_NINJA_NEUTRAL = 0,	// 待機
+		MOTION_NINJA_SLASHDOWN,	// 切り下ろし
+		MOTION_NINJA_SLASHUP,	// 切り上げ
+		MOTION_NINJA_MAX
+	};
 	enum STATE
 	{
 		STATE_NONE = 0,	// 何でもない状態
@@ -68,6 +75,12 @@ private:
 	{
 		bool bMove;	// 移動
 	};
+	struct SFragNinja
+	{
+		bool bNeutral;	// 待機モーション
+		bool bSlashDown;	// 切り下ろし
+		bool bSlashUp;	// 切り上げ
+	};
 	struct SInfo
 	{
 		STATE state;	// 状態
@@ -95,6 +108,7 @@ private:
 	void InputMove(void);
 	void InputWire(void);
 	void InputKatana(void);
+	void ManageKanataAtttack(void);	// 刀の攻撃管理
 	void ForwardFollowWire(float vecLength, D3DXVECTOR3 vecDiff);	// ワイヤーに沿って進める
 	void JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength);	// ドリフト変化の判定
 	void ControlRoap(void);	// ロープの制御
@@ -106,12 +120,14 @@ private:
 	void ManageSpeed(void);
 	void ManageState(void);
 	void ManageMotion(void);
+	void ManageMotionNinja(void);	// 忍者のモーション管理
 	void Event(EVENT_INFO *pEventInfo);
 	void Debug(void);
 
 	SInfo m_info;	// 自身の情報
 	SParam m_param;	// パラメータ情報
 	SFragMotion m_fragMotion;	// モーションのフラグ
+	SFragNinja m_fragNinja;	// 忍者のモーションフラグ
 	CMotion* m_pPlayerNinja;  // バイクに乗っている忍者
 	bool m_bMove = false;     // 移動しているかどうか
 	bool m_bDrift = false;    // ドリフトしているかどうか
