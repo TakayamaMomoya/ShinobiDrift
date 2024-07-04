@@ -1099,8 +1099,25 @@ void CPlayer::ManageMotionNinja(void)
 	}
 	else if (m_fragNinja.bSlashDown)
 	{
-		if(nMotion != MOTION_NINJA::MOTION_NINJA_SLASHDOWN)
+		if (nMotion != MOTION_NINJA::MOTION_NINJA_SLASHDOWN)
+		{
+			// エフェクシア取得
+			CEffekseer* pEffekseer = CManager::GetMyEffekseer();
+
+			// 後輪の位置取得
+			float PosX = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_41;
+			float PosY = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_42;
+			float PosZ = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_43;
+
+			// エフェクトの再生
+			if (pEffekseer != nullptr)
+				pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_SLASH], ::Effekseer::Vector3D(PosX, PosY, PosZ),
+					::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
+
 			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHDOWN);
+
+
+		}
 
 		if (bFinish)
 			m_fragNinja.bSlashDown = false;
