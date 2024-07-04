@@ -841,11 +841,21 @@ void CPlayer::Collision(void)
 	// ガードレールとの当たり判定
 	std::vector<CGuardRail*> *aGuardRail = CMeshRoad::GetInstance()->GetArrayGR();
 	D3DXMATRIX* mtx = GetMatrix();
-	D3DXVECTOR3 vecAxial = universal::VecToOffset(*mtx, m_param.sizeCollider);
+	D3DXMATRIX mtxTrans, mtxRot;
+	auto& paramSize = m_param.sizeCollider;
+
+	//D3DXVECTOR3 vecAxial = universal::VecToOffset(*mtx, paramSize);
+	CEffect3D::Create(D3DXVECTOR3(pos.x + paramSize.x, pos.y, pos.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x - paramSize.x, pos.y, pos.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y + paramSize.y, pos.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y - paramSize.y, pos.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y, pos.z + paramSize.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y, pos.z - paramSize.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CDebugProc::GetInstance()->Print("\n当たり判定位置[%f,%f,%f]", paramSize.x, paramSize.y, paramSize.z);
 
 	/*for(auto itGuardRail : *aGuardRail)
 	{
-		if (itGuardRail->CollideGuardRail(&pos, vecAxial))
+		if (itGuardRail->CollideGuardRail(&pos, paramSize))
 			break;
 	}*/
 
@@ -915,15 +925,17 @@ void CPlayer::Collision(void)
 	if (rot.x < -1.35f)
 		rot.x = -1.35f;
 
-	if (CInputKeyboard::GetInstance() != nullptr)
+#ifdef _DEBUG
+	if (CInputJoypad::GetInstance() != nullptr)
 	{
-		if (CInputKeyboard::GetInstance()->GetPress(DIK_SPACE))
+		if (CInputJoypad::GetInstance()->GetPress(CInputJoypad::PADBUTTONS_A, 0))
 		{// 操作方法変更
 			pos.y += 30.0f;
 			move.y = 0.0f;
 			rot.x = 0.0f;
 		}
 	}
+#endif // _DEBUG
 
 	// 位置と移動量と角度を代入
 	SetPosition(pos);
