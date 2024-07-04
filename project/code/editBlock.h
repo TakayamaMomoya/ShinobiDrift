@@ -16,6 +16,7 @@
 //*****************************************************
 class CObjectX;
 class CStateEditBlock;
+class CObject3D;
 
 //*****************************************************
 // クラスの定義
@@ -31,10 +32,22 @@ public:
 	void Update(void);
 	void Save(void);
 	void ChangeState(CStateEditBlock *pState);
+	void AddBlockToMap(CBlock *pBlock);
+	void SetMoveBlock(CBlock *pBlock) { m_pMoveBlock = pBlock; }
 
 private:
+	void CreateBlockIconAll(void);
+	void DeleteAllIcon(void);
+	void RaySelectBlock(void);
+	void CollideBlockRay(CBlock *pBlock,D3DXVECTOR3 posFar, D3DXVECTOR3 posNear, D3DXVECTOR3 vecDiff);
+	void MoveCurrentBlock(D3DXVECTOR3 posFar, D3DXVECTOR3 posNear);
+
 	char m_aPath[256];
 	CStateEditBlock *m_pState;	// ステイトのポインタ
+	D3DXVECTOR3 m_posCurrent;
+	CBlock *m_pCurrentBlock;	// 選択ブロック
+	CBlock *m_pMoveBlock;	// 動かすブロック
+	std::map<CBlock*, CObject3D*> m_aIcon;	// アイコンのポインタ
 };
 
 //*****************************************************
@@ -63,7 +76,7 @@ public:
 
 private:
 	void ChangeBlockBehaviour(void);
-	void CreateBlock(D3DXVECTOR3 pos);
+	void CreateBlock(D3DXVECTOR3 pos, CEditBlock *pEdit);
 	CBlock *CheckDelete(void);
 	void SelectBlock(void);
 

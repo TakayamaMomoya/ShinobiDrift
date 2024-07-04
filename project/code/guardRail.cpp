@@ -114,7 +114,7 @@ void CGuardRail::VtxFollowRoad(void)
 	if (pMesh != nullptr)
 	{
 		// 開始地点を算出
-		std::vector<CMeshRoad::SInfoRoadPoint> *pList = pMesh->GetList();
+		std::vector<CMeshRoad::SInfoRoadPoint> *pList = pMesh->GetArrayRP();
 
 		int nDistStart = std::distance(pList->begin(), m_itStart) + 1;
 
@@ -318,7 +318,7 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial)
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 	// 頂点数の計算
-	int size = CMeshRoad::GetInstance()->GetList()->size() * MeshRoad::NUM_EDGE_IN_ROADPOINT;
+	int size = CMeshRoad::GetInstance()->GetArrayRP()->size() * MeshRoad::NUM_EDGE_IN_ROADPOINT;
 	for (int i = 0; i < m_nNumVtx; i += 2)
 	{
 		if(i != 0)

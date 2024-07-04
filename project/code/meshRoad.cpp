@@ -586,6 +586,25 @@ void CMeshRoad::CreateSideSpline(void)
 }
 
 //=====================================================
+// 道イベントの調整
+//=====================================================
+void CMeshRoad::AjustRoadEvent(void)
+{
+	for (auto it : m_aGR)
+	{
+		it->VtxFollowRoad();
+	}
+}
+
+//=====================================================
+// スプラインの取得
+//=====================================================
+CCutMullSpline *CMeshRoad::GetCenterSpline(void)
+{
+	return m_pSpline;
+}
+
+//=====================================================
 // 当たり判定処理
 //=====================================================
 bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)

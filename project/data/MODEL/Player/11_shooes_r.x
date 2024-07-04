@@ -278,7 +278,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\ShinobiDrift\\MotionEditer\\data\\TEXTURE\\MATERIAL\\Player00.png";
+    "data\\TEXTURE\\MATERIAL\\Player00.png";
    }
   }
  }

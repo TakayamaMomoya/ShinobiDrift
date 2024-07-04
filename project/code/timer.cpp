@@ -17,23 +17,22 @@
 //*****************************************************
 namespace
 {
-	const int VALUE = 120;			// 値
-	const int PLACE = 3;			// 桁数
-	const float WIDTH = SCREEN_WIDTH * 0.5f;		// 幅
-	const float HEIGHT = SCREEN_HEIGHT * 0.5f;		// 高さ
+const int TIME_PLACE = 3;		// 桁数
+const int TIME_LIMIT = 5;		// タイムの上限値
+const float TIME_WIDTH = SCREEN_WIDTH * 0.5f;		// 幅
 }
 
 //*****************************************************
 // 静的メンバ変数宣言
 //*****************************************************
+CTimer* CTimer::m_pTimer = nullptr;
 
 //=====================================================
 // 優先順位を決めるコンストラクタ
 //=====================================================
-CTimer::CTimer(int nPriority)
+CTimer::CTimer(int nPriority) : CObject(nPriority)
 {
-	m_nSeconds = 0;		// 現在の時間
-	m_nCntSeconds = 0;	// カウント加算
+	m_fSeconds = 0.0f;		// 現在の時間
 	m_pNumber = nullptr;	// ナンバーのポインタ
 }
 
@@ -63,16 +62,20 @@ CTimer* CTimer::Create(void)
 //=====================================================
 HRESULT CTimer::Init(void)
 {
-	m_nSeconds = VALUE;
+	m_fSeconds = 0.0f;
 
 	// 生成
-	m_pNumber = CNumber::Create(PLACE, VALUE);
+	if(m_pNumber == nullptr)
+	m_pNumber = CNumber::Create(TIME_PLACE, TIME_LIMIT);
 
-	// 位置設定
-	m_pNumber->SetPosition(D3DXVECTOR3(WIDTH, 75.0f, 0.0f));
+	if (m_pNumber != nullptr)
+	{
+		// 位置設定
+		m_pNumber->SetPosition(D3DXVECTOR3(TIME_WIDTH, 75.0f, 0.0f));
 
-	// サイズ調整
-	m_pNumber->SetSizeAll(35.0f, 35.0f);
+		// サイズ調整
+		m_pNumber->SetSizeAll(35.0f, 35.0f);
+	}
 
 	return S_OK;
 }
@@ -82,7 +85,11 @@ HRESULT CTimer::Init(void)
 //=====================================================
 void CTimer::Uninit(void)
 {
-	m_pNumber = nullptr;
+	if (m_pNumber != nullptr)
+	{
+		m_pNumber->Uninit();
+		m_pNumber = nullptr;
+	}
 
 	// 自身の破棄
 	Release();
@@ -96,29 +103,19 @@ void CTimer::Update(void)
 	// デルタタイム取得
 	float fDeltaTime = CManager::GetDeltaTime();
 
-	// カウンター加算
-	m_nCntSeconds++;
-
-	if (m_nCntSeconds > 60)
-	{
-		m_nCntSeconds = 0;
-
-		if (m_nSeconds >= 1)
-		{
-			m_nSeconds--;
-		}
-	}
+	// タイマー加算
+	m_fSeconds += fDeltaTime;
 
 	// 秒の計算
-	int nSecond = m_nSeconds % VALUE;
+	int nSecond = (int)m_fSeconds % 60;
 
+	// 秒表示の制御
 	if (m_pNumber != nullptr)
-	{// 秒表示の制御
-		m_pNumber->SetValue(nSecond, PLACE);
-	}
+		m_pNumber->SetValue(nSecond, TIME_PLACE);
 
-	if (m_nSeconds <= 0)
-	{
-		m_nSeconds = 0;
-	}
+	// タイマーの上限値超えないように
+	if (nSecond >= TIME_LIMIT)
+		m_fSeconds = TIME_LIMIT;
+
+	//CDebugProc::GetInstance()->Print("\nデルタタイム[%f]", fDeltaTime);
 }

@@ -484,7 +484,7 @@ void CMotion::MultiplyMtx(void)
 		//ワールドマトリックス設定
 		pDevice->SetTransform(D3DTS_WORLD, pMtx);
 
-		m_apParts[nCntParts]->pParts->Draw();
+		m_apParts[nCntParts]->pParts->JustDraw();
 	}
 }
 
@@ -632,8 +632,6 @@ void CMotion::Load(char *pPath)
 							}
 
 						}//END_PART
-
-						m_apParts[nCntModel]->pParts->InitPhysics();
 
 						nCntModel++;
 					}
@@ -881,7 +879,7 @@ void CMotion::SetAfterImage(D3DXCOLOR col, int m_nLife)
 		if (m_apParts[nCntParts] != nullptr)
 		{// 残像設定
 			D3DXMATRIX *pMtx = m_apParts[nCntParts]->pParts->GetMatrix();
-			CModel::Model *model = m_apParts[nCntParts]->pParts->GetModel();
+			//CModel::Model *model = m_apParts[nCntParts]->pParts->GetModel();
 
 			CAfterImage::Create(*m_apParts[nCntParts]->pParts->GetMatrix(), m_apParts[nCntParts]->pParts->GetIdxModel(),col,m_nLife);
 		}
