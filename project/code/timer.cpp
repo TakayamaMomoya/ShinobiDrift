@@ -29,7 +29,7 @@ const int TIME_CALCULATION = 60;	// 秒計算用
 //*****************************************************
 // 静的メンバ変数宣言
 //*****************************************************
-CTimer* CTimer::m_pTimer = nullptr;
+CTimer* CTimer::s_pTimer = nullptr;
 
 //=====================================================
 // 優先順位を決めるコンストラクタ
@@ -54,41 +54,41 @@ CTimer::~CTimer()
 //=====================================================
 CTimer* CTimer::Create(void)
 {
-	if (m_pTimer == nullptr)
+	if (s_pTimer == nullptr)
 	{// インスタンス生成
-		m_pTimer = new CTimer;
+		s_pTimer = new CTimer;
 	}
 
-	if (m_pTimer != nullptr)
+	if (s_pTimer != nullptr)
 	{// 初期化
-		m_pTimer->Init();
+		s_pTimer->Init();
 
-		if (m_pTimer->m_pSecond == nullptr)
+		if (s_pTimer->m_pSecond == nullptr)
 		{// 秒表示
 			// 生成
-			m_pTimer->m_pSecond = CNumber::Create(SECOND_PLACE, SECOND_LIMIT);
+			s_pTimer->m_pSecond = CNumber::Create(SECOND_PLACE, SECOND_LIMIT);
 
 			// 位置
-			m_pTimer->m_pSecond->SetPosition(D3DXVECTOR3(SECOND_WIDTH, 75.0f, 0.0f));
+			s_pTimer->m_pSecond->SetPosition(D3DXVECTOR3(SECOND_WIDTH, 75.0f, 0.0f));
 
 			// サイズ
-			m_pTimer->m_pSecond->SetSizeAll(35.0f, 35.0f);
+			s_pTimer->m_pSecond->SetSizeAll(35.0f, 35.0f);
 		}
 
-		if (m_pTimer->m_pMilliSecond == nullptr)
+		if (s_pTimer->m_pMilliSecond == nullptr)
 		{// ミリ秒表示
 			// 生成
-			m_pTimer->m_pMilliSecond = CNumber::Create(MILLI_PLACE, MILLI_LIMIT);
+			s_pTimer->m_pMilliSecond = CNumber::Create(MILLI_PLACE, MILLI_LIMIT);
 
 			// 位置
-			m_pTimer->m_pMilliSecond->SetPosition(D3DXVECTOR3(MILLI_WIDTH, 85.0f, 0.0f));
+			s_pTimer->m_pMilliSecond->SetPosition(D3DXVECTOR3(MILLI_WIDTH, 85.0f, 0.0f));
 
 			// サイズ
-			m_pTimer->m_pMilliSecond->SetSizeAll(25.0f,15.0f);
+			s_pTimer->m_pMilliSecond->SetSizeAll(25.0f,15.0f);
 		}
 	}
 
-	return m_pTimer;
+	return s_pTimer;
 }
 
 //=====================================================
@@ -109,7 +109,7 @@ HRESULT CTimer::Init(void)
 //=====================================================
 void CTimer::Uninit(void)
 {
-	m_pTimer = nullptr;
+	s_pTimer = nullptr;
 
 	if (m_pSecond != nullptr)
 	{
@@ -137,12 +137,13 @@ void CTimer::Update(void)
 
 	// デルタタイム(リアル時間)加算
 	m_fSecond += fDeltaTime;
+	m_fMsecond++;
 
 	// 秒の計算
 	int nSecond = (int)m_fSecond % TIME_CALCULATION;
 
 	// ミリ秒の計算
-	int nMsecond;
+	int nMsecond = (int)m_fMsecond % TIME_CALCULATION;
 
 	// 秒表示の制御
 	if (m_pSecond != nullptr)
@@ -151,4 +152,12 @@ void CTimer::Update(void)
 	// 制限時間の上限値超えないように
 	if (nSecond >= SECOND_LIMIT)
 		m_fSecond = SECOND_LIMIT;
+
+	// 秒表示の制御
+	if (m_pMilliSecond!= nullptr)
+		m_pMilliSecond->SetValue(nMsecond, MILLI_PLACE);
+
+	// 制限時間の上限値超えないように
+	if (nMsecond >= MILLI_LIMIT)
+		m_fMsecond = MILLI_LIMIT;
 }
