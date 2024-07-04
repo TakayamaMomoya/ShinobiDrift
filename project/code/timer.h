@@ -34,9 +34,10 @@ public:
 
 private:
 	//メンバ変数
-	float m_fSeconds;		// 現在の時間
-	CNumber* m_pNumber;	// ナンバーのポインタ
-
+	float m_fSecond;			// 現在の時間(秒)
+	float m_fMsecond;			// 現在の時間(ミリ秒)
+	CNumber* m_pSecond;			// 秒表示のポインタ
+	CNumber* m_pMilliSecond;	// ミリセカンド秒表示の用ポインタ
 	static CTimer* m_pTimer;	// 自身のポインタ
 };
 #endif
