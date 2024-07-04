@@ -587,11 +587,13 @@ bool CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 po
 	if (lenProjection < fabs(lenPos))
 		return false;
 
+	vecNorPlane.y = 0.0f;
+
 	// ‚ß‚èž‚Ý‹ï‡‚Å–ß‚·‹——£‚ð•Ï‚¦‚é
-	if (lenPos >= 0.0f)
-		*posOBB += vecNorPlane * (lenProjection - lenPos);
+	if (lenPos > 0.0f)
+		*posOBB += vecNorPlane * (lenProjection - fabs(lenPos));
 	else
-		*posOBB += vecNorPlane * (lenProjection + lenPos);
+		*posOBB += vecNorPlane * (lenProjection + fabs(lenPos));
 
 	return true;
 }
