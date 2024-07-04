@@ -252,6 +252,8 @@ void CTunnel::DetectionPlayer(void)
 		CollidePlayerExit(pVtx);
 	}
 
+	CDebugProc::GetInstance()->Print("\nトンネル入ってるよ[%d]", m_bInPlayer);
+
 	// 頂点バッファをアンロック
 	pVtxBuff->Unlock();
 }
@@ -285,21 +287,25 @@ void CTunnel::CollidePlayerEnter(VERTEX_3D *pVtx)
 	// 外積でのトリガー判定
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
+	D3DXVECTOR3 posNext = posPlayer + movePlayer;
 	float fRate;
 
 	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate);
-
-	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate);
-
-#ifdef _DEBUG
-	CDebugProc::GetInstance()->Print("\nヒット１[%d]ヒット２[%d]プレイヤー[%d]", bHit1, bHit2,m_bInPlayer);
-#endif
+	bool bHit1Next = universal::IsCross(posNext, pos2, pos1, &fRate);
 
 	if (fRate > 1.0f || fRate < 0.0f)
 		return;
 
-	if (!m_bInPlayer && bHit1 && bHit2)
-	{// 入った判定
+	if (!m_bInPlayer && (!bHit1 && bHit1Next))
+	{// 入口から入った判定
+		m_bInPlayer = true;
+	}
+
+	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate);
+	bool bHit2Next = universal::IsCross(posNext, pos4, pos3, &fRate);
+
+	if (!m_bInPlayer && (!bHit2 && bHit2Next))
+	{// 出口から入った判定
 		m_bInPlayer = true;
 	}
 }
@@ -336,21 +342,25 @@ void CTunnel::CollidePlayerExit(VERTEX_3D *pVtx)
 	// 外積でのトリガー判定
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
+	D3DXVECTOR3 posNext = posPlayer + movePlayer;
 	float fRate;
 
 	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate);
-
-	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate);
-
-#ifdef _DEBUG
-	CDebugProc::GetInstance()->Print("\nヒット１[%d]ヒット２[%d]プレイヤー[%d]", bHit1, bHit2, m_bInPlayer);
-#endif
+	bool bHit1Next = universal::IsCross(posNext, pos2, pos1, &fRate);
 
 	if (fRate > 1.0f || fRate < 0.0f)
 		return;
 
-	if (m_bInPlayer && (!bHit1 || !bHit2))
-	{// 入った判定
+	if (m_bInPlayer && (bHit1 && !bHit1Next))
+	{// 入口から入った判定
+		m_bInPlayer = false;
+	}
+
+	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate);
+	bool bHit2Next = universal::IsCross(posNext, pos4, pos3, &fRate);
+
+	if (m_bInPlayer && (bHit2 && !bHit2Next))
+	{// 出口から入った判定
 		m_bInPlayer = false;
 	}
 }

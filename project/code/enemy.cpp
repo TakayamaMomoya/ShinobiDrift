@@ -57,25 +57,12 @@ HRESULT CEnemy::Init(void)
 	CMotion::Init();
 
 	// モデルの設定
-	CMotion::Load("data\\MOTION\\motionBike.txt");
+	CMotion::Load("data\\MOTION\\motionEnemy.txt");
 
-	// バイクに乗っている忍者の初期化とモデルの設定
-	if (m_pEnemyNinja == nullptr)
-	{
-		m_pEnemyNinja = new CMotion;
-
-		if (m_pEnemyNinja != nullptr)
-		{
-			m_pEnemyNinja->Init();
-			m_pEnemyNinja->Load("data\\MOTION\\motionPlayer.txt");
-			m_pEnemyNinja->SetMatrix(*GetMatrix());
-		}
-	}
-
-	// スプラインの情報取得
+	// スプラインの情報を取得
 	m_pSpline = CMeshRoad::GetInstance()->GetCenterSpline();
 
-	// ロードポイントの情報取得
+	// ロードポイントの情報を取得
 	std::vector<CMeshRoad::SInfoRoadPoint> pRoadPoint = *CMeshRoad::GetInstance()->GetArrayRP();
 
 	// ベクターを必要なサイズに調整
@@ -146,20 +133,14 @@ void CEnemy::Update(void)
 
 	CEffect3D::Create(pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
-	// バイクに乗っている忍者の位置と向き更新
-	if (m_pEnemyNinja != nullptr)
-	{
-		m_pEnemyNinja->SetPosition(D3DXVECTOR3(pos.x, pos.y + 50.0f, pos.z));
-		m_pEnemyNinja->SetRotation(GetRotation());
-	}
-
 	// デバッグプロック取得
 	CDebugProc* pDebugProc = CDebugProc::GetInstance();
 
 	if (pDebugProc == nullptr)
 		return;
 	
-	pDebugProc->Print("\n敵の位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
+	pDebugProc->Print("\n敵のバイクの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
+	//pDebugProc->Print("\n敵の位置[%f,%f,%f]", m_pEnemyNinja->GetPosition().x, m_pEnemyNinja->GetPosition().y, m_pEnemyNinja->GetPosition().z);
 }
 
 //=====================================================
