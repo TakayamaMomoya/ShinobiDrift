@@ -60,6 +60,7 @@ CPlayer::CPlayer(int nPriority)
 	ZeroMemory(&m_info, sizeof(CPlayer::SInfo));
 	ZeroMemory(&m_param, sizeof(CPlayer::SParam));
 	ZeroMemory(&m_fragMotion, sizeof(CPlayer::SFragMotion));
+	ZeroMemory(&m_fragNinja, sizeof(CPlayer::SFragNinja));
 }
 
 //=====================================================
@@ -255,6 +256,9 @@ void CPlayer::Update(void)
 	// モーション管理
 	ManageMotion();
 
+	// 忍者のモーション管理
+	ManageMotionNinja();
+
 	// 継承クラスの更新
 	CMotion::Update();
 
@@ -280,11 +284,11 @@ void CPlayer::Input(void)
 	// 移動操作
 	InputMove();
 
-	// カメラ操作
-	InputCamera();
-
 	// ワイヤーの操作
 	InputWire();
+
+	// 刀の操作
+	InputKatana();
 
 	// スピードの管理
 	ManageSpeed();
@@ -363,30 +367,6 @@ void CPlayer::InputMove(void)
 #if 0
 	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
 #endif
-}
-
-//=====================================================
-// カメラ操作
-//=====================================================
-void CPlayer::InputCamera(void)
-{
-	// 入力マネージャー取得
-	CInputManager *pInputManager = CInputManager::GetInstance();
-
-	if (pInputManager == nullptr)
-	{
-		return;
-	}
-
-	// カメラ取得
-	CCamera *pCamera = CManager::GetCamera();
-
-	if (pCamera == nullptr)
-	{
-		return;
-	}
-
-	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
 }
 
 //=====================================================
@@ -783,6 +763,38 @@ void CPlayer::RemoveWire(void)
 }
 
 //=====================================================
+// 刀の操作
+//=====================================================
+void CPlayer::InputKatana(void)
+{
+	CInputManager *pInputManager = CInputManager::GetInstance();
+
+	if (pInputManager == nullptr)
+		return;
+
+	if (pInputManager->GetTrigger(CInputManager::BUTTON_KATANA))
+	{
+		// 刀モーションフラグ管理
+		ManageKanataAtttack();
+	}
+}
+
+//=====================================================
+// 刀の攻撃の管理
+//=====================================================
+void CPlayer::ManageKanataAtttack(void)
+{
+	if (m_fragNinja.bSlashDown)
+	{
+		m_fragNinja.bSlashUp = true;
+	}
+	else
+	{
+		m_fragNinja.bSlashDown = true;
+	}
+}
+
+//=====================================================
 // ドリフトの補正
 //=====================================================
 void CPlayer::LimitDrift(float fLength)
@@ -1059,6 +1071,64 @@ void CPlayer::ManageMotion(void)
 }
 
 //=====================================================
+// 忍者のモーション管理
+//=====================================================
+void CPlayer::ManageMotionNinja(void)
+{
+	if (m_pPlayerNinja == nullptr)
+		return;
+	
+	int nMotion = m_pPlayerNinja->GetMotion();
+	bool bFinish = m_pPlayerNinja->IsFinish();
+
+	if (m_fragNinja.bSlashUp)
+	{
+		if (nMotion == MOTION_NINJA::MOTION_NINJA_SLASHDOWN)
+		{// 切り下ろしが終わってからモーション再生
+			if(bFinish)
+				m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHUP);
+		}
+		else
+		{// 切り下ろしからの派生でない場合
+			if (nMotion != MOTION_NINJA::MOTION_NINJA_SLASHUP)
+				m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHUP);
+
+			if (bFinish)
+				m_fragNinja.bSlashUp = false;
+		}
+	}
+	else if (m_fragNinja.bSlashDown)
+	{
+		if (nMotion != MOTION_NINJA::MOTION_NINJA_SLASHDOWN)
+		{
+			// エフェクシア取得
+			CEffekseer* pEffekseer = CManager::GetMyEffekseer();
+
+			// 後輪の位置取得
+			float PosX = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_41;
+			float PosY = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_42;
+			float PosZ = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_43;
+
+			// エフェクトの再生
+			if (pEffekseer != nullptr)
+				pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_SLASH], ::Effekseer::Vector3D(PosX, PosY, PosZ),
+					::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
+
+			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHDOWN);
+
+
+		}
+
+		if (bFinish)
+			m_fragNinja.bSlashDown = false;
+	}
+	else
+	{
+		m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_NEUTRAL);
+	}
+}
+
+//=====================================================
 // イベントの管理
 //=====================================================
 void CPlayer::Event(EVENT_INFO *pEventInfo)
@@ -1072,7 +1142,6 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 	universal::SetOffSet(&mtxParent, mtxPart, offset);
 
 	D3DXVECTOR3 pos = { mtxParent._41,mtxParent._42 ,mtxParent._43 };
-
 }
 
 //=====================================================
