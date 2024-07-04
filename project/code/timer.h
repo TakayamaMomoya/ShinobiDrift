@@ -15,11 +15,6 @@
 #include "number.h"
 
 //*****************************************************
-// マクロ定義
-//*****************************************************
-#define MAX_PLACE	(10)	// 最大桁数
-
-//*****************************************************
 // クラスの定義
 //*****************************************************
 class CTimer : public CObject
@@ -39,10 +34,10 @@ public:
 
 private:
 	//メンバ変数
-	int m_nSeconds;		// 現在の時間
-	int m_nCntSeconds;	// カウント加算
-	CNumber* m_pNumber;	// ナンバーのポインタ
-
+	float m_fSecond;			// 現在の時間(秒)
+	float m_fMsecond;			// 現在の時間(ミリ秒)
+	CNumber* m_pSecond;			// 秒表示のポインタ
+	CNumber* m_pMilliSecond;	// ミリセカンド秒表示の用ポインタ
 	static CTimer* m_pTimer;	// 自身のポインタ
 };
 #endif

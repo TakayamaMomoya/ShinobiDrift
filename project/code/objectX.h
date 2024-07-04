@@ -33,6 +33,7 @@ public:
 	void Update(void);
 	void Draw(void);
 	void JustDraw(void);
+	void DrawShadow(void);
 	static CObjectX *Create(D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f }, D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f });
 	float GetWidth(void) { return 0.0f; }	// サイズ取得
 	float GetHeight(void) { return 0.0f; }	// サイズ取得
@@ -62,10 +63,10 @@ public:
 	float GetScale(void) { return m_fScale; }
 	void SetScale(float fScale) { m_fScale = fScale; }
 	void EnableShadow(bool bEnable) { m_bShadow = bEnable; }
+	bool IsDisp(void) { return m_bDisp; }
+	void EnableDisp(bool bDisp) { m_bDisp = bDisp; }
 
 private:
-	void DrawShadow(void);
-
 	D3DXVECTOR3 m_pos;								//位置
 	D3DXVECTOR3 m_posOld;	// 前回の位置
 	D3DXVECTOR3 m_move;	// 移動量
@@ -80,6 +81,7 @@ private:
 	D3DXVECTOR3 m_vtxMin;	// 最小頂点
 	bool m_bChangeCol;
 	bool m_bShadow;
+	bool m_bDisp;	// 描画するかどうか
 };
 
 #endif

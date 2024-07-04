@@ -321,7 +321,9 @@ void CPlayer::InputMove(void)
 
 	m_info.fSpeedDest = fAccele * m_param.fSpeedMax;
 
+#if 0
 	CDebugProc::GetInstance()->Print("\nアクセル値[%f]", fAccele);
+#endif
 
 	if (m_info.pBlockGrab == nullptr)
 	{
@@ -358,7 +360,9 @@ void CPlayer::InputMove(void)
 		m_bMove = true;
 	}
 
+#if 0
 	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
+#endif
 }
 
 //=====================================================
@@ -508,9 +512,6 @@ void CPlayer::InputWire(void)
 			m_info.bManual = m_info.bManual ? false : true;
 		}
 	}
-
-	CDebugProc::GetInstance()->Print("\n掴んでるブロックはある？[%d]", m_info.pBlockGrab != nullptr);
-	CDebugProc::GetInstance()->Print("\nロックオン方向[%f]", fAngleInput);
 }
 
 //=====================================================
@@ -840,11 +841,21 @@ void CPlayer::Collision(void)
 	// ガードレールとの当たり判定
 	std::vector<CGuardRail*> *aGuardRail = CMeshRoad::GetInstance()->GetArrayGR();
 	D3DXMATRIX* mtx = GetMatrix();
-	D3DXVECTOR3 vecAxial = universal::VecToOffset(*mtx, m_param.sizeCollider);
+	D3DXMATRIX mtxTrans, mtxRot;
+	auto& paramSize = m_param.sizeCollider;
+
+	//D3DXVECTOR3 vecAxial = universal::VecToOffset(*mtx, paramSize);
+	CEffect3D::Create(D3DXVECTOR3(pos.x + paramSize.x, pos.y, pos.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x - paramSize.x, pos.y, pos.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y + paramSize.y, pos.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y - paramSize.y, pos.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y, pos.z + paramSize.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y, pos.z - paramSize.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CDebugProc::GetInstance()->Print("\n当たり判定位置[%f,%f,%f]", paramSize.x, paramSize.y, paramSize.z);
 
 	/*for(auto itGuardRail : *aGuardRail)
 	{
-		if (itGuardRail->CollideGuardRail(&pos, vecAxial))
+		if (itGuardRail->CollideGuardRail(&pos, paramSize))
 			break;
 	}*/
 
@@ -914,15 +925,17 @@ void CPlayer::Collision(void)
 	if (rot.x < -1.35f)
 		rot.x = -1.35f;
 
-	if (CInputKeyboard::GetInstance() != nullptr)
+#ifdef _DEBUG
+	if (CInputJoypad::GetInstance() != nullptr)
 	{
-		if (CInputKeyboard::GetInstance()->GetPress(DIK_SPACE))
+		if (CInputJoypad::GetInstance()->GetPress(CInputJoypad::PADBUTTONS_A, 0))
 		{// 操作方法変更
 			pos.y += 30.0f;
 			move.y = 0.0f;
 			rot.x = 0.0f;
 		}
 	}
+#endif // _DEBUG
 
 	// 位置と移動量と角度を代入
 	SetPosition(pos);
@@ -942,7 +955,9 @@ void CPlayer::ManageSpeed(void)
 	{// 加速しているとき
 		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAccele;
 
+#if 0
 		CDebugProc::GetInstance()->Print("\n加速中");
+#endif
 
 		//// サウンドインスタンスの取得
 		//CSound* pSound = CSound::GetInstance();
@@ -955,7 +970,9 @@ void CPlayer::ManageSpeed(void)
 	{// 減速しているとき
 		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAttenu;
 
+#if 0
 		CDebugProc::GetInstance()->Print("\n減速中");
+#endif
 	}
 
 	D3DXVECTOR3 pos = GetPosition();
@@ -1093,6 +1110,7 @@ void CPlayer::Debug(void)
 		return;
 	}
 
+#if 0
 	pDebugProc->Print("\nプレイヤーの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	pDebugProc->Print("\nプレイヤーの移動量[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
 	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);
@@ -1102,6 +1120,7 @@ void CPlayer::Debug(void)
 	pDebugProc->Print("\n角度カウンター[%f]", m_info.fCntAngle);
 	pDebugProc->Print("\nブラーのサイズ[%f]", m_info.fSizeBlurDrift);
 	pDebugProc->Print("\nブラーの濃さ[%f]", m_info.fDesityBlurDrift);
+#endif
 
 	// ブラーのサイズ調整
 	if (CInputKeyboard::GetInstance()->GetPress(DIK_UP))

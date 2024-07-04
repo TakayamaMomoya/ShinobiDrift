@@ -212,7 +212,7 @@ void CEditBlock::Update(void)
 			ImGui::TreePop();
 		}
 
-		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_BACKSPACE))
+		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_DELETE))
 		{
 			m_aIcon[m_pMoveBlock]->Uninit();
 			m_aIcon.erase(m_pMoveBlock);
@@ -237,9 +237,6 @@ void CEditBlock::RaySelectBlock(void)
 	D3DXVECTOR3 vecDiff;
 
 	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
-
-	CDebugProc::GetInstance()->Print("\nPosNear[%f,%f,%f]", posNear.x, posNear.y, posNear.z);
-	CDebugProc::GetInstance()->Print("\nPosFar[%f,%f,%f]", posFar.x, posFar.y, posFar.z);
 
 	if (m_pCurrentBlock == nullptr)
 	{// ƒuƒƒbƒN‚ğ’T‚µ‚Ä‚¢‚éó‘Ô
