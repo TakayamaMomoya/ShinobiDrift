@@ -93,8 +93,8 @@ private:
 	void Input(void);
 	void Collision(void);
 	void InputMove(void);
-	void InputCamera(void);
 	void InputWire(void);
+	void InputKatana(void);
 	void ForwardFollowWire(float vecLength, D3DXVECTOR3 vecDiff);	// ワイヤーに沿って進める
 	void JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength);	// ドリフト変化の判定
 	void ControlRoap(void);	// ロープの制御

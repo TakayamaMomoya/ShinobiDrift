@@ -280,11 +280,11 @@ void CPlayer::Input(void)
 	// 移動操作
 	InputMove();
 
-	// カメラ操作
-	InputCamera();
-
 	// ワイヤーの操作
 	InputWire();
+
+	// 刀の操作
+	InputKatana();
 
 	// スピードの管理
 	ManageSpeed();
@@ -363,30 +363,6 @@ void CPlayer::InputMove(void)
 #if 0
 	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
 #endif
-}
-
-//=====================================================
-// カメラ操作
-//=====================================================
-void CPlayer::InputCamera(void)
-{
-	// 入力マネージャー取得
-	CInputManager *pInputManager = CInputManager::GetInstance();
-
-	if (pInputManager == nullptr)
-	{
-		return;
-	}
-
-	// カメラ取得
-	CCamera *pCamera = CManager::GetCamera();
-
-	if (pCamera == nullptr)
-	{
-		return;
-	}
-
-	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
 }
 
 //=====================================================
@@ -783,6 +759,22 @@ void CPlayer::RemoveWire(void)
 }
 
 //=====================================================
+// 刀の操作
+//=====================================================
+void CPlayer::InputKatana(void)
+{
+	CInputManager *pInputManager = CInputManager::GetInstance();
+
+	if (pInputManager == nullptr)
+		return;
+
+	if (pInputManager->GetTrigger(CInputManager::BUTTON_KATANA))
+	{
+		// 刀モーションフラグ設定
+	}
+}
+
+//=====================================================
 // ドリフトの補正
 //=====================================================
 void CPlayer::LimitDrift(float fLength)
@@ -1072,7 +1064,6 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 	universal::SetOffSet(&mtxParent, mtxPart, offset);
 
 	D3DXVECTOR3 pos = { mtxParent._41,mtxParent._42 ,mtxParent._43 };
-
 }
 
 //=====================================================
