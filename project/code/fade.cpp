@@ -12,6 +12,7 @@
 #include "fade.h"
 #include "manager.h"
 #include "renderer.h"
+#include "blur.h"
 
 //*****************************************************
 // マクロ定義
@@ -140,6 +141,8 @@ void CFade::Update(void)
 
 				if (m_bTrans)
 				{
+					Blur::ResetBlur();
+
 					//モード設定
 					CManager::SetMode(m_modeNext);
 				}
