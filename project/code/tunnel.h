@@ -31,6 +31,8 @@ public:
 	// 変数取得・設定関数
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItStart(void) { return m_itStart; }
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItEnd(void) { return m_itEnd; }
+	void SetStart(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it) { m_itStart = it; }
+	void SetEnd(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it) { m_itEnd = it; }
 
 	// 静的メンバ関数
 	static CTunnel *Create(std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart, std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd);
@@ -42,6 +44,9 @@ private:
 	void DetectionPlayer(void);	// プレイヤーの検知
 	void CollidePlayerEnter(VERTEX_3D *pVtx);	// プレイヤー入ってくる判定
 	void CollidePlayerExit(VERTEX_3D *pVtx);	// プレイヤー出ていく判定
+	void EnterPlayer(void);	// プレイヤーが入ったときの処理
+	void ExitPlayer(void);	// プレイヤーが出たときの処理
+	void StayPlayer(void);	// プレイヤーが内にいるときの処理
 
 	// メンバ変数
 	bool m_bInPlayer;	// プレイヤーが入っているかどうか

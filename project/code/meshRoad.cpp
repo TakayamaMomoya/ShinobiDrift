@@ -257,10 +257,83 @@ void CMeshRoad::AddRoadPoint(D3DXVECTOR3 pos, bool bReCreateVtx)
 	info.pos = pos;
 	info.fWidth = 500.0f;
 
+	// トンネルの終始点を保存
+	std::vector<int> vStart;
+	std::vector<int> vEnd;
+	int nCnt = 0;
+
+	vStart.resize(m_aTunnel.size());
+	vEnd.resize(m_aTunnel.size());
+
+	for (auto it : m_aTunnel)
+	{
+		int nStart = std::distance(m_aRoadPoint.begin(), it->GetItStart());
+		int nEnd = std::distance(m_aRoadPoint.begin(), it->GetItEnd());
+
+		vStart[nCnt] = nStart;
+		vEnd[nCnt] = nEnd;
+
+		nCnt++;
+	}
+
+	// ガードレールの終始点を保存
+	nCnt = 0;
+
+	std::vector<int> vStartGR;
+	std::vector<int> vEndGR;
+
+	vStartGR.resize(m_aGR.size());
+	vEndGR.resize(m_aGR.size());
+
+	for (auto it : m_aGR)
+	{
+		int nStart = std::distance(m_aRoadPoint.begin(), it->GetItStart());
+		int nEnd = std::distance(m_aRoadPoint.begin(), it->GetItEnd());
+
+		vStartGR[nCnt] = nStart;
+		vEndGR[nCnt] = nEnd;
+
+		nCnt++;
+	}
+
 	m_aRoadPoint.push_back(info);
 
 	if (bReCreateVtx)	// ロードポイントに応じた頂点の再生成
 		CreateVtxBuffEdge();
+
+	// 終始点を再割り当て
+	for (int i = 0; i < m_aTunnel.size(); i++)
+	{
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator it;
+
+		it = m_aRoadPoint.begin();
+		std::advance(it, vStart[i]);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart = it;
+
+		it = m_aRoadPoint.begin();
+		std::advance(it, vEnd[i]);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd = it;
+
+		m_aTunnel[i]->SetStart(itStart);
+		m_aTunnel[i]->SetEnd(itEnd);
+	}
+
+	// ガードレールの再割り当て
+	for (int i = 0; i < m_aGR.size(); i++)
+	{
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator it;
+
+		it = m_aRoadPoint.begin();
+		std::advance(it, vStartGR[i]);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itStart = it;
+
+		it = m_aRoadPoint.begin();
+		std::advance(it, vEndGR[i]);
+		std::vector<CMeshRoad::SInfoRoadPoint>::iterator itEnd = it;
+
+		m_aGR[i]->SetStart(itStart);
+		m_aGR[i]->SetEnd(itEnd);
+	}
 }
 
 //=====================================================

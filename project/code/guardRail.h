@@ -32,6 +32,8 @@ public:
 	// 変数取得・設定関数
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItStart(void) { return m_itStart; }	// 開始イテレーター
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator GetItEnd(void) { return m_itEnd; }	// 終了イテレーター
+	void SetStart(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it) { m_itStart = it; }
+	void SetEnd(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it) { m_itEnd = it; }
 	bool IsLeft(void) { return m_bLeft; }	// 左にするかどうか
 	void EnableLeft(bool bLeft) { m_bLeft = bLeft; }
 	float GetHeight(void) { return m_fHeight; }	// 高さ
