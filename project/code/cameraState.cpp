@@ -146,8 +146,6 @@ void CFollowPlayer::Update(CCamera *pCamera)
 #ifdef _DEBUG
 	CEffect3D::Create(pInfoCamera->posRDest, 20.0f, 1, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
-	CDebugProc::GetInstance()->Print("\nカメラはプレイヤー追従です");
-
 	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
 
 	if (pKeyboard != nullptr)
@@ -194,12 +192,14 @@ void CFollowPlayer::Update(CCamera *pCamera)
 			}
 		}
 
+#if 0
 		CDebugProc::GetInstance()->Print("\n[調整カメラ値]");
 		CDebugProc::GetInstance()->Print("\n視野角[%f]", pInfoCamera->fViewAngle);
 		CDebugProc::GetInstance()->Print("\nカメラ距離[%f]", pInfoCamera->fLength);
 		CDebugProc::GetInstance()->Print("\n角度[%f]", pInfoCamera->rot.x);
 		CDebugProc::GetInstance()->Print("\n先を見る距離[%f]", m_fLengthPosR);
 		CDebugProc::GetInstance()->Print("\n[調整カメラ値]");
+#endif
 	}
 #endif
 }
@@ -301,8 +301,6 @@ void CMoveControl::Update(CCamera *pCamera)
 
 		posAbove.y += pMouse->GetMoveIZ() * SPEED_ZOOM_ABOVE;
 		pInfoCamera->posVDest.y = posAbove.y;
-
-		CDebugProc::GetInstance()->Print("\nマウス奥：[%f]", pMouse->GetMoveIZ());
 
 		universal::LimitValue(&posAbove.y, FLT_MAX, 1000.0f);
 

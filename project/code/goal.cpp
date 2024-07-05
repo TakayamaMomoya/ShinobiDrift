@@ -167,9 +167,11 @@ void CGoal::Update()
 	CEffect3D::Create(m_posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif
 
+#if 0
 	CDebugProc::GetInstance()->Print("\nfCross‚Ì’l[%f]", fCross);
 	CDebugProc::GetInstance()->Print("\nstartPos‚ÌˆÊ’u[%f, %f, %f]", m_posStart.x, m_posStart.y, m_posStart.z);
 	CDebugProc::GetInstance()->Print("\nendPos‚ÌˆÊ’u[%f, %f, %f]", m_posEnd.x, m_posEnd.y, m_posEnd.z);
+#endif
 }
 
 //=====================================================

@@ -26,7 +26,7 @@ CEnemy* CEnemy::m_pEnemy = nullptr;
 //*****************************************************
 namespace
 {
-	const float SPEED = 0.004f;
+	const float SPEED = 50.0f;
 }
 
 //=====================================================
@@ -78,6 +78,16 @@ HRESULT CEnemy::Init(void)
 	if(m_pSpline != nullptr)
 	   m_pSpline->Init(m_vPos);
 
+	float StandardLenght = 5000.0f;
+
+	D3DXVECTOR3 vecDiff = m_vPos[m_nIdx] - m_vPos[m_nIdx - 1];
+	float fLength = D3DXVec3Length(&vecDiff);
+
+	//fLength = StandardLenght / fLength;
+
+	m_fRate = SPEED / fLength;
+	m_fRateOld = m_fRate;
+
 	SetPosition(D3DXVECTOR3(pRoadPoint[0].pos.x, pRoadPoint[0].pos.y, pRoadPoint[0].pos.z));
 
 	return S_OK;
@@ -103,26 +113,55 @@ void CEnemy::Update(void)
 	CMotion::Update();
 
 	D3DXVECTOR3 pos = { 0.0f, 0.0f, 0.0f };
+	D3DXVECTOR3 vecDiff = { 0.0f, 0.0f, 0.0f };  // 差分
+	float StandardLenght = 5000.0f;  // 基準の距離
+	float fLength = 0.0f;            // 現在のポイントと次のポイントまでの距離
 
 	// 向き取得
 	D3DXVECTOR3 rot = GetRotation();
 
-	// 位置補間
-	if(m_pSpline != nullptr)
-	   pos = m_pSpline->Interpolate(m_Info.fSpeed, m_nIdx);
-
-	m_Info.fSpeed += SPEED;
-
 	if (m_Info.fSpeed >= 1.0f)
 	{
-		m_Info.fSpeed = 0.0f;
+		m_fRateOld = m_fRate;
+		m_Info.fSpeed += m_fRate;
 
 		m_nIdx++;
+
+		// サイズを超えたら戻す
+		if (m_nIdx >= m_nSize)
+			m_nIdx = 1;
+
+		// 区間長算出
+		vecDiff = m_vPos[m_nIdx] - m_vPos[m_nIdx - 1];
+		fLength = D3DXVec3Length(&vecDiff);
+		
+		// 1フレームで進む距離
+		m_fRate =  SPEED / fLength;
+
+		m_Info.fSpeed -= 1.0f;
 	}
 
-	// サイズを超えたら戻す
-	if (m_nIdx >= m_nSize)
-		m_nIdx = 1;
+	m_Info.fSpeed += m_fRate;
+
+	// 位置補間
+	if (m_pSpline != nullptr)
+	{
+		if (m_pSpline->IsEmpty())
+		{
+			CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+			if (pMesh == nullptr)
+				return;
+
+			m_pSpline = pMesh->GetCenterSpline();
+
+			if (m_pSpline->IsEmpty())
+				return;	// 再取得しても空だったら処理を通さない
+		}
+
+		pos = m_pSpline->Interpolate(m_Info.fSpeed, m_nIdx);
+
+	}
 		
 	// 次のポイントに向かせる
 	universal::FactingRotTarget(&rot, pos, m_vPos[m_nIdx], 0.05f);
@@ -140,7 +179,7 @@ void CEnemy::Update(void)
 		return;
 	
 	pDebugProc->Print("\n敵のバイクの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
-	//pDebugProc->Print("\n敵の位置[%f,%f,%f]", m_pEnemyNinja->GetPosition().x, m_pEnemyNinja->GetPosition().y, m_pEnemyNinja->GetPosition().z);
+	pDebugProc->Print("\n敵の速度[%f]", m_Info.fSpeed);
 }
 
 //=====================================================

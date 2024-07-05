@@ -255,6 +255,7 @@ void CMeshRoad::AddRoadPoint(D3DXVECTOR3 pos, bool bReCreateVtx)
 	// リストに情報を追加
 	SInfoRoadPoint info;
 	info.pos = pos;
+	info.fWidth = 500.0f;
 
 	m_aRoadPoint.push_back(info);
 
@@ -679,6 +680,9 @@ void CMeshRoad::Save(void)
 
 	// トンネル情報保存
 	size = m_aTunnel.size();	// トンネル数保存
+
+
+
 	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
 	// イテレーターの終始端を保存
@@ -780,7 +784,7 @@ void CMeshRoad::Load(void)
 
 		CTunnel *pTunnel = CTunnel::Create(itStart, itEnd);
 
-		m_aTunnel.push_back(pTunnel);
+		m_aTunnel[i] = pTunnel;
 	}
 
 	// ガードレールの生成

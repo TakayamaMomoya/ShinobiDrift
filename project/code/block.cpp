@@ -435,8 +435,10 @@ bool CBlockGrab::CanGrab(D3DXVECTOR3 pos)
 	bCanGrab1 = universal::IsCross(pos, posMtx1, GetPosition(), nullptr);
 	bCanGrab2 = universal::IsCross(pos, GetPosition(), posMtx2, nullptr);
 
+#if 0
 	CDebugProc::GetInstance()->Print("\n’Í‚ß‚é1[%d]", bCanGrab1);
 	CDebugProc::GetInstance()->Print("\n’Í‚ß‚é2[%d]", bCanGrab2);
+#endif
 
 	bool bOK = bCanGrab1 && bCanGrab2;
 
