@@ -61,6 +61,8 @@ public:
 	virtual void Save(FILE *pFile);	// •Û‘¶ˆ—
 	virtual void Load(FILE *pFile, char* pTemp);	// “Çˆ—
 
+	bool Collide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld);
+
 private:
 	static int m_nNumAll;	// ‘”
 	float m_fLife;	// ‘Ì—Í

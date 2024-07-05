@@ -288,6 +288,26 @@ void CBlock::Load(FILE *pFile, char* pTemp)
 	}
 }
 
+//=====================================================
+// 当たり判定処理
+//=====================================================
+bool CBlock::Collide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
+{
+	float fHeight = pPos->y;
+
+	//// ポリゴンの下に入っているか判定する
+	//if (!universal::IsOnSquare(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
+	//	return false;
+
+	//// 高さが一定の高さ以内か判定する
+	//if (100.0f < fHeight - pPos->y)
+	//	return false;
+
+	//pPos->y = fHeight;
+
+	return true;
+}
+
 //============================================================================
 // 掴めるブロッククラス
 //============================================================================

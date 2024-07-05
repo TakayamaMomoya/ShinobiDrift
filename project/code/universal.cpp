@@ -601,15 +601,13 @@ bool IsOnTriangle(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECT
 	float fHeight, fDot;
 
 	// ポリゴンと内外判定
-	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &(vtx2 - vtx1))->y < 0 &&
+	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &(vtx2 - vtx1))->y <= 0 &&
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &(vtx3 - vtx2))->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx1 - vtx3))->y < 0)
+		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx1 - vtx3))->y <= 0)
 	{
 		// y軸法線が0ではないか判定
 		if (vtxNor.y == 0.0f)
-		{
 			return false;
-		}
 
 		// 角から目標位置へのベクトル
 		vecP = posTarget - vtx1;
@@ -621,7 +619,7 @@ bool IsOnTriangle(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECT
 		fHeight = -(fDot / vtxNor.y) + vtx1.y;
 
 		// 高さが目標位置より高いか判定
-		if (fHeight > posTarget.y)
+		if (fHeight >= posTarget.y)
 		{
 			// 高さ代入
 			rHeight = fHeight;
@@ -637,15 +635,17 @@ bool IsOnTriangle(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECT
 //========================================
 bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR3 vtx4, D3DXVECTOR3 vtxNor1, D3DXVECTOR3 vtxNor2, D3DXVECTOR3 posTarget, D3DXVECTOR3 posOldTarget, float& rHeight)
 {
+	bool bColllision = false;
+
 	// 1つ目のポリゴンと内外判定
 	if (IsOnTriangle(vtx1, vtx2, vtx3, vtxNor1, posTarget, rHeight))
-		return true;
+		bColllision = true;
 
 	// 2つ目のポリゴンと内外判定
 	if (IsOnTriangle(vtx4, vtx3, vtx2, vtxNor2, posTarget, rHeight))
-		return true;
+		bColllision = true;
 	
-	return false;
+	return bColllision;
 }
 
 //========================================
@@ -709,7 +709,7 @@ bool LineCrossProduct(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3* pos, D3DX
 //========================================
 // OBBの平面に対する押し戻し判定処理
 //========================================
-bool CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 posPlane, D3DXVECTOR3 vecNorPlane)
+D3DXVECTOR3 CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 posPlane, D3DXVECTOR3 vecNorPlane)
 {
 	// 各方向軸ベクトル計算
 	D3DXVECTOR3 axis1 = D3DXVECTOR3(vecAxial.x, 0.0f, 0.0f);
@@ -724,17 +724,15 @@ bool CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 po
 
 	// めり込んでいる
 	if (lenProjection < fabs(lenPos))
-		return false;
+		return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	vecNorPlane.y = 0.0f;
 
 	// めり込み具合で戻す距離を変える
 	if (lenPos > 0.0f)
-		*posOBB += vecNorPlane * (lenProjection - fabs(lenPos));
+		return vecNorPlane * (lenProjection - fabs(lenPos));
 	else
-		*posOBB += vecNorPlane * (lenProjection + fabs(lenPos));
-
-	return true;
+		return vecNorPlane * (lenProjection + fabs(lenPos));
 }
 
 //========================================
