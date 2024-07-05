@@ -115,7 +115,7 @@ HRESULT CGame::Init(void)
 	CMeshRoad::Create();
 
 	// “G‚Ì¶¬
-	CEnemy::Create();
+	//CEnemy::Create();
 
 	return S_OK;
 }

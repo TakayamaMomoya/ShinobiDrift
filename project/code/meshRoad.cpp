@@ -255,6 +255,7 @@ void CMeshRoad::AddRoadPoint(D3DXVECTOR3 pos, bool bReCreateVtx)
 	// ƒŠƒXƒg‚Éî•ñ‚ğ’Ç‰Á
 	SInfoRoadPoint info;
 	info.pos = pos;
+	info.fWidth = 500.0f;
 
 	m_aRoadPoint.push_back(info);
 
