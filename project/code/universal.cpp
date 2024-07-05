@@ -595,21 +595,19 @@ bool IsInTriangle(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECT
 //========================================
 // 三角形の下にいるかの判定
 //========================================
-bool IsOnTriangle(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR3 vtxNor, D3DXVECTOR3 posTarget, float& rHeight)
+bool IsOnTrianglePolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR3 vtxNor, D3DXVECTOR3 posTarget, float& rHeight)
 {
 	D3DXVECTOR3 vecP, vecTemp;
 	float fHeight, fDot;
 
 	// ポリゴンと内外判定
-	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &(vtx2 - vtx1))->y < 0 &&
+	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &(vtx2 - vtx1))->y <= 0 &&
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &(vtx3 - vtx2))->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx1 - vtx3))->y < 0)
+		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx1 - vtx3))->y <= 0)
 	{
 		// y軸法線が0ではないか判定
 		if (vtxNor.y == 0.0f)
-		{
 			return false;
-		}
 
 		// 角から目標位置へのベクトル
 		vecP = posTarget - vtx1;
@@ -621,7 +619,7 @@ bool IsOnTriangle(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECT
 		fHeight = -(fDot / vtxNor.y) + vtx1.y;
 
 		// 高さが目標位置より高いか判定
-		if (fHeight > posTarget.y)
+		if (fHeight >= posTarget.y)
 		{
 			// 高さ代入
 			rHeight = fHeight;
@@ -635,16 +633,58 @@ bool IsOnTriangle(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECT
 //========================================
 // ポリゴンの下にいるかの判定
 //========================================
-bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR3 vtx4, D3DXVECTOR3 vtxNor1, D3DXVECTOR3 vtxNor2, D3DXVECTOR3 posTarget, D3DXVECTOR3 posOldTarget, float& rHeight)
+bool IsOnSquarePolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR3 vtx4, D3DXVECTOR3 vtxNor1, D3DXVECTOR3 vtxNor2, D3DXVECTOR3 posTarget, D3DXVECTOR3 posOldTarget, float& rHeight)
 {
+	bool bColllision = false;
+
 	// 1つ目のポリゴンと内外判定
-	if (IsOnTriangle(vtx1, vtx2, vtx3, vtxNor1, posTarget, rHeight))
-		return true;
+	if (IsOnTrianglePolygon(vtx1, vtx2, vtx3, vtxNor1, posTarget, rHeight))
+		bColllision = true;
 
 	// 2つ目のポリゴンと内外判定
-	if (IsOnTriangle(vtx4, vtx3, vtx2, vtxNor2, posTarget, rHeight))
-		return true;
+	if (IsOnTrianglePolygon(vtx4, vtx3, vtx2, vtxNor2, posTarget, rHeight))
+		bColllision = true;
 	
+	return bColllision;
+}
+
+//========================================
+// 四角の下にいるかの判定
+// 1から時計回りに代入してください
+//========================================
+bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR3 vtx4, D3DXVECTOR3 vtxNor, D3DXVECTOR3 posTarget, D3DXVECTOR3 posOldTarget, float& rHeight)
+{
+	D3DXVECTOR3 vecP, vecTemp;
+	float fHeight, fDot;
+
+	// ポリゴンと内外判定
+	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &(vtx2 - vtx1))->y <= 0 &&
+		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &(vtx3 - vtx2))->y <= 0 &&
+		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx4 - vtx3))->y <= 0 &&
+		D3DXVec3Cross(&vecTemp, &(posTarget - vtx4), &(vtx1 - vtx4))->y <= 0)
+	{
+		// y軸法線が0ではないか判定
+		if (vtxNor.y == 0.0f)
+			return false;
+
+		// 角から目標位置へのベクトル
+		vecP = posTarget - vtx1;
+
+		// 内積を計算
+		fDot = (vtxNor.x * vecP.x) + (vtxNor.z * vecP.z);
+
+		// 内積を用いて高さを計算
+		fHeight = -(fDot / vtxNor.y) + vtx1.y;
+
+		// 高さが目標位置より高いか判定
+		if (fHeight >= posTarget.y)
+		{
+			// 高さ代入
+			rHeight = fHeight;
+			return true;
+		}
+	}
+
 	return false;
 }
 
@@ -709,7 +749,7 @@ bool LineCrossProduct(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3* pos, D3DX
 //========================================
 // OBBの平面に対する押し戻し判定処理
 //========================================
-bool CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 posPlane, D3DXVECTOR3 vecNorPlane)
+D3DXVECTOR3 CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 posPlane, D3DXVECTOR3 vecNorPlane)
 {
 	// 各方向軸ベクトル計算
 	D3DXVECTOR3 axis1 = D3DXVECTOR3(vecAxial.x, 0.0f, 0.0f);
@@ -724,17 +764,15 @@ bool CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 po
 
 	// めり込んでいる
 	if (lenProjection < fabs(lenPos))
-		return false;
+		return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
 
 	vecNorPlane.y = 0.0f;
 
 	// めり込み具合で戻す距離を変える
 	if (lenPos > 0.0f)
-		*posOBB += vecNorPlane * (lenProjection - fabs(lenPos));
+		return vecNorPlane * (lenProjection - fabs(lenPos));
 	else
-		*posOBB += vecNorPlane * (lenProjection + fabs(lenPos));
-
-	return true;
+		return vecNorPlane * (lenProjection + fabs(lenPos));
 }
 
 //========================================
@@ -951,5 +989,72 @@ float lengthAxis(D3DXVECTOR3 sep, D3DXVECTOR3 e1, D3DXVECTOR3 e2, D3DXVECTOR3 e3
 	length3 = fabs(D3DXVec3Dot(&sep, &e3));
 
 	return length1 + length2 + length3;
+}
+
+//========================================
+//3次元空間での行列による回転座標変換関数
+//(任意の点からのオフセット位置を角度と距離で変換)
+//========================================
+D3DXVECTOR3 PosRelativeMtx(D3DXVECTOR3 posO, D3DXVECTOR3 rot, D3DXVECTOR3 offset)
+{
+	D3DXVECTOR3 posAnswer;
+	D3DXMATRIX mtxO, mtxAnswer;
+	D3DXMATRIX mtxRot, mtxTrans;		//計算用マトリックス
+	D3DXMATRIX mtxRotModel, mtxTransModel, mtxPalent;		//計算用マトリックス
+
+	//パーツのワールドマトリックス初期化
+	D3DXMatrixIdentity(&mtxO);
+
+	//向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot,
+		rot.y, rot.x, rot.z);
+	D3DXMatrixMultiply(&mtxO, &mtxO, &mtxRot);
+
+	//位置を反映
+	D3DXMatrixTranslation(&mtxTransModel,
+		posO.x, posO.y, posO.z);
+	D3DXMatrixMultiply(&mtxO, &mtxO, &mtxTransModel);
+
+	mtxPalent = mtxO;
+
+	//パーツのワールドマトリックス初期化
+	D3DXMatrixIdentity(&mtxAnswer);
+
+	//向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot,
+		3.14f, 3.14f, 3.14f);
+	D3DXMatrixMultiply(&mtxO, &mtxO, &mtxRot);
+
+	//位置を反映
+	D3DXMatrixTranslation(&mtxTransModel,
+		offset.x, offset.y, offset.z);
+	D3DXMatrixMultiply(&mtxAnswer, &mtxAnswer, &mtxTransModel);
+
+	//算出したパーツのワールドマトリックスと親のマトリックスをかけ合わせる
+	D3DXMatrixMultiply(&mtxAnswer,
+		&mtxAnswer,
+		&mtxPalent);
+
+	posAnswer = GetMtxPos(mtxAnswer);
+
+	return posAnswer;
+}
+
+//========================================
+//3次元空間での行列による回転座標変換からの法線計算関数
+//========================================
+D3DXVECTOR3 NorRelativeMtx(D3DXVECTOR3 posO, D3DXVECTOR3 rot, D3DXVECTOR3 offsetMax, D3DXVECTOR3 offsetMin)
+{
+	D3DXVECTOR3 posMax, posMin;
+	D3DXVECTOR3 vecNor;
+
+	posMax = PosRelativeMtx(posO, rot, D3DXVECTOR3(offsetMax.x, offsetMax.y, offsetMax.z));
+	posMin = PosRelativeMtx(posO, rot, D3DXVECTOR3(offsetMax.x, offsetMin.y, offsetMax.z));
+
+	vecNor = posMax - posMin;
+
+	D3DXVec3Normalize(&vecNor, &vecNor);
+
+	return vecNor;
 }
 }	// namespace universal
