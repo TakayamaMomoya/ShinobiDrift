@@ -60,6 +60,9 @@ private:
 	int m_nIdx = 1;
 	int m_nSize = 0;
 	float m_t = 0.0f;
+	float m_fRate = 0.0f;
+	float m_fRateOld = 0.0f;
+	float m_fSplineLenght = 0.0f;
 };
 
 #endif
