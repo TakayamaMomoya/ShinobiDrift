@@ -145,7 +145,23 @@ void CEnemy::Update(void)
 
 	// 位置補間
 	if (m_pSpline != nullptr)
+	{
+		if (m_pSpline->IsEmpty())
+		{
+			CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+			if (pMesh == nullptr)
+				return;
+
+			m_pSpline = pMesh->GetCenterSpline();
+
+			if (m_pSpline->IsEmpty())
+				return;	// 再取得しても空だったら処理を通さない
+		}
+
 		pos = m_pSpline->Interpolate(m_Info.fSpeed, m_nIdx);
+
+	}
 		
 	// 次のポイントに向かせる
 	universal::FactingRotTarget(&rot, pos, m_vPos[m_nIdx], 0.05f);
