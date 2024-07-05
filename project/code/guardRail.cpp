@@ -74,7 +74,7 @@ HRESULT CGuardRail::Init(void)
 	VtxFollowRoad();
 
 #ifdef _DEBUG
-	//EnableWire(true);
+	EnableWire(true);
 #endif // _DEBUG
 
 	return S_OK;
@@ -339,7 +339,7 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3* move, D3DXVECTO
 		if (m_bLeft)
 			vecReturn = universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, pVtx[0].nor);
 		else
-			vecReturn = universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, pVtx[0].nor * -1.0f);
+			vecReturn = universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, -pVtx[0].nor);
 
 		if (D3DXVec3Length(&vecReturn) == 0.0f)
 			continue;

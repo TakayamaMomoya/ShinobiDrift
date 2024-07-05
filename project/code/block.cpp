@@ -295,15 +295,29 @@ bool CBlock::Collide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 {
 	float fHeight = pPos->y;
 
-	//// ƒ|ƒŠƒSƒ“‚Ì‰º‚É“ü‚Á‚Ä‚¢‚é‚©”»’è‚·‚é
-	//if (!universal::IsOnSquare(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
-	//	return false;
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
+	D3DXVECTOR3 BlockCorner[4];
+	D3DXVECTOR3 BlockNor;
+	D3DXVECTOR3 BlockMax = GetVtxMax();
+	D3DXVECTOR3 BlockMin = GetVtxMin();
 
-	//// ‚‚³‚ªˆê’è‚Ì‚‚³ˆÈ“à‚©”»’è‚·‚é
-	//if (100.0f < fHeight - pPos->y)
-	//	return false;
+	BlockCorner[0] = universal::PosRelativeMtx(pos, rot, D3DXVECTOR3(BlockMax.x, BlockMax.y, BlockMin.z));
+	BlockCorner[1] = universal::PosRelativeMtx(pos, rot, D3DXVECTOR3(BlockMin.x, BlockMax.y, BlockMin.z));
+	BlockCorner[2] = universal::PosRelativeMtx(pos, rot, D3DXVECTOR3(BlockMin.x, BlockMax.y, BlockMax.z));
+	BlockCorner[3] = universal::PosRelativeMtx(pos, rot, D3DXVECTOR3(BlockMax.x, BlockMax.y, BlockMax.z));
 
-	//pPos->y = fHeight;
+	BlockNor = universal::NorRelativeMtx(pos, rot, BlockMax, BlockMin);
+
+	// ƒ|ƒŠƒSƒ“‚Ì‰º‚É“ü‚Á‚Ä‚¢‚é‚©”»’è‚·‚é
+	if (!universal::IsOnSquare(BlockCorner[0], BlockCorner[1], BlockCorner[2], BlockCorner[3], BlockNor, *pPos, posOld, fHeight))
+		return false;
+
+	// ‚‚³‚ªˆê’è‚Ì‚‚³ˆÈ“à‚©”»’è‚·‚é
+	if (100.0f < fHeight - pPos->y)
+		return false;
+
+	pPos->y = fHeight;
 
 	return true;
 }

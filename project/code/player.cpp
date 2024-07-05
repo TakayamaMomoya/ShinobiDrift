@@ -889,9 +889,29 @@ void CPlayer::Collision(void)
 	// タイヤの中点を計算
 	posDef = (posParts[0] + posParts[1]) * 0.5f;
 
-	// タイヤそれぞれで当たり判定をとる
+	// タイヤそれぞれでmeshRoadと当たり判定をとる
 	bRoad[0] = CMeshRoad::GetInstance()->CollideRoad(&posParts[0], posOldParts[0]);
 	bRoad[1] = CMeshRoad::GetInstance()->CollideRoad(&posParts[1], posOldParts[1]);
+
+	// タイヤそれぞれでblockと当たり判定をとる
+	// 先頭オブジェクトを代入
+	CBlock* pBlock = CBlockManager::GetInstance()->GetHead();
+
+	while (pBlock != nullptr)
+	{
+		// 次のアドレスを保存
+		CBlock* pBlockNext = pBlock->GetNext();
+
+		// 当たり判定処理
+		if (pBlock->Collide(&posParts[0], posOldParts[0]))
+			bRoad[0] = true;
+
+		if (pBlock->Collide(&posParts[1], posOldParts[1]))
+			bRoad[1] = true;
+
+		// 次のアドレスを代入
+		pBlock = pBlockNext;
+	}
 
 	// プレイヤーの高さを調整
 	pos.y += ((posParts[0] + posParts[1]) * 0.5f).y - posDef.y;
