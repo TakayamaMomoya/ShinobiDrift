@@ -345,6 +345,7 @@ void CObject::DrawAll(void)
 		pBlur->RestoreTarget();	// レンダーターゲットの復元
 		pBlur->DrawBuckBuffer();	// バックバッファへの描画
 		pBlur->SwapBuffer();	// バッファーの入れ替え
+		pBlur->ClearNotBlur();	// ブラーしないレンダラーのクリア
 	}
 	
 	// 死亡フラグのたったオブジェクトの破棄
@@ -408,7 +409,7 @@ void CObject::DrawObject(bool bBlur)
 
 			CBlur *pBlur = CBlur::GetInstance();
 
-			if (pObject->m_bBlur != bBlur)
+			if (!bBlur)
 			{
 				if (pBlur != nullptr)
 				{
@@ -422,9 +423,12 @@ void CObject::DrawObject(bool bBlur)
 				pObject->Draw();
 			}
 
-			if (pBlur != nullptr)
+			if (!bBlur)
 			{
-				pBlur->RestoreTargetBlur();
+				if (pBlur != nullptr)
+				{
+					pBlur->RestoreTargetBlur();
+				}
 			}
 
 			if (pObject->m_bWire)

@@ -60,6 +60,7 @@ CPlayer::CPlayer(int nPriority)
 	ZeroMemory(&m_info, sizeof(CPlayer::SInfo));
 	ZeroMemory(&m_param, sizeof(CPlayer::SParam));
 	ZeroMemory(&m_fragMotion, sizeof(CPlayer::SFragMotion));
+	ZeroMemory(&m_fragNinja, sizeof(CPlayer::SFragNinja));
 }
 
 //=====================================================
@@ -255,6 +256,9 @@ void CPlayer::Update(void)
 	// モーション管理
 	ManageMotion();
 
+	// 忍者のモーション管理
+	ManageMotionNinja();
+
 	// 継承クラスの更新
 	CMotion::Update();
 
@@ -280,11 +284,11 @@ void CPlayer::Input(void)
 	// 移動操作
 	InputMove();
 
-	// カメラ操作
-	InputCamera();
-
 	// ワイヤーの操作
 	InputWire();
+
+	// 刀の操作
+	InputKatana();
 
 	// スピードの管理
 	ManageSpeed();
@@ -321,7 +325,9 @@ void CPlayer::InputMove(void)
 
 	m_info.fSpeedDest = fAccele * m_param.fSpeedMax;
 
+#if 0
 	CDebugProc::GetInstance()->Print("\nアクセル値[%f]", fAccele);
+#endif
 
 	if (m_info.pBlockGrab == nullptr)
 	{
@@ -358,31 +364,9 @@ void CPlayer::InputMove(void)
 		m_bMove = true;
 	}
 
+#if 0
 	CDebugProc::GetInstance()->Print("\nブレーキ値[%f]", fBrake);
-}
-
-//=====================================================
-// カメラ操作
-//=====================================================
-void CPlayer::InputCamera(void)
-{
-	// 入力マネージャー取得
-	CInputManager *pInputManager = CInputManager::GetInstance();
-
-	if (pInputManager == nullptr)
-	{
-		return;
-	}
-
-	// カメラ取得
-	CCamera *pCamera = CManager::GetCamera();
-
-	if (pCamera == nullptr)
-	{
-		return;
-	}
-
-	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+#endif
 }
 
 //=====================================================
@@ -508,9 +492,6 @@ void CPlayer::InputWire(void)
 			m_info.bManual = m_info.bManual ? false : true;
 		}
 	}
-
-	CDebugProc::GetInstance()->Print("\n掴んでるブロックはある？[%d]", m_info.pBlockGrab != nullptr);
-	CDebugProc::GetInstance()->Print("\nロックオン方向[%f]", fAngleInput);
 }
 
 //=====================================================
@@ -782,6 +763,38 @@ void CPlayer::RemoveWire(void)
 }
 
 //=====================================================
+// 刀の操作
+//=====================================================
+void CPlayer::InputKatana(void)
+{
+	CInputManager *pInputManager = CInputManager::GetInstance();
+
+	if (pInputManager == nullptr)
+		return;
+
+	if (pInputManager->GetTrigger(CInputManager::BUTTON_KATANA))
+	{
+		// 刀モーションフラグ管理
+		ManageKanataAtttack();
+	}
+}
+
+//=====================================================
+// 刀の攻撃の管理
+//=====================================================
+void CPlayer::ManageKanataAtttack(void)
+{
+	if (m_fragNinja.bSlashDown)
+	{
+		m_fragNinja.bSlashUp = true;
+	}
+	else
+	{
+		m_fragNinja.bSlashDown = true;
+	}
+}
+
+//=====================================================
 // ドリフトの補正
 //=====================================================
 void CPlayer::LimitDrift(float fLength)
@@ -840,11 +853,21 @@ void CPlayer::Collision(void)
 	// ガードレールとの当たり判定
 	std::vector<CGuardRail*> *aGuardRail = CMeshRoad::GetInstance()->GetArrayGR();
 	D3DXMATRIX* mtx = GetMatrix();
-	D3DXVECTOR3 vecAxial = universal::VecToOffset(*mtx, m_param.sizeCollider);
+	D3DXMATRIX mtxTrans, mtxRot;
+	auto& paramSize = m_param.sizeCollider;
+
+	//D3DXVECTOR3 vecAxial = universal::VecToOffset(*mtx, paramSize);
+	CEffect3D::Create(D3DXVECTOR3(pos.x + paramSize.x, pos.y, pos.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x - paramSize.x, pos.y, pos.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y + paramSize.y, pos.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y - paramSize.y, pos.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y, pos.z + paramSize.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y, pos.z - paramSize.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CDebugProc::GetInstance()->Print("\n当たり判定位置[%f,%f,%f]", paramSize.x, paramSize.y, paramSize.z);
 
 	/*for(auto itGuardRail : *aGuardRail)
 	{
-		if (itGuardRail->CollideGuardRail(&pos, vecAxial))
+		if (itGuardRail->CollideGuardRail(&pos, paramSize))
 			break;
 	}*/
 
@@ -914,15 +937,17 @@ void CPlayer::Collision(void)
 	if (rot.x < -1.35f)
 		rot.x = -1.35f;
 
-	if (CInputKeyboard::GetInstance() != nullptr)
+#ifdef _DEBUG
+	if (CInputJoypad::GetInstance() != nullptr)
 	{
-		if (CInputKeyboard::GetInstance()->GetPress(DIK_SPACE))
+		if (CInputJoypad::GetInstance()->GetPress(CInputJoypad::PADBUTTONS_A, 0))
 		{// 操作方法変更
 			pos.y += 30.0f;
 			move.y = 0.0f;
 			rot.x = 0.0f;
 		}
 	}
+#endif // _DEBUG
 
 	// 位置と移動量と角度を代入
 	SetPosition(pos);
@@ -942,7 +967,9 @@ void CPlayer::ManageSpeed(void)
 	{// 加速しているとき
 		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAccele;
 
+#if 0
 		CDebugProc::GetInstance()->Print("\n加速中");
+#endif
 
 		//// サウンドインスタンスの取得
 		//CSound* pSound = CSound::GetInstance();
@@ -955,7 +982,9 @@ void CPlayer::ManageSpeed(void)
 	{// 減速しているとき
 		m_info.fSpeed += (m_info.fSpeedDest - m_info.fSpeed) * m_param.fFactAttenu;
 
+#if 0
 		CDebugProc::GetInstance()->Print("\n減速中");
+#endif
 	}
 
 	D3DXVECTOR3 pos = GetPosition();
@@ -1042,6 +1071,64 @@ void CPlayer::ManageMotion(void)
 }
 
 //=====================================================
+// 忍者のモーション管理
+//=====================================================
+void CPlayer::ManageMotionNinja(void)
+{
+	if (m_pPlayerNinja == nullptr)
+		return;
+	
+	int nMotion = m_pPlayerNinja->GetMotion();
+	bool bFinish = m_pPlayerNinja->IsFinish();
+
+	if (m_fragNinja.bSlashUp)
+	{
+		if (nMotion == MOTION_NINJA::MOTION_NINJA_SLASHDOWN)
+		{// 切り下ろしが終わってからモーション再生
+			if(bFinish)
+				m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHUP);
+		}
+		else
+		{// 切り下ろしからの派生でない場合
+			if (nMotion != MOTION_NINJA::MOTION_NINJA_SLASHUP)
+				m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHUP);
+
+			if (bFinish)
+				m_fragNinja.bSlashUp = false;
+		}
+	}
+	else if (m_fragNinja.bSlashDown)
+	{
+		if (nMotion != MOTION_NINJA::MOTION_NINJA_SLASHDOWN)
+		{
+			// エフェクシア取得
+			CEffekseer* pEffekseer = CManager::GetMyEffekseer();
+
+			// 後輪の位置取得
+			float PosX = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_41;
+			float PosY = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_42;
+			float PosZ = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_43;
+
+			// エフェクトの再生
+			if (pEffekseer != nullptr)
+				pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_SLASH], ::Effekseer::Vector3D(PosX, PosY, PosZ),
+					::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
+
+			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHDOWN);
+
+
+		}
+
+		if (bFinish)
+			m_fragNinja.bSlashDown = false;
+	}
+	else
+	{
+		m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_NEUTRAL);
+	}
+}
+
+//=====================================================
 // イベントの管理
 //=====================================================
 void CPlayer::Event(EVENT_INFO *pEventInfo)
@@ -1055,7 +1142,6 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 	universal::SetOffSet(&mtxParent, mtxPart, offset);
 
 	D3DXVECTOR3 pos = { mtxParent._41,mtxParent._42 ,mtxParent._43 };
-
 }
 
 //=====================================================
@@ -1093,6 +1179,7 @@ void CPlayer::Debug(void)
 		return;
 	}
 
+#if 0
 	pDebugProc->Print("\nプレイヤーの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	pDebugProc->Print("\nプレイヤーの移動量[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
 	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);
@@ -1102,6 +1189,7 @@ void CPlayer::Debug(void)
 	pDebugProc->Print("\n角度カウンター[%f]", m_info.fCntAngle);
 	pDebugProc->Print("\nブラーのサイズ[%f]", m_info.fSizeBlurDrift);
 	pDebugProc->Print("\nブラーの濃さ[%f]", m_info.fDesityBlurDrift);
+#endif
 
 	// ブラーのサイズ調整
 	if (CInputKeyboard::GetInstance()->GetPress(DIK_UP))

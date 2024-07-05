@@ -12,7 +12,6 @@
 #include "renderer.h"
 #include "universal.h"
 #include "debugproc.h"
-#include "blur.h"
 
 namespace universal
 {
@@ -558,8 +557,9 @@ bool IsCross(D3DXVECTOR3 posTarget, D3DXVECTOR3 vecSorce, D3DXVECTOR3 vecDest, f
 		if (pRate != nullptr)
 		{
 			// äÑçáÇéZèo
-			float fAreaMax = (vecDest.z * move.x) - (vecDest.x * move.z);
-			fArea = (vecToPos.z * move.x) - (vecToPos.x * move.z);
+
+			float fAreaMax = CrossProduct(vecLine, move);
+			fArea = CrossProduct(vecToPos, move);
 
 			*pRate = fArea / fAreaMax;
 		}
@@ -726,11 +726,13 @@ bool CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 po
 	if (lenProjection < fabs(lenPos))
 		return false;
 
+	vecNorPlane.y = 0.0f;
+
 	// ÇﬂÇËçûÇ›ãÔçáÇ≈ñﬂÇ∑ãóó£ÇïœÇ¶ÇÈ
-	if (lenPos >= 0.0f)
-		*posOBB += vecNorPlane * (lenProjection - lenPos);
+	if (lenPos > 0.0f)
+		*posOBB += vecNorPlane * (lenProjection - fabs(lenPos));
 	else
-		*posOBB += vecNorPlane * (lenProjection + lenPos);
+		*posOBB += vecNorPlane * (lenProjection + fabs(lenPos));
 
 	return true;
 }

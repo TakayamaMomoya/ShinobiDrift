@@ -292,11 +292,6 @@ void CRenderer::Draw(void)
 
 		CBlur *pBlur = CBlur::GetInstance();
 
-		if (pBlur != nullptr)
-		{
-			pBlur->ClearNotBlur();
-		}
-
 #ifdef _DEBUG
 		// imgui•`‰æ
 		ImGui::Render();

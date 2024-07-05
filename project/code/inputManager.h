@@ -32,6 +32,7 @@ public:
 		BUTTON_TRIGGER_DOWN,	// ‰º•ûŒü’e‚«
 		BUTTON_TRIGGER_RIGHT,	// ‰E•ûŒü’e‚«
 		BUTTON_TRIGGER_LEFT,	// ¶•ûŒü’e‚«
+		BUTTON_KATANA,	// “‚ðU‚é
 		BUTTON_MAX
 	};
 	struct SAxis

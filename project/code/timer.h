@@ -30,13 +30,15 @@ public:
 	void Uninit();
 	void Update();
 
-	static CTimer* GetInstance() { return m_pTimer; }	// 自身の情報取得
+	static CTimer* GetInstance() { return s_pTimer; }	// 自身の情報取得
 
 private:
 	//メンバ変数
-	float m_fSeconds;		// 現在の時間
-	CNumber* m_pNumber;	// ナンバーのポインタ
-
-	static CTimer* m_pTimer;	// 自身のポインタ
+	float m_fSecond;			// 現在の時間(秒)
+	float m_fMsecond;			// 現在の時間(ミリ秒)
+	CNumber* m_pSecond;			// 秒表示のポインタ
+	CNumber* m_pMilliSecond;	// ミリセカンド秒表示の用ポインタ
+	static CTimer* s_pTimer;	// 自身のポインタ
 };
+
 #endif
