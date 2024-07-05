@@ -74,7 +74,7 @@ HRESULT CGuardRail::Init(void)
 	VtxFollowRoad();
 
 #ifdef _DEBUG
-	//EnableWire(true);
+	EnableWire(true);
 #endif // _DEBUG
 
 	return S_OK;
@@ -304,7 +304,7 @@ void CGuardRail::Draw(void)
 //=====================================================
 // 当たり判定処理
 //=====================================================
-bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial)
+bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3* move, D3DXVECTOR3 vecAxial, float* fSpeed)
 {
 	bool bCollision = false;
 
@@ -335,10 +335,22 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3 vecAxial)
 			D3DXVec3Dot(&(*pos - pVtx[2].pos), &(pVtx[0].pos - pVtx[2].pos)) < 0.0f)
 			continue;
 
-		if (universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, pVtx[0].nor))
-		{
-			bCollision = true;
-		}
+		D3DXVECTOR3 vecReturn;
+		if (m_bLeft)
+			vecReturn = universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, pVtx[0].nor);
+		else
+			vecReturn = universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, -pVtx[0].nor);
+
+		if (D3DXVec3Length(&vecReturn) == 0.0f)
+			continue;
+
+		*pos += vecReturn * 1.0f;
+		D3DXVec3Normalize(&vecReturn, &vecReturn);
+		*move -= vecReturn * D3DXVec3Dot(&vecReturn, move) * 1.7f;
+		*fSpeed *= 0.5f;
+		bCollision = true;
+
+		break;
 	}
 
 	// 頂点バッファをアンロック

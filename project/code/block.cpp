@@ -288,6 +288,40 @@ void CBlock::Load(FILE *pFile, char* pTemp)
 	}
 }
 
+//=====================================================
+// 当たり判定処理
+//=====================================================
+bool CBlock::Collide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
+{
+	float fHeight = pPos->y;
+
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
+	D3DXVECTOR3 BlockCorner[4];
+	D3DXVECTOR3 BlockNor;
+	D3DXVECTOR3 BlockMax = GetVtxMax();
+	D3DXVECTOR3 BlockMin = GetVtxMin();
+
+	BlockCorner[0] = universal::PosRelativeMtx(pos, rot, D3DXVECTOR3(BlockMax.x, BlockMax.y, BlockMin.z));
+	BlockCorner[1] = universal::PosRelativeMtx(pos, rot, D3DXVECTOR3(BlockMin.x, BlockMax.y, BlockMin.z));
+	BlockCorner[2] = universal::PosRelativeMtx(pos, rot, D3DXVECTOR3(BlockMin.x, BlockMax.y, BlockMax.z));
+	BlockCorner[3] = universal::PosRelativeMtx(pos, rot, D3DXVECTOR3(BlockMax.x, BlockMax.y, BlockMax.z));
+
+	BlockNor = universal::NorRelativeMtx(pos, rot, BlockMax, BlockMin);
+
+	// ポリゴンの下に入っているか判定する
+	if (!universal::IsOnSquare(BlockCorner[0], BlockCorner[1], BlockCorner[2], BlockCorner[3], BlockNor, *pPos, posOld, fHeight))
+		return false;
+
+	// 高さが一定の高さ以内か判定する
+	if (100.0f < fHeight - pPos->y)
+		return false;
+
+	pPos->y = fHeight;
+
+	return true;
+}
+
 //============================================================================
 // 掴めるブロッククラス
 //============================================================================

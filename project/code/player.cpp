@@ -866,11 +866,14 @@ void CPlayer::Collision(void)
 	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y, pos.z - paramSize.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
 	CDebugProc::GetInstance()->Print("\n当たり判定位置[%f,%f,%f]", paramSize.x, paramSize.y, paramSize.z);
 
-	/*for(auto itGuardRail : *aGuardRail)
+	for (auto itGuardRail : *aGuardRail)
 	{
-		if (itGuardRail->CollideGuardRail(&pos, paramSize))
+		if (itGuardRail->CollideGuardRail(&pos, &move, paramSize, &m_info.fSpeed))
+		{
+			rot.y = atan2f(move.x, move.z);
 			break;
-	}*/
+		}
+	}
 
 	// タイヤの位置保存
 	posParts[0] = universal::GetMtxPos(*GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
@@ -887,9 +890,29 @@ void CPlayer::Collision(void)
 	// タイヤの中点を計算
 	posDef = (posParts[0] + posParts[1]) * 0.5f;
 
-	// タイヤそれぞれで当たり判定をとる
+	// タイヤそれぞれでmeshRoadと当たり判定をとる
 	bRoad[0] = CMeshRoad::GetInstance()->CollideRoad(&posParts[0], posOldParts[0]);
 	bRoad[1] = CMeshRoad::GetInstance()->CollideRoad(&posParts[1], posOldParts[1]);
+
+	// タイヤそれぞれでblockと当たり判定をとる
+	// 先頭オブジェクトを代入
+	CBlock* pBlock = CBlockManager::GetInstance()->GetHead();
+
+	while (pBlock != nullptr)
+	{
+		// 次のアドレスを保存
+		CBlock* pBlockNext = pBlock->GetNext();
+
+		// 当たり判定処理
+		if (pBlock->Collide(&posParts[0], posOldParts[0]))
+			bRoad[0] = true;
+
+		if (pBlock->Collide(&posParts[1], posOldParts[1]))
+			bRoad[1] = true;
+
+		// 次のアドレスを代入
+		pBlock = pBlockNext;
+	}
 
 	// プレイヤーの高さを調整
 	pos.y += ((posParts[0] + posParts[1]) * 0.5f).y - posDef.y;

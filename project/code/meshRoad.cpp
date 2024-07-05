@@ -95,7 +95,7 @@ HRESULT CMeshRoad::Init(void)
 	m_it = m_aRoadPoint.begin();
 
 #ifdef _DEBUG
-	//EnableWire(true);
+	EnableWire(true);
 #endif // _DEBUG
 
 	return S_OK;
@@ -709,22 +709,16 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 			pVtx += MeshRoad::NUM_VTX_IN_EDGE;
 
 			// ƒ|ƒŠƒSƒ“‚Ì‰º‚É“ü‚Á‚Ä‚¢‚é‚©”»’è‚·‚é
-			if (!universal::IsOnSquare(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
-			{// “–‚½‚Á‚Ä‚¢‚½‚ç
+			if (!universal::IsOnSquarePolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
 				continue;
-			}
 
 			// ‚‚³‚ªˆê’è‚Ì‚‚³ˆÈ“à‚©”»’è‚·‚é
 			if (100.0f < fHeight - pPos->y)
-			{
 				continue;
-			}
 
 			// ‚‚³‚ªˆê”Ô‚‚¢êŠ‚Å”»’è‚·‚é
 			if (fHeightDef < fHeight || !bColRoad)
-			{
 				fHeightDef = fHeight;
-			}
 
 			// ”»’è‚ğtrue‚É‚·‚é
 			bColRoad = true;
