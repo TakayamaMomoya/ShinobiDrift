@@ -306,58 +306,44 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 	CEffect3D::Create(pos + vecPole * 200.0f, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 	CEffect3D::Create(pos - vecPole * 200.0f, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
-	if (!pMouse->GetPress(CInputMouse::BUTTON_RMB))
-	{// 右クリックしてないときに、移動可能
-		float fMove = SPEED_MOVE;
+	D3DXVECTOR3 posHit;
+	D3DXVECTOR3 posNear;
+	D3DXVECTOR3 posFar;
+	D3DXVECTOR3 vecDiff;
 
-		if (pKeyboard->GetPress(DIK_LSHIFT) == true)
-		{// 加速
-			fMove *= 7;
-		}
+	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
 
-		// 視点移動===============================================
-		if (pKeyboard->GetPress(DIK_A) == true)
-		{// 左移動
-			pos.x += sinf(rot.y - D3DX_PI * 0.5f) * fMove;
-			pos.z += cosf(rot.y - D3DX_PI * 0.5f) * fMove;
-		}
-		if (pKeyboard->GetPress(DIK_D) == true)
-		{// 右移動
-			pos.x += sinf(rot.y - D3DX_PI * -0.5f) * fMove;
-			pos.z += cosf(rot.y - D3DX_PI * -0.5f) * fMove;
-		}
-		if (pKeyboard->GetPress(DIK_W) == true)
-		{// 前移動
-			pos.x += sinf(D3DX_PI * 0.5f) * sinf(rot.y) * fMove;
-			pos.z += sinf(D3DX_PI * 0.5f) * cosf(rot.y) * fMove;
-		}
-		if (pKeyboard->GetPress(DIK_S) == true)
-		{// 後移動
-			pos.x += sinf(-D3DX_PI * 0.5f) * sinf(rot.y) * fMove;
-			pos.z += sinf(-D3DX_PI * 0.5f) * cosf(rot.y) * fMove;
-		}
-		if (pKeyboard->GetPress(DIK_E) == true)
-		{// 上昇
-			pos.y += fMove;
-		}
-		if (pKeyboard->GetPress(DIK_Q) == true)
-		{// 下降
-			pos.y -= fMove;
-		}
+	universal::CalcRayFlat(D3DXVECTOR3(0.0f, 100.0f, 0.0f), D3DXVECTOR3(0.0f, 1.0f, 0.0f), posNear, posFar, &posHit);
 
-		// 回転
-		if (pKeyboard->GetPress(DIK_Z) == true)
-		{
-			rot.y += SPEED_ROLL;
-		}
-		if (pKeyboard->GetPress(DIK_C) == true)
-		{
-			rot.y -= SPEED_ROLL;
-		}
+	D3DXVECTOR3 posEdit = pEdit->GetPosition();
 
-		pEdit->SetRotation(rot);
-		pEdit->SetPosition(pos);
+	// 移動
+	if (pKeyboard->GetPress(DIK_V))
+	{// 上下移動
+		CCamera *pCamera = CManager::GetCamera();
+
+		if (pCamera == nullptr)
+			return;
+
+		CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+
+		// カメラとブロックの平面差分ベクトルを法線にする
+		D3DXVECTOR3 posCamera = { pInfoCamera->posV.x,0.0f, pInfoCamera->posV.z };
+		D3DXVECTOR3 posBlock = { posEdit.x,0.0f,posEdit.z };
+		D3DXVECTOR3 vecDiff = posCamera - posBlock;
+
+		D3DXVec3Normalize(&vecDiff, &vecDiff);
+
+		universal::CalcRayFlat(posEdit, vecDiff, posNear, posFar, &posHit);
+
+		// y軸以外は固定する
+		posHit.x = posEdit.x;
+		posHit.z = posEdit.z;
 	}
+
+	posEdit = posHit;
+
+	pEdit->SetPosition(posEdit);
 
 	bool bStop = CGame::GetInstance()->GetStop();
 
@@ -370,7 +356,7 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 			pMesh->AddRoadPoint(pos, true);
 		}
 	}
-	
+
 	if (ImGui::Button("Save", ImVec2(100, 50)))
 	{// 保存
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
