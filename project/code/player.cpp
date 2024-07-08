@@ -41,8 +41,8 @@ const float DIST_LIMIT = 3000.0f;	// ワイヤー制限距離
 const float LINE_CORRECT_DRIFT = 40.0f;	// ドリフト補正のしきい値
 const float SIZE_BLUR = -20.0f;	// ブラーのサイズ
 const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
-const D3DXVECTOR3 DEFAULT_POS = { -22798.0f,2570.5f,14615.8f };	// 初期位置
-const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,-2.0f,0.0f };	// 初期向き
+const D3DXVECTOR3 DEFAULT_POS = { 30445.6f,2821.1f,-24808.4f };	// 初期位置
+const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,2.0f,0.0f };	// 初期向き
 const float SE_CHANGE_SPEED = 10.0f;  // エンジン音とアクセル音が切り替わる速度の値
 }
 
