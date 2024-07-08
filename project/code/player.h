@@ -49,6 +49,7 @@ public:
 	{
 		char aPathBody[MAX_STRING];	// 見た目のパス
 		float fSpeedMax;	// 最大速度
+		float fSpeedMaxInitial;	// 初期最大速度
 		float fFactAccele;	// 加速係数
 		float fFactAttenu;	// 減速係数
 		float fFactBrake;	// ブレーキ減速係数
@@ -67,6 +68,7 @@ public:
 	void Draw(void);
 	void Hit(float fDamage);
 	SParam GetParam(void) { return m_param; }
+	void SetParam(SParam param) { m_param = param; }
 	CBlockGrab *GetBlock(void) { return m_info.pBlockGrab; }
 	float GetSpeed() { return m_info.fSpeed; }
 

@@ -171,6 +171,7 @@ void CPlayer::Load(void)
 			if (key == "SPEED_MAX")
 			{// Å‘å‘¬“x
 				iss >> m_param.fSpeedMax;
+				m_param.fSpeedMaxInitial = m_param.fSpeedMax;
 			}
 
 			if (key == "FACT_ACCELE")

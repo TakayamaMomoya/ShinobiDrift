@@ -14,6 +14,7 @@
 #include "player.h"
 #include "debugproc.h"
 #include "blur.h"
+#include "player.h"
 
 //*****************************************************
 // 定数定義
@@ -224,9 +225,7 @@ void CTunnel::Update(void)
 	CMeshCylinder::Update();
 
 	if (m_bInPlayer)
-	{// プレイヤーが内側にいるときの処理
-		Blur::SetBlur(10.0f, 0.5f);
-	}
+		StayPlayer();	// プレイヤーが内側にいるときの処理
 }
 
 //=====================================================
@@ -301,7 +300,7 @@ void CTunnel::CollidePlayerEnter(VERTEX_3D *pVtx)
 	{
 		if (!m_bInPlayer && (!bHit1 && bHit1Next))
 		{// 入口から入った判定
-			m_bInPlayer = true;
+			EnterPlayer();
 		}
 	}
 
@@ -314,7 +313,7 @@ void CTunnel::CollidePlayerEnter(VERTEX_3D *pVtx)
 	{
 		if (!m_bInPlayer && (!bHit2 && bHit2Next))
 		{// 出口から入った判定
-			m_bInPlayer = true;
+			EnterPlayer();
 		}
 	}
 
@@ -363,9 +362,7 @@ void CTunnel::CollidePlayerExit(VERTEX_3D *pVtx)
 	{
 		if (m_bInPlayer && (bHit1 && !bHit1Next))
 		{// 入口から出た判定
-			m_bInPlayer = false;
-
-			Blur::ResetBlur();
+			ExitPlayer();
 		}
 	}
 
@@ -378,13 +375,68 @@ void CTunnel::CollidePlayerExit(VERTEX_3D *pVtx)
 	{
 		if (m_bInPlayer && (bHit2 && !bHit2Next))
 		{// 出口から出た判定
-			m_bInPlayer = false;
-
-			Blur::ResetBlur();
+			ExitPlayer();
 		}
 	}
 
 	CDebugProc::GetInstance()->Print("\nOutfRate2[%f]", fRate);
+}
+
+//=====================================================
+// プレイヤーが入ってきたときの処理
+//=====================================================
+void CTunnel::EnterPlayer(void)
+{
+	m_bInPlayer = true;
+
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer != nullptr)
+	{
+		CPlayer::SParam param = pPlayer->GetParam();
+
+		param.fSpeedMax = param.fSpeedMaxInitial * 4.0f;
+
+		pPlayer->SetParam(param);
+	}
+}
+
+//=====================================================
+// プレイヤーが出たときの処理
+//=====================================================
+void CTunnel::ExitPlayer(void)
+{
+	m_bInPlayer = false;
+
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer != nullptr)
+	{
+		CPlayer::SParam param = pPlayer->GetParam();
+
+		param.fSpeedMax = param.fSpeedMaxInitial;
+
+		pPlayer->SetParam(param);
+	}
+
+	Blur::ResetBlur();
+}
+
+//=====================================================
+// プレイヤーが内側にいるときの処理
+//=====================================================
+void CTunnel::StayPlayer(void)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	// ブラーをかける
+	Blur::SetBlur(10.0f, 0.5f);
+
+	CPlayer::SParam param = pPlayer->GetParam();
+
+	param.fSpeedMax = param.fSpeedMaxInitial * 4.0f;
+
+	pPlayer->SetParam(param);
 }
 
 //=====================================================
