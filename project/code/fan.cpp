@@ -31,8 +31,8 @@ namespace
 CFan::CFan(int nPriority) : CObject(nPriority)
 {
 	m_pVtxBuff = nullptr;
-	m_pos = { 0,0,0 };
-	m_rot = { 0,0,0 };
+	m_pos = { 0.0f,0.0f,0.0f };
+	m_rot = { 0.0f,0.0f,0.0f };
 	m_fRadius = 0.0f;
 	m_nNumVtx = 0;
 	m_fRateAngle = 1.0f;
