@@ -15,6 +15,7 @@
 #include "debugproc.h"
 #include "blur.h"
 #include "player.h"
+#include "fan3D.h"
 
 //*****************************************************
 // 定数定義
@@ -30,7 +31,7 @@ const int NUM_VTX_IN_EDGE = 5;	// 辺の中にある頂点数
 //=====================================================
 // コンストラクタ
 //=====================================================
-CTunnel::CTunnel(int nPriority) : CMeshCylinder(nPriority),m_bInPlayer(false)
+CTunnel::CTunnel(int nPriority) : CMeshCylinder(nPriority),m_bInPlayer(false),m_pFanEnter(nullptr)
 {
 	m_bInPlayer = false;
 }
@@ -211,6 +212,12 @@ void CTunnel::VtxFollowRoad(void)
 //=====================================================
 void CTunnel::Uninit(void)
 {
+	if (m_pFanEnter != nullptr)
+	{
+		m_pFanEnter->Uninit();
+		m_pFanEnter = nullptr;
+	}
+
 	CMeshCylinder::Uninit();
 }
 
