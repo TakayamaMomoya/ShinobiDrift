@@ -133,6 +133,7 @@ void CFan3D::SetVtx(void)
 		// íÜêSÇÃí∏ì_ÇÃê›íË
 		pVtx[0].pos = D3DXVECTOR3{ 0.0f,0.0f,0.0f };
 		pVtx[0].tex = D3DXVECTOR2{ 0.5f,0.5f };
+		pVtx[0].col = GetCol();
 
 		for (int i = 1;i < nNumVtx + 2;i++)
 		{// â~é¸ÇÃí∏ì_ÇÃê›íË
