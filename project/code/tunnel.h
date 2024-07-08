@@ -46,6 +46,7 @@ private:
 	// メンバ関数
 	void CreateVtx(void);	// 頂点の生成
 	void VtxFollowRoad(void);	// 頂点を道に沿わせる
+	void CreateFan(void);	// 扇ポリゴンの生成
 	void DetectionPlayer(void);	// プレイヤーの検知
 	void CollidePlayerEnter(VERTEX_3D *pVtx);	// プレイヤー入ってくる判定
 	void CollidePlayerExit(VERTEX_3D *pVtx);	// プレイヤー出ていく判定

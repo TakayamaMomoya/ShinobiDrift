@@ -26,6 +26,7 @@ const int MESH_U = 32;	// 横の分割数
 const float MESH_HEIGHT = 50.0f;	// メッシュの高さ
 const char* TEX_PATH = "data\\TEXTURE\\MATERIAL\\concrete.jpg";	// テクスチャパス
 const int NUM_VTX_IN_EDGE = 5;	// 辺の中にある頂点数
+const int PRIORITY_FAN = 5;	// 扇ポリゴンの描画プライオリティ
 }
 
 //=====================================================
@@ -74,6 +75,9 @@ HRESULT CTunnel::Init(void)
 
 	// 頂点を道に沿わせる
 	VtxFollowRoad();
+
+	// 扇ポリゴンの生成
+	CreateFan();
 
 	return S_OK;
 }
@@ -205,6 +209,59 @@ void CTunnel::VtxFollowRoad(void)
 
 	// 頂点バッファをアンロック
 	pVtxBuff->Unlock();
+}
+
+//=====================================================
+// 扇ポリゴンの生成
+//=====================================================
+void CTunnel::CreateFan(void)
+{
+	if (m_pFanEnter != nullptr)
+	{
+		m_pFanEnter->Uninit();
+		m_pFanEnter = nullptr;
+	}
+
+	// 扇ポリゴンの生成
+	m_pFanEnter = CFan3D::Create(PRIORITY_FAN, MESH_U);
+
+	if (m_pFanEnter == nullptr)
+		return;
+
+	// トンネルの入口の頂点座標取得==================================
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
+
+	// 頂点情報のポインタ
+	VERTEX_3D *pVtx;
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	std::vector<D3DXVECTOR3> vPos;
+
+	for (int i = 0; i <= MESH_U; i++)
+	{
+		vPos.push_back(pVtx[i].pos);
+	}
+
+	// 頂点バッファをアンロック
+	pVtxBuff->Unlock();
+
+	// トンネルの入口の頂点座標取得==================================
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuffFan = *m_pFanEnter->GetVtxBuff();
+
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
+	pVtxBuffFan->Lock(0, 0, (void**)&pVtx, 0);
+
+	for (int i = 0; i <= MESH_U; i++)
+	{
+		pVtx[i].pos = vPos[i];
+	}
+
+	// 頂点バッファをアンロック
+	pVtxBuffFan->Unlock();
+
+	m_pFanEnter->SetPosition(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
 //=====================================================

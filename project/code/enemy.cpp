@@ -15,6 +15,7 @@
 #include "effect3D.h"
 #include "meshRoad.h"
 #include "universal.h"
+#include "shuriken.h"
 
 //*****************************************************
 // 静的メンバ変数
@@ -112,7 +113,7 @@ void CEnemy::Update(void)
 	// 継承クラスの更新
 	CMotion::Update();
 
-	D3DXVECTOR3 pos = { 0.0f, 0.0f, 0.0f };
+	D3DXVECTOR3 pos = GetPosition();
 	D3DXVECTOR3 vecDiff = { 0.0f, 0.0f, 0.0f };  // 差分
 	float StandardLenght = 5000.0f;  // 基準の距離
 	float fLength = 0.0f;            // 現在のポイントと次のポイントまでの距離
@@ -139,6 +140,9 @@ void CEnemy::Update(void)
 		m_fRate =  SPEED / fLength;
 
 		m_Info.fSpeed -= 1.0f;
+
+		// 手裏剣生成
+		CShuriken::Create(D3DXVECTOR3(pos.x, pos.y + 300.0f, pos.z));
 	}
 
 	m_Info.fSpeed += m_fRate;
