@@ -240,7 +240,7 @@ void CMotion::Update(void)
 		for (int nCntEvent = 0; nCntEvent < m_aMotionInfo[m_motionType].nNumEvent; nCntEvent++)
 		{
 			if (m_nKey == m_aMotionInfo[m_motionType].pEvent[nCntEvent].nKey &&
-				m_fCounterMotion >= m_aMotionInfo[m_motionType].pEvent[nCntEvent].nFrame && 
+				m_fCounterMotion >= m_aMotionInfo[m_motionType].pEvent[nCntEvent].nFrame &&
 				fFrameOld < m_aMotionInfo[m_motionType].pEvent[nCntEvent].nFrame)
 			{// イベントの開始
 				m_aMotionInfo[m_motionType].pEvent[nCntEvent].fTimer = 0.0f;
