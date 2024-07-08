@@ -10,6 +10,7 @@
 //*****************************************************
 #include "playerNinja.h"
 #include "player.h"
+#include "shuriken.h"
 
 //*****************************************************
 // 定数定義
@@ -17,6 +18,7 @@
 namespace
 {
 const char* PATH_BODY = "data\\MOTION\\motionPlayer.txt";	// 自身のモーションデータ
+const float RANGE_GUARD = 500.0f;	// ガード範囲
 }
 
 //=====================================================
@@ -114,10 +116,21 @@ void CPlayerNinja::Event(EVENT_INFO *pEventInfo)
 void CPlayerNinja::ManagekatanaCollision(D3DXVECTOR3 pos)
 {
 	// 手裏剣リストの取得
+	std::list<CShuriken*> listShuriken = CShuriken::GetList();
 
+	for (auto it : listShuriken)
+	{
+		// 手裏剣との距離を測る
+		D3DXVECTOR3 pos = GetPosition();
+		D3DXVECTOR3 posShuriken = it->GetPosition();
 
-	// 範囲内なら、手裏剣のヒット処理を呼ぶ
+		bool bHit = universal::DistCmp(pos, posShuriken, RANGE_GUARD, nullptr);
 
+		if (bHit)
+		{// 範囲内なら手裏剣のヒット処理を呼ぶ
+			it->Hit(0.0f);	// ダメージ値は使わない
+		}
+	}
 }
 
 //=====================================================

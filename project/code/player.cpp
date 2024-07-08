@@ -268,7 +268,6 @@ void CPlayer::Update(void)
 		m_pPlayerNinja->SetRotation(GetRotation());
 		m_pPlayerNinja->Update();
 	}
-		
 
 // デバッグ処理
 #if _DEBUG
