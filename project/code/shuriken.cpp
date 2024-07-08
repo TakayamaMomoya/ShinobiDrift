@@ -47,8 +47,14 @@ HRESULT CShuriken::Init(void)
 	CObjectX::Init();
 
 	// モデル読込
-	int nIdx = CModel::Load("data\\MODEL\\Player\\02_head.x");
+	int nIdx = CModel::Load("data\\MODEL\\Player\\shuriken.x");
 	BindModel(nIdx);
+
+	// プレイヤー取得
+	CPlayer* pPlayer = CPlayer::GetInstance();
+
+	// プレイヤーの頭のマトリックス取得
+	m_PlayerMtx = *pPlayer->GetParts(2)->pParts->GetMatrix();
 
 	return S_OK;
 }
@@ -116,14 +122,8 @@ void CShuriken::MoveToPlyaer(void)
 	// 自分の位置取得
 	D3DXVECTOR3 pos = GetPosition();
 
-	// プレイヤーの取得と位置取得
-	CPlayer* pPlayer = CPlayer::GetInstance();
-	D3DXVECTOR3 PlayerPos = pPlayer->GetPosition();
-	D3DXMATRIX PlayerMatrix = *pPlayer->GetParts(2)->pParts->GetMatrix();
-	
-
 	// 目標の位置に向かう
-	universal::MoveToDest(&pos, D3DXVECTOR3(PlayerMatrix._41, PlayerMatrix._42 + 200.0f, PlayerMatrix._43), 0.05f);
+	universal::MoveToDest(&pos, D3DXVECTOR3(m_PlayerMtx._41, m_PlayerMtx._42 + 200.0f, m_PlayerMtx._43), 0.05f);
 
 	// 位置設定
 	SetPosition(pos);

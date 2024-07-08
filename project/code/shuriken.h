@@ -32,7 +32,7 @@ public:
 private:
 
 	void MoveToPlyaer(void);  // プレイヤーに向かって移動する処理
-
+	D3DMATRIX m_PlayerMtx;    // プレイヤーのマトリックス
 };
 
 #endif
