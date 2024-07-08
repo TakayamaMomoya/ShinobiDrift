@@ -29,9 +29,14 @@ public:
 	void Draw(void);                // 描画処理
 	static CShuriken* Create(D3DXVECTOR3 pos);     // 生成処理
 
+	// 設定系
+	static std::list<CShuriken*> GetList(void) { return m_aShuriken; }
+
 private:
 
-	void MoveToPlyaer(void);  // プレイヤーに向かって移動する処理
+	void MoveToPlayer(void);  // プレイヤーに向かって移動する処理
+
+	static std::list<CShuriken*> m_aShuriken;  // 手裏剣のリスト
 	D3DMATRIX m_PlayerMtx;    // プレイヤーのマトリックス
 };
 
