@@ -28,6 +28,7 @@
 #include "effekseer.h"
 #include "sound.h"
 #include "guardRail.h"
+#include "playerNinja.h"
 
 //*****************************************************
 // 定数定義
@@ -114,12 +115,10 @@ HRESULT CPlayer::Init(void)
 	// バイクに乗っている忍者の初期化とモデルの設定
 	if (m_pPlayerNinja == nullptr)
 	{
-		m_pPlayerNinja = new CMotion;
+		m_pPlayerNinja = CPlayerNinja::Create();
 
 		if (m_pPlayerNinja != nullptr)
 		{
-			m_pPlayerNinja->Init();
-			m_pPlayerNinja->Load("data\\MOTION\\motionPlayer.txt");
 			m_pPlayerNinja->SetMatrix(*GetMatrix());
 		}
 	}
@@ -1164,10 +1163,10 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 
 	D3DXVECTOR3 pos = { mtxParent._41,mtxParent._42 ,mtxParent._43 };
 
-	if (nMotion == MOTION_NINJA::MOTION_NINJA_SLASHDOWN || 
+	if (nMotion == MOTION_NINJA::MOTION_NINJA_SLASHDOWN ||
 		nMotion == MOTION_NINJA::MOTION_NINJA_SLASHUP)
 	{// 斬撃時
-		ManagekatanaCollision();
+		ManagekatanaCollision(pos);
 	}
 }
 
@@ -1180,6 +1179,7 @@ void CPlayer::ManagekatanaCollision(D3DXVECTOR3 pos)
 
 
 	// 範囲内なら、手裏剣のヒット処理を呼ぶ
+
 }
 
 //=====================================================

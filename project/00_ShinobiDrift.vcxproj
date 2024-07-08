@@ -225,6 +225,7 @@
     <ClCompile Include="code\pause.cpp" />
     <ClCompile Include="code\physics.cpp" />
     <ClCompile Include="code\player.cpp" />
+    <ClCompile Include="code\playerNinja.cpp" />
     <ClCompile Include="code\precompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -313,6 +314,7 @@
     <ClInclude Include="code\pause.h" />
     <ClInclude Include="code\physics.h" />
     <ClInclude Include="code\player.h" />
+    <ClInclude Include="code\playerNinja.h" />
     <ClInclude Include="code\precompile.h" />
     <ClInclude Include="code\renderer.h" />
     <ClInclude Include="code\result.h" />
