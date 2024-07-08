@@ -2,10 +2,10 @@ Metasequoia Document
 Format Text Ver 1.0
 
 Scene {
-	pos -946.8357 -20296.3359 100000.0000
+	pos 8326.1533 -24521.2324 100000.0000
 	lookat 0.0000 0.0000 0.0000
-	head -3.1035
-	pich 0.0292
+	head -3.1335
+	pich 1.0492
 	bank 0.0000
 	ortho 0
 	zoom2 0.0750
@@ -17,9 +17,10 @@ Scene {
 		}
 	}
 }
-Material 2 {
+Material 3 {
 	"ビル3" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.510) spc(0.000) power(5.00) tex("C:\Users\student\Documents\授業用\総合演習\3年group制作\ShinobiDrift\project\data\TEXTURE\MATERIAL\bill004.jpg")
 	"lambert15SG" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("arms_01.png")
+	"mat1" col(1.000 1.000 1.000 1.000) dif(0.800) amb(0.600) emi(0.000) spc(0.000) power(5.00) tex("C:\Users\student\Documents\授業用\総合演習\3年group制作\ShinobiDrift\project\data\TEXTURE\MATERIAL\conc_flore.jpg")
 }
 Object "obj2" {
 	visible 15
@@ -43,7 +44,7 @@ Object "obj2" {
 		4 V(2 4 5 3) M(0) UV(0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 0.00000 1.00000)
 		4 V(4 6 7 5) M(0) UV(0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 0.00000 1.00000)
 		4 V(6 0 1 7) M(0) UV(0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 0.00000 1.00000)
-		4 V(6 4 2 0) UV(0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 0.00000 1.00000)
+		4 V(6 4 2 0) M(2) UV(0.48529 0.48529 0.51471 0.48529 0.51471 0.48529 0.48529 0.48529)
 		4 V(1 3 5 7) UV(0.00000 0.00000 1.00000 0.00000 1.00000 1.00000 0.00000 1.00000)
 	}
 }

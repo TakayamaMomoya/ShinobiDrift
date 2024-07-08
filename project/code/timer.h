@@ -30,14 +30,21 @@ public:
 	void Uninit();
 	void Update();
 
+	void Second();
+	void MilliSecond();
+
 	static CTimer* GetInstance() { return s_pTimer; }	// 自身の情報取得
 
 private:
 	//メンバ変数
+	float m_fMinutes;			// 現在の時間(分)
 	float m_fSecond;			// 現在の時間(秒)
-	float m_fMsecond;			// 現在の時間(ミリ秒)
+	float m_fMilli;				// 現在の時間(ミリ秒)
+
+	CNumber* m_pMinutes;		// 分表示のポインタ
 	CNumber* m_pSecond;			// 秒表示のポインタ
-	CNumber* m_pMilliSecond;	// ミリセカンド秒表示の用ポインタ
+	CNumber* m_pMilli;			// ミリセカンド秒表示のポインタ
+
 	static CTimer* s_pTimer;	// 自身のポインタ
 };
 
