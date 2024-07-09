@@ -95,7 +95,7 @@ HRESULT CMeshRoad::Init(void)
 	m_it = m_aRoadPoint.begin();
 
 #ifdef _DEBUG
-	//EnableWire(true);
+	EnableWire(true);
 #endif // _DEBUG
 
 	return S_OK;
@@ -709,16 +709,21 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 			pVtx += MeshRoad::NUM_VTX_IN_EDGE;
 
 			// ƒ|ƒŠƒSƒ“‚Ì‰º‚É“ü‚Á‚Ä‚¢‚é‚©”»’è‚·‚é
-			if (!universal::IsOnSquarePolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, pVtx[0].nor, pVtx[3].nor, *pPos, posOld, fHeight))
+			if (!universal::IsOnSquare(pVtx[2].pos, pVtx[0].pos, pVtx[1].pos, pVtx[3].pos, pVtx[2].nor, *pPos, posOld, fHeight))
 				continue;
 
 			// ‚‚³‚ªˆê’è‚Ì‚‚³ˆÈ“à‚©”»’è‚·‚é
-			if (100.0f < fHeight - pPos->y)
+			if (200.0f < fHeight - pPos->y)
 				continue;
 
 			// ‚‚³‚ªˆê”Ô‚‚¢êŠ‚Å”»’è‚·‚é
 			if (fHeightDef < fHeight || !bColRoad)
 				fHeightDef = fHeight;
+
+			CEffect3D::Create(pVtx[0].pos + (pVtx[0].nor * 150.0f), 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+			CEffect3D::Create(pVtx[1].pos + (pVtx[1].nor * 150.0f), 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+			CEffect3D::Create(pVtx[2].pos + (pVtx[2].nor * 150.0f), 50.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+			CEffect3D::Create(pVtx[3].pos + (pVtx[3].nor * 150.0f), 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
 
 			// ”»’è‚ğtrue‚É‚·‚é
 			bColRoad = true;

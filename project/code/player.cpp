@@ -857,6 +857,7 @@ void CPlayer::Collision(void)
 	D3DXMATRIX mtxTrans, mtxRot;
 	auto& paramSize = m_param.sizeCollider;
 
+#ifdef _DEBUG
 	//D3DXVECTOR3 vecAxial = universal::VecToOffset(*mtx, paramSize);
 	CEffect3D::Create(D3DXVECTOR3(pos.x + paramSize.x, pos.y, pos.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 	CEffect3D::Create(D3DXVECTOR3(pos.x - paramSize.x, pos.y, pos.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
@@ -865,6 +866,7 @@ void CPlayer::Collision(void)
 	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y, pos.z + paramSize.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
 	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y, pos.z - paramSize.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
 	CDebugProc::GetInstance()->Print("\n当たり判定位置[%f,%f,%f]", paramSize.x, paramSize.y, paramSize.z);
+#endif // _DEBUG
 
 	for (auto itGuardRail : *aGuardRail)
 	{
@@ -894,6 +896,9 @@ void CPlayer::Collision(void)
 	bRoad[0] = CMeshRoad::GetInstance()->CollideRoad(&posParts[0], posOldParts[0]);
 	bRoad[1] = CMeshRoad::GetInstance()->CollideRoad(&posParts[1], posOldParts[1]);
 
+	CDebugProc::GetInstance()->Print("\nタイヤ1位置[%f,%f,%f]", posParts[0].x, posParts[0].y, posParts[0].z);
+	CDebugProc::GetInstance()->Print("\nタイヤ2位置[%f,%f,%f]", posParts[1].x, posParts[1].y, posParts[1].z);
+
 	// タイヤそれぞれでblockと当たり判定をとる
 	// 先頭オブジェクトを代入
 	CBlock* pBlock = CBlockManager::GetInstance()->GetHead();
@@ -909,6 +914,9 @@ void CPlayer::Collision(void)
 
 		if (pBlock->Collide(&posParts[1], posOldParts[1]))
 			bRoad[1] = true;
+
+		if (bRoad[0] && bRoad[1])
+			break;
 
 		// 次のアドレスを代入
 		pBlock = pBlockNext;
