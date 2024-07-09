@@ -1,7 +1,7 @@
 //*****************************************************
 //
 // エネミービヘイビア[enemyBehaviour.cpp]
-// Author:大原怜将
+// Author:髙山桃也
 //
 //*****************************************************
 
@@ -15,6 +15,8 @@
 #include "player.h"
 #include "myLib.h"
 #include "meshRoad.h"
+#include "manager.h"
+#include "shuriken.h"
 
 //*****************************************************
 // 定数定義
@@ -22,6 +24,8 @@
 namespace
 {
 const float SPEED_DEFAULT_CAHSE = 50.0f;	// 追跡の標準速度
+const float TIME_THROW_SHURIKEN = 2.0f;	// 手裏剣を投げる頻度
+const float LENGTH_PLAYER_FRONT = 3000.0f;	// プレイヤーの前とみなす距離
 }
 
 //********************************************************************************
@@ -32,7 +36,8 @@ const float SPEED_DEFAULT_CAHSE = 50.0f;	// 追跡の標準速度
 //=====================================================
 CEnemyBehaviourChasePlayer::CEnemyBehaviourChasePlayer()
 {
-
+	m_state = STATE::STATE_NONE;
+	m_fTimerAttack = 0.0f;
 }
 
 //=====================================================
@@ -48,6 +53,8 @@ CEnemyBehaviourChasePlayer::~CEnemyBehaviourChasePlayer()
 //=====================================================
 void CEnemyBehaviourChasePlayer::Init(CEnemy *pEnemy)
 {
+	m_state = STATE::STATE_CHASE;
+
 	// スプラインの情報を取得
 	m_pSpline = CMeshRoad::GetInstance()->GetCenterSpline();
 
@@ -79,7 +86,10 @@ void CEnemyBehaviourChasePlayer::Init(CEnemy *pEnemy)
 //=====================================================
 void CEnemyBehaviourChasePlayer::Uninit(CEnemy *pEnemy)
 {
-
+	if (m_pSpline != nullptr)
+	{
+		m_pSpline = nullptr;
+	}
 }
 
 //=====================================================
@@ -87,8 +97,86 @@ void CEnemyBehaviourChasePlayer::Uninit(CEnemy *pEnemy)
 //=====================================================
 void CEnemyBehaviourChasePlayer::Update(CEnemy *pEnemy)
 {
+	// 状態の管理
+	//ManageState(pEnemy);
+
 	// 位置の補間
-	InterpolatePosition(pEnemy);
+	//InterpolatePosition(pEnemy);
+}
+
+//=====================================================
+// 状態の管理
+//=====================================================
+void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
+{
+	switch (m_state)
+	{
+	case CEnemyBehaviourChasePlayer::STATE_CHASE:	// 追跡状態
+	{
+		// 速度を追跡用に加速
+		CPlayer *pPlayer = CPlayer::GetInstance();
+
+		m_fSpeedDefault = pPlayer->GetSpeed() * 1.5f;
+
+		CalcSpeed(pEnemy);
+
+		// プレイヤーの前に出たかの判定
+		bool bFront = CollidePlayerFront(pEnemy);
+
+		if (bFront)	// プレイヤーの前に出たら攻撃を開始
+			m_state = STATE_ATTACK;
+	}
+		break;
+	case CEnemyBehaviourChasePlayer::STATE_ATTACK:	// 攻撃状態
+	{
+		// 一定時間ごとに手裏剣を投げる
+		float fDeltaTime = CManager::GetDeltaTime();
+		m_fTimerAttack += fDeltaTime;
+
+		if (TIME_THROW_SHURIKEN <= m_fTimerAttack)
+		{
+			// タイマーリセット
+			m_fTimerAttack = 0.0f;
+
+			// 手裏剣を投げる
+			ThrowShuriken(pEnemy);
+		}
+
+		// 速度をプレイヤーに合わせる
+		CPlayer *pPlayer = CPlayer::GetInstance();
+
+		m_fSpeedDefault = pPlayer->GetSpeed() * 0.85f;
+
+		// スピードの計算
+		CalcSpeed(pEnemy);
+	}
+		break;
+	default:
+		break;
+	}
+}
+
+//=====================================================
+// プレイヤーの前に出た判定
+//=====================================================
+bool CEnemyBehaviourChasePlayer::CollidePlayerFront(CEnemy *pEnemy)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer == nullptr)
+		return false;
+
+	bool bFront = false;
+
+	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	D3DXVECTOR3 posEnemy = pEnemy->GetPosition();
+
+	// 前方ベクトルの垂直に線分を生成
+	D3DXVECTOR3 vecForward = posPlayer + pPlayer->GetForward() * LENGTH_PLAYER_FRONT;
+
+	CEffect3D::Create(vecForward, 100.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+	return bFront;
 }
 
 //=====================================================
@@ -113,13 +201,6 @@ void CEnemyBehaviourChasePlayer::InterpolatePosition(CEnemy *pEnemy)
 	}
 
 	m_fRate += m_fSpeed;
-
-	CPlayer *pPlayer = CPlayer::GetInstance();
-
-	m_fSpeedDefault = pPlayer->GetSpeed() * 0.85f;
-
-	// スピードの計算
-	CalcSpeed(pEnemy);
 
 	// 位置補間
 	if (m_pSpline != nullptr)
@@ -181,6 +262,16 @@ void CEnemyBehaviourChasePlayer::ControllRot(CEnemy *pEnemy)
 	universal::FactingRotTarget(&rot, pos, m_vPos[m_nIdx], 0.05f);
 
 	pEnemy->SetRotation(D3DXVECTOR3(0.0f, rot.y, 0.0f));
+}
+
+//=====================================================
+// 手裏剣を投げる
+//=====================================================
+void CEnemyBehaviourChasePlayer::ThrowShuriken(CEnemy *pEnemy)
+{
+	D3DXVECTOR3 pos = pEnemy->GetPosition();
+
+	CShuriken::Create(pos);
 }
 
 //=====================================================

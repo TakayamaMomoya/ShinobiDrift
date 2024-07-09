@@ -111,15 +111,12 @@ void CEnemy::Update(void)
 //=====================================================
 void CEnemy::ReleaseAllBehaviour(void)
 {
-	for (auto it = m_listBehaviour.begin();it != m_listBehaviour.end();)
+	for (auto it : m_listBehaviour)
 	{
-		auto itNext = std::next(it);
-
-		(*it)->Uninit(this);
-		m_listBehaviour.remove((*it));
-
-		it = itNext;
+		it->Uninit(this);
 	}
+
+	m_listBehaviour.clear();
 }
 
 //=====================================================
