@@ -16,6 +16,7 @@
 #include "meshRoad.h"
 #include "universal.h"
 #include "shuriken.h"
+#include "player.h"
 
 //*****************************************************
 // 静的メンバ変数
@@ -28,6 +29,7 @@ CEnemy* CEnemy::m_pEnemy = nullptr;
 namespace
 {
 	const float SPEED = 50.0f;
+	const float HEIGHT = 300.0f;
 }
 
 //=====================================================
@@ -79,12 +81,8 @@ HRESULT CEnemy::Init(void)
 	if(m_pSpline != nullptr)
 	   m_pSpline->Init(m_vPos);
 
-	float StandardLenght = 5000.0f;
-
 	D3DXVECTOR3 vecDiff = m_vPos[m_nIdx] - m_vPos[m_nIdx - 1];
 	float fLength = D3DXVec3Length(&vecDiff);
-
-	//fLength = StandardLenght / fLength;
 
 	m_fRate = SPEED / fLength;
 	m_fRateOld = m_fRate;
@@ -115,7 +113,6 @@ void CEnemy::Update(void)
 
 	D3DXVECTOR3 pos = GetPosition();
 	D3DXVECTOR3 vecDiff = { 0.0f, 0.0f, 0.0f };  // 差分
-	float StandardLenght = 5000.0f;  // 基準の距離
 	float fLength = 0.0f;            // 現在のポイントと次のポイントまでの距離
 
 	// 向き取得
@@ -142,7 +139,7 @@ void CEnemy::Update(void)
 		m_Info.fSpeed -= 1.0f;
 
 		// 手裏剣生成
-		CShuriken::Create(D3DXVECTOR3(pos.x, pos.y + 300.0f, pos.z));
+		CShuriken::Create(D3DXVECTOR3(pos.x, pos.y + HEIGHT, pos.z));
 	}
 
 	m_Info.fSpeed += m_fRate;
