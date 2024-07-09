@@ -17,11 +17,6 @@
 #include "player.h"
 
 //*****************************************************
-// 静的メンバ変数
-//*****************************************************
-CEnemy* CEnemy::m_pEnemy = nullptr;
-
-//*****************************************************
 // 定数定義
 //*****************************************************
 namespace
@@ -45,6 +40,27 @@ CEnemy::CEnemy(int nPriority)
 CEnemy::~CEnemy()
 {
 
+}
+
+//=====================================================
+// 生成処理
+//=====================================================
+CEnemy* CEnemy::Create()
+{
+	CEnemy *pEnemy = nullptr;
+
+	if (pEnemy == nullptr)
+	{
+		pEnemy = new CEnemy;
+
+		if (pEnemy != nullptr)
+		{
+			// 初期化
+			pEnemy->Init();
+		}
+	}
+
+	return pEnemy;
 }
 
 //=====================================================
@@ -97,7 +113,7 @@ void CEnemy::CalcSpeed(void)
 	if (m_pSpline->IsEmpty())
 		return;
 
-	float fLength = m_pSpline->GetLength(m_nIdx, 20);
+	float fLength = m_pSpline->GetLength(m_nIdx, 50);
 
 	if (fLength == 0)
 		return;	// 0割り防止
@@ -110,7 +126,8 @@ void CEnemy::CalcSpeed(void)
 //=====================================================
 void CEnemy::Uninit(void)
 {
-	m_pEnemy = nullptr;
+	// 全ビヘイビア解放
+	ReleaseAllBehaviour();
 
 	// 継承クラスの終了
 	CMotion::Uninit();
@@ -123,6 +140,12 @@ void CEnemy::Update(void)
 {
 	// 継承クラスの更新
 	CMotion::Update();
+
+	// ビヘイビアの更新
+	for (auto it : m_listBehaviour)
+	{
+		it->Update(this);
+	}
 
 	// 位置の補間
 	InterpolatePosition();
@@ -153,7 +176,7 @@ void CEnemy::InterpolatePosition(void)
 
 	CPlayer *pPlayer = CPlayer::GetInstance();
 
-	m_fSpeedDefault = pPlayer->GetSpeed();
+	m_fSpeedDefault = pPlayer->GetSpeed() * 0.85f;
 
 	// スピードの計算
 	CalcSpeed();
@@ -219,33 +242,22 @@ void CEnemy::Debug(void)
 }
 
 //=====================================================
+// 全ビヘイビア解放
+//=====================================================
+void CEnemy::ReleaseAllBehaviour(void)
+{
+	for (auto it : m_listBehaviour)
+	{
+		it->Uninit(this);
+		m_listBehaviour.remove(it);
+	}
+}
+
+//=====================================================
 // 描画処理
 //=====================================================
 void CEnemy::Draw(void)
 {
 	// 継承クラスの描画
 	CMotion::Draw();
-}
-
-//=====================================================
-// 生成処理
-//=====================================================
-CEnemy* CEnemy::Create()
-{
-	CEnemy *pEnemy = nullptr;
-
-	if (pEnemy == nullptr)
-	{
-		pEnemy = new CEnemy;
-
-		if (pEnemy != nullptr)
-		{
-			m_pEnemy = pEnemy;
-
-			// 初期化
-			pEnemy->Init();
-		}
-	}
-
-	return pEnemy;
 }
