@@ -133,6 +133,7 @@ void CFan3D::SetVtx(void)
 		// 中心の頂点の設定
 		pVtx[0].pos = D3DXVECTOR3{ 0.0f,0.0f,0.0f };
 		pVtx[0].tex = D3DXVECTOR2{ 0.5f,0.5f };
+		pVtx[0].col = GetCol();
 
 		for (int i = 1;i < nNumVtx + 2;i++)
 		{// 円周の頂点の設定
@@ -157,6 +158,31 @@ void CFan3D::SetVtx(void)
 
 			pVtx[i].col = GetCol();
 		}
+
+		// 頂点バッファのアンロック
+		pVtxBuff->Unlock();
+	}
+}
+
+//=====================================================
+// テクスチャ座標設定処理
+//=====================================================
+void CFan3D::SetTex(float fScrollX, float fScrollY)
+{
+	// 頂点情報のポインタ
+	VERTEX_3D* pVtx;
+
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = *GetVtxBuff();
+	int nNumVtx = GetNumVtx();
+
+	if (pVtxBuff != nullptr)
+	{
+		// 頂点バッファをロックし、頂点情報へのポインタを取得
+		pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		for (int i = 0; i < nNumVtx + 2; i++)
+			 pVtx[i].tex += D3DXVECTOR2(fScrollX, fScrollY);
+		
 
 		// 頂点バッファのアンロック
 		pVtxBuff->Unlock();

@@ -302,7 +302,7 @@ void CMeshRoad::AddRoadPoint(D3DXVECTOR3 pos, bool bReCreateVtx)
 		CreateVtxBuffEdge();
 
 	// 終始点を再割り当て
-	for (int i = 0; i < m_aTunnel.size(); i++)
+	for (int i = 0; i < (int)m_aTunnel.size(); i++)
 	{
 		std::vector<CMeshRoad::SInfoRoadPoint>::iterator it;
 
@@ -319,7 +319,7 @@ void CMeshRoad::AddRoadPoint(D3DXVECTOR3 pos, bool bReCreateVtx)
 	}
 
 	// ガードレールの再割り当て
-	for (int i = 0; i < m_aGR.size(); i++)
+	for (int i = 0; i < (int)m_aGR.size(); i++)
 	{
 		std::vector<CMeshRoad::SInfoRoadPoint>::iterator it;
 

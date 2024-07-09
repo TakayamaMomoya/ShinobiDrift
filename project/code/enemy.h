@@ -4,19 +4,19 @@
 // Author:大原怜将
 //
 //*****************************************************
-
-#ifndef _CAR_H_
-#define _CAR_H_
+#ifndef _ENEMY_H_
+#define _ENEMY_H_
 
 //*****************************************************
 // インクルード
 //*****************************************************
 #include "motion.h"
+#include "enemyBehaviour.h"
 
 //*****************************************************
 // 前方定義
 //*****************************************************
-class CCutMullSpline;
+class CBehaviourEnemy;
 
 //*****************************************************
 // クラスの定義
@@ -24,7 +24,6 @@ class CCutMullSpline;
 class CEnemy : public CMotion
 {
 public:
-
 	CEnemy(int nPriority = 4);	// コンストラクタ
 	~CEnemy();	                // デストラクタ
 
@@ -35,34 +34,23 @@ public:
 	static CEnemy* Create();    // 生成処理
 
 private:
-
-	// 状態
 	enum STATE
-	{
+	{// 状態
 		STATE_NONE = 0,	         // 何でもない状態
 		STATE_NORMAL,	         // 通常状態
 		STATE_MAX
 	};
-
-	// 情報
 	struct SInfo
-	{
+	{// 情報
 		STATE state;             // 状態
-		float fSpeed;            // 速さ
 	};
 
-	SInfo m_Info;                     // 情報
-	static CEnemy *m_pEnemy;          // 自分自身のポインタ
-	CMotion* m_pEnemyNinja;           // バイクに乗っている忍者
-	CCutMullSpline *m_pSpline;	      // スプライン
-	std::vector<D3DXVECTOR3> m_vPos;  // データ点のベクター
+	// メンバ関数
+	void ReleaseAllBehaviour(void);	// 全てのビヘイビアの解放
 
-	int m_nIdx = 1;
-	int m_nSize = 0;
-	float m_t = 0.0f;
-	float m_fRate = 0.0f;
-	float m_fRateOld = 0.0f;
-	float m_fSplineLenght = 0.0f;
+	// メンバ変数
+	SInfo m_Info;	// 情報
+	std::list<CEnemyBehaviour*> m_listBehaviour;	// ビヘイビアのリスト
 };
 
 #endif

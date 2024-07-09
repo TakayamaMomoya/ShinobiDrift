@@ -28,6 +28,7 @@
 #include "effekseer.h"
 #include "sound.h"
 #include "guardRail.h"
+#include "playerNinja.h"
 
 //*****************************************************
 // 定数定義
@@ -40,7 +41,7 @@ const float DIST_LIMIT = 3000.0f;	// ワイヤー制限距離
 const float LINE_CORRECT_DRIFT = 40.0f;	// ドリフト補正のしきい値
 const float SIZE_BLUR = -20.0f;	// ブラーのサイズ
 const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
-const D3DXVECTOR3 DEFAULT_POS = { -4331.0f,-12.4f,21389.0f };	// 初期位置
+const D3DXVECTOR3 DEFAULT_POS = { 30445.6f,2821.1f,-24808.4f };	// 初期位置
 const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,2.0f,0.0f };	// 初期向き
 const float SE_CHANGE_SPEED = 10.0f;  // エンジン音とアクセル音が切り替わる速度の値
 }
@@ -114,12 +115,10 @@ HRESULT CPlayer::Init(void)
 	// バイクに乗っている忍者の初期化とモデルの設定
 	if (m_pPlayerNinja == nullptr)
 	{
-		m_pPlayerNinja = new CMotion;
+		m_pPlayerNinja = CPlayerNinja::Create();
 
 		if (m_pPlayerNinja != nullptr)
 		{
-			m_pPlayerNinja->Init();
-			m_pPlayerNinja->Load("data\\MOTION\\motionPlayer.txt");
 			m_pPlayerNinja->SetMatrix(*GetMatrix());
 		}
 	}
@@ -269,7 +268,6 @@ void CPlayer::Update(void)
 		m_pPlayerNinja->SetRotation(GetRotation());
 		m_pPlayerNinja->Update();
 	}
-		
 
 // デバッグ処理
 #if _DEBUG
@@ -1136,7 +1134,6 @@ void CPlayer::ManageMotionNinja(void)
 			// エフェクシア取得
 			CEffekseer* pEffekseer = CManager::GetMyEffekseer();
 
-			// 後輪の位置取得
 			float PosX = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_41;
 			float PosY = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_42;
 			float PosZ = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_43;
@@ -1147,8 +1144,6 @@ void CPlayer::ManageMotionNinja(void)
 					::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
 
 			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHDOWN);
-
-
 		}
 
 		if (bFinish)
@@ -1174,6 +1169,24 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 	universal::SetOffSet(&mtxParent, mtxPart, offset);
 
 	D3DXVECTOR3 pos = { mtxParent._41,mtxParent._42 ,mtxParent._43 };
+
+	if (nMotion == MOTION_NINJA::MOTION_NINJA_SLASHDOWN ||
+		nMotion == MOTION_NINJA::MOTION_NINJA_SLASHUP)
+	{// 斬撃時
+		ManagekatanaCollision(pos);
+	}
+}
+
+//=====================================================
+// 刀の判定の管理
+//=====================================================
+void CPlayer::ManagekatanaCollision(D3DXVECTOR3 pos)
+{
+	// 手裏剣リストの取得
+
+
+	// 範囲内なら、手裏剣のヒット処理を呼ぶ
+
 }
 
 //=====================================================

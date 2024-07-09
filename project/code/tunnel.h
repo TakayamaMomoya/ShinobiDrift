@@ -14,6 +14,11 @@
 #include "meshRoad.h"
 
 //*****************************************************
+// 前方宣言
+//*****************************************************
+class CFan3D;
+
+//*****************************************************
 // クラス定義
 //*****************************************************
 class CTunnel : public CMeshCylinder
@@ -41,6 +46,7 @@ private:
 	// メンバ関数
 	void CreateVtx(void);	// 頂点の生成
 	void VtxFollowRoad(void);	// 頂点を道に沿わせる
+	void CreateFan(void);	// 扇ポリゴンの生成
 	void DetectionPlayer(void);	// プレイヤーの検知
 	void CollidePlayerEnter(VERTEX_3D *pVtx);	// プレイヤー入ってくる判定
 	void CollidePlayerExit(VERTEX_3D *pVtx);	// プレイヤー出ていく判定
@@ -52,5 +58,6 @@ private:
 	bool m_bInPlayer;	// プレイヤーが入っているかどうか
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itStart;	// 開始イテレイター
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itEnd;	// 終了イテレイター
+	CFan3D *m_pFanEnter;	// 入口の扇ポリゴン
 };
 #endif

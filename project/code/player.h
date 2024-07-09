@@ -124,6 +124,7 @@ private:
 	void ManageMotion(void);
 	void ManageMotionNinja(void);	// ”EÒ‚Ìƒ‚[ƒVƒ‡ƒ“ŠÇ—
 	void Event(EVENT_INFO *pEventInfo);
+	void ManagekatanaCollision(D3DXVECTOR3 pos);	// “‚Ì”»’èŠÇ—
 	void Debug(void);
 
 	SInfo m_info;	// ©g‚Ìî•ñ

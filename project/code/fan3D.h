@@ -30,6 +30,7 @@ public:
 	void DrawNormal(void);	// 通常描画
 	void DrawBillboard(void);	// ビルボード描画
 	void SetVtx(void) override;	// 頂点設定
+	void SetTex(float fScrollX, float fScrollY);      // テクスチャ座標設定処理
 
 private:
 	D3DXMATRIX m_mtxWorld;	// ワールドマトリックス

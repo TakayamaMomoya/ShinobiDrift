@@ -51,7 +51,7 @@
 #define NUM_PLAYER (4)	// プレイヤーの最大数
 #define MAX_STRING (256)	// 文字数の最大
 #define CLASS_NAME				"WindowClass"					// ウィンドウクラスの名前
-#define WINDOW_NAME				"Steel Fung"				// ウィンドウの名前(キャプション)
+#define WINDOW_NAME				"ShinobiDrift"				// ウィンドウの名前(キャプション)
 
 //*****************************************************
 // 定数定義

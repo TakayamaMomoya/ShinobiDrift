@@ -186,6 +186,7 @@
     <ClCompile Include="code\effect3D.cpp" />
     <ClCompile Include="code\effekseer.cpp" />
     <ClCompile Include="code\enemy.cpp" />
+    <ClCompile Include="code\enemyBehaviour.cpp" />
     <ClCompile Include="code\fade.cpp" />
     <ClCompile Include="code\fan.cpp" />
     <ClCompile Include="code\fan2D.cpp" />
@@ -225,6 +226,7 @@
     <ClCompile Include="code\pause.cpp" />
     <ClCompile Include="code\physics.cpp" />
     <ClCompile Include="code\player.cpp" />
+    <ClCompile Include="code\playerNinja.cpp" />
     <ClCompile Include="code\precompile.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -233,6 +235,7 @@
     <ClCompile Include="code\result.cpp" />
     <ClCompile Include="code\resultBehavior.cpp" />
     <ClCompile Include="code\scene.cpp" />
+    <ClCompile Include="code\shuriken.cpp" />
     <ClCompile Include="code\skybox.cpp" />
     <ClCompile Include="code\slow.cpp" />
     <ClCompile Include="code\smoke.cpp" />
@@ -271,6 +274,7 @@
     <ClInclude Include="code\effect3D.h" />
     <ClInclude Include="code\effekseer.h" />
     <ClInclude Include="code\enemy.h" />
+    <ClInclude Include="code\enemyBehaviour.h" />
     <ClInclude Include="code\fade.h" />
     <ClInclude Include="code\fan.h" />
     <ClInclude Include="code\fan2D.h" />
@@ -312,11 +316,13 @@
     <ClInclude Include="code\pause.h" />
     <ClInclude Include="code\physics.h" />
     <ClInclude Include="code\player.h" />
+    <ClInclude Include="code\playerNinja.h" />
     <ClInclude Include="code\precompile.h" />
     <ClInclude Include="code\renderer.h" />
     <ClInclude Include="code\result.h" />
     <ClInclude Include="code\resultBehavior.h" />
     <ClInclude Include="code\scene.h" />
+    <ClInclude Include="code\shuriken.h" />
     <ClInclude Include="code\skybox.h" />
     <ClInclude Include="code\slow.h" />
     <ClInclude Include="code\smoke.h" />

@@ -288,6 +288,15 @@
     <ClCompile Include="code\enemy.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="code\shuriken.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="code\playerNinja.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="code\enemyBehaviour.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\block.h">
@@ -537,6 +546,15 @@
       <Filter>ソース ファイル\mesh</Filter>
     </ClInclude>
     <ClInclude Include="code\enemy.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="code\shuriken.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="code\playerNinja.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="code\enemyBehaviour.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>
