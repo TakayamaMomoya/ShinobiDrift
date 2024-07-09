@@ -27,6 +27,8 @@ const float MESH_HEIGHT = 50.0f;	// メッシュの高さ
 const char* TEX_PATH = "data\\TEXTURE\\MATERIAL\\concrete.jpg";	// テクスチャパス
 const int NUM_VTX_IN_EDGE = 5;	// 辺の中にある頂点数
 const int PRIORITY_FAN = 5;	// 扇ポリゴンの描画プライオリティ
+const float TEX_SCROLL_U = 0.01f;  // テクスチャ座標の移動量
+const float TEX_SCROLL_V = 0.0f;   // テクスチャ座標の移動量
 }
 
 //=====================================================
@@ -228,6 +230,9 @@ void CTunnel::CreateFan(void)
 	if (m_pFanEnter == nullptr)
 		return;
 
+	int nIdx = Texture::GetIdx("data\\TEXTURE\\MATERIAL\\451026.jpg");
+	m_pFanEnter->SetIdxTexture(nIdx);
+
 	// トンネルの入口の頂点座標取得==================================
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 
@@ -290,6 +295,10 @@ void CTunnel::Update(void)
 
 	if (m_bInPlayer)
 		StayPlayer();	// プレイヤーが内側にいるときの処理
+
+	// テクスチャ座標設定処理
+	if (m_pFanEnter != nullptr)
+		m_pFanEnter->SetTex(TEX_SCROLL_U, TEX_SCROLL_V);
 }
 
 //=====================================================
