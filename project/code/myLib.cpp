@@ -141,7 +141,7 @@ D3DXVECTOR3 CCutMullSpline::Interpolate(float t,int nIdx)
     a3 = (m_vPos[nIdx] - m_vPos[nIdx - 1]) / 2;
 
     // a1‚ÌŒˆ’è
-    a1 = (m_vPos[nIdx + 2] - m_vPos[nIdx]) / 2 - 2 * m_vPos[nIdx + 1] + a3 + 2 * a4;
+    a1 = ((m_vPos[nIdx + 2] - m_vPos[nIdx]) / 2) - 2 * m_vPos[nIdx + 1] + a3 + 2 * a4;
 
     // a2‚ÌŒˆ’è
     a2 = 3 * m_vPos[nIdx + 1] - (m_vPos[nIdx + 2] - m_vPos[nIdx]) / 2 - 2 * a3 - 3 * a4;

@@ -49,6 +49,7 @@ private:
 	// メンバ関数
 	void CalcSpeed(void);	// スピードの計算
 	void InterpolatePosition(void);	// 位置の補間
+	void ControllRot(void);	// 向きの制御
 	void Debug(void);	// デバッグ表示
 
 	// メンバ変数
