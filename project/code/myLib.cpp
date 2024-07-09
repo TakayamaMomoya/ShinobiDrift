@@ -151,3 +151,30 @@ D3DXVECTOR3 CCutMullSpline::Interpolate(float t,int nIdx)
 
     return pos;
 }
+
+//=====================================================
+// 曲線の長さの取得
+//=====================================================
+float CCutMullSpline::GetLength(int nIdx, int nDiv)
+{
+    if (nDiv <= 0)
+        assert(("スプラインの長さ取得で不正な分割数を入力しています",false)); // 分割数が0より少ないエラー
+
+    float fLengthResult = 0;
+
+    for (int i = 1; i < nDiv; i++)
+    {// 区分ごとに差分距離を取得して加算する
+        float fRate = (float)i / nDiv;
+        float fRateLast = (float)(i - 1) / nDiv;
+
+        D3DXVECTOR3 pos = Interpolate(fRate, nIdx);
+        D3DXVECTOR3 posLast = Interpolate(fRateLast, nIdx);
+
+        D3DXVECTOR3 vecDiff = posLast - pos;
+        float fLength = D3DXVec3Length(&vecDiff);
+
+        fLengthResult += fLength;
+    }
+
+    return fLengthResult;
+}

@@ -91,8 +91,13 @@ HRESULT CEnemy::Init(void)
 //=====================================================
 void CEnemy::CalcSpeed(void)
 {
-	D3DXVECTOR3 vecDiff = m_vPos[m_nIdx] - m_vPos[m_nIdx - 1];
-	float fLength = D3DXVec3Length(&vecDiff);
+	if (m_pSpline == nullptr)
+		return;
+
+	if (m_pSpline->IsEmpty())
+		return;
+
+	float fLength = m_pSpline->GetLength(m_nIdx, 20);
 
 	if (fLength == 0)
 		return;	// 0割り防止
@@ -129,13 +134,9 @@ void CEnemy::Update(void)
 void CEnemy::InterpolatePosition(void)
 {
 	D3DXVECTOR3 pos = GetPosition();
-	D3DXVECTOR3 rot = GetRotation();
 
 	if (m_Info.fRate >= 1.0f)
 	{
-		m_fRateOld = m_Info.fRate;
-		m_Info.fRate += m_fSpeed;
-
 		m_nIdx++;
 
 		// サイズを超えたら戻す
@@ -176,23 +177,45 @@ void CEnemy::InterpolatePosition(void)
 		pos = m_pSpline->Interpolate(m_Info.fRate, m_nIdx);
 	}
 
-	// 次のポイントの方を向く
-	universal::FactingRotTarget(&rot, pos, m_vPos[m_nIdx], 0.05f);
-
 	// 位置と向き更新
 	SetPosition(pos);
+
+	// 向きの制御
+	ControllRot();
+
+	// デバッグ表示
+	Debug();
+}
+
+//=====================================================
+// 向きの制御
+//=====================================================
+void CEnemy::ControllRot(void)
+{
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
+
+	// 次のデータ点の方を向く
+	universal::FactingRotTarget(&rot, pos, m_vPos[m_nIdx], 0.05f);
+
 	SetRotation(D3DXVECTOR3(0.0f, rot.y, 0.0f));
+}
 
-	CEffect3D::Create(pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-
+//=====================================================
+// デバッグ表示
+//=====================================================
+void CEnemy::Debug(void)
+{
 	// デバッグプロック取得
 	CDebugProc* pDebugProc = CDebugProc::GetInstance();
 
 	if (pDebugProc == nullptr)
 		return;
 
+	CEffect3D::Create(GetPosition(), 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
 	pDebugProc->Print("\n敵のバイクの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
-	pDebugProc->Print("\n敵の速度[%f]", m_fSpeed);
+	pDebugProc->Print("\n敵の速度[%f]", m_fSpeedDefault);
 }
 
 //=====================================================
