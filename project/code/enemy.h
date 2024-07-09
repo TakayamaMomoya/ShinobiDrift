@@ -11,11 +11,12 @@
 // インクルード
 //*****************************************************
 #include "motion.h"
+#include "enemyBehaviour.h"
 
 //*****************************************************
 // 前方定義
 //*****************************************************
-class CCutMullSpline;
+class CBehaviourEnemy;
 
 //*****************************************************
 // クラスの定義
@@ -39,28 +40,17 @@ private:
 		STATE_NORMAL,	         // 通常状態
 		STATE_MAX
 	};
-	
 	struct SInfo
 	{// 情報
 		STATE state;             // 状態
-		float fRate;            // スプラインの割合
 	};
 
 	// メンバ関数
-	void CalcSpeed(void);	// スピードの計算
-	void InterpolatePosition(void);	// 位置の補間
-	void ControllRot(void);	// 向きの制御
-	void Debug(void);	// デバッグ表示
+	void ReleaseAllBehaviour(void);	// 全てのビヘイビアの解放
 
 	// メンバ変数
-	SInfo m_Info;                     // 情報
-	static CEnemy *m_pEnemy;          // 自分自身のポインタ
-	CCutMullSpline *m_pSpline;	      // スプライン
-	std::vector<D3DXVECTOR3> m_vPos;  // データ点のベクター
-	int m_nIdx = 1;	// スプラインの番号
-	float m_fSpeed = 0.0f;	// 速度
-	float m_fSpeedDefault;	// 基準にする速度
-	float m_fRateOld = 0.0f;	// 前回のスプラインの割合
+	SInfo m_Info;	// 情報
+	std::list<CEnemyBehaviour*> m_listBehaviour;	// ビヘイビアのリスト
 };
 
 #endif

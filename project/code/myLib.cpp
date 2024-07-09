@@ -121,9 +121,9 @@ void CCutMullSpline::Init(const std::vector<D3DXVECTOR3> vPos)
 
     // ダミーの最初と最後の位置情報を追加
     m_vPos[0] = vPos[0];
-    m_vPos[0].x -= 50.0f;
+    //m_vPos[0].x -= 50.0f;
     m_vPos[nSize + 1] = vPos[nSize - 1];
-    m_vPos[nSize + 1].x += 50.0f;
+    //m_vPos[nSize + 1].x += 50.0f;
 }
 
 //=====================================================
@@ -144,10 +144,10 @@ D3DXVECTOR3 CCutMullSpline::Interpolate(float t,int nIdx)
     a1 = ((m_vPos[nIdx + 2] - m_vPos[nIdx]) / 2) - 2 * m_vPos[nIdx + 1] + a3 + 2 * a4;
 
     // a2の決定
-    a2 = 3 * m_vPos[nIdx + 1] - (m_vPos[nIdx + 2] - m_vPos[nIdx]) / 2 - 2 * a3 - 3 * a4;
+    a2 = 3 * m_vPos[nIdx + 1] - ((m_vPos[nIdx + 2] - m_vPos[nIdx]) / 2) - 2 * a3 - 3 * a4;
 
     // 計算結果を返す
-    pos = a1 * t * t * t + a2 * t * t + a3 * t + a4;
+    pos = (a1 * t * t * t) + (a2 * t * t) + (a3 * t) + a4;
 
     return pos;
 }

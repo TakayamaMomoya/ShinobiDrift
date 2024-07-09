@@ -165,6 +165,31 @@ void CFan3D::SetVtx(void)
 }
 
 //=====================================================
+// テクスチャ座標設定処理
+//=====================================================
+void CFan3D::SetTex(float fScrollX, float fScrollY)
+{
+	// 頂点情報のポインタ
+	VERTEX_3D* pVtx;
+
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = *GetVtxBuff();
+	int nNumVtx = GetNumVtx();
+
+	if (pVtxBuff != nullptr)
+	{
+		// 頂点バッファをロックし、頂点情報へのポインタを取得
+		pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+		for (int i = 0; i < nNumVtx + 2; i++)
+			 pVtx[i].tex += D3DXVECTOR2(fScrollX, fScrollY);
+		
+
+		// 頂点バッファのアンロック
+		pVtxBuff->Unlock();
+	}
+}
+
+//=====================================================
 // 描画
 //=====================================================
 void CFan3D::Draw(void)
