@@ -11,10 +11,8 @@
 #include "enemy.h"
 #include "myLib.h"
 #include "debugproc.h"
-#include "player.h"
 #include "effect3D.h"
 #include "meshRoad.h"
-#include "universal.h"
 #include "shuriken.h"
 #include "player.h"
 
@@ -28,8 +26,7 @@ CEnemy* CEnemy::m_pEnemy = nullptr;
 //*****************************************************
 namespace
 {
-	const float SPEED = 50.0f;
-	const float HEIGHT = 300.0f;
+	const float SPEED_DEFAULT = 50.0f;
 }
 
 //=====================================================
@@ -37,10 +34,9 @@ namespace
 //=====================================================
 CEnemy::CEnemy(int nPriority)
 {
-	m_pEnemyNinja = nullptr;
 	m_nIdx = 1;
-	m_nSize = 0;
-	m_Info.fSpeed = 0.0f;
+	m_Info.fRate = 0.0f;
+	m_fSpeedDefault = 0.0f;
 }
 
 //=====================================================
@@ -69,10 +65,10 @@ HRESULT CEnemy::Init(void)
 	std::vector<CMeshRoad::SInfoRoadPoint> pRoadPoint = *CMeshRoad::GetInstance()->GetArrayRP();
 
 	// ベクターを必要なサイズに調整
-	m_nSize = pRoadPoint.size();
-	m_vPos.resize(m_nSize);
+	int nSize = pRoadPoint.size();
+	m_vPos.resize(nSize);
 
-	for (int i = 0; i < m_nSize; i++)
+	for (int i = 0; i < nSize; i++)
 	{
 		m_vPos[i] = pRoadPoint[i].pos;
 	}
@@ -81,15 +77,27 @@ HRESULT CEnemy::Init(void)
 	if(m_pSpline != nullptr)
 	   m_pSpline->Init(m_vPos);
 
-	D3DXVECTOR3 vecDiff = m_vPos[m_nIdx] - m_vPos[m_nIdx - 1];
-	float fLength = D3DXVec3Length(&vecDiff);
-
-	m_fRate = SPEED / fLength;
-	m_fRateOld = m_fRate;
+	// 初期スピードの計算
+	m_fSpeedDefault = SPEED_DEFAULT;
+	CalcSpeed();
 
 	SetPosition(D3DXVECTOR3(pRoadPoint[0].pos.x, pRoadPoint[0].pos.y, pRoadPoint[0].pos.z));
 
 	return S_OK;
+}
+
+//=====================================================
+// スピードの計算
+//=====================================================
+void CEnemy::CalcSpeed(void)
+{
+	D3DXVECTOR3 vecDiff = m_vPos[m_nIdx] - m_vPos[m_nIdx - 1];
+	float fLength = D3DXVec3Length(&vecDiff);
+
+	if (fLength == 0)
+		return;	// 0割り防止
+
+	m_fSpeed = m_fSpeedDefault / fLength;
 }
 
 //=====================================================
@@ -111,44 +119,49 @@ void CEnemy::Update(void)
 	// 継承クラスの更新
 	CMotion::Update();
 
-	D3DXVECTOR3 pos = GetPosition();
-	D3DXVECTOR3 vecDiff = { 0.0f, 0.0f, 0.0f };  // 差分
-	float fLength = 0.0f;            // 現在のポイントと次のポイントまでの距離
+	// 位置の補間
+	InterpolatePosition();
+}
 
-	// 向き取得
+//=====================================================
+// 位置の補間
+//=====================================================
+void CEnemy::InterpolatePosition(void)
+{
+	D3DXVECTOR3 pos = GetPosition();
 	D3DXVECTOR3 rot = GetRotation();
 
-	if (m_Info.fSpeed >= 1.0f)
+	if (m_Info.fRate >= 1.0f)
 	{
-		m_fRateOld = m_fRate;
-		m_Info.fSpeed += m_fRate;
+		m_fRateOld = m_Info.fRate;
+		m_Info.fRate += m_fSpeed;
 
 		m_nIdx++;
 
 		// サイズを超えたら戻す
-		if (m_nIdx >= m_nSize)
+		if (m_nIdx >= (int)m_vPos.size())
 			m_nIdx = 1;
 
-		// 区間長算出
-		vecDiff = m_vPos[m_nIdx] - m_vPos[m_nIdx - 1];
-		fLength = D3DXVec3Length(&vecDiff);
-		
-		// 1フレームで進む距離
-		m_fRate =  SPEED / fLength;
+		// スピードの計算
+		CalcSpeed();
 
-		m_Info.fSpeed -= 1.0f;
-
-		// 手裏剣生成
-		CShuriken::Create(D3DXVECTOR3(pos.x, pos.y + HEIGHT, pos.z));
+		m_Info.fRate -= 1.0f;
 	}
 
-	m_Info.fSpeed += m_fRate;
+	m_Info.fRate += m_fSpeed;
+
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	m_fSpeedDefault = pPlayer->GetSpeed();
+
+	// スピードの計算
+	CalcSpeed();
 
 	// 位置補間
 	if (m_pSpline != nullptr)
 	{
 		if (m_pSpline->IsEmpty())
-		{
+		{// スプラインが空だった時の再取得
 			CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 			if (pMesh == nullptr)
@@ -160,11 +173,10 @@ void CEnemy::Update(void)
 				return;	// 再取得しても空だったら処理を通さない
 		}
 
-		pos = m_pSpline->Interpolate(m_Info.fSpeed, m_nIdx);
-
+		pos = m_pSpline->Interpolate(m_Info.fRate, m_nIdx);
 	}
-		
-	// 次のポイントに向かせる
+
+	// 次のポイントの方を向く
 	universal::FactingRotTarget(&rot, pos, m_vPos[m_nIdx], 0.05f);
 
 	// 位置と向き更新
@@ -178,9 +190,9 @@ void CEnemy::Update(void)
 
 	if (pDebugProc == nullptr)
 		return;
-	
+
 	pDebugProc->Print("\n敵のバイクの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
-	pDebugProc->Print("\n敵の速度[%f]", m_Info.fSpeed);
+	pDebugProc->Print("\n敵の速度[%f]", m_fSpeed);
 }
 
 //=====================================================
