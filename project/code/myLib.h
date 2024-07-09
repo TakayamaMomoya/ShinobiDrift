@@ -43,6 +43,7 @@ public:
     void Init(const std::vector<D3DXVECTOR3> vPos); // ‰Šú‰»ˆ—
     D3DXVECTOR3 Interpolate(float t, int nIdx);   // •âŠÔˆ—
     bool IsEmpty(void) { return m_vPos.size() == 0; }; // ‹ó‚©‚Ç‚¤‚©‚Ì”»’è
+    float GetLength(int nIdx,int nDiv);   // ‹Èü‚Ì’·‚³‚Ìæ“¾
 
 private:
     // ƒƒ“ƒo•Ï”

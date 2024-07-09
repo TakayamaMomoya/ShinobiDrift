@@ -60,13 +60,15 @@ HRESULT CShuriken::Init(void)
 	// プレイヤー取得
 	CPlayer* pPlayer = CPlayer::GetInstance();
 
+	// プレイヤーの速度取得
+	float PlayerSpeed = pPlayer->GetSpeed();
+
 	// プレイヤーの頭のマトリックス取得
 	m_PlayerMtx = *pPlayer->GetParts(2)->pParts->GetMatrix();
 
-	float PlayerSpeed = pPlayer->GetSpeed();
-
-	m_PlayerMtx._41 += PlayerSpeed;
-	m_PlayerMtx._43 += PlayerSpeed;
+	// プレイヤーの位置に速度を加算
+	m_PlayerMtx._41 += (PlayerSpeed * 5.0f);
+	m_PlayerMtx._43 += (PlayerSpeed * 5.0f);
 
 	return S_OK;
 }
@@ -133,8 +135,14 @@ CShuriken* CShuriken::Create(D3DXVECTOR3 pos)
 //=====================================================
 void CShuriken::MoveToPlayer(void)
 {
+	// プレイヤー取得
+	CPlayer* pPlayer = CPlayer::GetInstance();
+
 	// 自分の位置取得
 	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 Playerpos = {};
+
+	//Playerpos = universal::LinePridiction(pos, MOVE_SPEED, D3DXVECTOR3(m_PlayerMtx._41, m_PlayerMtx._42 + 200.0f, m_PlayerMtx._43), pPlayer->GetMove());
 
 	// 目標の位置に向かう
 	universal::MoveToDest(&pos, D3DXVECTOR3(m_PlayerMtx._41, m_PlayerMtx._42 + 200.0f, m_PlayerMtx._43), MOVE_SPEED);
