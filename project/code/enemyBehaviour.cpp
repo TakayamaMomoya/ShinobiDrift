@@ -98,10 +98,10 @@ void CEnemyBehaviourChasePlayer::Uninit(CEnemy *pEnemy)
 void CEnemyBehaviourChasePlayer::Update(CEnemy *pEnemy)
 {
 	// 状態の管理
-	//ManageState(pEnemy);
+	ManageState(pEnemy);
 
 	// 位置の補間
-	//InterpolatePosition(pEnemy);
+	InterpolatePosition(pEnemy);
 }
 
 //=====================================================
@@ -123,8 +123,12 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 		// プレイヤーの前に出たかの判定
 		bool bFront = CollidePlayerFront(pEnemy);
 
-		if (bFront)	// プレイヤーの前に出たら攻撃を開始
+		if (bFront)
+		{// プレイヤーの前に出たら攻撃を開始
+			CDebugProc::GetInstance()->Print("\n追い越している");
+
 			m_state = STATE_ATTACK;
+		}
 	}
 		break;
 	case CEnemyBehaviourChasePlayer::STATE_ATTACK:	// 攻撃状態
@@ -145,7 +149,14 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 		// 速度をプレイヤーに合わせる
 		CPlayer *pPlayer = CPlayer::GetInstance();
 
-		m_fSpeedDefault = pPlayer->GetSpeed() * 0.85f;
+		if (CollidePlayerFront(pEnemy))
+		{
+			m_fSpeedDefault = pPlayer->GetSpeed() * 0.85f;
+		}
+		else
+		{
+			m_fSpeedDefault = pPlayer->GetSpeed() * 1.5f;
+		}
 
 		// スピードの計算
 		CalcSpeed(pEnemy);
@@ -166,17 +177,31 @@ bool CEnemyBehaviourChasePlayer::CollidePlayerFront(CEnemy *pEnemy)
 	if (pPlayer == nullptr)
 		return false;
 
-	bool bFront = false;
-
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	D3DXVECTOR3 posEnemy = pEnemy->GetPosition();
 
 	// 前方ベクトルの垂直に線分を生成
-	D3DXVECTOR3 vecForward = posPlayer + pPlayer->GetForward() * LENGTH_PLAYER_FRONT;
+	D3DXVECTOR3 vecForward = posEnemy - pEnemy->GetForward() * LENGTH_PLAYER_FRONT;
 
 	CEffect3D::Create(vecForward, 100.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
-	return bFront;
+	D3DXVECTOR3 vec1 = universal::Vec3Cross(-vecForward, D3DXVECTOR3(0.0f, 1.0f, 0.0f));
+	D3DXVECTOR3 vec2 = -universal::Vec3Cross(-vecForward, D3DXVECTOR3(0.0f, 1.0f, 0.0f));
+
+	vec1 += vecForward;
+	vec2 += vecForward;
+
+	float fRate;
+
+	bool bHit = universal::IsCross(posPlayer, vec1, vec2, &fRate);
+
+	if (!bHit)
+		return false;
+
+	//if (fRate > 1.0f || fRate < 0.0f)
+		//return false;
+
+	return true;
 }
 
 //=====================================================

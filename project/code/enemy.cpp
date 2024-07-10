@@ -114,6 +114,8 @@ void CEnemy::ReleaseAllBehaviour(void)
 	for (auto it : m_listBehaviour)
 	{
 		it->Uninit(this);
+
+		delete it;
 	}
 
 	m_listBehaviour.clear();

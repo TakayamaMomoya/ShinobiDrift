@@ -45,6 +45,10 @@
     <ClCompile Include="code\objectX.cpp" />
     <ClCompile Include="code\particle.cpp" />
     <ClCompile Include="code\parts.cpp" />
+    <ClCompile Include="code\precompile.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="code\renderer.cpp" />
     <ClCompile Include="code\shadow.cpp" />
     <ClCompile Include="code\skybox.cpp" />
@@ -78,6 +82,7 @@
     <ClInclude Include="code\objectX.h" />
     <ClInclude Include="code\particle.h" />
     <ClInclude Include="code\parts.h" />
+    <ClInclude Include="code\precompile.h" />
     <ClInclude Include="code\renderer.h" />
     <ClInclude Include="code\shadow.h" />
     <ClInclude Include="code\skybox.h" />
@@ -159,14 +164,16 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>;6031;</DisableSpecificWarnings>
+      <PrecompiledHeaderFile>precompile.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>precompile.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>C:\Users\student\Desktop\ShinobiDrift\MotionEditer\code;C:\Users\student\Desktop\ShinobiDrift\MotionEditer\code\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -190,14 +197,16 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalIncludeDirectories>C:\Users\student\Desktop\ShinobiDrift\MotionEditer\code;C:\Users\student\Desktop\ShinobiDrift\MotionEditer\code\backends;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile>precompile.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>precompile.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -387,6 +387,23 @@ void ConvertScreenPosTo3D(D3DXVECTOR3 *pPosNear, D3DXVECTOR3 *pPosFar, D3DXVECTO
 }
 
 //========================================
+// 外積の作成
+//========================================
+D3DXVECTOR3 Vec3Cross(D3DXVECTOR3 vec1, D3DXVECTOR3 vec2)
+{
+	D3DXVECTOR3 vecCross;
+
+	vecCross =
+	{
+		vec1.y * vec2.z - vec1.z * vec2.y,
+		vec1.z * vec2.x - vec1.x * vec2.z,
+		vec1.x * vec2.y - vec1.y * vec2.x
+	};
+
+	return vecCross;
+}
+
+//========================================
 // オフセット設定処理
 //========================================
 void SetOffSet(D3DXMATRIX *pMtxWorldOffset, D3DXMATRIX mtxWorldOwner, D3DXVECTOR3 posOffset, D3DXVECTOR3 rot)
