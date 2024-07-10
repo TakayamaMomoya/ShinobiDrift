@@ -71,15 +71,14 @@ void CField::Draw(void)
 //=====================================================
 CField *CField::Create(D3DXVECTOR2 tex,D3DXVECTOR3 pos,float width,float height)
 {
-	CField *pField = NULL;
+	CField *pField = nullptr;
 
-	if (pField == NULL)
+	if (pField == nullptr)
 	{
 		pField = new CField;
 
-		if (pField != NULL)
+		if (pField != nullptr)
 		{
-
 			// ‰Šú‰»ˆ—
 			pField->Init();
 

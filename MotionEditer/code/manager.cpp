@@ -290,3 +290,20 @@ void CManager::Draw(void)
 		m_pRenderer->Draw();
 	}
 }
+
+namespace Manager
+{
+D3DXVECTOR3 GetPosVCamera(void)
+{
+    D3DXVECTOR3 posV = {};
+
+    CCamera *pCamera = CManager::GetCamera();
+
+    if (pCamera == nullptr)
+        return posV;
+
+    posV = pCamera->GetCamera()->posV;
+
+    return posV;
+}
+}

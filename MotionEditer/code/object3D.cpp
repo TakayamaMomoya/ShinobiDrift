@@ -38,6 +38,7 @@ CObject3D::CObject3D(int nPriority) : CObject(nPriority)
 	m_pVtxBuff = nullptr;
 	m_nIdxTexture = -1;
 	m_nNumVtx = 0;
+    m_mode = MODE::MODE_NORMAL;
 }
 
 //=====================================================
@@ -321,6 +322,9 @@ void CObject3D::Draw(void)
 	if (m_mode == MODE_BILLBOARD)
 	{
 		SetMtxBillboard();
+
+        pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+        pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	}
 	else
 	{
@@ -354,6 +358,11 @@ void CObject3D::Draw(void)
 		// カリングを有効化
 		pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	}
+
+    {// Zテストの設定
+        pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+        pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+    }
 }
 
 //=====================================================
