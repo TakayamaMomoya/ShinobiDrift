@@ -33,7 +33,8 @@ namespace
 {
 const float SIZE_ICON = 10.f;   // アイコンのサイズ
 const D3DXCOLOR COL_NOT_CURRENT = { 1.0f,1.0f,1.0f,1.0f };
-const D3DXCOLOR COL_CURRENT = { 1.0f,0.0f,0.0f,1.0f };
+const D3DXCOLOR COL_CURRENT = { 0.0f,1.0f,0.0f,1.0f };
+const D3DXCOLOR COL_MOVE = { 1.0f,0.0f,0.0f,1.0f };
 }
 
 //=====================================================
@@ -187,39 +188,6 @@ void CMotion::Input(void)
             Reset();
             m_bSetUp = true;
         }
-    }
-
-    m_apParts[m_nIdxParts]->pParts->SetCurrent(false);
-
-    if (ImGui::SliderInt("Parts", &m_nIdxParts, 0, m_nNumParts - 1))
-    {
-        SetMotion(m_motionType);
-
-        if (m_bMotion == false)
-        {
-            // ポーズ初期設定
-            InitPose(m_motionType);
-        }
-    }
-
-    m_apParts[m_nIdxParts]->pParts->SetCurrent(true);
-
-    if (ImGui::Button("PATRS_UP", ImVec2(100.0f, 20.0f)))
-    {// パーツ切り替え
-        m_apParts[m_nIdxParts]->pParts->SetCurrent(false);
-
-        m_nIdxParts = (m_nIdxParts + m_nNumParts - 1) % m_nNumParts;
-
-        m_apParts[m_nIdxParts]->pParts->SetCurrent(true);
-    }
-
-    if (ImGui::Button("PATRS_DOWN", ImVec2(100.0f, 20.0f)))
-    {// パーツ切り替え
-        m_apParts[m_nIdxParts]->pParts->SetCurrent(false);
-
-        m_nIdxParts = (m_nIdxParts + 1) % m_nNumParts;
-
-        m_apParts[m_nIdxParts]->pParts->SetCurrent(true);
     }
 
     if (m_bSetUp)
@@ -376,6 +344,11 @@ void CMotion::Input(void)
 
     // パーツの選択
     SelectParts();
+
+    if (m_nIdxParts >= 0)
+    {
+        m_mapIcon[m_nIdxParts]->SetColor(COL_MOVE);
+    }
 }
 
 //=====================================================
@@ -662,13 +635,18 @@ void CMotion::CreateIcon(int nIdx)
 //=====================================================
 void CMotion::SelectParts(void)
 {
+    CInputMouse *pMouse = CManager::GetMouse();
+
+    if (pMouse == nullptr)
+        return;
+
     D3DXVECTOR3 posNear;
     D3DXVECTOR3 posFar;
     D3DXVECTOR3 vecDiff;
 
     universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
 
-    std::vector<CObject3D*> vIcon;
+    std::map<CObject3D*,int> mapIcon;
 
     for (int i = 0; i < m_nNumParts; i++)
     {
@@ -679,18 +657,18 @@ void CMotion::SelectParts(void)
         bool bHit = universal::CalcRaySphere(posNear, vecDiff, posIcon, SIZE_ICON);
 
         if (bHit)
-            vIcon.push_back(m_mapIcon[i]);
+            mapIcon[m_mapIcon[i]] = i;
     }
 
-    if (vIcon.size() == 0)
+    if (mapIcon.size() == 0)
         return;
 
     float fLengthMin = FLT_MAX;
     CObject3D *pIcon = nullptr;
 
-    for (auto it : vIcon)
+    for (auto it : mapIcon)
     {
-        D3DXVECTOR3 posIcon = it->GetPosition();
+        D3DXVECTOR3 posIcon = it.first->GetPosition();
         D3DXVECTOR3 posCamera = Manager::GetPosVCamera();
 
         float fLength;
@@ -700,13 +678,18 @@ void CMotion::SelectParts(void)
         if (bMin)
         {
             fLengthMin = fLength;
-            pIcon = it;
+            pIcon = it.first;
         }
     }
 
     if (pIcon != nullptr)
     {
         pIcon->SetColor(COL_CURRENT);
+        
+        if (pMouse->GetTrigger(CInputMouse::BUTTON_LMB))
+        {
+            m_nIdxParts = mapIcon[pIcon];
+        }
     }
 }
 
