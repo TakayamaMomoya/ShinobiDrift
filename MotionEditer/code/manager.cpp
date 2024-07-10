@@ -19,7 +19,6 @@
 #include "light.h"
 #include "object3D.h"
 #include "objectX.h"
-#include "billboard.h"
 #include "model.h"
 #include "texture.h"
 #include "field.h"
