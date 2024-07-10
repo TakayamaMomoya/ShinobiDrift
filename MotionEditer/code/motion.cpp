@@ -31,7 +31,7 @@
 #define MOVE_SPEED	(0.1f)	// パーツが動くスピード
 namespace
 {
-const float SIZE_ICON = 10.f;   // アイコンのサイズ
+const float SIZE_ICON = 5.f;   // アイコンのサイズ
 const D3DXCOLOR COL_NOT_CURRENT = { 1.0f,1.0f,1.0f,1.0f };
 const D3DXCOLOR COL_CURRENT = { 0.0f,1.0f,0.0f,1.0f };
 const D3DXCOLOR COL_MOVE = { 1.0f,0.0f,0.0f,1.0f };

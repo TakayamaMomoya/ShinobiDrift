@@ -812,6 +812,67 @@ D3DXVECTOR3 CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVEC
 }
 
 //========================================
+// 円柱とレイの判定
+//========================================
+bool RayCollideCylinder(D3DXVECTOR3 startRay, D3DXVECTOR3 EndRay, D3DXVECTOR3 posCylinder1, D3DXVECTOR3 posCylinder2,
+    float fRadiusCylinder, D3DXVECTOR3 *pPosEnter, D3DXVECTOR3 *pPosExit, bool bInfinite)
+{
+    D3DXVECTOR3 px = posCylinder1 - startRay;
+    posCylinder2 -= startRay;
+    D3DXVECTOR3 sx = posCylinder2 - px;
+
+    // 各種内積値
+    float Dvv = EndRay.x * EndRay.x + EndRay.y * EndRay.y + EndRay.z * EndRay.z;
+    float Dsv = sx.x * EndRay.x + sx.y * EndRay.y + sx.z * EndRay.z;
+    float Dpv = px.x * EndRay.x + px.y * EndRay.y + px.z * EndRay.z;
+    float Dss = sx.x * sx.x + sx.y * sx.y + sx.z * sx.z;
+    float Dps = px.x * sx.x + px.y * sx.y + px.z * sx.z;
+    float Dpp = px.x * px.x + px.y * px.y + px.z * px.z;
+    float rr = fRadiusCylinder * fRadiusCylinder;
+
+    if (Dss == 0.0f)
+        return false; // 円柱が定義されない
+
+    float A = Dvv - Dsv * Dsv / Dss;
+    float B = Dpv - Dps * Dsv / Dss;
+    float C = Dpp - Dps * Dps / Dss - rr;
+
+    if (A == 0.0f)
+        return false;
+
+    float s = B * B - A * C;
+    if (s < 0.0f)
+        return false; // レイが円柱と衝突していない
+    s = sqrtf(s);
+
+    float a1 = (B - s) / A;
+    float a2 = (B + s) / A;
+
+    *pPosEnter = startRay + a1 * EndRay;
+    *pPosExit = startRay + a2 * EndRay;
+
+    if (!bInfinite)
+    {// 有限円柱とする
+        D3DXVECTOR3 posEnterLocal = *pPosEnter - startRay;
+
+        float f1 = CheckDot(px, posCylinder2, posEnterLocal);
+        float f2 = CheckDot(posCylinder2, px, posEnterLocal);
+
+        return f1 > 0.0f && f2 > 0.0f;
+    }
+
+    return true;
+}
+
+//========================================
+// 3ベクトルの内積出す
+//========================================
+float CheckDot(D3DXVECTOR3 vec1, D3DXVECTOR3 vec2, D3DXVECTOR3 vec3)
+{
+    return (vec1.x - vec2.x) * (vec3.x - vec2.x) + (vec1.y - vec2.y) * (vec3.y - vec2.y) + (vec1.z - vec2.z) * (vec3.z - vec2.z);
+}
+
+//========================================
 // 矩形の中にいるかどうかの計算
 //========================================
 bool CubeCrossProduct(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR3 vtx4, D3DXVECTOR3 pos)

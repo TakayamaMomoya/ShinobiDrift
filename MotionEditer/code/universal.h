@@ -72,6 +72,9 @@ bool IsInScreen(const D3DXVECTOR3 pos, D3DXMATRIX mtx, D3DXVECTOR3 *pPos = nullp
 bool DistCmp(D3DXVECTOR3 posOwn, D3DXVECTOR3 posTarget, float fLengthMax, float *fDiff);
 bool DistCmpFlat(D3DXVECTOR3 posOwn, D3DXVECTOR3 posTarget, float fLengthMax, float *fDiff);
 D3DXVECTOR3 CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVECTOR3 posPlane, D3DXVECTOR3 vecNorPlane);
+bool RayCollideCylinder(D3DXVECTOR3 startRay, D3DXVECTOR3 EndRay, D3DXVECTOR3 posCylinder1, D3DXVECTOR3 posCylinder2,
+    float fRadiusCylinder, D3DXVECTOR3 *pPosEnter, D3DXVECTOR3 *pPosExit, bool bInfinite = true);
+float CheckDot(D3DXVECTOR3 vec1, D3DXVECTOR3 vec2, D3DXVECTOR3 vec3);
 
 //======================================
 // •âŠ®Œn
