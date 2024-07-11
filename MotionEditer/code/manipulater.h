@@ -39,6 +39,9 @@ public:
     void SetIdxPart(int nIdx) { m_nIdxPart = nIdx; }
     void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }	// 位置
     D3DXVECTOR3 GetPosition(void) { return m_pos; }
+    void SetRotation(D3DXVECTOR3 rot) { m_rot = rot; }	// 向き
+    D3DXVECTOR3 GetRotation(void) { return m_rot; }
+    CMotion *GetMotion(void) { return m_pMotion; }  // モーション取得
 
     // 静的メンバ関数
     static CManipulater* Create(int nIdxPart, CMotion *pMotion);    // 生成処理
@@ -46,6 +49,7 @@ public:
 private:
 	// メンバ関数
     D3DXVECTOR3 m_pos;  // 位置
+    D3DXVECTOR3 m_rot;  // 向き
 
 	// メンバ変数
     int m_nIdxPart; // パーツの番号
@@ -79,6 +83,11 @@ public:
     void Update(CManipulater *pManipulater) override;  // 更新処理
 
 private:
+    // メンバ関数
+    void Input(CManipulater *pManipulater);   // 入力処理
+    void FollowModel(CManipulater *pManipulater); // モデルの追従
+
+    // メンバ変数
     CObjectX *m_pManipulater;   // マニピュレーター
 };
 

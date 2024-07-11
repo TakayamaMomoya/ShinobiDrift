@@ -92,8 +92,20 @@ void CManipulater::Update(void)
 {
     // パーツの位置の取得
     D3DXVECTOR3 posPart = m_pMotion->GetMtxPos(m_nIdxPart);
+    D3DXVECTOR3 rotPart = universal::ExtractEulerAngles(*m_pMotion->GetParts(m_nIdxPart)->pParts->GetMatrix());
+    int nIdxPartParent = m_pMotion->GetParts(m_nIdxPart)->nIdxParent;
+
+    if (nIdxPartParent != -1)
+    {// 親がいる場合は親のマトリックスから向きを取得
+        rotPart = universal::ExtractEulerAngles(*m_pMotion->GetParts(nIdxPartParent)->pParts->GetMatrix());
+    }
+    else
+    {// 親無しなら向きをリセット
+        rotPart = { 0.0f,0.0f,0.0f };
+    }
 
     SetPosition(posPart);
+    SetRotation(rotPart);
 
     if (m_pState != nullptr)
     {
@@ -172,7 +184,30 @@ void CStateManipulaterTranslate::Uninit(CManipulater *pManipulater)
 //=====================================================
 void CStateManipulaterTranslate::Update(CManipulater *pManipulater)
 {
+    // 入力
+    Input(pManipulater);
+
+    // モデルの追従
+    FollowModel(pManipulater);
+}
+
+//=====================================================
+// 入力処理
+//=====================================================
+void CStateManipulaterTranslate::Input(CManipulater *pManipulater)
+{
+
+}
+
+//=====================================================
+// モデルの追従
+//=====================================================
+void CStateManipulaterTranslate::FollowModel(CManipulater *pManipulater)
+{
+    // モデルの追従
     D3DXVECTOR3 posManipulater = pManipulater->GetPosition();
+    D3DXVECTOR3 rotManipulater = pManipulater->GetRotation();
 
     m_pManipulater->SetPosition(posManipulater);
+    m_pManipulater->SetRot(rotManipulater);
 }

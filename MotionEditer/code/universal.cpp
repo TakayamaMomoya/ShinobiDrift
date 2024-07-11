@@ -1154,4 +1154,26 @@ D3DXVECTOR3 NorRelativeMtx(D3DXVECTOR3 posO, D3DXVECTOR3 rot, D3DXVECTOR3 offset
 
 	return vecNor;
 }
+
+//========================================
+// 行列からオイラー角を抽出
+//========================================
+D3DXVECTOR3 ExtractEulerAngles(D3DXMATRIX mtx)
+{
+    D3DXVECTOR3 angles;
+
+    // ピッチ（x軸周りの回転）
+    angles.x = asinf(-mtx._32);
+
+    // コサインを使用してジンバルロックをチェック
+    float cosPitch = cosf(angles.x);
+
+    // ヨー（y軸周りの回転）
+    angles.y = atan2f(mtx._31, mtx._33);
+
+    // ロール（z軸周りの回転）
+    angles.z = atan2f(mtx._12, mtx._22);
+
+    return angles;
+}
 }	// namespace universal
