@@ -23,7 +23,7 @@
 //*****************************************************
 namespace
 {
-const float SPEED_DEFAULT_CAHSE = 50.0f;	// 追跡の標準速度
+const float SPEED_DEFAULT_CHASE = 50.0f;	// 追跡の標準速度
 const float TIME_THROW_SHURIKEN = 2.0f;	// 手裏剣を投げる頻度
 const float LENGTH_PLAYER_FRONT = 3000.0f;	// プレイヤーの前とみなす距離
 }
@@ -75,7 +75,7 @@ void CEnemyBehaviourChasePlayer::Init(CEnemy *pEnemy)
 		m_pSpline->Init(m_vPos);
 
 	// 初期スピードの計算
-	m_fSpeedDefault = SPEED_DEFAULT_CAHSE;
+	m_fSpeedDefault = SPEED_DEFAULT_CHASE;
 	CalcSpeed(pEnemy);
 
 	pEnemy->SetPosition(D3DXVECTOR3(pRoadPoint[0].pos.x, pRoadPoint[0].pos.y, pRoadPoint[0].pos.z));
@@ -116,7 +116,7 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 		// 速度を追跡用に加速
 		CPlayer *pPlayer = CPlayer::GetInstance();
 
-		m_fSpeedDefault = pPlayer->GetSpeed() * 1.5f;
+		//m_fSpeedDefault = pPlayer->GetSpeed() * 1.5f;
 
 		CalcSpeed(pEnemy);
 
@@ -151,11 +151,17 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 
 		if (CollidePlayerFront(pEnemy))
 		{
-			m_fSpeedDefault = pPlayer->GetSpeed() * 0.85f;
+			m_fSpeedDefault += (pPlayer->GetSpeed() * 0.3f - m_fSpeedDefault) * 0.8f;
+
+			CDebugProc::GetInstance()->Print("\n敵減速中");
+
 		}
 		else
 		{
-			m_fSpeedDefault = pPlayer->GetSpeed() * 1.5f;
+			m_fSpeedDefault += (pPlayer->GetSpeed() * 2.0f - m_fSpeedDefault) * 0.8f;
+
+			CDebugProc::GetInstance()->Print("\n敵加速中");
+
 		}
 
 		// スピードの計算
@@ -203,11 +209,13 @@ bool CEnemyBehaviourChasePlayer::CollidePlayerFront(CEnemy *pEnemy)
 
 	bool bHit = universal::IsCross(posPlayer, vec1, vec2, &fRate);
 
+	CDebugProc::GetInstance()->Print("\n追い越し判定[%d][%d]", bHit, fRate > 1.0f || fRate < 0.0f);
+
 	if (!bHit)
 		return false;
 
-	if (fRate > 1.0f || fRate < 0.0f)
-		return false;
+	//if (fRate > 1.0f || fRate < 0.0f)
+		//return false;
 
 	return true;
 }
