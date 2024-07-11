@@ -314,7 +314,7 @@ bool CBlock::Collide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 		return false;
 
 	// ‚‚³‚ªˆê’è‚Ì‚‚³ˆÈ“à‚©”»’è‚·‚é
-	if (100.0f < fHeight - pPos->y)
+	if (200.0f < fHeight - pPos->y)
 		return false;
 
 	pPos->y = fHeight;

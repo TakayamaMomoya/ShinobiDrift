@@ -13,6 +13,7 @@
 #include "model.h"
 #include "player.h"
 #include "manager.h"
+#include "effect3D.h"
 #include "debugproc.h"
 
 //*****************************************************
@@ -25,7 +26,7 @@ std::list<CShuriken*> CShuriken::m_aShuriken;
 //*****************************************************
 namespace
 {
-	const float MOVE_SPEED = 30.0f;  // スピード
+	const float MOVE_SPEED = 120.0f;  // スピード
 	const float LIFE_DEFAULT = 5.0f;	// デフォルトの寿命
 }
 
@@ -48,7 +49,7 @@ CShuriken::~CShuriken()
 //=====================================================
 // 生成処理
 //=====================================================
-CShuriken* CShuriken::Create(D3DXVECTOR3 pos)
+CShuriken* CShuriken::Create(D3DXVECTOR3 pos, D3DXVECTOR3 vecForward)
 {
 	CShuriken *pShuriken = nullptr;
 	pShuriken = new CShuriken;
@@ -56,6 +57,7 @@ CShuriken* CShuriken::Create(D3DXVECTOR3 pos)
 	if (pShuriken != nullptr)
 	{
 		pShuriken->SetPosition(pos);
+		pShuriken->CalcMove(vecForward);
 		pShuriken->Init();
 	}
 
@@ -75,15 +77,25 @@ HRESULT CShuriken::Init(void)
 
 	m_aShuriken.push_back(this);
 
+	m_fLife = LIFE_DEFAULT;
+
+	return S_OK;
+}
+
+//=====================================================
+// 移動量の計算
+//=====================================================
+void CShuriken::CalcMove(D3DXVECTOR3 vecForward)
+{
 	// プレイヤー取得
 	CPlayer* pPlayer = CPlayer::GetInstance();
 
 	if (pPlayer == nullptr)
-		return E_FAIL;
+		return;
 
 	// プレイヤーの移動ベクトル取得
-	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
-	movePlayer.y = 0.0f;
+	float fSpeedPlayer = pPlayer->GetSpeed();
+	D3DXVECTOR3 moveEnemy = vecForward * fSpeedPlayer;
 
 	// プレイヤーの頭のマトリックス取得
 	D3DXVECTOR3 posHeadPlayer = pPlayer->GetNInjaBody()->GetMtxPos(2);
@@ -93,13 +105,9 @@ HRESULT CShuriken::Init(void)
 
 	universal::VecConvertLength(&vecDiff, MOVE_SPEED);
 
-	D3DXVECTOR3 move = movePlayer + vecDiff;
+	D3DXVECTOR3 move = moveEnemy + vecDiff;
 
 	SetMove(move);
-
-	m_fLife = LIFE_DEFAULT;
-
-	return S_OK;
 }
 
 //=====================================================
@@ -126,6 +134,8 @@ void CShuriken::Update(void)
 	pos += move;
 
 	SetPosition(pos);
+
+	CEffect3D::Create(pos, 100.0f, 10, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 	// 寿命の減少
 	m_fLife -= CManager::GetDeltaTime();
@@ -165,7 +175,6 @@ void CShuriken::Hit(float fDamage)
 	if(pEffekseer != nullptr)
 		pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_PARRY], ::Effekseer::Vector3D(GetPosition().x, GetPosition().y, GetPosition().z),
 			::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
-
 
 	// 終了する
 	Uninit();
