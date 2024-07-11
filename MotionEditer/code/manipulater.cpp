@@ -23,7 +23,9 @@ namespace
 //=====================================================
 CManipulater::CManipulater(int nPriority)
 {
-
+    m_nIdxPart = 0;
+    m_pState = nullptr;
+    m_pMotion = nullptr;
 }
 
 //=====================================================
@@ -37,7 +39,7 @@ CManipulater::~CManipulater()
 //=====================================================
 // 生成処理
 //=====================================================
-CManipulater* CManipulater::Create()
+CManipulater* CManipulater::Create(int nIdxPart, CMotion *pMotion)
 {
     CManipulater *pManipulater = nullptr;
 
@@ -49,6 +51,9 @@ CManipulater* CManipulater::Create()
 		{
 			// 初期化
             pManipulater->Init();
+
+            pManipulater->m_nIdxPart = nIdxPart;
+            pManipulater->m_pMotion = pMotion;
 		}
 	}
 
@@ -60,7 +65,7 @@ CManipulater* CManipulater::Create()
 //=====================================================
 HRESULT CManipulater::Init(void)
 {
-    CObjectX::Init();
+    ChangeState(new CStateManipulaterTranslate);
 
 	return S_OK;
 }
@@ -70,7 +75,13 @@ HRESULT CManipulater::Init(void)
 //=====================================================
 void CManipulater::Uninit(void)
 {
-    CObjectX::Uninit();
+    if (m_pState != nullptr)
+    {
+        m_pState->Uninit();
+        m_pState = nullptr;
+    }
+
+    Release();
 }
 
 //=====================================================
@@ -78,7 +89,10 @@ void CManipulater::Uninit(void)
 //=====================================================
 void CManipulater::Update(void)
 {
-    CObjectX::Update();
+    if (m_pState != nullptr)
+    {
+        m_pState->Update();
+    }
 }
 
 //=====================================================
@@ -86,5 +100,51 @@ void CManipulater::Update(void)
 //=====================================================
 void CManipulater::Draw(void)
 {
-	CObjectX::Draw();
+
+}
+
+//=====================================================
+// ステイトの変更
+//=====================================================
+void CManipulater::ChangeState(CStateManipulater *pState)
+{
+    if (m_pState != nullptr)
+    {
+        m_pState->Uninit();
+        m_pState = nullptr;
+    }
+
+    m_pState = pState;
+
+    if (m_pState != nullptr)
+    {
+        m_pState->Init();
+    }
+}
+
+//********************************************************************************
+// 移動のステイト
+//********************************************************************************
+//=====================================================
+// 初期化
+//=====================================================
+void CStateManipulaterTranslate::Init(void)
+{
+
+}
+
+//=====================================================
+// 終了
+//=====================================================
+void CStateManipulaterTranslate::Uninit(void)
+{
+
+}
+
+//=====================================================
+// 更新
+//=====================================================
+void CStateManipulaterTranslate::Update(void)
+{
+
 }

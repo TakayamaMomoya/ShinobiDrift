@@ -12,6 +12,7 @@
 // 前方宣言
 //*****************************************************
 class CObject3D;
+class CManipulater;
 
 //*****************************************************
 // インクルード
@@ -132,6 +133,8 @@ public:
 	EVENT_INFO *GetInfoEvent(int nMotion) { return m_aMotionInfo[nMotion].pEvent; }
 	int GetNumEventInfo(int nMotion) { return m_aMotionInfo[nMotion].nNumEvent; }
 	virtual void Event(EVENT_INFO *pEventInfo) {};
+    CManipulater *CreateManipulater(int nIdxPart);
+    void DeleteManipulater(void);
 
 private:
 	void Motion(void);
@@ -172,6 +175,7 @@ private:
 	bool m_bSetUp;
     char m_aPathSave[256];    // 保存パス
     std::map<int, CObject3D*> m_mapIcon;    // アイコンのマップコンテナ
+    CManipulater *m_pManipulater;   // マニピュレーター
 };
 
 #endif

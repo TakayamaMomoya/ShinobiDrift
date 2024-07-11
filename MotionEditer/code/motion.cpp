@@ -22,6 +22,7 @@
 #include "effect3D.h"
 #include "object3D.h"
 #include "texture.h"
+#include "manipulater.h"
 
 //*****************************************************
 // マクロ定義
@@ -64,6 +65,7 @@ CMotion::CMotion(int nPriority) : CObject(nPriority)
 	m_col = { 1.0f,1.0f,1.0f,1.0f };
 	m_bInde = false;
     ZeroMemory(&m_aPathSave[0], sizeof(m_apParts));
+    m_pManipulater = nullptr;
 }
 
 //=====================================================
@@ -687,8 +689,13 @@ void CMotion::SelectParts(void)
         pIcon->SetColor(COL_CURRENT);
         
         if (pMouse->GetTrigger(CInputMouse::BUTTON_LMB))
-        {
+        {// クリックしたらパーツ番号の決定
             m_nIdxParts = mapIcon[pIcon];
+
+            if (m_pManipulater != nullptr)
+            {// マニピュレーターにパーツ番号を渡す
+                m_pManipulater->SetIdxPart(m_nIdxParts);
+            }
         }
     }
 }
@@ -1483,4 +1490,27 @@ void CMotion::SaveMotion(void)
 
         fclose(pFile);
 	}
+}
+
+//=====================================================
+// マニピュレーターの生成
+//=====================================================
+CManipulater *CMotion::CreateManipulater(int nIdxPart)
+{
+    if(m_pManipulater == nullptr)
+        m_pManipulater = CManipulater::Create(nIdxPart);
+
+    return m_pManipulater;
+}
+
+//=====================================================
+// マニピュレーターの削除
+//=====================================================
+void CMotion::DeleteManipulater(void)
+{
+    if (m_pManipulater != nullptr)
+    {
+        m_pManipulater->Uninit();
+        m_pManipulater = nullptr;
+    }
 }

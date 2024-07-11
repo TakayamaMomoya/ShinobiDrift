@@ -125,10 +125,10 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 
 		if (bFront)
 		{// ƒvƒŒƒCƒ„[‚Ì‘O‚Éo‚½‚çUŒ‚‚ğŠJn
-			CDebugProc::GetInstance()->Print("\n’Ç‚¢‰z‚µ‚Ä‚¢‚é");
-
 			m_state = STATE_ATTACK;
 		}
+
+		CDebugProc::GetInstance()->Print("\n“G[’ÇÕó‘Ô]");
 	}
 		break;
 	case CEnemyBehaviourChasePlayer::STATE_ATTACK:	// UŒ‚ó‘Ô
@@ -160,6 +160,8 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 
 		// ƒXƒs[ƒh‚ÌŒvZ
 		CalcSpeed(pEnemy);
+
+		CDebugProc::GetInstance()->Print("\n“G[UŒ‚ó‘Ô]");
 	}
 		break;
 	default:
@@ -183,13 +185,19 @@ bool CEnemyBehaviourChasePlayer::CollidePlayerFront(CEnemy *pEnemy)
 	// ‘O•ûƒxƒNƒgƒ‹‚Ì‚’¼‚Éü•ª‚ğ¶¬
 	D3DXVECTOR3 vecForward = posEnemy - pEnemy->GetForward() * LENGTH_PLAYER_FRONT;
 
-	CEffect3D::Create(vecForward, 100.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(vecForward, 1000.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
-	D3DXVECTOR3 vec1 = universal::Vec3Cross(-vecForward, D3DXVECTOR3(0.0f, 1.0f, 0.0f));
-	D3DXVECTOR3 vec2 = -universal::Vec3Cross(-vecForward, D3DXVECTOR3(0.0f, 1.0f, 0.0f));
+	D3DXVECTOR3 vec1 = universal::Vec3Cross(pEnemy->GetForward(), D3DXVECTOR3(0.0f, 1.0f, 0.0f));
+	D3DXVECTOR3 vec2 = -universal::Vec3Cross(pEnemy->GetForward(), D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 
-	vec1 += vecForward;
-	vec2 += vecForward;
+	D3DXVec3Normalize(&vec1, &vec1);
+	D3DXVec3Normalize(&vec2, &vec2);
+
+	vec1 = vec1 * 1000.0f + vecForward;
+	vec2 = vec2 * 1000.0f + vecForward;
+
+	CEffect3D::Create(vec1, 100.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(vec2, 100.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 	float fRate;
 
@@ -198,8 +206,8 @@ bool CEnemyBehaviourChasePlayer::CollidePlayerFront(CEnemy *pEnemy)
 	if (!bHit)
 		return false;
 
-	//if (fRate > 1.0f || fRate < 0.0f)
-		//return false;
+	if (fRate > 1.0f || fRate < 0.0f)
+		return false;
 
 	return true;
 }

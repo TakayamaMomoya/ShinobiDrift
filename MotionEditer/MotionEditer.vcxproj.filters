@@ -111,6 +111,9 @@
     <ClCompile Include="code\slow.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="code\manipulater.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\camera.h">
@@ -208,6 +211,9 @@
     </ClInclude>
     <ClInclude Include="code\slow.h">
       <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="code\manipulater.h">
+      <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
