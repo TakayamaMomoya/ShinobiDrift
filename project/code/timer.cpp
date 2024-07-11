@@ -159,9 +159,7 @@ void CTimer::Minutes()
 
 	// 分の上限値超えないように
 	if (nMinutes >= MINUTES_LIMIT)
-	{
 		nMinutes = MINUTES_LIMIT;
-	}
 
 	// 分表示
 	if (m_pMinutes != nullptr)
@@ -173,6 +171,9 @@ void CTimer::Minutes()
 //=====================================================
 void CTimer::Second()
 {
+	// ミリ秒の更新
+	MilliSecond();
+
 	// デルタタイム取得
 	float fDeltaTime = CManager::GetDeltaTime();
 
@@ -185,9 +186,6 @@ void CTimer::Second()
 	// 秒表示
 	if (m_pSecond != nullptr)
 		m_pSecond->SetValue(nSecond, TIME_DIGIT);
-
-	// ミリ秒の更新
-	MilliSecond();
 }
 
 //=====================================================
@@ -201,6 +199,7 @@ void CTimer::MilliSecond()
 	// デルタタイム(リアル時間)加算
 	m_fMilli += fDeltaTime;
 
+	// 秒を100倍
 	m_fMilli = m_fSecond * MAGNIFICATION;
 
 	// ミリ秒の計算
