@@ -22,7 +22,8 @@ public:
 		TYPE_DRIFT,     // ドリフト時の火花と煙
 		TYPE_SPARK,     // 火花
 		TYPE_ENGINE,	// 排気口の火
-		TYPE_SLASH,	// 斬撃
+		TYPE_SLASH,		// 斬撃
+		TYPE_PARRY,		// パリィ
 		TYPE_MAX
 	};
 
