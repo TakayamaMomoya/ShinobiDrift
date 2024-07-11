@@ -27,6 +27,7 @@ public:
 	void Uninit(void);              // 終了処理
 	void Update(void);              // 更新処理
 	void Draw(void);                // 描画処理
+	void Hit(float fDamage);	// ヒット処理
 	static CShuriken* Create(D3DXVECTOR3 pos);     // 生成処理
 
 	// 設定系
