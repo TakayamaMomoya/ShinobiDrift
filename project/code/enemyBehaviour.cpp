@@ -310,7 +310,7 @@ void CEnemyBehaviourChasePlayer::ThrowShuriken(CEnemy *pEnemy)
 {
 	D3DXVECTOR3 pos = pEnemy->GetMtxPos(5);
 
-	CShuriken::Create(pos);
+	CShuriken::Create(pos,pEnemy->GetForward());
 }
 
 //=====================================================
