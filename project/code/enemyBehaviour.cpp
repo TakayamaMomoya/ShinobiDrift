@@ -123,7 +123,7 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 		// プレイヤーの前に出たかの判定
 		bool bFront = CollidePlayerFront(pEnemy);
 
-		if (bFront)
+		if (!bFront)
 		{// プレイヤーの前に出たら攻撃を開始
 			m_state = STATE_ATTACK;
 		}
@@ -151,17 +151,15 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 
 		if (CollidePlayerFront(pEnemy))
 		{
-			m_fSpeedDefault += (pPlayer->GetSpeed() * 0.3f - m_fSpeedDefault) * 0.8f;
+			m_fSpeedDefault += (pPlayer->GetSpeed() * 0.5f - m_fSpeedDefault) * 0.1f;
 
 			CDebugProc::GetInstance()->Print("\n敵減速中");
-
 		}
 		else
 		{
-			m_fSpeedDefault += (pPlayer->GetSpeed() * 2.0f - m_fSpeedDefault) * 0.8f;
+			m_fSpeedDefault += (pPlayer->GetSpeed() * 1.5f - m_fSpeedDefault) * 0.1f;
 
 			CDebugProc::GetInstance()->Print("\n敵加速中");
-
 		}
 
 		// スピードの計算
@@ -191,7 +189,7 @@ bool CEnemyBehaviourChasePlayer::CollidePlayerFront(CEnemy *pEnemy)
 	// 前方ベクトルの垂直に線分を生成
 	D3DXVECTOR3 vecForward = posEnemy - pEnemy->GetForward() * LENGTH_PLAYER_FRONT;
 
-	CEffect3D::Create(vecForward, 1000.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(vecForward, 100.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 	D3DXVECTOR3 vec1 = universal::Vec3Cross(pEnemy->GetForward(), D3DXVECTOR3(0.0f, 1.0f, 0.0f));
 	D3DXVECTOR3 vec2 = -universal::Vec3Cross(pEnemy->GetForward(), D3DXVECTOR3(0.0f, 1.0f, 0.0f));
@@ -209,7 +207,7 @@ bool CEnemyBehaviourChasePlayer::CollidePlayerFront(CEnemy *pEnemy)
 
 	bool bHit = universal::IsCross(posPlayer, vec1, vec2, &fRate);
 
-	CDebugProc::GetInstance()->Print("\n追い越し判定[%d][%d]", bHit, fRate > 1.0f || fRate < 0.0f);
+	CDebugProc::GetInstance()->Print("\n追い越し判定[%d][%d]", bHit);
 
 	if (!bHit)
 		return false;
@@ -310,7 +308,7 @@ void CEnemyBehaviourChasePlayer::ControllRot(CEnemy *pEnemy)
 //=====================================================
 void CEnemyBehaviourChasePlayer::ThrowShuriken(CEnemy *pEnemy)
 {
-	D3DXVECTOR3 pos = pEnemy->GetPosition();
+	D3DXVECTOR3 pos = pEnemy->GetMtxPos(5);
 
 	CShuriken::Create(pos);
 }

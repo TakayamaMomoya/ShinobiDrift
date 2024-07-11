@@ -12,6 +12,7 @@
 #include "effekseer.h"
 #include "model.h"
 #include "player.h"
+#include "manager.h"
 #include "debugproc.h"
 
 //*****************************************************
@@ -24,13 +25,14 @@ std::list<CShuriken*> CShuriken::m_aShuriken;
 //*****************************************************
 namespace
 {
-	const float MOVE_SPEED = 0.05f;  // 移動量
+	const float MOVE_SPEED = 30.0f;  // スピード
+	const float LIFE_DEFAULT = 5.0f;	// デフォルトの寿命
 }
 
 //=====================================================
 // コンストラクタ
 //=====================================================
-CShuriken::CShuriken()
+CShuriken::CShuriken() : m_fLife(0.0f)
 {
 
 }
@@ -44,15 +46,31 @@ CShuriken::~CShuriken()
 }
 
 //=====================================================
+// 生成処理
+//=====================================================
+CShuriken* CShuriken::Create(D3DXVECTOR3 pos)
+{
+	CShuriken *pShuriken = nullptr;
+	pShuriken = new CShuriken;
+
+	if (pShuriken != nullptr)
+	{
+		pShuriken->SetPosition(pos);
+		pShuriken->Init();
+	}
+
+	return pShuriken;
+}
+
+//=====================================================
 // 初期化処理
 //=====================================================
 HRESULT CShuriken::Init(void)
 {
-	// 継承クラスの初期化
 	CObjectX::Init();
 
 	// モデル読込
-	int nIdx = CModel::Load("data\\MODEL\\Player\\02_head.x");
+	int nIdx = CModel::Load("data\\MODEL\\Player\\shuriken.x");
 	BindModel(nIdx);
 
 	m_aShuriken.push_back(this);
@@ -60,15 +78,26 @@ HRESULT CShuriken::Init(void)
 	// プレイヤー取得
 	CPlayer* pPlayer = CPlayer::GetInstance();
 
-	// プレイヤーの速度取得
-	float PlayerSpeed = pPlayer->GetSpeed();
+	if (pPlayer == nullptr)
+		return E_FAIL;
+
+	// プレイヤーの移動ベクトル取得
+	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
+	movePlayer.y = 0.0f;
 
 	// プレイヤーの頭のマトリックス取得
-	m_PlayerMtx = *pPlayer->GetParts(2)->pParts->GetMatrix();
+	D3DXVECTOR3 posHeadPlayer = pPlayer->GetNInjaBody()->GetMtxPos(2);
 
-	// プレイヤーの位置に速度を加算
-	m_PlayerMtx._41 += (PlayerSpeed * 5.0f);
-	m_PlayerMtx._43 += (PlayerSpeed * 5.0f);
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 vecDiff = posHeadPlayer - pos;
+
+	universal::VecConvertLength(&vecDiff, MOVE_SPEED);
+
+	D3DXVECTOR3 move = movePlayer + vecDiff;
+
+	SetMove(move);
+
+	m_fLife = LIFE_DEFAULT;
 
 	return S_OK;
 }
@@ -78,7 +107,6 @@ HRESULT CShuriken::Init(void)
 //=====================================================
 void CShuriken::Uninit(void)
 {
-	// 継承クラスの初期化
 	CObjectX::Uninit();
 
 	m_aShuriken.remove(this);
@@ -89,19 +117,32 @@ void CShuriken::Uninit(void)
 //=====================================================
 void CShuriken::Update(void)
 {
-	// 継承クラスの初期化
 	CObjectX::Update();
 
-	// プレイヤーの位置に向かう
-	MoveToPlayer();
+	// 移動量の反映
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 move = GetMove();
 
-	// デバッグプロック取得
-	CDebugProc* pDebugProc = CDebugProc::GetInstance();
+	pos += move;
 
-	if (pDebugProc == nullptr)
+	SetPosition(pos);
+
+	// 寿命の減少
+	m_fLife -= CManager::GetDeltaTime();
+
+	if (m_fLife <= 0.0f)
+	{
+		m_fLife = 0.0f;
+
+		Uninit();
+
 		return;
+	}
 
-	pDebugProc->Print("\n手裏剣の位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
+#ifdef _DEBUG
+	// デバッグ処理
+	Debug();
+#endif
 }
 
 //=====================================================
@@ -114,39 +155,16 @@ void CShuriken::Draw(void)
 }
 
 //=====================================================
-// 生成処理
+// デバッグ処理
 //=====================================================
-CShuriken* CShuriken::Create(D3DXVECTOR3 pos)
+void CShuriken::Debug(void)
 {
-	CShuriken *pShuriken = nullptr;
-	pShuriken = new CShuriken;
+	// デバッグプロック取得
+	CDebugProc* pDebugProc = CDebugProc::GetInstance();
 
-	if (pShuriken != nullptr)
-	{
-		pShuriken->Init();
-		pShuriken->SetPosition(pos);
-	}
-		
-	return pShuriken;
-}
+	if (pDebugProc == nullptr)
+		return;
 
-//=====================================================
-// プレイヤーに向かって移動する処理
-//=====================================================
-void CShuriken::MoveToPlayer(void)
-{
-	// プレイヤー取得
-	CPlayer* pPlayer = CPlayer::GetInstance();
-
-	// 自分の位置取得
-	D3DXVECTOR3 pos = GetPosition();
-	D3DXVECTOR3 Playerpos = {};
-
-	//Playerpos = universal::LinePridiction(pos, MOVE_SPEED, D3DXVECTOR3(m_PlayerMtx._41, m_PlayerMtx._42 + 200.0f, m_PlayerMtx._43), pPlayer->GetMove());
-
-	// 目標の位置に向かう
-	universal::MoveToDest(&pos, D3DXVECTOR3(m_PlayerMtx._41, m_PlayerMtx._42 + 200.0f, m_PlayerMtx._43), MOVE_SPEED);
-
-	// 位置設定
-	SetPosition(pos);
+	pDebugProc->Print("\n手裏剣の移動[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
+	pDebugProc->Print("\n手裏剣の位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
 }

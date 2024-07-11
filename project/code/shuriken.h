@@ -19,10 +19,10 @@
 class CShuriken : public CObjectX
 {
 public:
-
 	CShuriken();	// コンストラクタ
 	~CShuriken();	                // デストラクタ
 
+	// メンバ関数
 	HRESULT Init(void);             // 初期化処理
 	void Uninit(void);              // 終了処理
 	void Update(void);              // 更新処理
@@ -33,11 +33,14 @@ public:
 	static std::list<CShuriken*> GetList(void) { return m_aShuriken; }
 
 private:
+	// メンバ関数
+	void Debug(void);	// デバッグ処理
 
-	void MoveToPlayer(void);  // プレイヤーに向かって移動する処理
+	// メンバ変数
+	float m_fLife;	// 寿命
 
+	// 静的メンバ関数
 	static std::list<CShuriken*> m_aShuriken;  // 手裏剣のリスト
-	D3DMATRIX m_PlayerMtx;    // プレイヤーのマトリックス
 };
 
 #endif
