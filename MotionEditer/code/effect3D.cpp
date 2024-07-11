@@ -12,6 +12,7 @@
 #include "manager.h"
 #include "renderer.h"
 #include "texture.h"
+#include "slow.h"
 
 //*****************************************************
 // マクロ定義
@@ -21,7 +22,7 @@
 //=====================================================
 // コンストラクタ
 //=====================================================
-CEffect3D::CEffect3D(int nPriority) : CBillboard(nPriority)
+CEffect3D::CEffect3D(int nPriority) : CObject3D(nPriority)
 {
 	m_nLife = 0;
 	m_fDecreaseRadius = 0.0f;
@@ -30,6 +31,7 @@ CEffect3D::CEffect3D(int nPriority) : CBillboard(nPriority)
 	m_relPos = { 0.0f,0.0f,0.0f };
 	m_bAdd = true;
 	m_fGravity = 0.0f;
+	m_pPosOwner = nullptr;
 }
 
 //=====================================================
@@ -46,7 +48,9 @@ CEffect3D::~CEffect3D()
 HRESULT CEffect3D::Init(void)
 {
 	// 継承クラスの初期化
-	CBillboard::Init();
+	CObject3D::Init();
+
+	SetMode(CObject3D::MODE_BILLBOARD);
 
 	return S_OK;
 }
@@ -57,7 +61,7 @@ HRESULT CEffect3D::Init(void)
 void CEffect3D::Uninit(void)
 {
 	// 継承クラスの終了
-	CBillboard::Uninit();
+	CObject3D::Uninit();
 }
 
 //=====================================================
@@ -66,15 +70,33 @@ void CEffect3D::Uninit(void)
 void CEffect3D::Update(void)
 {
 	// 継承クラスの更新
-	CBillboard::Update();
+	CObject3D::Update();
+
+	MODE mode = GetMode();
+
+	if (mode == MODE_STRETCHBILLBOARD)
+	{
+		D3DXVECTOR3 rot = universal::VecToRot(m_move);
+
+		rot.x += 1.57f;
+		rot.y += 3.14f;
+
+		SetRotation(rot);
+	}
 
 	// 寿命減衰
 	m_nLife--;
 
-	// サイズ縮小
-	SetSize(GetWidth() - m_fDecreaseRadius, GetHeight() - m_fDecreaseRadius);
+	float fWidth = GetWidth();
+	float fHeight = GetHeight();
 
-	if (GetWidth() < 0.0f)
+	fWidth -= m_fDecreaseRadius;
+	fHeight -= m_fDecreaseRadius;
+
+	// サイズ縮小
+	SetSize(fWidth, fHeight);
+
+	if (fWidth < 0.0f)
 	{// 大きさの補正
 		SetSize(0.0f, 0.0f);
 	}
@@ -95,8 +117,25 @@ void CEffect3D::Update(void)
 	}
 	else
 	{
+		D3DXVECTOR3 pos = GetPosition();
+
+		CSlow *pSlow = CSlow::GetInstance();
+
+		if (pSlow != nullptr)
+		{
+			float fScale = pSlow->GetScale();
+
+			// 位置の更新
+			pos += m_move * fScale;
+		}
+		else
+		{
+			// 位置の更新
+			pos += m_move;
+		}
+
 		// 位置更新
-		SetPosition(GetPosition() + m_move);
+		SetPosition(pos);
 	}
 
 	if (m_nLife < 0)
@@ -121,10 +160,6 @@ void CEffect3D::Draw(void)
 		pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	}
 
-	//Zテストを無効化
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-
 	// アルファテストの無効化
 	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);
@@ -133,15 +168,17 @@ void CEffect3D::Draw(void)
 	// ライティングを無効化
 	pDevice->SetRenderState(D3DRS_LIGHTING,FALSE);
 
-	// 継承クラスの描画
-	CBillboard::Draw();
+	MODE mode = GetMode();
+
+	if (mode == MODE_STRETCHBILLBOARD)
+	{
+		SetVtx();
+	}
+
+	CObject3D::Draw();
 
 	// ライティングを無効化
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-
-	//Zテストを有効にする
-	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 
 	if (m_bAdd)
 	{
@@ -165,11 +202,11 @@ CEffect3D *CEffect3D::Create(D3DXVECTOR3 pos, float fRadius, int nLife, D3DXCOLO
 
 		if (pEffect3D != nullptr)
 		{
-			pEffect3D->SetPosition(pos);
-			pEffect3D->SetSize(fRadius, fRadius);
-
 			// 初期化処理
 			pEffect3D->Init();
+
+			pEffect3D->SetPosition(pos);
+			pEffect3D->SetSize(fRadius, fRadius);
 
 			pEffect3D->SetColor(col);
 
@@ -202,6 +239,8 @@ CEffect3D *CEffect3D::Create(D3DXVECTOR3 pos, float fRadius, int nLife, D3DXCOLO
 					pEffect3D->m_move *= -1;
 				}
 			}
+
+			pEffect3D->SetVtx();
 		}
 	}
 	
@@ -221,11 +260,12 @@ CEffect3D* CEffect3D::Create(const char* pTexName, D3DXVECTOR3 pos, float fRadiu
 
 		if (pEffect3D != nullptr)
 		{
-			pEffect3D->SetPosition(pos);
-			pEffect3D->SetSize(fRadius, fRadius);
-
 			// 初期化処理
 			pEffect3D->Init();
+
+			pEffect3D->SetPosition(pos);
+			pEffect3D->SetSize(fRadius, fRadius);
+			pEffect3D->SetVtx();
 
 			pEffect3D->SetColor(col);
 

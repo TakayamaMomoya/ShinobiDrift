@@ -18,8 +18,6 @@
 //*****************************************************
 // マクロ定義
 //*****************************************************
-#define CLASS_NAME				"WindowClass"					// ウィンドウクラスの名前
-#define WINDOW_NAME				"MotionEditor"				// ウィンドウの名前(キャプション)
 
 //*****************************************************
 // プロトタイプ宣言
@@ -36,59 +34,61 @@ int g_nCountFPS;	// FPSカウンター
 //=====================================================
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine, int nCmdShow)
 {
-	// マネージャーの宣言
-	CManager *pManager = NULL;
+    //乱数シード値の設定
+    srand((unsigned int)time(0));
 
-	//変数宣言
-	DWORD dwCurrentTime;				//現在時刻
-	DWORD dwExecLastTime;				//最後に処理した時刻
-	DWORD dwFrameCount;					//フレームカウント
-	DWORD dwFPSLastTime;				//最後にFPSを計測した時間
+    // マネージャーの宣言
+    CManager *pManager = nullptr;
 
-	RECT rect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
+    DWORD dwCurrentTime;				//現在時刻
+    DWORD dwExecLastTime;				//最後に処理した時刻
+    DWORD dwFrameCount;					//フレームカウント
+    DWORD dwFPSLastTime;				//最後にFPSを計測した時間
 
-	//フォントポインタ・FPSカウンタの初期化
-	dwFrameCount = 0;
-	dwFPSLastTime = timeGetTime();
+    RECT rect = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
 
-	WNDCLASSEX wcex =
-	{
-		sizeof(WNDCLASSEX),
-		CS_CLASSDC,
-		WindowProc,
-		0,
-		0,
-		hInstance,
-		LoadIcon(NULL, IDI_APPLICATION),
-		LoadCursor(NULL, IDC_ARROW),
-		(HBRUSH)(COLOR_WINDOW + 1),
-		NULL,
-		CLASS_NAME,
-		LoadIcon(NULL,IDI_APPLICATION),
-	};
+    //フォントポインタ・FPSカウンタの初期化
+    dwFrameCount = 0;
+    dwFPSLastTime = timeGetTime();
 
-	HWND hWnd;
-	MSG msg;
+    WNDCLASSEX wcex =
+    {
+        sizeof(WNDCLASSEX),
+        CS_CLASSDC,
+        WindowProc,
+        0,
+        0,
+        hInstance,
+        LoadIcon(nullptr, IDI_APPLICATION),
+        LoadCursor(nullptr, IDC_ARROW),
+        (HBRUSH)(COLOR_WINDOW + 1),
+        nullptr,
+        CLASS_NAME,
+        LoadIcon(nullptr,IDI_APPLICATION),
+    };
 
-	// ウィンドウクラスの登録
-	RegisterClassEx(&wcex);
+    HWND hWnd;
+    MSG msg;
 
-	// クライアント領域をウィンドウサイズに合わせる
-	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+    // ウィンドウクラスの登録
+    RegisterClassEx(&wcex);
 
-	// ウィンドウを生成
-	hWnd = CreateWindowEx(0,
-		CLASS_NAME,
-		WINDOW_NAME,
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		SCREEN_WIDTH,
-		SCREEN_HEIGHT,
-		NULL,
-		NULL,
-		hInstance,
-		NULL);
+    // クライアント領域をウィンドウサイズに合わせる
+    AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+
+    // ウィンドウを生成
+    hWnd = CreateWindowEx(0,
+        CLASS_NAME,
+        WINDOW_NAME,
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        rect.right - rect.left,  // 調整された幅
+        rect.bottom - rect.top,  // 調整された高さ
+        nullptr,
+        nullptr,
+        hInstance,
+        nullptr);
 
 	if (pManager == NULL)
 	{
@@ -99,20 +99,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 		pManager->Init(hInstance, hWnd, TRUE);
 	}
 
+#ifdef _DEBUG
     // Imguiの初期化
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     io.DisplaySize = ImVec2(SCREEN_WIDTH, SCREEN_HEIGHT);
-    bool bDisp = false;
 
+    // imgui設定
     ImGui::StyleColorsDark();
 
     LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
-    ImGui_ImplDX9_Init(CRenderer::GetInstance()->GetDevice());
+
+    ImGui_ImplDX9_Init(pDevice);
     ImGui_ImplWin32_Init(hWnd);
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+#endif
 
 	//分解能を設定
 	timeBeginPeriod(1);
@@ -164,6 +167,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 
 				if (pManager != NULL)
 				{
+#ifdef _DEBUG
+                    RECT rect;
+                    GetClientRect(hWnd, &rect);
+                    float width = static_cast<float>(rect.right - rect.left);
+                    float height = static_cast<float>(rect.bottom - rect.top);
+                    io.DisplaySize = ImVec2(width, height);
+#endif
                     ImGui_ImplDX9_NewFrame();
                     ImGui::NewFrame();
 
@@ -218,6 +228,8 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	int nID;
 
+        ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
+
 	switch (uMsg)
 	{
 		// ウィンドウ破棄メッセージを受け取った場合
@@ -263,7 +275,6 @@ LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 	}
 
-    ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }

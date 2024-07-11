@@ -19,7 +19,6 @@
 #include "light.h"
 #include "object3D.h"
 #include "objectX.h"
-#include "billboard.h"
 #include "model.h"
 #include "texture.h"
 #include "field.h"
@@ -290,4 +289,21 @@ void CManager::Draw(void)
 		// ƒŒƒ“ƒ_ƒ‰[‚Ì•`‰æ
 		m_pRenderer->Draw();
 	}
+}
+
+namespace Manager
+{
+D3DXVECTOR3 GetPosVCamera(void)
+{
+    D3DXVECTOR3 posV = {};
+
+    CCamera *pCamera = CManager::GetCamera();
+
+    if (pCamera == nullptr)
+        return posV;
+
+    posV = pCamera->GetCamera()->posV;
+
+    return posV;
+}
 }

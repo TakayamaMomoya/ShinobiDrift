@@ -970,7 +970,8 @@ void CPlayer::Collision(void)
 #ifdef _DEBUG
 	if (CInputJoypad::GetInstance() != nullptr)
 	{
-		if (CInputJoypad::GetInstance()->GetPress(CInputJoypad::PADBUTTONS_A, 0))
+		if (CInputJoypad::GetInstance()->GetPress(CInputJoypad::PADBUTTONS_A, 0) || 
+			CInputKeyboard::GetInstance()->GetPress(DIK_SPACE))
 		{// ‘€ì•û–@•ÏX
 			pos.y += 30.0f;
 			move.y = 0.0f;

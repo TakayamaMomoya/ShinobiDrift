@@ -106,6 +106,14 @@ double CSpline::Interpolate(double xi, int nIdx)
 }
 
 //=====================================================
+// デストラクタ
+//=====================================================
+CCutMullSpline::~CCutMullSpline()
+{
+    m_vPos.clear();
+}
+
+//=====================================================
 // 初期化処理
 //=====================================================
 void CCutMullSpline::Init(const std::vector<D3DXVECTOR3> vPos)
