@@ -57,4 +57,9 @@ private:
 	static CTexture *m_pTexture;	// テクスチャ管理へのポインタ
 };
 
+namespace Manager
+{
+D3DXVECTOR3 GetPosVCamera(void);
+}
+
 #endif

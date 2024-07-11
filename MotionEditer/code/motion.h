@@ -9,6 +9,12 @@
 #define _MOTION_H_
 
 //*****************************************************
+// 前方宣言
+//*****************************************************
+class CObject3D;
+class CManipulater;
+
+//*****************************************************
 // インクルード
 //*****************************************************
 #include "parts.h"
@@ -127,6 +133,8 @@ public:
 	EVENT_INFO *GetInfoEvent(int nMotion) { return m_aMotionInfo[nMotion].pEvent; }
 	int GetNumEventInfo(int nMotion) { return m_aMotionInfo[nMotion].nNumEvent; }
 	virtual void Event(EVENT_INFO *pEventInfo) {};
+    CManipulater *CreateManipulater(int nIdxPart);
+    void DeleteManipulater(void);
 
 private:
 	void Motion(void);
@@ -136,6 +144,8 @@ private:
 	void SetTransform(int nIdx = -1);
 	void SaveMotion(void);
 	void Reset(void);
+    void CreateIcon(int nIdx);
+    void SelectParts(void);
 
 	Parts *m_apParts[motion::MAX_PARTS];	// パーツの構造体
 	MOTION_INFO m_aMotionInfo[motion::MAX_MOTION];	//モーション情報の構造体
@@ -164,6 +174,8 @@ private:
 	bool m_bMotion;
 	bool m_bSetUp;
     char m_aPathSave[256];    // 保存パス
+    std::map<int, CObject3D*> m_mapIcon;    // アイコンのマップコンテナ
+    CManipulater *m_pManipulater;   // マニピュレーター
 };
 
 #endif

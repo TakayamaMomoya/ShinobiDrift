@@ -21,8 +21,9 @@ const char* CEffekseer::m_apEfkName[CEffekseer::TYPE_MAX] =
 	"",                               // ‚È‚ñ‚à‚È‚¢
 	"data\\EFFEKSEER\\Effect\\drift.efkefc",  // ƒhƒŠƒtƒg‚Ì‰Î‰Ô‚Æ‰Œ
 	"data\\EFFEKSEER\\Effect\\spark.efkefc",  // •ÇÕ“Ë‚Ì‰Î‰Ô
-	"data\\EFFEKSEER\\Effect\\bikefire.efkefc",  // ”r‹CŒû‚Ì‰Î
-	"data\\EFFEKSEER\\Effect\\slash00.efkefc",  // aŒ‚
+	"data\\EFFEKSEER\\Effect\\bikefire.efkefc", // ”r‹CŒû‚Ì‰Î
+	"data\\EFFEKSEER\\Effect\\slash00.efkefc",	// aŒ‚
+	"data\\EFFEKSEER\\Effect\\parry.efkefc",	// aŒ‚
 };
 
 //===========================================================

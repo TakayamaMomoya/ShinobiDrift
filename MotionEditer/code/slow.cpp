@@ -1,39 +1,45 @@
 //*****************************************************
 //
-// エネミーの処理[enemy.cpp]
-// Author:大原怜将
+// スローの処理[slow.cpp]
+// Author:髙山桃也
 //
 //*****************************************************
 
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "enemy.h"
+#include "slow.h"
 #include "debugproc.h"
-#include "effect3D.h"
-#include "shuriken.h"
-#include "player.h"
+#include "manager.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-	const float SPEED_DEFAULT = 50.0f;
+
 }
+
+//*****************************************************
+// 静的メンバ変数宣言
+//*****************************************************
+CSlow *CSlow::m_pSlow = nullptr;	// 自身のポインタ
 
 //=====================================================
 // コンストラクタ
 //=====================================================
-CEnemy::CEnemy(int nPriority)
+CSlow::CSlow()
 {
+	m_pSlow = this;
 
+	m_fScale = 0.0f;
+	m_fTimeSlow = 0.0f;
 }
 
 //=====================================================
 // デストラクタ
 //=====================================================
-CEnemy::~CEnemy()
+CSlow::~CSlow()
 {
 
 }
@@ -41,40 +47,27 @@ CEnemy::~CEnemy()
 //=====================================================
 // 生成処理
 //=====================================================
-CEnemy* CEnemy::Create()
+CSlow *CSlow::Create(void)
 {
-	CEnemy *pEnemy = nullptr;
-
-	if (pEnemy == nullptr)
+	if (m_pSlow == nullptr)
 	{
-		pEnemy = new CEnemy;
+		m_pSlow = new CSlow;
 
-		if (pEnemy != nullptr)
+		if (m_pSlow != nullptr)
 		{
-			// 初期化
-			pEnemy->Init();
+			m_pSlow->Init();
 		}
 	}
 
-	return pEnemy;
+	return m_pSlow;
 }
 
 //=====================================================
 // 初期化処理
 //=====================================================
-HRESULT CEnemy::Init(void)
+HRESULT CSlow::Init(void)
 {
-	// 継承クラスの初期化
-	CMotion::Init();
-
-	// モデルの設定
-	CMotion::Load("data\\MOTION\\motionEnemy.txt");
-
-	CEnemyBehaviour *pBehaviour = new CEnemyBehaviourChasePlayer;
-
-	pBehaviour->Init(this);
-
-	m_listBehaviour.push_back(pBehaviour);
+	m_fScale = 1.0f;
 
 	return S_OK;
 }
@@ -82,50 +75,70 @@ HRESULT CEnemy::Init(void)
 //=====================================================
 // 終了処理
 //=====================================================
-void CEnemy::Uninit(void)
+void CSlow::Uninit(void)
 {
-	// 全ビヘイビア解放
-	ReleaseAllBehaviour();
+	m_pSlow = nullptr;
 
-	// 継承クラスの終了
-	CMotion::Uninit();
+	Release();
 }
 
 //=====================================================
 // 更新処理
 //=====================================================
-void CEnemy::Update(void)
+void CSlow::Update(void)
 {
-	// 継承クラスの更新
-	CMotion::Update();
 
-	// ビヘイビアの更新
-	for (auto it : m_listBehaviour)
-	{
-		it->Update(this);
-	}
-}
-
-//=====================================================
-// 全ビヘイビア解放
-//=====================================================
-void CEnemy::ReleaseAllBehaviour(void)
-{
-	for (auto it : m_listBehaviour)
-	{
-		it->Uninit(this);
-
-		delete it;
-	}
-
-	m_listBehaviour.clear();
 }
 
 //=====================================================
 // 描画処理
 //=====================================================
-void CEnemy::Draw(void)
+void CSlow::Draw(void)
 {
-	// 継承クラスの描画
-	CMotion::Draw();
+#ifdef _DEBUG
+	CDebugProc *pDebugProc = CDebugProc::GetInstance();
+
+	if (pDebugProc != nullptr)
+	{
+		pDebugProc->Print("\nスロー倍率[%f]",m_fScale);
+	}
+#endif
+}
+
+//=====================================================
+// スケールの設定
+//=====================================================
+void CSlow::SetScale(float fScale)
+{
+	if (fScale >= 0.0f)
+	{
+		m_fScale = fScale;
+	}
+}
+
+//=====================================================
+// スロータイムの設定
+//=====================================================
+void CSlow::SetSlowTime(float fTime, float fScale)
+{
+	m_fTimeSlow = fTime;
+
+	SetScale(fScale);
+}
+
+namespace Slow
+{
+float GetScale(void)
+{
+	float fScale = 1.0f;
+
+	CSlow *pSlow = CSlow::GetInstance();
+
+	if (pSlow != nullptr)
+	{
+		fScale = pSlow->GetScale();
+	}
+
+	return fScale;
+}
 }

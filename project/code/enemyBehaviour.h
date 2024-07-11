@@ -1,7 +1,7 @@
 //*****************************************************
 //
 // エネミービヘイビア[enemyBehaviour.h]
-// Author:大原怜将
+// Author:髙山桃也
 //
 //*****************************************************
 #ifndef _ENEMYBEHAVIOUR_H_
@@ -46,13 +46,26 @@ public:
 	void Update(CEnemy *pEnemy) override;	// 更新処理
 
 private:
+	// 列挙型定義
+	enum STATE
+	{
+		STATE_NONE = 0,	// 何もしていない状態
+		STATE_CHASE,	// 追跡状態
+		STATE_ATTACK,	// 攻撃状態
+		STATE_MAX
+	};
+
 	// メンバ関数
+	void ManageState(CEnemy *pEnemy);	// 状態の管理
+	bool CollidePlayerFront(CEnemy *pEnemy);	// プレイヤーの前に出た判定
 	void CalcSpeed(CEnemy *pEnemy);	// スピードの計算
 	void InterpolatePosition(CEnemy *pEnemy);	// 位置の補間
 	void ControllRot(CEnemy *pEnemy);	// 向きの制御
+	void ThrowShuriken(CEnemy *pEnemy);	// 手裏剣を投げる
 	void Debug(CEnemy *pEnemy);	// デバッグ表示
 
 	// メンバ変数
+	STATE m_state;	// 状態
 	CCutMullSpline *m_pSpline;	// スプライン
 	std::vector<D3DXVECTOR3> m_vPos;	// データ点のベクター
 	int m_nIdx = 1;	// スプラインの番号
@@ -60,6 +73,7 @@ private:
 	float m_fSpeedDefault;	// 基準にする速度
 	float m_fRate;
 	float m_fRateOld;	// 前回のスプラインの割合
+	float m_fTimerAttack;	// 攻撃タイマー
 };
 
 #endif

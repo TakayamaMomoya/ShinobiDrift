@@ -264,7 +264,7 @@ void CMotion::Update(void)
 
 				float fRadius = m_aMotionInfo[m_motionType].pEvent[nCntEvent].fRadius;
 
-				CEffect3D::Create(pos, fRadius, 10, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+				//CEffect3D::Create(pos, fRadius, 10, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 				m_aMotionInfo[m_motionType].pEvent[nCntEvent].fTimer += 1.0f;
 			}
