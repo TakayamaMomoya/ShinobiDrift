@@ -617,13 +617,18 @@ bool IsOnTrianglePolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D
 	D3DXVECTOR3 vecP, vecTemp;
 	float fHeight, fDot;
 
+	D3DXVECTOR3 vecVtx[3];
+	vecVtx[0] = vtx2 - vtx1;
+	vecVtx[1] = vtx3 - vtx2;
+	vecVtx[2] = vtx1 - vtx3;
+
 	// ポリゴンと内外判定
-	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &(vtx2 - vtx1))->y < 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &(vtx3 - vtx2))->y < 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx1 - vtx3))->y < 0)
+	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &vecVtx[0])->y < 0 &&
+		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &vecVtx[1])->y < 0 &&
+		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &vecVtx[2])->y < 0)
 	{
 		// y軸法線が0ではないか判定
-		if (vtxNor.y == 0.0f)
+		if (!vtxNor.y)
 			return false;
 
 		// 角から目標位置へのベクトル
@@ -636,7 +641,7 @@ bool IsOnTrianglePolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D
 		fHeight = -(fDot / vtxNor.y) + vtx1.y;
 
 		// 高さが目標位置より高いか判定
-		if (fHeight >= posTarget.y)
+		if (fHeight >= rHeight)
 		{
 			// 高さ代入
 			rHeight = fHeight;
@@ -656,11 +661,11 @@ bool IsOnSquarePolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3D
 
 	// 1つ目のポリゴンと内外判定
 	if (IsOnTrianglePolygon(vtx1, vtx2, vtx3, vtxNor1, posTarget, rHeight))
-		return true;
+		bColllision = true;
 
 	// 2つ目のポリゴンと内外判定
 	if (IsOnTrianglePolygon(vtx4, vtx3, vtx2, vtxNor2, posTarget, rHeight))
-		return true;
+		bColllision = true;
 	
 	return bColllision;
 }
@@ -681,7 +686,7 @@ bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx4), &(vtx1 - vtx4))->y <= 0)
 	{
 		// y軸法線が0ではないか判定
-		if (vtxNor.y == 0.0f)
+		if (!vtxNor.y)
 			return false;
 
 		// 角から目標位置へのベクトル
@@ -694,7 +699,7 @@ bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR
 		fHeight = -(fDot / vtxNor.y) + vtx1.y;
 
 		// 高さが目標位置より高いか判定
-		if (fHeight >= posTarget.y)
+		if (fHeight > posTarget.y)
 		{
 			// 高さ代入
 			rHeight = fHeight;
