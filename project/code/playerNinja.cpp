@@ -121,7 +121,7 @@ void CPlayerNinja::ManagekatanaCollision(D3DXVECTOR3 pos)
 	for (auto it : listShuriken)
 	{
 		// Žè— Œ•‚Æ‚Ì‹——£‚ð‘ª‚é
-		D3DXVECTOR3 pos = GetPosition();
+		D3DXVECTOR3 pos = GetMtxPos(2);
 		D3DXVECTOR3 posShuriken = it->GetPosition();
 
 		bool bHit = universal::DistCmp(pos, posShuriken, RANGE_GUARD, nullptr);
