@@ -611,7 +611,7 @@ bool IsOnTrianglePolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &vecVtx[2])->y < 0)
 	{
 		// y軸法線が0ではないか判定
-		if (vtxNor.y == 0.0f)
+		if (!vtxNor.y)
 			return false;
 
 		// 角から目標位置へのベクトル
@@ -669,7 +669,7 @@ bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR
 		D3DXVec3Cross(&vecTemp, &(posTarget - vtx4), &(vtx1 - vtx4))->y <= 0)
 	{
 		// y軸法線が0ではないか判定
-		if (vtxNor.y == 0.0f)
+		if (!vtxNor.y)
 			return false;
 
 		// 角から目標位置へのベクトル

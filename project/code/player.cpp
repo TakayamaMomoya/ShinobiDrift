@@ -842,10 +842,8 @@ void CPlayer::Collision(void)
 	D3DXVECTOR3 move = GetMove();
 	D3DXVECTOR3 rot = GetRotation();
 	D3DXVECTOR3 posParts[2];
-	D3DXVECTOR3 posPartsDef[2];
 	D3DXVECTOR3 posOldParts[2];
 	D3DXVECTOR3 posDef, posDefOld;
-	D3DXVECTOR3 vecTire = pos - posParts[0];
 	bool bRoad[2];
 	CInputManager* pInputManager = CInputManager::GetInstance();
 
@@ -896,12 +894,14 @@ void CPlayer::Collision(void)
 
 	CDebugProc::GetInstance()->Print("\nタイヤ1位置[%f,%f,%f]", posParts[0].x, posParts[0].y, posParts[0].z);
 	CDebugProc::GetInstance()->Print("\nタイヤ2位置[%f,%f,%f]", posParts[1].x, posParts[1].y, posParts[1].z);
+	CEffect3D::Create(posParts[0], 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(posParts[1], 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 
 	// タイヤそれぞれでblockと当たり判定をとる
 	// 先頭オブジェクトを代入
 	CBlock* pBlock = CBlockManager::GetInstance()->GetHead();
 
-	while (pBlock != nullptr)
+	while (pBlock)
 	{
 		// 次のアドレスを保存
 		CBlock* pBlockNext = pBlock->GetNext();
@@ -1037,8 +1037,20 @@ void CPlayer::ManageSpeed(void)
 
 	if (m_info.fSpeed >= NOTROTATE)
 	{// ハンドルの回転を追加
-		rot.y += m_info.fAngleHandle * m_param.fAngleMaxCurve;
+		if (m_info.fAngleHandle == 0.0f)
+			rot.z += (m_info.fAngleHandle * m_param.fAngleMaxCurve - rot.z) * 0.07f;
+		else
+			rot.z += (m_info.fAngleHandle * m_param.fAngleMaxCurve - rot.z) * 0.03f;
+		
+		universal::LimitRot(&rot.z);
+
+		rot.y += rot.z * -0.04f;
 		universal::LimitRot(&rot.y);
+	}
+	else
+	{
+		rot.z += (0.0f - rot.z) * 0.07f;
+		universal::LimitRot(&rot.z);
 	}
 
 	SetRotation(rot);
