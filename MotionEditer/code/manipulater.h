@@ -37,13 +37,15 @@ public:
     // 変数取得・設定関数
     int GetIdxPart(void) { return m_nIdxPart; } // パーツ番号
     void SetIdxPart(int nIdx) { m_nIdxPart = nIdx; }
+    void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }	// 位置
+    D3DXVECTOR3 GetPosition(void) { return m_pos; }
 
     // 静的メンバ関数
     static CManipulater* Create(int nIdxPart, CMotion *pMotion);    // 生成処理
 
 private:
 	// メンバ関数
-
+    D3DXVECTOR3 m_pos;  // 位置
 
 	// メンバ変数
     int m_nIdxPart; // パーツの番号
@@ -56,11 +58,11 @@ class CStateManipulater
 public:
     CStateManipulater() {};	// コンストラクタ
     virtual ~CStateManipulater() {};    // デストラクタ
-
+    
     // メンバ関数
     virtual void Init(CManipulater *pManipulater) = 0; // 初期化処理
-    virtual void Uninit(void) = 0;  // 終了処理
-    virtual void Update(void) = 0;  // 更新処理
+    virtual void Uninit(CManipulater *pManipulater) = 0;  // 終了処理
+    virtual void Update(CManipulater *pManipulater) = 0;  // 更新処理
 
 private:
 };
@@ -68,15 +70,16 @@ private:
 class CStateManipulaterTranslate : public CStateManipulater
 {// 移動のステイト
 public:
-    CStateManipulaterTranslate() {};    // コンストラクタ
-    virtual ~CStateManipulaterTranslate() {};   // デストラクタ
+    CStateManipulaterTranslate();    // コンストラクタ
+    virtual ~CStateManipulaterTranslate();   // デストラクタ
 
     // メンバ関数
-    void Init(void) override; // 初期化処理
-    void Uninit(void) override;  // 終了処理
-    void Update(void) override;  // 更新処理
+    void Init(CManipulater *pManipulater) override; // 初期化処理
+    void Uninit(CManipulater *pManipulater) override;  // 終了処理
+    void Update(CManipulater *pManipulater) override;  // 更新処理
 
 private:
+    CObjectX *m_pManipulater;   // マニピュレーター
 };
 
 #endif

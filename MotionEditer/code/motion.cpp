@@ -86,6 +86,8 @@ HRESULT CMotion::Init(void)
 
     strcpy(&m_aPathSave[0], "data\\motion.txt");
 
+    CreateManipulater(0);
+
 	return S_OK;
 }
 
@@ -628,6 +630,7 @@ void CMotion::CreateIcon(int nIdx)
     // テクスチャの読込
     int nIdxTexture = CManager::GetTexture()->Regist("data\\TEXTURE\\UI\\FK.png");
     pIcon->SetIdxTexture(nIdxTexture);
+    pIcon->EnableZtest(true);
 
     m_mapIcon[nIdx] = pIcon;
 }
@@ -1498,7 +1501,7 @@ void CMotion::SaveMotion(void)
 CManipulater *CMotion::CreateManipulater(int nIdxPart)
 {
     if(m_pManipulater == nullptr)
-        m_pManipulater = CManipulater::Create(nIdxPart);
+        m_pManipulater = CManipulater::Create(nIdxPart,this);
 
     return m_pManipulater;
 }

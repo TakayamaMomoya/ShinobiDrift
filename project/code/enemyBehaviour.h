@@ -16,6 +16,7 @@
 //*****************************************************
 class CEnemy;
 class CCutMullSpline;
+class CObjectX;
 
 //*****************************************************
 // クラスの定義
@@ -61,6 +62,8 @@ private:
 	void CalcSpeed(CEnemy *pEnemy);	// スピードの計算
 	void InterpolatePosition(CEnemy *pEnemy);	// 位置の補間
 	void ControllRot(CEnemy *pEnemy);	// 向きの制御
+	void CreateBigShuriken(void);	// でかい手裏剣の生成
+	void FollowBigShuriken(CEnemy *pEnemy);	// でかい手裏剣の追従
 	void ThrowShuriken(CEnemy *pEnemy);	// 手裏剣を投げる
 	void Debug(CEnemy *pEnemy);	// デバッグ表示
 
@@ -74,6 +77,7 @@ private:
 	float m_fRate;
 	float m_fRateOld;	// 前回のスプラインの割合
 	float m_fTimerAttack;	// 攻撃タイマー
+	CObjectX *m_pBigShuriken;	// 投げる前に手元に出す大きな手裏剣
 };
 
 #endif

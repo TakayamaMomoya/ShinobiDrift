@@ -9,6 +9,7 @@
 // インクルード
 //*****************************************************
 #include "manipulater.h"
+#include "motion.h"
 
 //*****************************************************
 // 定数定義
@@ -77,7 +78,7 @@ void CManipulater::Uninit(void)
 {
     if (m_pState != nullptr)
     {
-        m_pState->Uninit();
+        m_pState->Uninit(this);
         m_pState = nullptr;
     }
 
@@ -89,9 +90,14 @@ void CManipulater::Uninit(void)
 //=====================================================
 void CManipulater::Update(void)
 {
+    // パーツの位置の取得
+    D3DXVECTOR3 posPart = m_pMotion->GetMtxPos(m_nIdxPart);
+
+    SetPosition(posPart);
+
     if (m_pState != nullptr)
     {
-        m_pState->Update();
+        m_pState->Update(this);
     }
 }
 
@@ -110,7 +116,7 @@ void CManipulater::ChangeState(CStateManipulater *pState)
 {
     if (m_pState != nullptr)
     {
-        m_pState->Uninit();
+        m_pState->Uninit(this);
         m_pState = nullptr;
     }
 
@@ -118,7 +124,7 @@ void CManipulater::ChangeState(CStateManipulater *pState)
 
     if (m_pState != nullptr)
     {
-        m_pState->Init();
+        m_pState->Init(this);
     }
 }
 
@@ -126,17 +132,37 @@ void CManipulater::ChangeState(CStateManipulater *pState)
 // 移動のステイト
 //********************************************************************************
 //=====================================================
-// 初期化
+// コンストラクタ
 //=====================================================
-void CStateManipulaterTranslate::Init(void)
+CStateManipulaterTranslate::CStateManipulaterTranslate()
+{
+    m_pManipulater = nullptr;
+}
+
+//=====================================================
+// デストラクタ
+//=====================================================
+CStateManipulaterTranslate::~CStateManipulaterTranslate()
 {
 
 }
 
 //=====================================================
+// 初期化
+//=====================================================
+void CStateManipulaterTranslate::Init(CManipulater *pManipulater)
+{
+    m_pManipulater = CObjectX::Create();
+
+    int nIdx = CModel::Load("data\\MODEL\\manipulator.x");
+    m_pManipulater->BindModel(nIdx);
+    m_pManipulater->EnableZtest(true);
+}
+
+//=====================================================
 // 終了
 //=====================================================
-void CStateManipulaterTranslate::Uninit(void)
+void CStateManipulaterTranslate::Uninit(CManipulater *pManipulater)
 {
 
 }
@@ -144,7 +170,9 @@ void CStateManipulaterTranslate::Uninit(void)
 //=====================================================
 // 更新
 //=====================================================
-void CStateManipulaterTranslate::Update(void)
+void CStateManipulaterTranslate::Update(CManipulater *pManipulater)
 {
+    D3DXVECTOR3 posManipulater = pManipulater->GetPosition();
 
+    m_pManipulater->SetPosition(posManipulater);
 }

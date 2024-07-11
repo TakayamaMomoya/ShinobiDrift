@@ -1,1 +1,1 @@
-data\\MOTION\\motionPlayer.txt
+data\\MOTION\\motionArms00.txt
