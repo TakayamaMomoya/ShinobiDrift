@@ -1,11 +1,11 @@
 //===========================================================
 //
-// 私のエフェクシア[effekseer.h]
+// マイエフェクシア[MyEffekseer.h]
 // Author 大原怜将
 //
 //===========================================================
-#ifndef _EFFEKSEER_H_     //このマクロが定義されてなかったら
-#define _EFFEKSEER_H_     //2重インクルードを防止のマクロを定義する
+#ifndef _EFFEKSEER_H_     // このマクロが定義されてなかったら
+#define _EFFEKSEER_H_     // 2重インクルードを防止のマクロを定義する
 
 class CEffekseerEffect;
 
@@ -74,7 +74,10 @@ public:
 	Effekseer::Handle GetHandle(void) { return m_efkHandle; }
 	void SetTime(int32_t time) { m_time = time; }	// 時間
 	int32_t GetTime(void) { return m_time; }
-	Effekseer::Vector3D GetPosition(void) { return m_pos; }	// 位置の取得
+	Effekseer::Vector3D GetPosition(void) { return m_pos; }	// 位置
+	void SetPosition(Effekseer::Vector3D pos) { m_pos = pos; }
+	Effekseer::Vector3D GetRotation(void) { return m_rot; }	// 向き
+	void SetRotation(Effekseer::Vector3D rot) { m_rot = rot; }
 
 private:
 	// メンバ変数
