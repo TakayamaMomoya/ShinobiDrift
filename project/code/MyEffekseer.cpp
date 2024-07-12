@@ -1,6 +1,6 @@
 //===========================================================
 //
-// 私のエフェクシア[effekseer.cpp]
+// マイエフェクシア[MyEffekseer.cpp]
 // Author 大原怜将
 //
 //===========================================================
@@ -101,7 +101,11 @@ void CEffekseer::Update(void)
 		// エフェクトの移動
 		Effekseer::Handle handle = (*it)->GetHandle();
 		Effekseer::Vector3D pos = (*it)->GetPosition();
-		m_efkManager->AddLocation(handle, Effekseer::Vector3D(0.0f, 0.0f, 0.0f));
+		m_efkManager->SetLocation(handle, pos);
+
+		// エフェクトの向き反映
+		Effekseer::Vector3D rot = (*it)->GetRotation();
+		m_efkManager->SetRotation(handle, rot.X, rot.Y, rot.Z);
 
 		// レイヤーパラメータの設定
 		Effekseer::Manager::LayerParameter layerParameter;
