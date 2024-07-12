@@ -228,6 +228,8 @@ CEffect3D *CEffect3D::Create(D3DXVECTOR3 pos, float fRadius, int nLife, D3DXCOLO
 			
 			pEffect3D->m_pPosOwner = pPosOwner;
 
+            pEffect3D->EnableZtest(true);
+
 			if (pPosOwner != nullptr)
 			{// 位置のリセット
 				pEffect3D->SetPosition(D3DXVECTOR3(0.0f, 0.0f, 0.0f));

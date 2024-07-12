@@ -16,6 +16,7 @@
 #include "myLib.h"
 #include "meshRoad.h"
 #include "manager.h"
+#include "MyEffekseer.h"
 #include "shuriken.h"
 
 //*****************************************************
@@ -122,6 +123,8 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 	{
 		// ‘¬“x‚ð’ÇÕ—p‚É‰Á‘¬
 		CPlayer *pPlayer = CPlayer::GetInstance();
+
+		m_fSpeedDefault += (pPlayer->GetSpeed() * 4.0f - m_fSpeedDefault) * 0.1f;
 
 		CalcSpeed(pEnemy);
 
@@ -350,6 +353,12 @@ void CEnemyBehaviourChasePlayer::ThrowShuriken(CEnemy *pEnemy)
 	D3DXVECTOR3 pos = pEnemy->GetMtxPos(5);
 
 	CShuriken::Create(pos,pEnemy->GetForward());
+
+	CEffekseer *pEffekseer = CManager::GetMyEffekseer();
+
+	if(pEffekseer != nullptr)
+		pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_FLASH00], ::Effekseer::Vector3D(pos.x, pos.y, pos.z),
+			::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
 }
 
 //=====================================================

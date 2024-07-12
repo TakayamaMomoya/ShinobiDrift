@@ -12,7 +12,7 @@
 #include "camera.h"
 #include "manager.h"
 #include "renderer.h"
-#include "effekseer.h"
+#include "MyEffekseer.h"
 #include "blur.h"
 
 //*****************************************************
@@ -333,11 +333,17 @@ void CObject::DrawAll(void)
 
 	DrawObject(false);
 
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+
 	if (CManager::GetMyEffekseer() != nullptr)
 	{// エフェクシアの更新
 		CManager::GetMyEffekseer()->Update();
 		CManager::GetMyEffekseer()->Draw();
 	}
+
+	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	
 	if (pBlur != nullptr)
 	{
