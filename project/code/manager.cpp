@@ -28,7 +28,7 @@
 #include "inputManager.h"
 #include "block.h"
 #include "debrisSpawner.h"
-#include "effekseer.h"
+#include "MyEffekseer.h"
 #include "physics.h"
 
 //*****************************************************

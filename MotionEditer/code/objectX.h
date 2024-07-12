@@ -26,7 +26,7 @@
 class CObjectX : public CObject
 {
 public:
-	CObjectX();	// コンストラクタ
+	CObjectX(int nPriority = 5);	// コンストラクタ
 	~CObjectX();	// デストラクタ
 
 	HRESULT Init(void);

@@ -11,7 +11,7 @@
 #include "main.h"
 #include "manager.h"
 #include "renderer.h"
-#include "effekseer.h"
+#include "MyEffekseer.h"
 #include "camera.h"
 #include "debugproc.h"
 
@@ -21,8 +21,10 @@ const char* CEffekseer::m_apEfkName[CEffekseer::TYPE_MAX] =
 	"",                               // なんもない
 	"data\\EFFEKSEER\\Effect\\drift.efkefc",  // ドリフト時の火花と煙
 	"data\\EFFEKSEER\\Effect\\spark.efkefc",  // 壁衝突時の火花
-	"data\\EFFEKSEER\\Effect\\bikefire.efkefc",  // 排気口の火
-	"data\\EFFEKSEER\\Effect\\slash00.efkefc",  // 斬撃
+	"data\\EFFEKSEER\\Effect\\bikefire.efkefc", // 排気口の火
+	"data\\EFFEKSEER\\Effect\\slash00.efkefc",	// 斬撃
+	"data\\EFFEKSEER\\Effect\\parry.efkefc",	// パリィ
+	"data\\EFFEKSEER\\Effect\\flash00.efkefc",	// 手裏剣の光
 };
 
 //===========================================================

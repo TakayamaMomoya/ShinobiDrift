@@ -14,7 +14,7 @@ SPEED_MAX 70.0 # 最大速度
 FACT_ACCELE 0.01 # 加速係数
 FACT_ATTENU 0.02 # 減速係数
 FACT_BRAKE 0.01 # ブレーキの減衰係数
-ANGLE_MAX_CURVE 0.02	# カーブの最大角度
+ANGLE_MAX_CURVE -0.55	# カーブの最大角度
 COLLIDER_SIZE 200.0 200.0 200.0	# プレイヤーの当たり判定サイズ
 
 END_SCRIPT

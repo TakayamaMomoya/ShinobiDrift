@@ -344,10 +344,10 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3* move, D3DXVECTO
 		if (D3DXVec3Length(&vecReturn) == 0.0f)
 			continue;
 
-		*pos += vecReturn * 1.0f;
+		*pos += vecReturn;
 		D3DXVec3Normalize(&vecReturn, &vecReturn);
-		*move -= vecReturn * D3DXVec3Dot(&vecReturn, move) * 1.7f;
-		*fSpeed *= 0.5f;
+		*move -= vecReturn * D3DXVec3Dot(&vecReturn, move) * 0.15f;
+		*fSpeed *= 0.98f;
 		bCollision = true;
 
 		break;

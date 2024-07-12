@@ -276,7 +276,7 @@
     <ClCompile Include="code\physics.cpp">
       <Filter>ソース ファイル\lib</Filter>
     </ClCompile>
-    <ClCompile Include="code\effekseer.cpp">
+    <ClCompile Include="code\MyEffekseer.cpp">
       <Filter>ソース ファイル\lib</Filter>
     </ClCompile>
     <ClCompile Include="code\editGoal.cpp">
@@ -533,7 +533,7 @@
     <ClInclude Include="code\editMesh.h">
       <Filter>ソース ファイル\edit</Filter>
     </ClInclude>
-    <ClInclude Include="code\effekseer.h">
+    <ClInclude Include="code\MyEffekseer.h">
       <Filter>ソース ファイル\lib</Filter>
     </ClInclude>
     <ClInclude Include="code\physics.h">

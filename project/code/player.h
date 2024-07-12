@@ -71,6 +71,7 @@ public:
 	void SetParam(SParam param) { m_param = param; }
 	CBlockGrab *GetBlock(void) { return m_info.pBlockGrab; }
 	float GetSpeed() { return m_info.fSpeed; }
+	CMotion *GetNInjaBody(void) { return m_pPlayerNinja; }	// ã‚Éæ‚Á‚Ä‚¢‚é”EÒ‚Ìæ“¾
 
 private:
 	struct SFragMotion

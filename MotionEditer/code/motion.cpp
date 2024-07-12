@@ -20,6 +20,9 @@
 #include "inputmouse.h"
 #include <string.h>
 #include "effect3D.h"
+#include "object3D.h"
+#include "texture.h"
+#include "manipulater.h"
 
 //*****************************************************
 // マクロ定義
@@ -27,6 +30,13 @@
 #define MAX_STRING	(256)	// 文字列の最大数
 #define ROLL_SPEED	(0.01f)	// パーツが回る速度
 #define MOVE_SPEED	(0.1f)	// パーツが動くスピード
+namespace
+{
+const float SIZE_ICON = 5.f;   // アイコンのサイズ
+const D3DXCOLOR COL_NOT_CURRENT = { 1.0f,1.0f,1.0f,1.0f };
+const D3DXCOLOR COL_CURRENT = { 0.0f,1.0f,0.0f,1.0f };
+const D3DXCOLOR COL_MOVE = { 1.0f,0.0f,0.0f,1.0f };
+}
 
 //=====================================================
 // コンストラクタ
@@ -55,6 +65,7 @@ CMotion::CMotion(int nPriority) : CObject(nPriority)
 	m_col = { 1.0f,1.0f,1.0f,1.0f };
 	m_bInde = false;
     ZeroMemory(&m_aPathSave[0], sizeof(m_apParts));
+    m_pManipulater = nullptr;
 }
 
 //=====================================================
@@ -74,6 +85,8 @@ HRESULT CMotion::Init(void)
 	InitPose(0);
 
     strcpy(&m_aPathSave[0], "data\\motion.txt");
+
+    CreateManipulater(0);
 
 	return S_OK;
 }
@@ -114,6 +127,16 @@ void CMotion::Update(void)
 	{
 		Motion();
 	}
+
+    // アイコンをパーツ原点に持っていく処理
+    for (int nCntParts = 0; nCntParts < m_nNumParts; nCntParts++)
+    {
+        D3DXMATRIX mtx = *m_apParts[nCntParts]->pParts->GetMatrix();
+
+        D3DXVECTOR3 posParts = { mtx._41,mtx._42,mtx._43 };
+
+        m_mapIcon[nCntParts]->SetPosition(posParts);
+    }
 
     // 入力処理
 	Input();
@@ -169,39 +192,6 @@ void CMotion::Input(void)
             Reset();
             m_bSetUp = true;
         }
-    }
-
-    m_apParts[m_nIdxParts]->pParts->SetCurrent(false);
-
-    if (ImGui::SliderInt("Parts", &m_nIdxParts, 0, m_nNumParts - 1))
-    {
-        SetMotion(m_motionType);
-
-        if (m_bMotion == false)
-        {
-            // ポーズ初期設定
-            InitPose(m_motionType);
-        }
-    }
-
-    m_apParts[m_nIdxParts]->pParts->SetCurrent(true);
-
-    if (ImGui::Button("PATRS_UP", ImVec2(100.0f, 20.0f)))
-    {// パーツ切り替え
-        m_apParts[m_nIdxParts]->pParts->SetCurrent(false);
-
-        m_nIdxParts = (m_nIdxParts + m_nNumParts - 1) % m_nNumParts;
-
-        m_apParts[m_nIdxParts]->pParts->SetCurrent(true);
-    }
-
-    if (ImGui::Button("PATRS_DOWN", ImVec2(100.0f, 20.0f)))
-    {// パーツ切り替え
-        m_apParts[m_nIdxParts]->pParts->SetCurrent(false);
-
-        m_nIdxParts = (m_nIdxParts + 1) % m_nNumParts;
-
-        m_apParts[m_nIdxParts]->pParts->SetCurrent(true);
     }
 
     if (m_bSetUp)
@@ -355,6 +345,14 @@ void CMotion::Input(void)
             ImGui::TreePop();
         }
     }
+
+    // パーツの選択
+    SelectParts();
+
+    if (m_nIdxParts >= 0)
+    {
+        m_mapIcon[m_nIdxParts]->SetColor(COL_MOVE);
+    }
 }
 
 //=====================================================
@@ -366,7 +364,6 @@ void CMotion::Motion(void)
 	{
 		return;
 	}
-
 
 	int nNextKey;
 
@@ -620,6 +617,93 @@ void CMotion::Reset(void)
 }
 
 //=====================================================
+// アイコン生成
+//=====================================================
+void CMotion::CreateIcon(int nIdx)
+{
+    CObject3D *pIcon = CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+
+    pIcon->SetSize(SIZE_ICON, SIZE_ICON);
+    pIcon->SetMode(CObject3D::MODE::MODE_BILLBOARD);
+    pIcon->SetVtx();
+
+    // テクスチャの読込
+    int nIdxTexture = CManager::GetTexture()->Regist("data\\TEXTURE\\UI\\FK.png");
+    pIcon->SetIdxTexture(nIdxTexture);
+    pIcon->EnableZtest(true);
+
+    m_mapIcon[nIdx] = pIcon;
+}
+
+//=====================================================
+// パーツの選択
+//=====================================================
+void CMotion::SelectParts(void)
+{
+    CInputMouse *pMouse = CManager::GetMouse();
+
+    if (pMouse == nullptr)
+        return;
+
+    D3DXVECTOR3 posNear;
+    D3DXVECTOR3 posFar;
+    D3DXVECTOR3 vecDiff;
+
+    universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
+
+    std::map<CObject3D*,int> mapIcon;
+
+    for (int i = 0; i < m_nNumParts; i++)
+    {
+        D3DXVECTOR3 posIcon = m_mapIcon[i]->GetPosition();
+
+        m_mapIcon[i]->SetColor(COL_NOT_CURRENT);
+
+        bool bHit = universal::CalcRaySphere(posNear, vecDiff, posIcon, SIZE_ICON);
+
+        if (bHit)
+            mapIcon[m_mapIcon[i]] = i;
+    }
+
+    if (mapIcon.size() == 0)
+        return;
+
+    float fLengthMin = FLT_MAX;
+    CObject3D *pIcon = nullptr;
+
+    for (auto it : mapIcon)
+    {
+        D3DXVECTOR3 posIcon = it.first->GetPosition();
+        D3DXVECTOR3 posCamera = Manager::GetPosVCamera();
+
+        float fLength;
+
+        bool bMin = universal::DistCmp(posCamera, posIcon, fLengthMin, &fLength);
+
+        if (bMin)
+        {
+            fLengthMin = fLength;
+            pIcon = it.first;
+        }
+    }
+
+    if (pIcon != nullptr)
+    {
+        pIcon->SetColor(COL_CURRENT);
+        
+        if (pMouse->GetTrigger(CInputMouse::BUTTON_LMB))
+        {// クリックしたらパーツ番号の決定
+            m_nIdxParts = mapIcon[pIcon];
+
+            if (m_pManipulater != nullptr)
+            {// マニピュレーターにパーツ番号を渡す
+                m_pManipulater->SetIdxPart(m_nIdxParts);
+            }
+        }
+    }
+}
+
+//=====================================================
 // パーツのトランスフォーム設定
 //=====================================================
 void CMotion::SetTransform(int nIdx)
@@ -805,24 +889,6 @@ void CMotion::DrawMotionState(void)
 	CManager::GetDebugProc()->Print("選択モーション[%d / %d]\n", m_motionType, m_nNumMotion - 1);
 	CManager::GetDebugProc()->Print("選択キー[%d / %d]\n", m_nKey, m_aMotionInfo[m_motionType].nNumKey - 1);
 	CManager::GetDebugProc()->Print("フレーム数[%d]\n", m_nFrame);
-
-	CManager::GetDebugProc()->Print("//===============================\n");
-	CManager::GetDebugProc()->Print("// パーツ情報\n");
-	CManager::GetDebugProc()->Print("//===============================\n");
-
-	for (int nCntModel = 0; nCntModel < motion::MAX_PARTS; nCntModel++)
-	{// モデル数分の情報表示
-		pos = m_apParts[nIdx]->pParts->GetPosition();
-		rot = m_apParts[nIdx]->pParts->GetRot();
-
-		if (nCntModel == 0)
-		{
-			CManager::GetDebugProc()->Print("  ");
-		}
-		CManager::GetDebugProc()->Print("[%d]POS %f,%f,%f\n    ROT %f,%f,%f\n", nIdx, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z);
-
-		nIdx = (nIdx + 1) % m_nNumParts;
-	}
 }
 
 //=====================================================
@@ -887,7 +953,6 @@ void CMotion::Load(char *pPath)
 
 				for (int nCntFile = 0; nCntFile < m_nNumParts;)
 				{//ファイル名読み込み
-
 					(void)fscanf(pFile, "%s", &cTemp[0]);
 
 					if (strcmp(cTemp, "MODEL_FILENAME") == 0)
@@ -908,6 +973,9 @@ void CMotion::Load(char *pPath)
 						// モデル読込
 						m_apParts[nCntFile]->pParts->SetIdxModel(nIdx);
 						m_apParts[nCntFile]->pParts->BindModel(m_apParts[nCntFile]->pParts->GetIdxModel());
+
+                        // アイコンの生成
+                        CreateIcon(nCntFile);
 
 						nCntFile++;
 					}
@@ -1407,4 +1475,27 @@ void CMotion::SaveMotion(void)
 
         fclose(pFile);
 	}
+}
+
+//=====================================================
+// マニピュレーターの生成
+//=====================================================
+CManipulater *CMotion::CreateManipulater(int nIdxPart)
+{
+    if(m_pManipulater == nullptr)
+        m_pManipulater = CManipulater::Create(nIdxPart,this);
+
+    return m_pManipulater;
+}
+
+//=====================================================
+// マニピュレーターの削除
+//=====================================================
+void CMotion::DeleteManipulater(void)
+{
+    if (m_pManipulater != nullptr)
+    {
+        m_pManipulater->Uninit();
+        m_pManipulater = nullptr;
+    }
 }

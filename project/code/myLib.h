@@ -37,7 +37,7 @@ class CCutMullSpline
 {// カットマル・スプライン
 public:
     CCutMullSpline() {};    // コンストラクタ
-    ~CCutMullSpline() {};    // デストラクタ
+    ~CCutMullSpline();    // デストラクタ
 
     // メンバ関数
     void Init(const std::vector<D3DXVECTOR3> vPos); // 初期化処理

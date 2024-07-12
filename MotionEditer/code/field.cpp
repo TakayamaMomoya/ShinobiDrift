@@ -71,19 +71,20 @@ void CField::Draw(void)
 //=====================================================
 CField *CField::Create(D3DXVECTOR2 tex,D3DXVECTOR3 pos,float width,float height)
 {
-	CField *pField = NULL;
+	CField *pField = nullptr;
 
-	if (pField == NULL)
+	if (pField == nullptr)
 	{
 		pField = new CField;
 
-		if (pField != NULL)
+		if (pField != nullptr)
 		{
-			pField->SetPosition(pos);
-			pField->SetSize(width, height);
-
 			// 初期化処理
 			pField->Init();
+
+            pField->SetPosition(pos);
+            pField->SetSize(width, height);
+            pField->SetVtx();
 
 			// テクスチャの読込
 			int nIdx = CManager::GetTexture()->Regist("data\\TEXTURE\\BG\\metal000.jpg");
