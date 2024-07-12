@@ -16,7 +16,7 @@
 #include "myLib.h"
 #include "meshRoad.h"
 #include "manager.h"
-#include "effekseer.h"
+#include "MyEffekseer.h"
 #include "shuriken.h"
 
 //*****************************************************

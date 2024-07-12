@@ -9,7 +9,7 @@
 // インクルード
 //*****************************************************
 #include "shuriken.h"
-#include "effekseer.h"
+#include "MyEffekseer.h"
 #include "model.h"
 #include "player.h"
 #include "manager.h"

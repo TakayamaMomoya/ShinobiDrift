@@ -12,7 +12,7 @@
 #include "camera.h"
 #include "manager.h"
 #include "renderer.h"
-#include "effekseer.h"
+#include "MyEffekseer.h"
 #include "blur.h"
 
 //*****************************************************
