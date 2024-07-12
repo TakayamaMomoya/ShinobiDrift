@@ -187,14 +187,6 @@ void CEffekseer::Draw(void)
 }
 
 //===========================================================
-// 設定
-//===========================================================
-void CEffekseer::Set(const char *FileName, ::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot, ::Effekseer::Vector3D scale)
-{
-	CreateEffect(FileName, pos, rot, scale);
-}
-
-//===========================================================
 // エフェクトの生成
 //===========================================================
 CEffekseerEffect *CEffekseer::CreateEffect(const char* FileName, ::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot, ::Effekseer::Vector3D scale)
@@ -283,6 +275,17 @@ void CEffekseer::ReleaseEffect(CEffekseerEffect *pEffect)
 	m_listEffect.remove(pEffect);
 }
 
+//===========================================================
+// エフェクトファイルのパス取得
+//===========================================================
+const char* CEffekseer::GetPathEffect(CEffekseer::TYPE type)
+{
+	if (type <= TYPE::TYPE_NONE || type >= TYPE::TYPE_MAX)
+		return nullptr;
+
+	return m_apEfkName[type];
+}
+
 //**************************************************************************************
 // エフェクトクラス
 //**************************************************************************************
@@ -331,4 +334,25 @@ void CEffekseerEffect::Init(::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot
 void CEffekseerEffect::Uninit()
 {
 
+}
+
+namespace MyEffekseer
+{
+CEffekseerEffect *CreateEffect(CEffekseer::TYPE type, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale)
+{
+	CEffekseer *pEffekseer = CManager::GetMyEffekseer();
+
+	if (pEffekseer == nullptr)
+		return nullptr;
+
+	// パスの取得
+	const char* pPath = pEffekseer->GetPathEffect(type);
+
+	if (pPath == nullptr)
+		return nullptr;
+
+	CEffekseerEffect *pEffect = pEffekseer->CreateEffect(pPath, Effekseer::Vector3D(pos.x, pos.y, pos.z), Effekseer::Vector3D(rot.x, rot.y, rot.z), Effekseer::Vector3D(scale.x, scale.y, scale.z));
+
+	return pEffect;
+}
 }

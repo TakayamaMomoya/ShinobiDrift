@@ -354,11 +354,7 @@ void CEnemyBehaviourChasePlayer::ThrowShuriken(CEnemy *pEnemy)
 
 	CShuriken::Create(pos,pEnemy->GetForward());
 
-	CEffekseer *pEffekseer = CManager::GetMyEffekseer();
-
-	if(pEffekseer != nullptr)
-		pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_FLASH00], ::Effekseer::Vector3D(pos.x, pos.y, pos.z),
-			::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
+	MyEffekseer::CreateEffect(CEffekseer::TYPE_FLASH00,pos);
 }
 
 //=====================================================
