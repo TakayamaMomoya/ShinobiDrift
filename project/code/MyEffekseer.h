@@ -35,21 +35,15 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-
-	void Set(const char* FileName, ::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot, ::Effekseer::Vector3D scale);
 	CEffekseerEffect *CreateEffect(const char* FileName, ::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot, ::Effekseer::Vector3D scale);
-
 	::EffekseerRendererDX9::RendererRef GetEffekseerRenderer(void) { return m_efkRenderer; }
 	::Effekseer::ManagerRef GetEfkManager(void) { return m_efkManager; }
 	void SetupEffekseerModules(::Effekseer::ManagerRef efkManager);
-
 	void Release(int idx);
 	void ReleaseEffect(CEffekseerEffect *pEffect);	// エフェクトの解放
-
-	static const char* m_apEfkName[CEffekseer::TYPE_MAX];
+	const char* GetPathEffect(CEffekseer::TYPE type);
 
 private:
-
 	// メンバ変数 
 	EffekseerRendererDX9::RendererRef m_efkRenderer;
 	::Effekseer::Matrix44 cameraMatrix;
@@ -58,6 +52,9 @@ private:
 	::Effekseer::Vector3D viewerPosition;
 	int m_nNum;
 	std::list<CEffekseerEffect*> m_listEffect;	// エフェクトクラスのリスト
+
+	// 静的メンバ変数
+	static const char* m_apEfkName[CEffekseer::TYPE_MAX];
 };
 
 class CEffekseerEffect
@@ -90,4 +87,8 @@ private:
 	int32_t m_time;                  // 時間
 };
 
+namespace MyEffekseer
+{
+CEffekseerEffect *CreateEffect(CEffekseer::TYPE type, D3DXVECTOR3 pos, D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f }, D3DXVECTOR3 scale = { 100.0f,100.0f,100.0f });
+}
 #endif
