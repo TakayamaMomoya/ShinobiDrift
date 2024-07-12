@@ -47,19 +47,19 @@ CHARACTERSET
     PARTSSET
         INDEX = 1
         PARENT = 0
-        POS = 0.0 43.5 0.0
+        POS = 0.0 13.0 0.0
         ROT = 0.0 0.0 0.0
     END_PARTSSET
-     PARTSSET
+    PARTSSET
         INDEX = 2
         PARENT = 1
-        POS = 0.0 42.4 0.0
+        POS = 0.0 71.9 0.0
         ROT = 0.0 0.0 0.0
     END_PARTSSET
     PARTSSET
         INDEX = 3
         PARENT = 1
-        POS = -24.0 22.1 0.0
+        POS = -24.0 54.0 0.0
         ROT = 0.0 0.0 0.0
     END_PARTSSET
     PARTSSET
@@ -77,7 +77,7 @@ CHARACTERSET
     PARTSSET
         INDEX = 6
         PARENT = 1
-        POS = 24.8 22.0 0.0
+        POS = 24.8 54.0 0.0
         ROT = 0.0 0.0 0.0
     END_PARTSSET
     PARTSSET
@@ -131,7 +131,7 @@ CHARACTERSET
     PARTSSET
         INDEX = 15
         PARENT = 1
-        POS = -29.7 62.4 -18.2
+        POS = -29.7 92.2 -18.2
         ROT = 0.0 0.0 0.0
     END_PARTSSET
     PARTSSET
@@ -159,12 +159,12 @@ MOTIONSET
             ROT = 0.00 0.00 0.00
         END_KEY
         KEY # -----[1]----
-            POS = 0.00 -2.90 15.30
+            POS = 0.00 0.00 0.00
             ROT = 0.47 0.00 0.00
         END_KEY
         KEY # -----[2]----
             POS = 0.00 0.00 0.00
-            ROT = 0.00 0.00 0.00
+            ROT = -0.37 0.00 0.00
         END_KEY
         KEY # -----[3]----
             POS = 0.00 0.00 0.00
@@ -218,7 +218,7 @@ MOTIONSET
             POS = 0.00 0.00 0.00
             ROT = 0.00 0.00 0.00
         END_KEY
-           KEY # -----[16]----
+        KEY # -----[16]----
             POS = 0.00 0.00 0.00
             ROT = -1.67 -0.28 -0.07
         END_KEY
@@ -236,8 +236,8 @@ MOTIONSET
         KEY = 0
         FRAME = 2
         NUM_FRAME = 10.000000
-        RADIUS = 400.000000
-        PARENT = 2
+        RADIUS = 500.000000
+        PARENT = 5
         POS = 0.000000 0.000000 0.000000
     END_EVENTSET
 
@@ -248,12 +248,12 @@ MOTIONSET
             ROT = 0.00 0.00 0.00
         END_KEY
         KEY # -----[1]----
-            POS = 0.00 -2.90 15.30
-            ROT = 0.47 0.00 0.00
+            POS = 0.00 0.00 0.00
+            ROT = 0.47 -0.65 0.00
         END_KEY
         KEY # -----[2]----
             POS = 0.00 0.00 0.00
-            ROT = 0.00 0.00 0.00
+            ROT = -0.37 0.85 -0.29
         END_KEY
         KEY # -----[3]----
             POS = 0.00 0.00 0.00
@@ -261,15 +261,15 @@ MOTIONSET
         END_KEY
         KEY # -----[4]----
             POS = 0.00 0.00 0.00
-            ROT = -1.18 0.21 -1.68
+            ROT = -1.05 0.24 -1.72
         END_KEY
         KEY # -----[5]----
             POS = 0.00 0.00 0.00
-            ROT = -0.56 -1.21 1.64
+            ROT = 0.25 -1.92 2.24
         END_KEY
         KEY # -----[6]----
             POS = 0.00 0.00 0.00
-            ROT = 0.00 -0.96 -0.64
+            ROT = 0.00 -0.19 -0.91
         END_KEY
         KEY # -----[7]----
             POS = 0.00 0.00 0.00
@@ -319,12 +319,12 @@ MOTIONSET
             ROT = 0.00 0.00 0.00
         END_KEY
         KEY # -----[1]----
-            POS = 0.00 -2.90 15.30
+            POS = 0.00 0.00 0.00
             ROT = 0.47 0.00 0.00
         END_KEY
         KEY # -----[2]----
             POS = 0.00 0.00 0.00
-            ROT = 0.00 0.00 0.00
+            ROT = -0.37 0.00 0.00
         END_KEY
         KEY # -----[3]----
             POS = 0.00 0.00 0.00
@@ -336,11 +336,11 @@ MOTIONSET
         END_KEY
         KEY # -----[5]----
             POS = 0.00 0.00 0.00
-            ROT = -0.56 -1.21 1.64
+            ROT = -0.23 -1.99 1.12
         END_KEY
         KEY # -----[6]----
             POS = 0.00 0.00 0.00
-            ROT = 0.00 -0.96 -0.64
+            ROT = 0.00 -0.91 -0.64
         END_KEY
         KEY # -----[7]----
             POS = 0.00 0.00 0.00
@@ -380,7 +380,7 @@ MOTIONSET
         END_KEY
         KEY # -----[16]----
             POS = 0.00 0.00 0.00
-            ROT = -1.67 -0.28 -0.07
+            ROT = -1.86 -0.35 0.23
         END_KEY
     END_KEYSET
     KEYSET     #---<< 2 / 3 >>
@@ -390,16 +390,16 @@ MOTIONSET
             ROT = 0.00 0.00 0.00
         END_KEY
         KEY # -----[1]----
-            POS = 0.00 -2.90 15.30
-            ROT = 0.47 0.00 0.00
+            POS = 0.00 0.00 0.00
+            ROT = 0.47 0.55 0.00
         END_KEY
         KEY # -----[2]----
             POS = 0.00 0.00 0.00
-            ROT = 0.00 0.00 0.00
+            ROT = -0.37 -0.51 0.22
         END_KEY
         KEY # -----[3]----
             POS = 0.00 0.00 0.00
-            ROT = 1.64 1.35 -0.43
+            ROT = 2.02 2.31 0.17
         END_KEY
         KEY # -----[4]----
             POS = 0.00 0.00 0.00
@@ -407,11 +407,11 @@ MOTIONSET
         END_KEY
         KEY # -----[5]----
             POS = 0.00 0.00 0.00
-            ROT = -0.56 -1.21 1.64
+            ROT = -0.06 -1.21 2.44
         END_KEY
         KEY # -----[6]----
             POS = 0.00 0.00 0.00
-            ROT = 0.00 -0.96 -0.64
+            ROT = 0.00 -1.55 -0.68
         END_KEY
         KEY # -----[7]----
             POS = 0.00 0.00 0.00
@@ -467,11 +467,10 @@ MOTIONSET
         KEY = 0
         FRAME = 2
         NUM_FRAME = 10.000000
-        RADIUS = 400.000000
-        PARENT = 2
+        RADIUS = 500.000000
+        PARENT = 5
         POS = 0.000000 0.000000 0.000000
     END_EVENTSET
-
 
     KEYSET     #---<< 0 / 2 >>
         FRAME = 10
@@ -480,28 +479,28 @@ MOTIONSET
             ROT = 0.00 0.00 0.00
         END_KEY
         KEY # -----[1]----
-            POS = 0.00 -2.90 15.30
-            ROT = 0.47 0.00 0.00
+            POS = 0.00 0.00 0.00
+            ROT = 0.47 0.54 0.00
         END_KEY
         KEY # -----[2]----
             POS = 0.00 0.00 0.00
-            ROT = 0.00 0.00 0.00
+            ROT = -0.38 -0.57 0.25
         END_KEY
         KEY # -----[3]----
             POS = 0.00 0.00 0.00
-            ROT = 1.48 1.35 -0.43
+            ROT = 0.72 1.95 0.01
         END_KEY
         KEY # -----[4]----
             POS = 0.00 0.00 0.00
-            ROT = 0.81 0.10 -0.76
+            ROT = 0.61 0.10 -0.55
         END_KEY
         KEY # -----[5]----
             POS = 0.00 0.00 0.00
-            ROT = -0.56 -1.11 1.07
+            ROT = -1.03 -0.80 0.77
         END_KEY
         KEY # -----[6]----
             POS = 0.00 0.00 0.00
-            ROT = 0.00 -0.96 -0.64
+            ROT = 0.00 -1.51 -0.65
         END_KEY
         KEY # -----[7]----
             POS = 0.00 0.00 0.00
@@ -541,7 +540,7 @@ MOTIONSET
         END_KEY
         KEY # -----[16]----
             POS = 0.00 0.00 0.00
-            ROT = -1.67 -0.28 -0.07
+            ROT = -1.67 -0.35 -0.07
         END_KEY
     END_KEYSET
     KEYSET     #---<< 1 / 2 >>
@@ -551,16 +550,16 @@ MOTIONSET
             ROT = 0.00 0.00 0.00
         END_KEY
         KEY # -----[1]----
-            POS = 0.00 -2.90 15.30
-            ROT = 0.47 0.00 0.00
+            POS = 0.00 0.00 0.00
+            ROT = 0.47 -0.42 0.00
         END_KEY
         KEY # -----[2]----
             POS = 0.00 0.00 0.00
-            ROT = 0.00 0.00 0.00
+            ROT = -0.37 0.42 -0.14
         END_KEY
         KEY # -----[3]----
             POS = 0.00 0.00 0.00
-            ROT = -0.25 0.28 -0.82
+            ROT = -0.25 0.31 -0.60
         END_KEY
         KEY # -----[4]----
             POS = 0.00 0.00 0.00
@@ -568,11 +567,11 @@ MOTIONSET
         END_KEY
         KEY # -----[5]----
             POS = 0.00 0.00 0.00
-            ROT = -0.16 -1.11 1.07
+            ROT = -0.45 -1.43 1.07
         END_KEY
         KEY # -----[6]----
             POS = 0.00 0.00 0.00
-            ROT = 0.00 -0.96 -0.64
+            ROT = 0.00 -0.51 -0.70
         END_KEY
         KEY # -----[7]----
             POS = 0.00 0.00 0.00
@@ -627,9 +626,9 @@ MOTIONSET
     EVENTSET
         KEY = 0
         FRAME = 2
-        NUM_FRAME = 10.000000
-        RADIUS = 50.000000
-        PARENT = 2
+        NUM_FRAME = 0.000000
+        RADIUS = 0.000000
+        PARENT = 0
         POS = 0.000000 0.000000 0.000000
     END_EVENTSET
 
@@ -999,11 +998,11 @@ MOTIONSET
     NUM_EVENT = 1
 
     EVENTSET
-        KEY = 1
+        KEY = 0
         FRAME = 2
-        NUM_FRAME = 0.000000
-        RADIUS = 0.000000
-        PARENT = 0
+        NUM_FRAME = 10.000000
+        RADIUS = 500.000000
+        PARENT = 5
         POS = 0.000000 0.000000 0.000000
     END_EVENTSET
 

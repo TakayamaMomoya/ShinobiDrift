@@ -25,7 +25,7 @@
 #include "renderer.h"
 #include "meshRoad.h"
 #include "game.h"
-#include "effekseer.h"
+#include "MyEffekseer.h"
 #include "sound.h"
 #include "guardRail.h"
 #include "playerNinja.h"
@@ -454,10 +454,8 @@ void CPlayer::InputWire(void)
 		float PosZ = GetParts(3)->pParts->GetMatrix()->_43;
 
 		// エフェクトの再生
-		if (pEffekseer != nullptr)
-			pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_DRIFT], ::Effekseer::Vector3D(PosX, PosY, PosZ),
-				::Effekseer::Vector3D(0.0f, fAngleDiff, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
-
+		MyEffekseer::CreateEffect(CEffekseer::TYPE_DRIFT, D3DXVECTOR3(PosX, PosY, PosZ));
+		
 		// サウンドインスタンスの取得
 		CSound* pSound = CSound::GetInstance();
 
@@ -1155,9 +1153,7 @@ void CPlayer::ManageMotionNinja(void)
 			float PosZ = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_43;
 
 			// エフェクトの再生
-			if (pEffekseer != nullptr)
-				pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_SLASH], ::Effekseer::Vector3D(PosX, PosY, PosZ),
-					::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
+			MyEffekseer::CreateEffect(CEffekseer::TYPE_SLASH, D3DXVECTOR3(PosX, PosY, PosZ));
 
 			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHDOWN);
 		}

@@ -16,6 +16,7 @@
 #include "myLib.h"
 #include "meshRoad.h"
 #include "manager.h"
+#include "MyEffekseer.h"
 #include "shuriken.h"
 
 //*****************************************************
@@ -38,6 +39,7 @@ CEnemyBehaviourChasePlayer::CEnemyBehaviourChasePlayer()
 {
 	m_state = STATE::STATE_NONE;
 	m_fTimerAttack = 0.0f;
+	m_pBigShuriken = nullptr;
 }
 
 //=====================================================
@@ -79,6 +81,9 @@ void CEnemyBehaviourChasePlayer::Init(CEnemy *pEnemy)
 	CalcSpeed(pEnemy);
 
 	pEnemy->SetPosition(D3DXVECTOR3(pRoadPoint[0].pos.x, pRoadPoint[0].pos.y, pRoadPoint[0].pos.z));
+
+	// でかい手裏剣の生成
+	CreateBigShuriken();
 }
 
 //=====================================================
@@ -102,6 +107,9 @@ void CEnemyBehaviourChasePlayer::Update(CEnemy *pEnemy)
 
 	// 位置の補間
 	InterpolatePosition(pEnemy);
+
+	// 手裏剣の追従
+	FollowBigShuriken(pEnemy);
 }
 
 //=====================================================
@@ -116,7 +124,7 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 		// 速度を追跡用に加速
 		CPlayer *pPlayer = CPlayer::GetInstance();
 
-		//m_fSpeedDefault = pPlayer->GetSpeed() * 1.5f;
+		m_fSpeedDefault += (pPlayer->GetSpeed() * 4.0f - m_fSpeedDefault) * 0.1f;
 
 		CalcSpeed(pEnemy);
 
@@ -133,19 +141,6 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 		break;
 	case CEnemyBehaviourChasePlayer::STATE_ATTACK:	// 攻撃状態
 	{
-		// 一定時間ごとに手裏剣を投げる
-		float fDeltaTime = CManager::GetDeltaTime();
-		m_fTimerAttack += fDeltaTime;
-
-		if (TIME_THROW_SHURIKEN <= m_fTimerAttack)
-		{
-			// タイマーリセット
-			m_fTimerAttack = 0.0f;
-
-			// 手裏剣を投げる
-			ThrowShuriken(pEnemy);
-		}
-
 		// 速度をプレイヤーに合わせる
 		CPlayer *pPlayer = CPlayer::GetInstance();
 
@@ -154,6 +149,19 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 			m_fSpeedDefault += (pPlayer->GetSpeed() * 0.5f - m_fSpeedDefault) * 0.1f;
 
 			CDebugProc::GetInstance()->Print("\n敵減速中");
+
+			// 一定時間ごとに手裏剣を投げる
+			float fDeltaTime = CManager::GetDeltaTime();
+			m_fTimerAttack += fDeltaTime;
+
+			if (TIME_THROW_SHURIKEN <= m_fTimerAttack)
+			{
+				// タイマーリセット
+				m_fTimerAttack = 0.0f;
+
+				// 手裏剣を投げる
+				ThrowShuriken(pEnemy);
+			}
 		}
 		else
 		{
@@ -304,6 +312,40 @@ void CEnemyBehaviourChasePlayer::ControllRot(CEnemy *pEnemy)
 }
 
 //=====================================================
+// でかい手裏剣の生成
+//=====================================================
+void CEnemyBehaviourChasePlayer::CreateBigShuriken(void)
+{
+	if (m_pBigShuriken != nullptr)
+	{
+		m_pBigShuriken->Uninit();
+		m_pBigShuriken = nullptr;
+	}
+
+	m_pBigShuriken = CObjectX::Create();
+
+	if (m_pBigShuriken != nullptr)
+	{
+		// モデル読込
+		int nIdx = CModel::Load("data\\MODEL\\Player\\shuriken.x");
+		m_pBigShuriken->BindModel(nIdx);
+	}
+}
+
+//=====================================================
+// でかい手裏剣の追従
+//=====================================================
+void CEnemyBehaviourChasePlayer::FollowBigShuriken(CEnemy *pEnemy)
+{
+	if (m_pBigShuriken == nullptr)
+		return;
+
+	D3DXVECTOR3 posHand = pEnemy->GetMtxPos(5);
+
+	m_pBigShuriken->SetPosition(posHand);
+}
+
+//=====================================================
 // 手裏剣を投げる
 //=====================================================
 void CEnemyBehaviourChasePlayer::ThrowShuriken(CEnemy *pEnemy)
@@ -311,6 +353,8 @@ void CEnemyBehaviourChasePlayer::ThrowShuriken(CEnemy *pEnemy)
 	D3DXVECTOR3 pos = pEnemy->GetMtxPos(5);
 
 	CShuriken::Create(pos,pEnemy->GetForward());
+
+	MyEffekseer::CreateEffect(CEffekseer::TYPE_FLASH00,pos);
 }
 
 //=====================================================
