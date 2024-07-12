@@ -32,17 +32,6 @@ const char* CEffekseer::m_apEfkName[CEffekseer::TYPE_MAX] =
 //===========================================================
 CEffekseer::CEffekseer()
 {
-	// 値を初期化
-	for (int i = 0; i < MAX_EFK; i++)
-	{
-		m_Info[i].pos = {};
-		m_Info[i].rot = {};
-		m_Info[i].effect = nullptr;
-		m_Info[i].efkHandle = NULL;
-		m_Info[i].EfkName = {};
-		m_Info[i].time = 0;
-	}
-
 	m_nNum = 0;
 }
 
@@ -87,14 +76,16 @@ void CEffekseer::Init(void)
 //===========================================================
 void CEffekseer::Uninit(void)
 {
-	for (int i = 0; i < MAX_EFK; i++)
+	for (auto it = m_listEffect.begin(); it != m_listEffect.end();)
 	{
-		m_Info[i].pos = {};
-		m_Info[i].rot = {};
-		m_Info[i].effect = nullptr;
-		m_Info[i].efkHandle = NULL;
-		m_Info[i].EfkName = {};
-		m_Info[i].time = 0;
+		auto itNext = std::next(it);
+
+		if (itNext == m_listEffect.end())
+			break;
+
+		ReleaseEffect((*it));
+
+		it = itNext;
 	}
 
 	m_nNum = 0;
@@ -105,39 +96,42 @@ void CEffekseer::Uninit(void)
 //===========================================================
 void CEffekseer::Update(void)
 {
-	for (int i = 0; i < MAX_EFK; i++)
+	for (auto it = m_listEffect.begin();it != m_listEffect.end();)
 	{
-		if (m_Info[i].effect != nullptr)
+		// エフェクトの移動
+		Effekseer::Handle handle = (*it)->GetHandle();
+		Effekseer::Vector3D pos = (*it)->GetPosition();
+		m_efkManager->AddLocation(handle, Effekseer::Vector3D(0.0f, 0.0f, 0.0f));
+
+		// レイヤーパラメータの設定
+		Effekseer::Manager::LayerParameter layerParameter;
+		layerParameter.ViewerPosition = viewerPosition;
+		m_efkManager->SetLayerParameter(0, layerParameter);
+
+		// マネージャーの更新
+		Effekseer::Manager::UpdateParameter updateParameter;
+		m_efkManager->Update(updateParameter);
+
+		// 時間を更新する
+		int32_t time = (*it)->GetTime();
+		m_efkRenderer->SetTime((float)time / 60.0f);
+		time++;
+		(*it)->SetTime(time);
+
+		auto itNext = std::next(it);
+
+		if (itNext == m_listEffect.end())
+			break;
+
+		// 毎フレーム、エフェクトが再生終了しているか確認する
+		if (m_efkManager->Exists(handle) == false)
 		{
-			// Move the effect
-			// エフェクトの移動
-			m_efkManager->AddLocation(m_Info[i].efkHandle, ::Effekseer::Vector3D(0.0f, 0.0f, 0.0f));
-
-			// Set layer parameters
-			// レイヤーパラメータの設定
-			Effekseer::Manager::LayerParameter layerParameter;
-			layerParameter.ViewerPosition = viewerPosition;
-			m_efkManager->SetLayerParameter(0, layerParameter);
-
-			// Update the manager
-			// マネージャーの更新
-			Effekseer::Manager::UpdateParameter updateParameter;
-			m_efkManager->Update(updateParameter);
-
-			// Update a time
-			// 時間を更新する
-			m_efkRenderer->SetTime(m_Info[i].time / 60.0f);
-			m_Info[i].time++;
-
-			// 毎フレーム、エフェクトが再生終了しているか確認する
-			if (m_efkManager->Exists(m_Info[i].efkHandle) == false)
-			{
-				// 新たにエフェクトを再生し直す。座標はエフェクトを表示したい場所を設定する
-				// (位置や回転、拡大縮小も設定しなおす必要がある)
-				m_efkManager->StopEffect(m_Info[i].efkHandle);
-				Release(i);
-			}
+			// エフェクトの解放
+			m_efkManager->StopEffect(handle);
+			ReleaseEffect((*it));
 		}
+
+		it = itNext;
 	}
 }
 
@@ -193,40 +187,37 @@ void CEffekseer::Draw(void)
 }
 
 //===========================================================
-// 設定
+// エフェクトの生成
 //===========================================================
-void CEffekseer::Set(const char *FileName, ::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot, ::Effekseer::Vector3D scale)
+CEffekseerEffect *CEffekseer::CreateEffect(const char* FileName, ::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot, ::Effekseer::Vector3D scale)
 {
-	for (int i = 0; i < MAX_EFK; i++)
-	{
-		if (m_Info[i].effect == nullptr)
-		{
-			// char16_tに変換
-			std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
-			std::u16string string16t = converter.from_bytes(FileName);
+	CEffekseerEffect *pEffect = nullptr;
 
-			m_Info[i].pos = pos;
- 			m_Info[i].rot = rot;
-			m_Info[i].scale = scale;
-			m_Info[i].time = 0;
+	pEffect = new CEffekseerEffect;
 
-			//std::char_16
-			// Load an effect
-			// エフェクトの読込
-			m_Info[i].effect = Effekseer::Effect::Create(m_efkManager, string16t.c_str());
+	if (pEffect == nullptr)
+		return nullptr;
 
-			// Play an effect
-			// エフェクトの再生
-			m_Info[i].efkHandle = m_efkManager->Play(m_Info[i].effect, 0, 0, 0);
+	// エフェクトの読込
+	// char16_tに変換
+	std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
+	std::u16string string16t = converter.from_bytes(FileName);
 
-			// 位置、向き、大きさ設定
-			m_efkManager->SetLocation(m_Info[i].efkHandle, m_Info[i].pos);
-			m_efkManager->SetRotation(m_Info[i].efkHandle, {0.0f, 1.0f, 0.0f}, rot.Y);
-			m_efkManager->SetScale(m_Info[i].efkHandle, m_Info[i].scale.X, m_Info[i].scale.Y, m_Info[i].scale.Z);
-			
-			break;
-		}
-	}
+	Effekseer::EffectRef effect = Effekseer::Effect::Create(m_efkManager, string16t.c_str());
+
+	pEffect->SetEffect(effect);
+	
+	// Play an effect
+	// エフェクトの再生
+	Effekseer::Handle handle = m_efkManager->Play(effect, 0, 0, 0);
+
+	pEffect->SetHandle(handle);
+
+	pEffect->Init(pos, rot, scale);
+
+	m_listEffect.push_back(pEffect);
+
+	return pEffect;
 }
 
 //===========================================================
@@ -261,14 +252,107 @@ void CEffekseer::SetupEffekseerModules(::Effekseer::ManagerRef efkManager)
 	efkManager->SetCurveLoader(Effekseer::MakeRefPtr<Effekseer::CurveLoader>());
 }
 
+//===========================================================
+// エフェクトのリリース
+//===========================================================
 void CEffekseer::Release(int idx)
 {
-	// 値を初期化
-	m_Info[idx].pos = {};
-	m_Info[idx].rot = {};
-	m_Info[idx].scale = {};
-	m_Info[idx].effect = nullptr;
-	m_Info[idx].efkHandle = NULL;
-	m_Info[idx].EfkName = {};
-	m_Info[idx].time = 0;
+
+}
+
+//===========================================================
+// エフェクトのリリース
+//===========================================================
+void CEffekseer::ReleaseEffect(CEffekseerEffect *pEffect)
+{
+	if (pEffect == nullptr)
+		return;
+
+	// エフェクトの終了処理
+	pEffect->Uninit();
+
+	// リストから除外
+	m_listEffect.remove(pEffect);
+}
+
+//===========================================================
+// エフェクトファイルのパス取得
+//===========================================================
+const char* CEffekseer::GetPathEffect(CEffekseer::TYPE type)
+{
+	if (type <= TYPE::TYPE_NONE || type >= TYPE::TYPE_MAX)
+		return nullptr;
+
+	return m_apEfkName[type];
+}
+
+//**************************************************************************************
+// エフェクトクラス
+//**************************************************************************************
+//===========================================================
+// コンストラクタ
+//===========================================================
+CEffekseerEffect::CEffekseerEffect()
+{
+
+}
+
+//===========================================================
+// デストラクタ
+//===========================================================
+CEffekseerEffect::~CEffekseerEffect()
+{
+
+}
+
+//===========================================================
+// 初期化
+//===========================================================
+void CEffekseerEffect::Init(::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot, ::Effekseer::Vector3D scale)
+{
+	m_pos = pos;
+	m_rot = rot;
+	m_scale = scale;
+	m_time = 0;
+
+	CEffekseer *pEffekseer = CManager::GetMyEffekseer();
+
+	if (pEffekseer == nullptr)
+		return;
+
+	Effekseer::ManagerRef manager = pEffekseer->GetEfkManager();
+
+	// 位置、向き、大きさ設定
+	manager->SetLocation(m_efkHandle, m_pos);
+	manager->SetRotation(m_efkHandle, { 0.0f, 1.0f, 0.0f }, rot.Y);
+	manager->SetScale(m_efkHandle, m_scale.X, m_scale.Y, m_scale.Z);
+}
+
+//===========================================================
+// 終了
+//===========================================================
+void CEffekseerEffect::Uninit()
+{
+
+}
+
+namespace MyEffekseer
+{
+CEffekseerEffect *CreateEffect(CEffekseer::TYPE type, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale)
+{
+	CEffekseer *pEffekseer = CManager::GetMyEffekseer();
+
+	if (pEffekseer == nullptr)
+		return nullptr;
+
+	// パスの取得
+	const char* pPath = pEffekseer->GetPathEffect(type);
+
+	if (pPath == nullptr)
+		return nullptr;
+
+	CEffekseerEffect *pEffect = pEffekseer->CreateEffect(pPath, Effekseer::Vector3D(pos.x, pos.y, pos.z), Effekseer::Vector3D(rot.x, rot.y, rot.z), Effekseer::Vector3D(scale.x, scale.y, scale.z));
+
+	return pEffect;
+}
 }

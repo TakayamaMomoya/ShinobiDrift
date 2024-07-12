@@ -172,9 +172,7 @@ void CShuriken::Hit(float fDamage)
 	// 弾いた時のエフェクトを出す
 	CEffekseer* pEffekseer = CManager::GetMyEffekseer();
 
-	if(pEffekseer != nullptr)
-		pEffekseer->Set(CEffekseer::m_apEfkName[CEffekseer::TYPE_PARRY], ::Effekseer::Vector3D(GetPosition().x, GetPosition().y, GetPosition().z),
-			::Effekseer::Vector3D(0.0f, 0.0f, 0.0f), ::Effekseer::Vector3D(100.0f, 100.0f, 100.0f));
+	MyEffekseer::CreateEffect(CEffekseer::TYPE_PARRY, GetPosition(), GetRotation());
 
 	// 終了する
 	Uninit();
