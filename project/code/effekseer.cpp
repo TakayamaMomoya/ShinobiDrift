@@ -23,7 +23,8 @@ const char* CEffekseer::m_apEfkName[CEffekseer::TYPE_MAX] =
 	"data\\EFFEKSEER\\Effect\\spark.efkefc",  // •ÇÕ“Ë‚Ì‰Î‰Ô
 	"data\\EFFEKSEER\\Effect\\bikefire.efkefc", // ”r‹CŒû‚Ì‰Î
 	"data\\EFFEKSEER\\Effect\\slash00.efkefc",	// aŒ‚
-	"data\\EFFEKSEER\\Effect\\parry.efkefc",	// aŒ‚
+	"data\\EFFEKSEER\\Effect\\parry.efkefc",	// ƒpƒŠƒB
+	"data\\EFFEKSEER\\Effect\\flash00.efkefc",	// è— Œ•‚ÌŒõ
 };
 
 //===========================================================

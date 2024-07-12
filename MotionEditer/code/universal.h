@@ -56,6 +56,7 @@ float lengthAxis(D3DXVECTOR3 sep, D3DXVECTOR3 e1, D3DXVECTOR3 e2, D3DXVECTOR3 e3
 D3DXVECTOR3 PosRelativeMtx(D3DXVECTOR3 posO, D3DXVECTOR3 rot, D3DXVECTOR3 offset);
 D3DXVECTOR3 NorRelativeMtx(D3DXVECTOR3 posO, D3DXVECTOR3 rot, D3DXVECTOR3 offsetMax, D3DXVECTOR3 offsetMin);
 D3DXVECTOR3 ExtractEulerAngles(D3DXMATRIX mtx);
+D3DXVECTOR3 RotateYToX(D3DXVECTOR3 vec);
 
 //======================================
 // ”»’èŒn

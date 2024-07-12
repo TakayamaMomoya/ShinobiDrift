@@ -1176,4 +1176,28 @@ D3DXVECTOR3 ExtractEulerAngles(D3DXMATRIX mtx)
 
     return angles;
 }
+
+//========================================
+// Y軸ベクトルをX軸に向けて倒す処理
+//========================================
+D3DXVECTOR3 RotateYToX(D3DXVECTOR3 vec)
+{
+    // Y軸に向かうベクトルがX軸に向くための回転行列を計算
+    D3DXVECTOR3 from(0, 1, 0);  // Y軸方向
+    D3DXVECTOR3 to(1, 0, 0);    // X軸方向
+
+    D3DXVECTOR3 axis;
+    D3DXVec3Cross(&axis, &from, &to);
+    float cosTheta = D3DXVec3Dot(&from, &to);
+    float angle = acosf(cosTheta);
+
+    D3DXMATRIX rotationMatrix;
+    D3DXMatrixRotationAxis(&rotationMatrix, &axis, angle);
+
+    // 回転行列をベクトルに適用
+    D3DXVECTOR3 result;
+    D3DXVec3TransformCoord(&result, &vec, &rotationMatrix);
+
+    return result;
+}
 }	// namespace universal

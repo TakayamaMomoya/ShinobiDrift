@@ -83,12 +83,22 @@ public:
     void Update(CManipulater *pManipulater) override;  // 更新処理
 
 private:
+    enum E_MODE
+    {// 軸モード
+        MODE_NONE = 0,  // 何でもない状態
+        MODE_X,  // X軸を動かしている
+        MODE_Y,  // Y軸を動かしている
+        MODE_Z,  // Z軸を動かしている
+        MODE_MAX
+    };
     // メンバ関数
     void Input(CManipulater *pManipulater);   // 入力処理
     void FollowModel(CManipulater *pManipulater); // モデルの追従
+    void ModeMove(CManipulater *pManipulater);    // モードごとの動き
 
     // メンバ変数
     CObjectX *m_pManipulater;   // マニピュレーター
+    E_MODE m_mode;  // 軸のモード
 };
 
 #endif

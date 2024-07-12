@@ -24,6 +24,7 @@ public:
 		TYPE_ENGINE,	// ”r‹CŒû‚Ì‰Î
 		TYPE_SLASH,		// ŽaŒ‚
 		TYPE_PARRY,		// ƒpƒŠƒB
+		TYPE_FLASH00,	// Žè— Œ•‚ÌŒõ
 		TYPE_MAX
 	};
 
