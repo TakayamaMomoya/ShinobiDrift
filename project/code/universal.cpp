@@ -679,18 +679,38 @@ bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR
 	D3DXVECTOR3 vecP, vecTemp;
 	float fHeight, fDot;
 
+	D3DXVECTOR3 vecVtx[4];
+	vecVtx[0] = vtx2 - vtx1;
+	vecVtx[0].y = 0.0f;
+	vecVtx[1] = vtx3 - vtx2;
+	vecVtx[1].y = 0.0f;
+	vecVtx[2] = vtx4 - vtx3;
+	vecVtx[2].y = 0.0f;
+	vecVtx[3] = vtx1 - vtx4;
+	vecVtx[3].y = 0.0f;
+
+	D3DXVECTOR3 vecVtxTarget[4];
+	vecVtxTarget[0] = posTarget - vtx1;
+	vecVtxTarget[0].y = 0.0f;
+	vecVtxTarget[1] = posTarget - vtx2;
+	vecVtxTarget[1].y = 0.0f;
+	vecVtxTarget[2] = posTarget - vtx3;
+	vecVtxTarget[2].y = 0.0f;
+	vecVtxTarget[3] = posTarget - vtx4;
+	vecVtxTarget[3].y = 0.0f;
+
 	// ポリゴンと内外判定
-	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &(vtx2 - vtx1))->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &(vtx3 - vtx2))->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx4 - vtx3))->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx4), &(vtx1 - vtx4))->y <= 0)
+	if (D3DXVec3Cross(&vecTemp, &vecVtxTarget[0], &vecVtx[0])->y <= 0 &&
+		D3DXVec3Cross(&vecTemp, &vecVtxTarget[1], &vecVtx[1])->y <= 0 &&
+		D3DXVec3Cross(&vecTemp, &vecVtxTarget[2], &vecVtx[2])->y <= 0 &&
+		D3DXVec3Cross(&vecTemp, &vecVtxTarget[3], &vecVtx[3])->y <= 0)
 	{
 		// y軸法線が0ではないか判定
 		if (!vtxNor.y)
 			return false;
 
 		// 角から目標位置へのベクトル
-		vecP = posTarget - vtx1;
+		vecP = vecVtxTarget[0];
 
 		// 内積を計算
 		fDot = (vtxNor.x * vecP.x) + (vtxNor.z * vecP.z);

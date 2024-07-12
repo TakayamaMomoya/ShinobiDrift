@@ -44,6 +44,9 @@ const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
 const D3DXVECTOR3 DEFAULT_POS = { 30445.6f,2821.1f,-24808.4f };	// 初期位置
 const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,2.0f,0.0f };	// 初期向き
 const float SE_CHANGE_SPEED = 10.0f;  // エンジン音とアクセル音が切り替わる速度の値
+const float HANDLE_INERTIA = 0.03f;  // カーブ時の角度変更慣性
+const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性
+const float HANDLE_CURVE_MAG = -0.04f;  // 体勢からカーブへの倍率
 }
 
 //*****************************************************
@@ -1039,18 +1042,18 @@ void CPlayer::ManageSpeed(void)
 	if (m_info.fSpeed >= NOTROTATE)
 	{// ハンドルの回転を追加
 		if (m_info.fAngleHandle == 0.0f)
-			rot.z += (m_info.fAngleHandle * m_param.fAngleMaxCurve - rot.z) * 0.07f;
+			rot.z += (m_info.fAngleHandle * m_param.fAngleMaxCurve - rot.z) * HANDLE_INERTIA_RESET;
 		else
-			rot.z += (m_info.fAngleHandle * m_param.fAngleMaxCurve - rot.z) * 0.03f;
+			rot.z += (m_info.fAngleHandle * m_param.fAngleMaxCurve - rot.z) * HANDLE_INERTIA;
 		
 		universal::LimitRot(&rot.z);
 
-		rot.y += rot.z * -0.04f;
+		rot.y += rot.z * HANDLE_CURVE_MAG;
 		universal::LimitRot(&rot.y);
 	}
 	else
 	{
-		rot.z += (0.0f - rot.z) * 0.07f;
+		rot.z += (0.0f - rot.z) * HANDLE_INERTIA_RESET;
 		universal::LimitRot(&rot.z);
 	}
 
