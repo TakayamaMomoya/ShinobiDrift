@@ -27,8 +27,9 @@ const float MESH_HEIGHT = 50.0f;	// メッシュの高さ
 const char* TEX_PATH = "data\\TEXTURE\\MATERIAL\\concrete.jpg";	// テクスチャパス
 const int NUM_VTX_IN_EDGE = 5;	// 辺の中にある頂点数
 const int PRIORITY_FAN = 5;	// 扇ポリゴンの描画プライオリティ
-const float TEX_SCROLL_U = 0.01f;  // テクスチャ座標の移動量
-const float TEX_SCROLL_V = 0.0f;   // テクスチャ座標の移動量
+const char* DOOR_TEX_PATH = "data\\TEXTURE\\MATERIAL\\potal00.png";
+const float TEX_SCROLL_X = 0.001f;  // テクスチャ座標の移動量
+const float TEX_SCROLL_Y = 0.01f;   // テクスチャ座標の移動量
 }
 
 //=====================================================
@@ -230,7 +231,7 @@ void CTunnel::CreateFan(void)
 	if (m_pFanEnter == nullptr)
 		return;
 
-	int nIdx = Texture::GetIdx("data\\TEXTURE\\MATERIAL\\451026.jpg");
+	int nIdx = Texture::GetIdx(DOOR_TEX_PATH);
 	m_pFanEnter->SetIdxTexture(nIdx);
 
 	// トンネルの入口の頂点座標取得==================================
@@ -298,7 +299,7 @@ void CTunnel::Update(void)
 
 	// テクスチャ座標設定処理
 	if (m_pFanEnter != nullptr)
-		m_pFanEnter->SetTex(TEX_SCROLL_U, TEX_SCROLL_V);
+		m_pFanEnter->SetTex(TEX_SCROLL_X, TEX_SCROLL_Y);
 }
 
 //=====================================================
