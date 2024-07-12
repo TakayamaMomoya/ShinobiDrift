@@ -19,7 +19,7 @@
 //*****************************************************
 namespace
 {
-
+	const float SWING_WIDTH = 10.0f;  // sinカーブの振れ幅
 }
 
 //=====================================================
@@ -29,6 +29,7 @@ CFan3D::CFan3D(int nPriority) : CFan(nPriority)
 {
 	m_bBillboard = false;
 	ZeroMemory(&m_mtxWorld, sizeof(D3DXMATRIX));
+	m_nStartOffsetCount = 0;
 }
 
 //=====================================================
@@ -148,6 +149,8 @@ void CFan3D::SetVtx(void)
 				0.0f,
 			};
 
+			float f = 0.1f * sinf((float)i * 0.01f);
+
 			D3DXVECTOR2 tex =
 			{
 				0.5f + sinf(fAngle) * 0.5f,
@@ -174,6 +177,9 @@ void CFan3D::SetTex(float fScrollX, float fScrollY)
 
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = *GetVtxBuff();
 	int nNumVtx = GetNumVtx();
+	float fAngleMax = GetAngleMax();
+	float fRadius = GetRadius();
+	float fRateAngle = GetRateAngle();
 
 	if (pVtxBuff != nullptr)
 	{
@@ -181,9 +187,15 @@ void CFan3D::SetTex(float fScrollX, float fScrollY)
 		pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
 		for (int i = 0; i < nNumVtx + 2; i++)
-			 pVtx[i].tex += D3DXVECTOR2(fScrollX, fScrollY);
-		
+		{
+			float fTexY = fScrollY * sinf((float)(m_nStartOffsetCount + i) / SWING_WIDTH);
 
+			pVtx[i].tex.x = pVtx[i].tex.x + fScrollX;
+			pVtx[i].tex.y = pVtx[i].tex.y + fTexY;
+		}
+
+		m_nStartOffsetCount++;
+		
 		// 頂点バッファのアンロック
 		pVtxBuff->Unlock();
 	}

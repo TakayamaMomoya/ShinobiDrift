@@ -889,24 +889,6 @@ void CMotion::DrawMotionState(void)
 	CManager::GetDebugProc()->Print("選択モーション[%d / %d]\n", m_motionType, m_nNumMotion - 1);
 	CManager::GetDebugProc()->Print("選択キー[%d / %d]\n", m_nKey, m_aMotionInfo[m_motionType].nNumKey - 1);
 	CManager::GetDebugProc()->Print("フレーム数[%d]\n", m_nFrame);
-
-	CManager::GetDebugProc()->Print("//===============================\n");
-	CManager::GetDebugProc()->Print("// パーツ情報\n");
-	CManager::GetDebugProc()->Print("//===============================\n");
-
-	for (int nCntModel = 0; nCntModel < motion::MAX_PARTS; nCntModel++)
-	{// モデル数分の情報表示
-		pos = m_apParts[nIdx]->pParts->GetPosition();
-		rot = m_apParts[nIdx]->pParts->GetRot();
-
-		if (nCntModel == 0)
-		{
-			CManager::GetDebugProc()->Print("  ");
-		}
-		CManager::GetDebugProc()->Print("[%d]POS %f,%f,%f\n    ROT %f,%f,%f\n", nIdx, pos.x, pos.y, pos.z, rot.x, rot.y, rot.z);
-
-		nIdx = (nIdx + 1) % m_nNumParts;
-	}
 }
 
 //=====================================================

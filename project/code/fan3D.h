@@ -35,6 +35,7 @@ public:
 private:
 	D3DXMATRIX m_mtxWorld;	// ワールドマトリックス
 	bool m_bBillboard;	// ビルボードかどうか
+	int m_nStartOffsetCount;  // 使用する波形の開始位置をずらすカウント
 };
 
 #endif
