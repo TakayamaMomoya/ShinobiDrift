@@ -305,7 +305,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Documents\\授業用\\総合演習\\3年group制作\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\wood.jpg";
+    "data\\TEXTURE\\MATERIAL\\wood.jpg";
    }
   }
   Material {
@@ -314,7 +314,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Documents\\授業用\\総合演習\\3年group制作\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\wiremesh.png";
+    "data\\TEXTURE\\MATERIAL\\wiremesh.png";
    }
   }
  }
