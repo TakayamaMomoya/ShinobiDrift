@@ -297,6 +297,9 @@
     <ClCompile Include="code\enemyBehaviour.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="code\meshCube.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\block.h">
@@ -555,6 +558,9 @@
       <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="code\enemyBehaviour.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="code\meshCube.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>

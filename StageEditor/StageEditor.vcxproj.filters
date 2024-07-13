@@ -93,6 +93,7 @@
     <ClCompile Include="code\backends\imgui_impl_win32.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="code\meshCube.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\anim3D.h" />
@@ -193,6 +194,7 @@
     <ClInclude Include="code\imgui_internal.h">
       <Filter>imgui</Filter>
     </ClInclude>
+    <ClInclude Include="code\meshCube.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
