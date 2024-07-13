@@ -446,9 +446,9 @@ void CPlayer::InputWire(void)
 		CEffekseer* pEffekseer = CManager::GetMyEffekseer();
 
 		// 後輪の位置取得
-		float PosX = GetParts(3)->pParts->GetMatrix()->_41;
-		float PosY = GetParts(3)->pParts->GetMatrix()->_42;
-		float PosZ = GetParts(3)->pParts->GetMatrix()->_43;
+		float PosX = GetParts(3)->pParts->GetMatrix()._41;
+		float PosY = GetParts(3)->pParts->GetMatrix()._42;
+		float PosZ = GetParts(3)->pParts->GetMatrix()._43;
 
 		// エフェクトの再生
 		MyEffekseer::CreateEffect(CEffekseer::TYPE_DRIFT, D3DXVECTOR3(PosX, PosY, PosZ));
@@ -872,9 +872,9 @@ void CPlayer::Collision(void)
 	}
 
 	// タイヤの位置保存
-	posParts[0] = universal::GetMtxPos(*GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
+	posParts[0] = universal::GetMtxPos(GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
 	posParts[0].y -= 55.0f;
-	posParts[1] = universal::GetMtxPos(*GetParts(3)->pParts->GetMatrix()) + (pos - posOld);
+	posParts[1] = universal::GetMtxPos(GetParts(3)->pParts->GetMatrix()) + (pos - posOld);
 	posParts[1].y -= 65.0f;
 
 	// タイヤの過去位置保存
@@ -1145,9 +1145,9 @@ void CPlayer::ManageMotionNinja(void)
 			// エフェクシア取得
 			CEffekseer* pEffekseer = CManager::GetMyEffekseer();
 
-			float PosX = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_41;
-			float PosY = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_42;
-			float PosZ = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_43;
+			float PosX = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()._41;
+			float PosY = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()._42;
+			float PosZ = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()._43;
 
 			// エフェクトの再生
 			MyEffekseer::CreateEffect(CEffekseer::TYPE_SLASH, D3DXVECTOR3(PosX, PosY, PosZ));
@@ -1173,7 +1173,7 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 
 	D3DXVECTOR3 offset = pEventInfo->offset;
 	D3DXMATRIX mtxParent;
-	D3DXMATRIX mtxPart = *GetParts(pEventInfo->nIdxParent)->pParts->GetMatrix();
+	D3DXMATRIX mtxPart = GetParts(pEventInfo->nIdxParent)->pParts->GetMatrix();
 
 	universal::SetOffSet(&mtxParent, mtxPart, offset);
 

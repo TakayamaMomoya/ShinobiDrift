@@ -97,7 +97,7 @@ void CPlayerNinja::Event(EVENT_INFO *pEventInfo)
 
 	D3DXVECTOR3 offset = pEventInfo->offset;
 	D3DXMATRIX mtxParent;
-	D3DXMATRIX mtxPart = *GetParts(pEventInfo->nIdxParent)->pParts->GetMatrix();
+	D3DXMATRIX mtxPart = GetParts(pEventInfo->nIdxParent)->pParts->GetMatrix();
 
 	universal::SetOffSet(&mtxParent, mtxPart, offset);
 

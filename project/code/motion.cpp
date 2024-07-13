@@ -250,7 +250,7 @@ void CMotion::Update(void)
 			{// イベントの呼び出し
 				Event(&m_aMotionInfo[m_motionType].pEvent[nCntEvent]);
 
-				D3DXMATRIX mtxParent = *GetParts(m_aMotionInfo[m_motionType].pEvent[nCntEvent].nIdxParent)->pParts->GetMatrix();
+				D3DXMATRIX mtxParent = GetParts(m_aMotionInfo[m_motionType].pEvent[nCntEvent].nIdxParent)->pParts->GetMatrix();
 				D3DXMATRIX mtx;
 
 				universal::SetOffSet(&mtx, mtxParent, m_aMotionInfo[m_motionType].pEvent[nCntEvent].offset);
@@ -419,7 +419,7 @@ void CMotion::MultiplyMtx(void)
 
 	D3DXMATRIX mtxRotModel, mtxTransModel;
 	D3DXMATRIX *pMtxParent;
-	D3DXMATRIX *pMtx;
+	D3DXMATRIX mtx;
 
 	D3DXMATRIX mtxShadow;
 	D3DLIGHT9 light;
@@ -438,25 +438,25 @@ void CMotion::MultiplyMtx(void)
 	for (int nCntParts = 0;nCntParts < m_nNumParts;nCntParts++)
 	{
 		// マトリックスの取得
-		pMtx = m_apParts[nCntParts]->pParts->GetMatrix();
+		mtx = m_apParts[nCntParts]->pParts->GetMatrix();
 
 		//ワールドマトリックス初期化
-		D3DXMatrixIdentity(pMtx);
+		D3DXMatrixIdentity(&mtx);
 
 		//向きを反映
 		D3DXMatrixRotationYawPitchRoll(&mtxRotModel,
 			m_apParts[nCntParts]->pParts->GetRotation().y, m_apParts[nCntParts]->pParts->GetRotation().x, m_apParts[nCntParts]->pParts->GetRotation().z);
-		D3DXMatrixMultiply(pMtx, pMtx, &mtxRotModel);
+		D3DXMatrixMultiply(&mtx, &mtx, &mtxRotModel);
 
 		//位置を反映
 		D3DXMatrixTranslation(&mtxTransModel,
 			m_apParts[nCntParts]->pParts->GetPosition().x, m_apParts[nCntParts]->pParts->GetPosition().y, m_apParts[nCntParts]->pParts->GetPosition().z);
-		D3DXMatrixMultiply(pMtx, pMtx, &mtxTransModel);
+		D3DXMatrixMultiply(&mtx, &mtx, &mtxTransModel);
 		
 		if (m_apParts[nCntParts]->nIdxParent != -1)
 		{//親パーツがある場合
 			// 親マトリックスの取得
-			pMtxParent = m_apParts[m_apParts[nCntParts]->nIdxParent]->pParts->GetMatrix();
+			pMtxParent = &m_apParts[m_apParts[nCntParts]->nIdxParent]->pParts->GetMatrix();
 		}
 		else
 		{
@@ -464,7 +464,9 @@ void CMotion::MultiplyMtx(void)
 		}
 
 		//親パーツとパーツのワールドマトリックスをかけ合わせる
-		D3DXMatrixMultiply(pMtx, pMtx, pMtxParent);
+		D3DXMatrixMultiply(&mtx, &mtx, pMtxParent);
+
+		m_apParts[nCntParts]->pParts->SetMatrix(mtx);
 
 		if (m_bShadow)
 		{
@@ -473,7 +475,7 @@ void CMotion::MultiplyMtx(void)
 
 			// シャドウマトリックスの作成
 			D3DXMatrixShadow(&mtxShadow, &posLight, &plane);
-			D3DXMatrixMultiply(&mtxShadow, pMtx, &mtxShadow);
+			D3DXMatrixMultiply(&mtxShadow, &mtx, &mtxShadow);
 
 			// シャドウマトリックスの設定
 			pDevice->SetTransform(D3DTS_WORLD, &mtxShadow);
@@ -482,7 +484,7 @@ void CMotion::MultiplyMtx(void)
 		}
 
 		//ワールドマトリックス設定
-		pDevice->SetTransform(D3DTS_WORLD, pMtx);
+		pDevice->SetTransform(D3DTS_WORLD, &mtx);
 
 		m_apParts[nCntParts]->pParts->JustDraw();
 	}
@@ -855,7 +857,7 @@ D3DXVECTOR3 CMotion::GetMtxPos(int nIdx)
 	{
 		if (m_apParts[nIdx]->pParts != nullptr)
 		{
-			D3DXMATRIX mtx = *m_apParts[nIdx]->pParts->GetMatrix();
+			D3DXMATRIX mtx = m_apParts[nIdx]->pParts->GetMatrix();
 
 			pos = 
 			{
@@ -878,10 +880,10 @@ void CMotion::SetAfterImage(D3DXCOLOR col, int m_nLife)
 	{
 		if (m_apParts[nCntParts] != nullptr)
 		{// 残像設定
-			D3DXMATRIX *pMtx = m_apParts[nCntParts]->pParts->GetMatrix();
+			D3DXMATRIX *pMtx = &m_apParts[nCntParts]->pParts->GetMatrix();
 			//CModel::Model *model = m_apParts[nCntParts]->pParts->GetModel();
 
-			CAfterImage::Create(*m_apParts[nCntParts]->pParts->GetMatrix(), m_apParts[nCntParts]->pParts->GetIdxModel(),col,m_nLife);
+			CAfterImage::Create(m_apParts[nCntParts]->pParts->GetMatrix(), m_apParts[nCntParts]->pParts->GetIdxModel(),col,m_nLife);
 		}
 	}
 }
