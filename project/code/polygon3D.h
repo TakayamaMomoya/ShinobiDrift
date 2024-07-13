@@ -1,12 +1,11 @@
 //*****************************************************
 //
-// 3Dポリゴンの処理[object3D.h]
+// 3Dポリゴンの処理[polygon3D.h]
 // Author:髙山桃也
 //
 //*****************************************************
-
-#ifndef _OBJECT3D_H_
-#define _OBJECT3D_H_
+#ifndef _POLYGON3D_H_
+#define _POLYGON3D_H_
 
 //*****************************************************
 // インクルード
@@ -17,7 +16,7 @@
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CObject3D : public CObject
+class CPolygon3D : public CObject
 {
 public:
 	enum MODE
@@ -28,14 +27,14 @@ public:
 		MODE_MAX
 	};
 
-	CObject3D(int nPriority = 5);	// コンストラクタ
-	~CObject3D();	// デストラクタ
+	CPolygon3D(int nPriority = 5);	// コンストラクタ
+	~CPolygon3D();	// デストラクタ
 
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	static CObject3D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f });
+	static CPolygon3D *Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f });
 	float GetWidth(void) { return m_width; }	// サイズ取得
 	float GetHeight(void) { return m_heigth; }	// サイズ取得
 	void SetSize(float width, float height);

@@ -10,20 +10,20 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "object.h"
+#include "gameObject.h"
 
 //*****************************************************
 // 前方定義
 //*****************************************************
-class CObject3D;
+class CPolygon3D;
 
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CMeshCube : public CObject
+class CMeshCube : public CGameObject
 {
 public:
-	CMeshCube(int nPriority = 3);	// コンストラクタ
+	CMeshCube(int nPriority = 6);	// コンストラクタ
 	~CMeshCube();	// デストラクタ
 
 	// メンバ関数
@@ -37,7 +37,8 @@ public:
 
 private:
 	// メンバ変数
-	std::vector<CObject3D*> m_apPolygon3D;	// 3Dポリゴンのポインタ
+	D3DXVECTOR3 m_size;	// サイズ
+	std::vector<CPolygon3D*> m_apPolygon3D;	// 3Dポリゴンのポインタ
 };
 
 #endif

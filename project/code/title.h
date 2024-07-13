@@ -19,7 +19,7 @@
 // 前方宣言
 //*****************************************************
 class CMenu;
-class CObject2D;
+class CPolygon2D;
 class CMotion;
 class CMotion;
 class CTitleBehavior;
@@ -49,7 +49,7 @@ public:
 
 private:
 	STATE m_state;				// 状態
-	CObject2D* m_pLogo;		// タイトルロゴのポインタ
+	CPolygon2D* m_pLogo;		// タイトルロゴのポインタ
 	CMotion *m_pMotion;	// プレイヤーモデル
 	CTitleBehavior *m_pBehavior;	// ビヘイビア
 	float m_fTImerSmoke;	// 煙のスポーンタイマー
@@ -74,8 +74,8 @@ public:
 	void Update(CTitle *pTItle) override;
 
 private:
-	CObject2D *m_pStart;	// スタート表示のポインタ
-	CObject2D *m_pAfter;	// スタート表示の残像
+	CPolygon2D *m_pStart;	// スタート表示のポインタ
+	CPolygon2D *m_pAfter;	// スタート表示の残像
 };
 
 class CTitleMenu : public CTitleBehavior
@@ -97,8 +97,8 @@ private:
 	void ManageCursor(void);
 	void Fade(void);
 
-	CObject2D *m_apMenu[MENU_MAX];	// メニュー項目
-	CObject2D *m_pCursor;	// カーソル
+	CPolygon2D *m_apMenu[MENU_MAX];	// メニュー項目
+	CPolygon2D *m_pCursor;	// カーソル
 	MENU m_menu;	// 選択メニュー項目
 };
 

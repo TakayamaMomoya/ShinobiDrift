@@ -20,7 +20,7 @@
 #include "debugproc.h"
 #include "blockManager.h"
 #include "effect3D.h"
-#include "object3D.h"
+#include "polygon3D.h"
 #include "blur.h"
 #include "renderer.h"
 #include "meshRoad.h"
@@ -123,7 +123,7 @@ HRESULT CPlayer::Init(void)
 		}
 	}
 
-	m_info.pRoap = CObject3D::Create(GetPosition());
+	m_info.pRoap = CPolygon3D::Create(GetPosition());
 
 	// デフォルト値設定
 	m_info.fLengthDrift = 1500.0f;

@@ -17,7 +17,7 @@
 //*****************************************************
 class CResult;
 class CNumber;
-class CObject2D;
+class CPolygon2D;
 
 //*****************************************************
 // クラスの定義
@@ -56,8 +56,8 @@ private:
 	void Uninit(CResult *pResult) override;
 
 	CNumber *m_apNumber[TYPE_MAX];	// 数値
-	CObject2D *m_apCaption[TYPE_MAX];	// 項目の見出し
-	CObject2D *m_pFrame;	// フレーム
+	CPolygon2D *m_apCaption[TYPE_MAX];	// 項目の見出し
+	CPolygon2D *m_pFrame;	// フレーム
 };
 
 class CResultRanking : public CResultBehavior

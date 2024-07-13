@@ -21,7 +21,7 @@
 //=====================================================
 // コンストラクタ
 //=====================================================
-CAnim2D::CAnim2D(int nPriority) : CObject2D(nPriority)
+CAnim2D::CAnim2D(int nPriority) : CPolygon2D(nPriority)
 {
 	m_nCounterAnim = 0;
 	m_nPatternAnim = 0;
@@ -63,7 +63,7 @@ CAnim2D *CAnim2D::Create(int nPtnAnim, int nNumAnim, int nTimeAnim, int nNumV)
 HRESULT CAnim2D::Init(void)
 {
 	// 継承クラスの初期化
-	CObject2D::Init();
+	CPolygon2D::Init();
 
 	return S_OK;
 }
@@ -74,7 +74,7 @@ HRESULT CAnim2D::Init(void)
 void CAnim2D::Uninit(void)
 {
 	// 継承クラスの終了
-	CObject2D::Uninit();
+	CPolygon2D::Uninit();
 }
 
 //=====================================================
@@ -95,7 +95,7 @@ void CAnim2D::Update(void)
 	}
 
 	// 継承クラスの更新
-	CObject2D::Update();
+	CPolygon2D::Update();
 
 	SetAnim(m_nPatternAnim,m_nNumAnim,m_nNumV);
 
@@ -108,7 +108,7 @@ void CAnim2D::Update(void)
 void CAnim2D::Draw(void)
 {
 	// 継承クラスの描画
-	CObject2D::Draw();
+	CPolygon2D::Draw();
 }
 
 //=====================================================

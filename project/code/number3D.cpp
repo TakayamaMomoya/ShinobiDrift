@@ -12,7 +12,7 @@
 #include "manager.h"
 #include "renderer.h"
 #include "texture.h"
-#include "object3D.h"
+#include "polygon3D.h"
 #include "billboard.h"
 
 //*****************************************************

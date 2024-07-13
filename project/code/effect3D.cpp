@@ -22,7 +22,7 @@
 //=====================================================
 // コンストラクタ
 //=====================================================
-CEffect3D::CEffect3D(int nPriority) : CObject3D(nPriority)
+CEffect3D::CEffect3D(int nPriority) : CPolygon3D(nPriority)
 {
 	m_nLife = 0;
 	m_fDecreaseRadius = 0.0f;
@@ -48,9 +48,9 @@ CEffect3D::~CEffect3D()
 HRESULT CEffect3D::Init(void)
 {
 	// 継承クラスの初期化
-	CObject3D::Init();
+	CPolygon3D::Init();
 
-	SetMode(CObject3D::MODE_BILLBOARD);
+	SetMode(CPolygon3D::MODE_BILLBOARD);
 	EnableZtest(true);
 
 	return S_OK;
@@ -62,7 +62,7 @@ HRESULT CEffect3D::Init(void)
 void CEffect3D::Uninit(void)
 {
 	// 継承クラスの終了
-	CObject3D::Uninit();
+	CPolygon3D::Uninit();
 }
 
 //=====================================================
@@ -71,7 +71,7 @@ void CEffect3D::Uninit(void)
 void CEffect3D::Update(void)
 {
 	// 継承クラスの更新
-	CObject3D::Update();
+	CPolygon3D::Update();
 
 	MODE mode = GetMode();
 
@@ -176,7 +176,7 @@ void CEffect3D::Draw(void)
 		SetVtx();
 	}
 
-	CObject3D::Draw();
+	CPolygon3D::Draw();
 
 	// ライティングを無効化
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);

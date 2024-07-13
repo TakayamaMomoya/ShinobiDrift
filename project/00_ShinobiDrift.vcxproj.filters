@@ -195,10 +195,10 @@
     <ClCompile Include="code\meshfield.cpp">
       <Filter>ソース ファイル\mesh</Filter>
     </ClCompile>
-    <ClCompile Include="code\object2D.cpp">
+    <ClCompile Include="code\polygon2D.cpp">
       <Filter>ソース ファイル\mesh</Filter>
     </ClCompile>
-    <ClCompile Include="code\object3D.cpp">
+    <ClCompile Include="code\polygon3D.cpp">
       <Filter>ソース ファイル\mesh</Filter>
     </ClCompile>
     <ClCompile Include="code\pause.cpp">
@@ -298,7 +298,10 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="code\meshCube.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="code\gameObject.cpp">
+      <Filter>ソース ファイル\base</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -455,10 +458,10 @@
     <ClInclude Include="code\meshfield.h">
       <Filter>ソース ファイル\mesh</Filter>
     </ClInclude>
-    <ClInclude Include="code\object2D.h">
+    <ClInclude Include="code\polygon2D.h">
       <Filter>ソース ファイル\mesh</Filter>
     </ClInclude>
-    <ClInclude Include="code\object3D.h">
+    <ClInclude Include="code\polygon3D.h">
       <Filter>ソース ファイル\mesh</Filter>
     </ClInclude>
     <ClInclude Include="code\pause.h">
@@ -561,7 +564,10 @@
       <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="code\meshCube.h">
-      <Filter>ソース ファイル</Filter>
+      <Filter>ソース ファイル\mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="code\gameObject.h">
+      <Filter>ソース ファイル\base</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

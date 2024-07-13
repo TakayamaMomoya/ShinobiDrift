@@ -13,7 +13,7 @@
 #include "fade.h"
 #include "inputManager.h"
 #include "object.h"
-#include "object2D.h"
+#include "polygon2D.h"
 #include "meshcylinder.h"
 #include "texture.h"
 #include "camera.h"
@@ -70,9 +70,9 @@ HRESULT CResult::Init(void)
 	}
 
 	// å©èoÇµÇÃê∂ê¨
-	CObject2D *pCaption = nullptr;
+	CPolygon2D *pCaption = nullptr;
 
-	pCaption = CObject2D::Create(4);
+	pCaption = CPolygon2D::Create(4);
 
 	if (pCaption != nullptr)
 	{

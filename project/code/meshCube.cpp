@@ -9,7 +9,7 @@
 // インクルード
 //*****************************************************
 #include "meshCube.h"
-#include "object3D.h"
+#include "polygon3D.h"
 
 //*****************************************************
 // 定数定義
@@ -17,12 +17,13 @@
 namespace
 {
 	const int NUM_POLYGON = 6;	// ポリゴンの数
+	const float SIZE_DEFAULT = 500.0f;	// デフォルトサイズ
 }
 
 //=====================================================
 // コンストラクタ
 //=====================================================
-CMeshCube::CMeshCube(int nPriority) : CObject(nPriority)
+CMeshCube::CMeshCube(int nPriority) : CGameObject(nPriority), m_size()
 {
 
 }
@@ -62,13 +63,17 @@ CMeshCube *CMeshCube::Create(void)
 //=====================================================
 HRESULT CMeshCube::Init(void)
 {
+	m_size = { SIZE_DEFAULT,SIZE_DEFAULT,SIZE_DEFAULT };
+
 	// 配列のリサイズ
 	m_apPolygon3D.resize(NUM_POLYGON);
 
-	for (int i = 0;i < m_apPolygon3D.size();i++)
+	for (int i = 0;i < (int)m_apPolygon3D.size();i++)
 	{
-		m_apPolygon3D[i] = CObject3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		m_apPolygon3D[i] = CPolygon3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	}
+
+
 
 	return S_OK;
 }
@@ -78,7 +83,7 @@ HRESULT CMeshCube::Init(void)
 //=====================================================
 void CMeshCube::Uninit(void)
 {
-	Release();
+	CGameObject::Uninit();
 }
 
 //=====================================================

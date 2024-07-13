@@ -15,7 +15,7 @@
 //=====================================================
 // 優先順位を決めるコンストラクタ
 //=====================================================
-CUI::CUI(int nPriority) : CObject2D(nPriority)
+CUI::CUI(int nPriority) : CPolygon2D(nPriority)
 {
 
 }
@@ -55,7 +55,7 @@ CUI *CUI::Create(void)
 //=====================================================
 HRESULT CUI::Init(void)
 {
-	CObject2D::Init();
+	CPolygon2D::Init();
 
 	EnableBlur(false);
 
@@ -67,7 +67,7 @@ HRESULT CUI::Init(void)
 //=====================================================
 void CUI::Uninit(void)
 {
-	CObject2D::Uninit();
+	CPolygon2D::Uninit();
 }
 
 //=====================================================
@@ -75,7 +75,7 @@ void CUI::Uninit(void)
 //=====================================================
 void CUI::Update(void)
 {
-	CObject2D::Update();
+	CPolygon2D::Update();
 }
 
 //=====================================================
@@ -94,6 +94,6 @@ void CUI::Draw(void)
 
 	if (bDisp)
 	{
-		CObject2D::Draw();
+		CPolygon2D::Draw();
 	}
 }

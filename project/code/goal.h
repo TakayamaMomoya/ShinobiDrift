@@ -13,7 +13,7 @@
 //*****************************************************
 #include "main.h"
 #include "player.h"
-#include "object3D.h"
+#include "polygon3D.h"
 
 //*****************************************************
 // クラスの定義
@@ -49,7 +49,7 @@ private:
 	D3DXVECTOR3 m_posEnd;	// ゴールの終点
 	float m_fRot;		// 向き
 	float m_fLength;	// 長さ
-	CObject3D* m_pObj3D;	// オブジェクト3Dのポインタ
+	CPolygon3D* m_pObj3D;	// オブジェクト3Dのポインタ
 
 	// 静的メンバ変数
 	static CGoal *m_pGoal;	// 自身のポインタ
