@@ -32,7 +32,8 @@ CObject3D::~CObject3D()
 //=====================================================
 HRESULT CObject3D::Init(void)
 {
-	D3DXMatrixIdentity(&m_mtxParent);
+	// 親マトリックスの初期化
+	ResetMtxParent();
 
 	return S_OK;
 }
@@ -61,16 +62,16 @@ void CObject3D::Draw(void)
 	LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();
 	D3DXMATRIX mtxRot, mtxTrans;
 
-	//ワールドマトリックス初期化
+	// ワールドマトリックス初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
-	//向きを反映
+	// 向きを反映
 	D3DXVECTOR3 rot = GetRotation();
 	D3DXMatrixRotationYawPitchRoll(&mtxRot,
 		rot.y, rot.x, rot.z);
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
 
-	//位置を反映
+	// 位置を反映
 	D3DXVECTOR3 pos = GetPosition();
 	D3DXMatrixTranslation(&mtxTrans,
 		pos.x, pos.y, pos.z);
@@ -79,6 +80,14 @@ void CObject3D::Draw(void)
 	// 親マトリックスをかけ合わせる
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &m_mtxParent);
 
-	//ワールドマトリックス設定
+	// ワールドマトリックス設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+}
+
+//=====================================================
+// 親マトリックスのリセット
+//=====================================================
+void CObject3D::ResetMtxParent(void)
+{
+	D3DXMatrixIdentity(&m_mtxParent);
 }

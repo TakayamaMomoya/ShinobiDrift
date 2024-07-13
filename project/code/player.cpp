@@ -119,7 +119,7 @@ HRESULT CPlayer::Init(void)
 
 		if (m_pPlayerNinja != nullptr)
 		{
-			m_pPlayerNinja->SetMatrix(*GetMatrix());
+			m_pPlayerNinja->SetMatrix(GetMatrix());
 		}
 	}
 
@@ -263,10 +263,10 @@ void CPlayer::Update(void)
 	CMotion::Update();
 
 	if (m_pPlayerNinja != nullptr)
-	{
-		m_pPlayerNinja->SetPosition(D3DXVECTOR3(pos.x, pos.y + 50.0f, pos.z));
-		m_pPlayerNinja->SetRotation(GetRotation());
-		m_pPlayerNinja->Update();
+	{// バイクに乗った忍者の追従
+		m_pPlayerNinja->SetPosition(D3DXVECTOR3(0.0f, 50.0f, 0.0f));
+		CObject3D::Draw();
+		m_pPlayerNinja->SetMatrixParent(GetMatrix());
 	}
 
 // デバッグ処理
@@ -847,7 +847,7 @@ void CPlayer::Collision(void)
 
 	// ガードレールとの当たり判定
 	std::vector<CGuardRail*> *aGuardRail = CMeshRoad::GetInstance()->GetArrayGR();
-	D3DXMATRIX* mtx = GetMatrix();
+	D3DXMATRIX* mtx = &GetMatrix();
 	D3DXMATRIX mtxTrans, mtxRot;
 	auto& paramSize = m_param.sizeCollider;
 
@@ -1160,7 +1160,10 @@ void CPlayer::ManageMotionNinja(void)
 	}
 	else
 	{
-		m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_NEUTRAL);
+		if (nMotion != MOTION_NINJA::MOTION_NINJA_NEUTRAL)
+		{
+			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_NEUTRAL);
+		}
 	}
 }
 

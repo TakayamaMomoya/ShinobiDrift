@@ -26,6 +26,7 @@ public:
 	virtual void Uninit(void);	// 終了
 	virtual void Update(void);	// 更新
 	virtual void Draw(void);	// 描画
+	void ResetMtxParent(void);	// 親マトリックスのリセット
 
 	// 変数取得・設定関数
 	D3DXMATRIX GetMatrix(void) { return m_mtxWorld; }	// ワールドマトリックス
