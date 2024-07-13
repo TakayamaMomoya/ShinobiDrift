@@ -77,7 +77,7 @@ void CObject3D::Draw(void)
 	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
 
 	// 親マトリックスをかけ合わせる
-	//D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &m_mtxParent);
+	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &m_mtxParent);
 
 	//ワールドマトリックス設定
 	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);

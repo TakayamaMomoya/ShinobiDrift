@@ -33,7 +33,6 @@ public:
 	D3DXMATRIX GetMatrixParent(void) { return m_mtxParent; }	// 親マトリックス
 	void SetMatrixParent(D3DXMATRIX mtx) { m_mtxParent = mtx; }
 
-
 private:
 	// メンバ変数
 	D3DXMATRIX m_mtxWorld;	// ワールドマトリックス

@@ -60,6 +60,8 @@ HRESULT CObjectX::Init(void)
 		BindModel(nIdx);
 	}
 
+	CObject3D::Init();
+
 	return S_OK;
 }
 
@@ -69,7 +71,7 @@ HRESULT CObjectX::Init(void)
 void CObjectX::Uninit(void)
 {
 	// é©êgÇÃîjä¸
-	Release();
+	CObject3D::Uninit();
 }
 
 //====================================================
