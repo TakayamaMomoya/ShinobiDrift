@@ -10,13 +10,13 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "object3D.h"
+#include "polygon3D.h"
 #include "meshRoad.h"
 
 //*****************************************************
 // クラス定義
 //*****************************************************
-class CGuardRail : public CObject3D
+class CGuardRail : public CPolygon3D
 {
 public:
 	CGuardRail(int nPriority = 5);	// コンストラクタ

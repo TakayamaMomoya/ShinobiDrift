@@ -1,42 +1,44 @@
 //*****************************************************
 //
-// プレイヤー忍者[playerNinja.cpp]
+// メッシュキューブ[meshCube.h]
 // Author:髙山桃也
 //
 //*****************************************************
-#ifndef _PLAYERNINJA_H_
-#define _PLAYERNINJA_H_
+#ifndef _MESHCUBE_H_
+#define _MESHCUBE_H_
 
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "motion.h"
+#include "gameObject.h"
 
 //*****************************************************
-// 前方宣言
+// 前方定義
 //*****************************************************
-class CBlockGrab;
 class CPolygon3D;
-class CPlayerNinja;
 
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CPlayerNinja : public CMotion
+class CMeshCube : public CGameObject
 {
 public:
-	CPlayerNinja(int nPriority = 4);	// コンストラクタ
-	~CPlayerNinja();	// デストラクタ
+	CMeshCube(int nPriority = 6);	// コンストラクタ
+	~CMeshCube();	// デストラクタ
 
-	static CPlayerNinja *Create(void);
-	HRESULT Init(void);
-	void Uninit(void);
-	void Update(void);
-	void Draw(void);
+	// メンバ関数
+	HRESULT Init(void);	// 初期化処理
+	void Uninit(void);	// 終了処理
+	void Update(void);	// 更新処理
+	void Draw(void);	// 描画処理
+
+	// 静的メンバ関数
+	static CMeshCube *Create(void);	// 生成処理
 
 private:
-	void Event(EVENT_INFO *pEventInfo);
-	void ManagekatanaCollision(D3DXVECTOR3 pos);
+	// メンバ変数
+	D3DXVECTOR3 m_size;	// サイズ
+	std::vector<CPolygon3D*> m_apPolygon3D;	// 3Dポリゴンのポインタ
 };
 
 #endif

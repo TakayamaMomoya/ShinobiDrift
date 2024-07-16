@@ -1,6 +1,6 @@
 //*****************************************************
 //
-// UIの処理[UI.cpp]
+// メッシュ道の処理[meshRoad.cpp]
 // Author:髙山桃也
 //
 //*****************************************************
@@ -8,14 +8,22 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "UI.h"
-#include "UIManager.h"
-#include "blur.h"
+#include "meshCube.h"
+#include "polygon3D.h"
+
+//*****************************************************
+// 定数定義
+//*****************************************************
+namespace
+{
+	const int NUM_POLYGON = 6;	// ポリゴンの数
+	const float SIZE_DEFAULT = 500.0f;	// デフォルトサイズ
+}
 
 //=====================================================
-// 優先順位を決めるコンストラクタ
+// コンストラクタ
 //=====================================================
-CUI::CUI(int nPriority) : CPolygon2D(nPriority)
+CMeshCube::CMeshCube(int nPriority) : CGameObject(nPriority), m_size()
 {
 
 }
@@ -23,7 +31,7 @@ CUI::CUI(int nPriority) : CPolygon2D(nPriority)
 //=====================================================
 // デストラクタ
 //=====================================================
-CUI::~CUI()
+CMeshCube::~CMeshCube()
 {
 
 }
@@ -31,33 +39,41 @@ CUI::~CUI()
 //=====================================================
 // 生成処理
 //=====================================================
-CUI *CUI::Create(void)
+CMeshCube *CMeshCube::Create(void)
 {
-	CUI *pUI = nullptr;
+	CMeshCube *pMeshCube = nullptr;
 
-	if (pUI == nullptr)
+	if (pMeshCube == nullptr)
 	{
 		// インスタンス生成
-		pUI = new CUI;
+		pMeshCube = new CMeshCube;
 
-		if (pUI != nullptr)
+		if (pMeshCube != nullptr)
 		{
 			// 初期化処理
-			pUI->Init();
+			pMeshCube->Init();
 		}
 	}
 
-	return pUI;
+	return pMeshCube;
 }
 
 //=====================================================
-// 初期化
+// 初期化処理
 //=====================================================
-HRESULT CUI::Init(void)
+HRESULT CMeshCube::Init(void)
 {
-	CPolygon2D::Init();
+	m_size = { SIZE_DEFAULT,SIZE_DEFAULT,SIZE_DEFAULT };
 
-	EnableBlur(false);
+	// 配列のリサイズ
+	m_apPolygon3D.resize(NUM_POLYGON);
+
+	for (int i = 0;i < (int)m_apPolygon3D.size();i++)
+	{
+		m_apPolygon3D[i] = CPolygon3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	}
+
+
 
 	return S_OK;
 }
@@ -65,35 +81,23 @@ HRESULT CUI::Init(void)
 //=====================================================
 // 終了処理
 //=====================================================
-void CUI::Uninit(void)
+void CMeshCube::Uninit(void)
 {
-	CPolygon2D::Uninit();
+	CGameObject::Uninit();
 }
 
 //=====================================================
 // 更新処理
 //=====================================================
-void CUI::Update(void)
+void CMeshCube::Update(void)
 {
-	CPolygon2D::Update();
+
 }
 
 //=====================================================
-// 描画
+// 描画処理
 //=====================================================
-void CUI::Draw(void)
+void CMeshCube::Draw(void)
 {
-	bool bDisp = true;
 
-	CUIManager *pUIManager = CUIManager::GetInstance();
-
-	if (pUIManager != nullptr)
-	{// 描画するかの取得
-		bDisp = pUIManager->IsDisp();
-	}
-
-	if (bDisp)
-	{
-		CPolygon2D::Draw();
-	}
 }

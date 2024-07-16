@@ -1,12 +1,11 @@
 //*****************************************************
 //
-// 2Dオブジェクトの処理[object2D.h]
+// 2Dポリゴンの処理[polygon2D.h]
 // Author:髙山桃也
 //
 //*****************************************************
-
-#ifndef _OBJECT2D_H_
-#define _OBJECT2D_H_
+#ifndef _POLYGON2D_H_
+#define _POLYGON2D_H_
 
 //*****************************************************
 // インクルード
@@ -17,17 +16,17 @@
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CObject2D	: public CObject
+class CPolygon2D	: public CObject
 {
 public:
-	CObject2D(int nPriority = 7);
-	~CObject2D();	//	デストラクタ
+	CPolygon2D(int nPriority = 7);
+	~CPolygon2D();	//	デストラクタ
 
 	HRESULT Init(void);	// 初期化処理
 	void Uninit(void);	// 終了処理
 	void Update(void);	// 更新処理
 	void Draw(void);	// 描画処理
-	static CObject2D *Create(int nPriority = 3,float fCenterHeight = 0.5f);	// 生成処理
+	static CPolygon2D *Create(int nPriority = 3,float fCenterHeight = 0.5f);	// 生成処理
 
 	void SetSize(float width, float height);
 	D3DXVECTOR2 GetSize(void) { return D3DXVECTOR2(m_width, m_heigth); }

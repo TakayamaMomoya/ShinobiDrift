@@ -12,7 +12,7 @@
 // インクルード
 //*****************************************************
 #include "parts.h"
-#include "object.h"
+#include "object3D.h"
 
 //*****************************************************
 // マクロ定義
@@ -23,7 +23,7 @@
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CMotion : public CObject
+class CMotion : public CObject3D
 {
 public:
 	//キーの構造体
@@ -83,27 +83,19 @@ public:
 	void Draw(void);
 	void Load(char *pPath);
 	void MultiplyMtx(void);
-	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }	// 設定処理
 	void SetPosShadow(D3DXVECTOR3 pos) { m_posShadow = pos; }	// 設定処理
 	void SetPositionOld(D3DXVECTOR3 pos) { m_posOld = pos; }	// 設定処理
-	D3DXVECTOR3 GetPosition(void) { return m_pos; }	// 取得処理
-	D3DXVECTOR3 *GetPosAddress(void) { return &m_pos; }	// 取得処理
 	D3DXVECTOR3 GetPositionOld(void) { return m_posOld; }
 	D3DXVECTOR3 GetMtxPos(int nIdx);
 	void SetMove(D3DXVECTOR3 move) { m_move = move; }
 	D3DXVECTOR3 GetMove(void) { return m_move; }	// 取得処理
-	void SetRotation(D3DXVECTOR3 rot) { m_rot = rot; }
-	void Rotation(D3DXVECTOR3 rot) { m_rot += rot; }
-	D3DXVECTOR3 GetRotation(void) { return m_rot; }
 	void SetMotion(int nMotionType);
 	int GetMotion(void) { return m_motionType; }
 	void SetKeyOld(void);
 	static CMotion *Create(char *pPath);
 	Parts *GetParts(int nIdx) { return m_apParts[nIdx]; }
-	D3DXMATRIX *GetMatrix(void) { return &m_mtxWorld; }
 	bool IsFinish(void) { return m_bFinish; }
 	void CalcMatrix(void);
-	void SetMatrix(D3DXMATRIX mtx) { m_mtxWorld = mtx; }
 	float GetRadiusMax(void);
 	void SetAfterImage(D3DXCOLOR col = { 0.0f,0.0f,0.0f,0.0f }, int m_nLife = 10);
 	int GetKey(void) { return m_nKey; }
@@ -137,12 +129,9 @@ private:
 	int m_nKey;	//現在のキー
 	float m_fCounterMotion;	//モーションカウンター
 	int m_nNumParts;	// パーツの数
-	D3DXVECTOR3 m_pos;	// 位置
 	D3DXVECTOR3 m_posOld;	// 前回の位置
 	D3DXVECTOR3 m_posShadow;	// 影の位置
 	D3DXVECTOR3 m_move;	// 移動量
-	D3DXVECTOR3 m_rot;	//向き
-	D3DXMATRIX m_mtxWorld;	// マトリックス
 	D3DXCOLOR m_col;	// 色
 	bool m_bFinish;	// モーションが終わったかどうか
 	bool m_bShadow;	// 影を描画するかどうか

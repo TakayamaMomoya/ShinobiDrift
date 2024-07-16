@@ -11,6 +11,7 @@
 #include "playerNinja.h"
 #include "player.h"
 #include "shuriken.h"
+#include "debugproc.h"
 
 //*****************************************************
 // 定数定義
@@ -68,6 +69,8 @@ HRESULT CPlayerNinja::Init(void)
 	// モデルの設定
 	CMotion::Load((char*)PATH_BODY);
 
+	SetMotion(CPlayer::MOTION::MOTION_NEUTRAL);
+
 	return S_OK;
 }
 
@@ -85,6 +88,8 @@ void CPlayerNinja::Uninit(void)
 //=====================================================
 void CPlayerNinja::Update(void)
 {
+	CDebugProc::GetInstance()->Print("\n忍者のモーション[%d]", GetMotion());
+
 	CMotion::Update();
 }
 
@@ -97,7 +102,7 @@ void CPlayerNinja::Event(EVENT_INFO *pEventInfo)
 
 	D3DXVECTOR3 offset = pEventInfo->offset;
 	D3DXMATRIX mtxParent;
-	D3DXMATRIX mtxPart = *GetParts(pEventInfo->nIdxParent)->pParts->GetMatrix();
+	D3DXMATRIX mtxPart = GetParts(pEventInfo->nIdxParent)->pParts->GetMatrix();
 
 	universal::SetOffSet(&mtxParent, mtxPart, offset);
 

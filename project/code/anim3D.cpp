@@ -17,7 +17,7 @@
 //=====================================================
 // コンストラクタ
 //=====================================================
-CAnim3D::CAnim3D(int nPriority) : CObject3D(nPriority)
+CAnim3D::CAnim3D(int nPriority) : CPolygon3D(nPriority)
 {
 	m_nCounterAnim = 0;
 	m_nPatternAnim = 0;
@@ -41,7 +41,7 @@ CAnim3D::~CAnim3D()
 HRESULT CAnim3D::Init(void)
 {
 	// 継承クラスの初期化
-	CObject3D::Init();
+	CPolygon3D::Init();
 
 	SetAnim(m_nPatternAnim, m_nNumAnim);
 
@@ -56,7 +56,7 @@ HRESULT CAnim3D::Init(void)
 void CAnim3D::Uninit(void)
 {
 	// 継承クラスの終了
-	CObject3D::Uninit();
+	CPolygon3D::Uninit();
 }
 
 //=====================================================
@@ -88,7 +88,7 @@ void CAnim3D::Update(void)
 	}
 
 	// 継承クラスの更新
-	CObject3D::Update();
+	CPolygon3D::Update();
 }
 
 //=====================================================
@@ -103,7 +103,7 @@ void CAnim3D::Draw(void)
 	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
 	// 継承クラスの描画
-	CObject3D::Draw();
+	CPolygon3D::Draw();
 
 	// ライティングを戻す
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);

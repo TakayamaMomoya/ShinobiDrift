@@ -13,7 +13,7 @@
 #include "debugproc.h"
 #include "effect3D.h"
 #include "fade.h"
-#include "object3D.h"
+#include "polygon3D.h"
 #include "game.h"
 
 //*****************************************************
@@ -79,7 +79,7 @@ CGoal* CGoal::Create(D3DXVECTOR3 pos,float fRot, float fLength)
 HRESULT CGoal::Init()
 {
 	// ゴールテープの生成
-	m_pObj3D = CObject3D::Create(m_pos);
+	m_pObj3D = CPolygon3D::Create(m_pos);
 
 	// ゴールの設定
 	SetGoal();

@@ -25,7 +25,7 @@ LPDIRECT3DTEXTURE9 CEffect2D::m_pTexture = nullptr;	// テクスチャのポインタ
 //=====================================================
 // コンストラクタ
 //=====================================================
-CEffect2D::CEffect2D(int nPriority) : CObject2D(nPriority)
+CEffect2D::CEffect2D(int nPriority) : CPolygon2D(nPriority)
 {
 	m_nLife = 0;
 	m_fDecrease = 0.0f;
@@ -45,7 +45,7 @@ CEffect2D::~CEffect2D()
 HRESULT CEffect2D::Init(void)
 {
 	// 継承クラスの初期化
-	CObject2D::Init();
+	CPolygon2D::Init();
 
 	return S_OK;
 }
@@ -56,7 +56,7 @@ HRESULT CEffect2D::Init(void)
 void CEffect2D::Uninit(void)
 {
 	// 継承クラスの終了
-	CObject2D::Uninit();
+	CPolygon2D::Uninit();
 }
 
 //=====================================================
@@ -71,7 +71,7 @@ void CEffect2D::Update(void)
 	SetSize(GetSize().x - m_fDecrease, GetSize().y - m_fDecrease);
 
 	// 継承クラスの更新
-	CObject2D::Update();
+	CPolygon2D::Update();
 
 	if (m_nLife < 0)
 	{// 自分の削除
@@ -96,7 +96,7 @@ void CEffect2D::Draw(void)
 	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 
 	// 継承クラスの描画
-	CObject2D::Draw();
+	CPolygon2D::Draw();
 
 	//αブレンディングを元に戻す
 	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);

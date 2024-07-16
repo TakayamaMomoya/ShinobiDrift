@@ -74,7 +74,7 @@ void CParts::Update(void)
 	CObjectX::Update();
 
 	// 前回のマトリックスを保存
-	m_mtxWorldOld = *GetMatrix();
+	m_mtxWorldOld = GetMatrix();
 }
 
 //====================================================

@@ -25,10 +25,8 @@ const char* INITIAL_MODEL = "data\\MODEL\\block\\bill00.x";	// 初期モデル
 //====================================================
 // コンストラクタ
 //====================================================
-CObjectX::CObjectX(int nPriority) : CObject(nPriority)
+CObjectX::CObjectX(int nPriority) : CObject3D(nPriority)
 {
-	m_pos = { 0.0f,0.0f,0.0f };
-	m_rot = { 0.0f,0.0f,0.0f };
 	m_col = { 0.0f,0.0f,0.0f,0.0f };
 	m_nIdxModel = -1;
 	m_fRadius = 0.0f;
@@ -62,6 +60,8 @@ HRESULT CObjectX::Init(void)
 		BindModel(nIdx);
 	}
 
+	CObject3D::Init();
+
 	return S_OK;
 }
 
@@ -71,7 +71,7 @@ HRESULT CObjectX::Init(void)
 void CObjectX::Uninit(void)
 {
 	// 自身の破棄
-	Release();
+	CObject3D::Uninit();
 }
 
 //====================================================
@@ -97,7 +97,7 @@ void CObjectX::Draw(void)
 
 		if (m_bShadow)
 		{
-			D3DXMATRIX *pMtx = GetMatrix();
+			D3DXMATRIX *pMtx = &GetMatrix();
 			D3DXMATRIX mtxShadow;
 			D3DLIGHT9 light;
 			D3DXVECTOR4 posLight;
@@ -239,7 +239,8 @@ void CObjectX::JustDraw(void)
 		LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
 
 		// ワールドマトリックス設定
-		pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+		D3DXMATRIX mtxWorld = CObject3D::GetMatrix();
+		pDevice->SetTransform(D3DTS_WORLD, &mtxWorld);
 
 		D3DXMATERIAL *pMat;				// マテリアルデータへのポインタ
 		D3DMATERIAL9 matDef;			// 現在のマテリアル保存用
@@ -288,30 +289,7 @@ void CObjectX::JustDraw(void)
 //=====================================================
 void CObjectX::CalcMatrix(void)
 {
-	// デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
-
-	//変数宣言
-	D3DXMATRIX mtxRot, mtxTrans;
-	
-	//ワールドマトリックス初期化
-	D3DXMatrixIdentity(&m_mtxWorld);
-
-	// スケール反映
-	D3DXMatrixScaling(&m_mtxWorld, m_fScale, m_fScale, m_fScale);
-
-	//向きを反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot,
-		m_rot.y, m_rot.x, m_rot.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
-
-	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans,
-		m_pos.x, m_pos.y, m_pos.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
-
-	//ワールドマトリックス設定
-	pDevice->SetTransform(D3DTS_WORLD, &m_mtxWorld);
+	CObject3D::Draw();
 }
 
 //=====================================================
@@ -326,8 +304,9 @@ CObjectX *CObjectX::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 		// インスタンス生成
 		pObjectX = new CObjectX;
 
-		pObjectX->m_pos = pos;
-		pObjectX->m_rot = rot;
+		pObjectX->SetPosition(pos);
+		pObjectX->SetRotation(rot);
+
 
 		// 初期化処理
 		pObjectX->Init();

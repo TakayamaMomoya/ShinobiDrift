@@ -20,7 +20,7 @@
 #include "debugproc.h"
 #include "blockManager.h"
 #include "effect3D.h"
-#include "object3D.h"
+#include "polygon3D.h"
 #include "blur.h"
 #include "renderer.h"
 #include "meshRoad.h"
@@ -122,11 +122,11 @@ HRESULT CPlayer::Init(void)
 
 		if (m_pPlayerNinja != nullptr)
 		{
-			m_pPlayerNinja->SetMatrix(*GetMatrix());
+			m_pPlayerNinja->SetMatrix(GetMatrix());
 		}
 	}
 
-	m_info.pRoap = CObject3D::Create(GetPosition());
+	m_info.pRoap = CPolygon3D::Create(GetPosition());
 
 	// デフォルト値設定
 	m_info.fLengthDrift = 1500.0f;
@@ -266,10 +266,10 @@ void CPlayer::Update(void)
 	CMotion::Update();
 
 	if (m_pPlayerNinja != nullptr)
-	{
-		m_pPlayerNinja->SetPosition(D3DXVECTOR3(pos.x, pos.y + 50.0f, pos.z));
-		m_pPlayerNinja->SetRotation(GetRotation());
-		m_pPlayerNinja->Update();
+	{// バイクに乗った忍者の追従
+		m_pPlayerNinja->SetPosition(D3DXVECTOR3(0.0f, 50.0f, 0.0f));
+		CObject3D::Draw();
+		m_pPlayerNinja->SetMatrixParent(GetMatrix());
 	}
 
 // デバッグ処理
@@ -449,9 +449,9 @@ void CPlayer::InputWire(void)
 		CEffekseer* pEffekseer = CManager::GetMyEffekseer();
 
 		// 後輪の位置取得
-		float PosX = GetParts(3)->pParts->GetMatrix()->_41;
-		float PosY = GetParts(3)->pParts->GetMatrix()->_42;
-		float PosZ = GetParts(3)->pParts->GetMatrix()->_43;
+		float PosX = GetParts(3)->pParts->GetMatrix()._41;
+		float PosY = GetParts(3)->pParts->GetMatrix()._42;
+		float PosZ = GetParts(3)->pParts->GetMatrix()._43;
 
 		// エフェクトの再生
 		MyEffekseer::CreateEffect(CEffekseer::TYPE_DRIFT, D3DXVECTOR3(PosX, PosY, PosZ));
@@ -850,7 +850,7 @@ void CPlayer::Collision(void)
 
 	// ガードレールとの当たり判定
 	std::vector<CGuardRail*> *aGuardRail = CMeshRoad::GetInstance()->GetArrayGR();
-	D3DXMATRIX* mtx = GetMatrix();
+	D3DXMATRIX* mtx = &GetMatrix();
 	D3DXMATRIX mtxTrans, mtxRot;
 	auto& paramSize = m_param.sizeCollider;
 
@@ -875,9 +875,9 @@ void CPlayer::Collision(void)
 	}
 
 	// タイヤの位置保存
-	posParts[0] = universal::GetMtxPos(*GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
+	posParts[0] = universal::GetMtxPos(GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
 	posParts[0].y -= 55.0f;
-	posParts[1] = universal::GetMtxPos(*GetParts(3)->pParts->GetMatrix()) + (pos - posOld);
+	posParts[1] = universal::GetMtxPos(GetParts(3)->pParts->GetMatrix()) + (pos - posOld);
 	posParts[1].y -= 65.0f;
 
 	// タイヤの過去位置保存
@@ -1148,9 +1148,9 @@ void CPlayer::ManageMotionNinja(void)
 			// エフェクシア取得
 			CEffekseer* pEffekseer = CManager::GetMyEffekseer();
 
-			float PosX = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_41;
-			float PosY = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_42;
-			float PosZ = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()->_43;
+			float PosX = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()._41;
+			float PosY = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()._42;
+			float PosZ = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()._43;
 
 			// エフェクトの再生
 			MyEffekseer::CreateEffect(CEffekseer::TYPE_SLASH, D3DXVECTOR3(PosX, PosY, PosZ));
@@ -1163,7 +1163,10 @@ void CPlayer::ManageMotionNinja(void)
 	}
 	else
 	{
-		m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_NEUTRAL);
+		if (nMotion != MOTION_NINJA::MOTION_NINJA_NEUTRAL)
+		{
+			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_NEUTRAL);
+		}
 	}
 }
 
@@ -1176,7 +1179,7 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 
 	D3DXVECTOR3 offset = pEventInfo->offset;
 	D3DXMATRIX mtxParent;
-	D3DXMATRIX mtxPart = *GetParts(pEventInfo->nIdxParent)->pParts->GetMatrix();
+	D3DXMATRIX mtxPart = GetParts(pEventInfo->nIdxParent)->pParts->GetMatrix();
 
 	universal::SetOffSet(&mtxParent, mtxPart, offset);
 

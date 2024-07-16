@@ -10,7 +10,7 @@
 //*****************************************************
 #include "pause.h"
 #include "manager.h"
-#include "object2D.h"
+#include "polygon2D.h"
 #include "inputkeyboard.h"
 #include "inputjoypad.h"
 #include "inputManager.h"
@@ -94,7 +94,7 @@ HRESULT CPause::Init(void)
 	}
 
 	// ”wŒi‚Ì¶¬
-	m_pBg = CObject2D::Create(7);
+	m_pBg = CPolygon2D::Create(7);
 
 	if (m_pBg != nullptr)
 	{
@@ -121,7 +121,7 @@ HRESULT CPause::Init(void)
 	{// ƒƒjƒ…[€–Ú‚Ìƒ|ƒŠƒSƒ“‚ğ¶¬
 		if (m_apMenu[nCntMenu] == nullptr)
 		{
-			m_apMenu[nCntMenu] = CObject2D::Create(7);
+			m_apMenu[nCntMenu] = CPolygon2D::Create(7);
 
 			if (m_apMenu[nCntMenu] != nullptr)
 			{

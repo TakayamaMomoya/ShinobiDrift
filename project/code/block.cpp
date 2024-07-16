@@ -434,7 +434,7 @@ bool CBlockGrab::CanGrab(D3DXVECTOR3 pos)
 	// 判定の設置
 	D3DXMATRIX mtxVec1;
 	D3DXMATRIX mtxVec2;
-	D3DXMATRIX mtx = *GetMatrix();
+	D3DXMATRIX mtx = GetMatrix();
 
 	// オフセットの設定
 	D3DXVECTOR3 offset1 = { sinf(m_afAngleOffset[0]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[0]) * m_fRadiusOffset };
@@ -489,7 +489,7 @@ void CBlockGrab::SetFan(void)
 	// オフセットの設定
 	D3DXMATRIX mtxVec1;
 	D3DXMATRIX mtxVec2;
-	D3DXMATRIX mtx = *GetMatrix();
+	D3DXMATRIX mtx = GetMatrix();
 
 	D3DXVECTOR3 offset1 = { sinf(m_afAngleOffset[0]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[0]) * m_fRadiusOffset };
 	D3DXVECTOR3 offset2 = { sinf(m_afAngleOffset[1]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[1]) * m_fRadiusOffset };

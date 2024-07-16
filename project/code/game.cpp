@@ -19,7 +19,7 @@
 #include "scene.h"
 #include "debugproc.h"
 #include "UIManager.h"
-#include "object3D.h"
+#include "polygon3D.h"
 #include "texture.h"
 #include "skybox.h"
 #include "block.h"
@@ -41,6 +41,7 @@
 #include "editBlock.h"
 #include "editGoal.h"
 #include "enemy.h"
+#include "meshCube.h"
 
 //*****************************************************
 // マクロ定義
@@ -116,6 +117,11 @@ HRESULT CGame::Init(void)
 
 	// 敵の生成
 	CEnemy::Create();
+
+#ifdef _DEBUG
+	// メッシュキューブのテスト生成
+	CMeshCube::Create();
+#endif
 
 	return S_OK;
 }

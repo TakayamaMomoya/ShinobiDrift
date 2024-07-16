@@ -40,7 +40,7 @@ CMeshRoad *CMeshRoad::m_pMeshRoad = nullptr;	// 自身のポインタ
 //=====================================================
 // コンストラクタ
 //=====================================================
-CMeshRoad::CMeshRoad(int nPriority) : CObject3D(nPriority), m_nNumVtx(0), m_pSpline(nullptr), m_pSplineL(nullptr), m_pSplineR(nullptr)
+CMeshRoad::CMeshRoad(int nPriority) : CPolygon3D(nPriority), m_nNumVtx(0), m_pSpline(nullptr), m_pSplineL(nullptr), m_pSplineR(nullptr)
 {
 
 }

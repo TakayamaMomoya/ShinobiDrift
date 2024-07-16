@@ -191,6 +191,7 @@
     <ClCompile Include="code\light.cpp" />
     <ClCompile Include="code\main.cpp" />
     <ClCompile Include="code\manager.cpp" />
+    <ClCompile Include="code\meshCube.cpp" />
     <ClCompile Include="code\meshcylinder.cpp" />
     <ClCompile Include="code\meshRoad.cpp" />
     <ClCompile Include="code\model.cpp" />
@@ -259,6 +260,7 @@
     <ClInclude Include="code\light.h" />
     <ClInclude Include="code\main.h" />
     <ClInclude Include="code\manager.h" />
+    <ClInclude Include="code\meshCube.h" />
     <ClInclude Include="code\meshcylinder.h" />
     <ClInclude Include="code\meshRoad.h" />
     <ClInclude Include="code\model.h" />
