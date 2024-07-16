@@ -41,7 +41,7 @@ const float DIST_LIMIT = 3000.0f;	// ワイヤー制限距離
 const float LINE_CORRECT_DRIFT = 40.0f;	// ドリフト補正のしきい値
 const float SIZE_BLUR = -20.0f;	// ブラーのサイズ
 const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
-const D3DXVECTOR3 DEFAULT_POS = { 30445.6f,2821.1f,-24808.4f };	// 初期位置
+const D3DXVECTOR3 DEFAULT_POS = { 6329.1f,2477.7f,-28621.6f };	// 初期位置
 const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,2.0f,0.0f };	// 初期向き
 const float SE_CHANGE_SPEED = 10.0f;  // エンジン音とアクセル音が切り替わる速度の値
 }
@@ -1181,23 +1181,6 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 	universal::SetOffSet(&mtxParent, mtxPart, offset);
 
 	D3DXVECTOR3 pos = { mtxParent._41,mtxParent._42 ,mtxParent._43 };
-
-	if (nMotion == MOTION_NINJA::MOTION_NINJA_SLASHDOWN ||
-		nMotion == MOTION_NINJA::MOTION_NINJA_SLASHUP)
-	{// 斬撃時
-		ManagekatanaCollision(pos);
-	}
-}
-
-//=====================================================
-// 刀の判定の管理
-//=====================================================
-void CPlayer::ManagekatanaCollision(D3DXVECTOR3 pos)
-{
-	// 手裏剣リストの取得
-
-
-	// 範囲内なら、手裏剣のヒット処理を呼ぶ
 
 }
 
