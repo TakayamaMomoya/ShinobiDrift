@@ -27,6 +27,7 @@ public:
 		TYPE_SLASH,		// 斬撃
 		TYPE_PARRY,		// パリィ
 		TYPE_FLASH00,	// 手裏剣の光
+		TYPE_WINDSHURIKEN,	// 手裏剣の回転風
 		TYPE_MAX
 	};
 
@@ -64,8 +65,8 @@ public:
 	~CEffekseerEffect();	// デストラクタ
 
 	// メンバ関数
-	void Init(::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot, ::Effekseer::Vector3D scale);
-	void Uninit(void);
+	void Init(::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot, ::Effekseer::Vector3D scale);	// 初期化
+	void Uninit(void);	// 終了処理
 	CEffekseerEffect *FollowPosition(D3DXVECTOR3 pos);	// 位置の追従
 
 	// 変数取得・設定関数
