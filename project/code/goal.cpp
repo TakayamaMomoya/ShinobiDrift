@@ -156,7 +156,7 @@ void CGoal::Update()
 	{
 		if (fCross >= 0.0f && fCross <= 1.0f)
 		{// 始点と終点の間を通った時
-			//CGame::SetState(CGame::STATE::STATE_END);
+			CGame::SetState(CGame::STATE::STATE_END);
 
 			CDebugProc::GetInstance()->Print("\nゴールした");
 		}

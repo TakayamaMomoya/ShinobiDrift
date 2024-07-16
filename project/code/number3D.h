@@ -16,7 +16,7 @@
 //*****************************************************
 // 前方宣言
 //*****************************************************
-class CBillboard;
+class CPolygon3D;
 
 //*****************************************************
 // マクロ定義
@@ -44,7 +44,7 @@ public:
 	void SetColor(D3DXCOLOR col);
 
 private:
-	CBillboard *m_apObject[MAX_PLACE];	// ２Ⅾオブジェクトのポインタ
+	CPolygon3D *m_apObject[MAX_PLACE];	// 3Dポリゴンの配列
 	D3DXVECTOR3 m_pos;	// 位置
 	int m_nNumPlace;	// 桁数
 	int m_nValue;	// 値

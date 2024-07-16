@@ -180,9 +180,6 @@
     <ClCompile Include="code\animation2D.cpp">
       <Filter>ソース ファイル\mesh</Filter>
     </ClCompile>
-    <ClCompile Include="code\billboard.cpp">
-      <Filter>ソース ファイル\mesh</Filter>
-    </ClCompile>
     <ClCompile Include="code\fan2D.cpp">
       <Filter>ソース ファイル\mesh</Filter>
     </ClCompile>
@@ -444,9 +441,6 @@
       <Filter>ソース ファイル\VFX</Filter>
     </ClInclude>
     <ClInclude Include="code\animation2D.h">
-      <Filter>ソース ファイル\mesh</Filter>
-    </ClInclude>
-    <ClInclude Include="code\billboard.h">
       <Filter>ソース ファイル\mesh</Filter>
     </ClInclude>
     <ClInclude Include="code\fan2D.h">
