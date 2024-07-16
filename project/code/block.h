@@ -105,7 +105,7 @@ public:
 private:
 
 	// メンバ関数
-	void GrabPoint(void);  // 鉤縄ポイントUI表示
+	void GrabPointUI(void);  // 鉤縄ポイントUI表示
 
 	// 定数
 	static const int NUM_OFFSET = 2;	// オフセットの数
@@ -116,6 +116,7 @@ private:
 	bool m_bCurrent;	// 選択されているかどうか
 	CFan3D *m_pFan;	// 判定可視化用の扇ポリゴン
 	CPolygon3D *m_pGrabPointUI;  // 鉤縄ポイントUI表示用ポリゴン
+	float m_fColA = 0.0f;  // 鉤縄ポイントUI表示用ポリゴンのα値
 
 };
 
