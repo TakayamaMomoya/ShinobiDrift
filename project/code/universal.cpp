@@ -563,28 +563,50 @@ float CrossProduct(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2)
 //========================================
 bool IsCross(D3DXVECTOR3 posTarget, D3DXVECTOR3 vecSorce, D3DXVECTOR3 vecDest, float *pRate, D3DXVECTOR3 move)
 {
-	bool bHit = false;
 
-	D3DXVECTOR3 vecLine = vecDest - vecSorce;
-	D3DXVECTOR3 vecToPos = posTarget - vecSorce;
-	float fArea = CrossProduct(vecLine, vecToPos);
+	D3DXVECTOR3 vecLine = D3DXVECTOR3
+	(//一旦Y座標は平面
+		vecDest.x - vecSorce.x,
+		0.0f,
+		vecDest.z - vecSorce.z
+	);
 
-	if (fArea > 0)
+	D3DXVECTOR3 vecToPos = D3DXVECTOR3
+	(
+		posTarget.x - vecSorce.x,
+		0.0f,
+		posTarget.z - vecSorce.z
+	);
+
+	//計算用変数
+	float fAngle = atan2f(vecLine.x, vecLine.z);
+	float fAreaMax = (vecLine.z * move.x) - (vecLine.x * move.z);
+	float fArea = (vecToPos.z * move.x) - (vecToPos.x * move.z);
+	float fRate = fArea / fAreaMax;
+
+	if (pRate != nullptr)
 	{
-		if (pRate != nullptr)
-		{
-			// 割合を算出
-
-			float fAreaMax = CrossProduct(vecLine, move);
-			fArea = CrossProduct(vecToPos, move);
-
-			*pRate = fArea / fAreaMax;
-		}
-
-		bHit = true;
+		*pRate = fRate;
 	}
 
-	return bHit;
+	if ((vecLine.z * vecToPos.x) - (vecLine.x * vecToPos.z) > 0)
+	{//線分の左にめり込んでいる
+
+		float fLength = sqrtf(vecLine.x * vecLine.x + vecLine.z * vecLine.z) * fRate;
+
+		D3DXVECTOR3 posCross =
+		{//線分の交点
+			vecSorce.x + sinf(fAngle) * fLength,
+			posTarget.y,
+			vecSorce.z + cosf(fAngle) * fLength
+		};
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 //========================================
