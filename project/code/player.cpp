@@ -852,22 +852,27 @@ void CPlayer::Collision(void)
 	std::vector<CGuardRail*> *aGuardRail = CMeshRoad::GetInstance()->GetArrayGR();
 	D3DXMATRIX* mtx = &GetMatrix();
 	D3DXMATRIX mtxTrans, mtxRot;
-	auto& paramSize = m_param.sizeCollider;
+	D3DXVECTOR3 paramSize = m_param.sizeCollider;
+	D3DXVECTOR3 sizeX = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, rot.y, 0.0f), paramSize);
+	D3DXVECTOR3 sizeZ = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, -rot.y, 0.0f), D3DXVECTOR3(paramSize.x, 0.0f, paramSize.z));
 
 #ifdef _DEBUG
 	//D3DXVECTOR3 vecAxial = universal::VecToOffset(*mtx, paramSize);
-	CEffect3D::Create(D3DXVECTOR3(pos.x + paramSize.x, pos.y, pos.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-	CEffect3D::Create(D3DXVECTOR3(pos.x - paramSize.x, pos.y, pos.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y + paramSize.y, pos.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
-	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y - paramSize.y, pos.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
-	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y, pos.z + paramSize.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	CEffect3D::Create(D3DXVECTOR3(pos.x, pos.y, pos.z - paramSize.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	CDebugProc::GetInstance()->Print("\n“–‚½‚è”»’èˆÊ’u[%f,%f,%f]", paramSize.x, paramSize.y, paramSize.z);
+	CEffect3D::Create(D3DXVECTOR3(pos.x + sizeX.x, pos.y + sizeX.y + 100.0f, pos.z + sizeX.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	/*CEffect3D::Create(D3DXVECTOR3(pos.x - sizeZ.x, pos.y + sizeX.y + 100.0f, pos.z + sizeZ.z), 50.0f, 2, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x + sizeZ.x, pos.y + sizeX.y + 100.0f, pos.z - sizeZ.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x - sizeX.x, pos.y + sizeX.y + 100.0f, pos.z - sizeX.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x + sizeX.x, pos.y - sizeX.y + 100.0f, pos.z + sizeX.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x - sizeZ.x, pos.y - sizeX.y + 100.0f, pos.z + sizeZ.z), 50.0f, 2, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	CEffect3D::Create(D3DXVECTOR3(pos.x + sizeZ.x, pos.y - sizeX.y + 100.0f, pos.z - sizeZ.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));*/
+	CEffect3D::Create(D3DXVECTOR3(pos.x - sizeX.x, pos.y - sizeX.y + 100.0f, pos.z - sizeX.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	
+	CDebugProc::GetInstance()->Print("\n“–‚½‚è”»’èˆÊ’u[%f,%f,%f]", sizeX.x, paramSize.y, sizeX.z);
 #endif // _DEBUG
 
 	for (auto itGuardRail : *aGuardRail)
 	{
-		if (itGuardRail->CollideGuardRail(&pos, &move, paramSize, &m_info.fSpeed))
+		if (itGuardRail->CollideGuardRail(&pos, &move, sizeX, &m_info.fSpeed))
 		{
 			rot.y = atan2f(move.x, move.z);
 			break;
