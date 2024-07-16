@@ -341,7 +341,12 @@ void CEnemyBehaviourChasePlayer::FollowBigShuriken(CEnemy *pEnemy)
 
 	D3DXVECTOR3 posHand = pEnemy->GetMtxPos(5);
 
-	m_pBigShuriken->FollowPosition(posHand);
+	m_pBigShuriken = m_pBigShuriken->FollowPosition(posHand);
+
+	if (m_pBigShuriken == nullptr)
+	{
+		CreateBigShuriken();
+	}
 }
 
 //=====================================================

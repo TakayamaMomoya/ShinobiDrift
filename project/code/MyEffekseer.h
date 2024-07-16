@@ -27,6 +27,7 @@ public:
 		TYPE_SLASH,		// ŽaŒ‚
 		TYPE_PARRY,		// ƒpƒŠƒB
 		TYPE_FLASH00,	// Žè— Œ•‚ÌŒõ
+		TYPE_THROWSHURIKEN,	// Žè— Œ•‚Ì“Š‚°
 		TYPE_WINDSHURIKEN,	// Žè— Œ•‚Ì‰ñ“]•—
 		TYPE_MAX
 	};
