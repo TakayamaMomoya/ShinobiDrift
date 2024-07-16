@@ -16,6 +16,8 @@
 #include "object.h"
 #include "effect3D.h"
 #include "fan3D.h"
+#include "polygon3D.h"
+#include "player.h"
 #include "debugproc.h"
 
 //*****************************************************
@@ -26,6 +28,9 @@ namespace
 	const float SPEED_MOVE(1.0f);	// 移動速度
 	const char* MAP_FILE = "data\\MAP\\map01.bin";	// マップのファイルパス
 	const float RADIUS_DRIFT_DEFAULT = 1000.0f;	// ドリフト半径のデフォルト値
+	const float POLYGON_SIZE_X = 100.0f;        // 鉤縄ポイントUIのサイズ
+	const float POLYGON_SIZE_Y = 100.0f;        // 鉤縄ポイントUIのサイズ
+	const float STANDARD_LENGHT = 5000.0f;      // 鉤縄ポイントUIが出る距離
 }
 
 //*****************************************************
@@ -334,6 +339,8 @@ CBlockGrab::CBlockGrab() : m_bCurrent(false), m_fRadiusOffset(0.0f),m_pFan(nullp
 	{
 		m_afAngleOffset[i] = 0.0f;
 	}
+
+	m_pGrabPointUI = nullptr;
 }
  
 //=====================================================
@@ -404,6 +411,8 @@ void CBlockGrab::Uninit(void)
 void CBlockGrab::Update(void)
 {
 	CBlock::Update();
+
+	GrabPoint();
 
 #ifdef _DEBUG
 	SetFan();	// 扇ポリゴンの設定
@@ -559,6 +568,49 @@ void CBlockGrab::SetRotation(D3DXVECTOR3 rot)
 		SetFan();
 	}
 #endif
+}
+
+//=====================================================
+// 鉤縄ポイントUI表示処理
+//=====================================================
+void CBlockGrab::GrabPoint(void)
+{
+	CPlayer* pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer != nullptr)
+	{
+		D3DXVECTOR3 PlayerPos = pPlayer->GetPosition();
+		D3DXVECTOR3 pos = GetPosition();
+
+		// プレイヤーと鉤縄ポイントの距離
+		float fLenght = (pos.x + pos.z) - (PlayerPos.x + PlayerPos.z);
+		fLenght = fabs(fLenght);
+
+		if (fLenght < STANDARD_LENGHT)
+		{// 範囲内
+
+			if (m_pGrabPointUI == nullptr)
+			{
+				// UIの設定
+				m_pGrabPointUI = CPolygon3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+				D3DXVECTOR3 vtxmax = GetVtxMax();
+				m_pGrabPointUI->SetPosition(D3DXVECTOR3(pos.x, pos.y + vtxmax.y, pos.z));
+				m_pGrabPointUI->SetMode(CPolygon3D::MODE_BILLBOARD);
+				m_pGrabPointUI->SetSize(POLYGON_SIZE_X, POLYGON_SIZE_Y);
+				m_pGrabPointUI->SetVtx();
+				m_pGrabPointUI->EnableZtest(true);
+			}
+		}
+		else
+		{// 範囲外
+
+			if (m_pGrabPointUI != nullptr)
+			{
+				m_pGrabPointUI->Uninit();
+				m_pGrabPointUI = nullptr;
+			}
+		}
+	}
 }
 
 //=====================================================
