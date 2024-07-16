@@ -27,7 +27,7 @@ const int NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
 //=====================================================
 // コンストラクタ
 //=====================================================
-CGuardRail::CGuardRail(int nPriority) : CObject3D(nPriority), m_nNumVtx(0), m_fHeight(0.0f), m_bLeft(false)
+CGuardRail::CGuardRail(int nPriority) : CPolygon3D(nPriority), m_nNumVtx(0), m_fHeight(0.0f), m_bLeft(false)
 {
 
 }
@@ -234,7 +234,7 @@ void CGuardRail::SetNormal(VERTEX_3D *pVtx)
 //=====================================================
 void CGuardRail::Uninit(void)
 {
-	CObject3D::Uninit();
+	CPolygon3D::Uninit();
 }
 
 //=====================================================
@@ -242,7 +242,7 @@ void CGuardRail::Uninit(void)
 //=====================================================
 void CGuardRail::Update(void)
 {
-	CObject3D::Update();
+	CPolygon3D::Update();
 }
 
 //=====================================================

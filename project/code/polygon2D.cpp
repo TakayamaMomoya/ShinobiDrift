@@ -8,7 +8,7 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "object2D.h"
+#include "polygon2D.h"
 #include "manager.h"
 #include "renderer.h"
 #include "texture.h"
@@ -16,7 +16,7 @@
 //=====================================================
 // 優先順位を決めるコンストラクタ
 //=====================================================
-CObject2D::CObject2D(int nPriority) : CObject(nPriority)
+CPolygon2D::CPolygon2D(int nPriority) : CObject(nPriority)
 {
 	// 変数のクリア
 	m_pVtxBuff = nullptr;
@@ -33,7 +33,7 @@ CObject2D::CObject2D(int nPriority) : CObject(nPriority)
 //=====================================================
 // デストラクタ
 //=====================================================
-CObject2D::~CObject2D()
+CPolygon2D::~CPolygon2D()
 {
 
 }
@@ -41,7 +41,7 @@ CObject2D::~CObject2D()
 //=====================================================
 // 初期化
 //=====================================================
-HRESULT CObject2D::Init(void)
+HRESULT CPolygon2D::Init(void)
 {
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
@@ -126,7 +126,7 @@ HRESULT CObject2D::Init(void)
 //=====================================================
 // 終了処理
 //=====================================================
-void CObject2D::Uninit(void)
+void CPolygon2D::Uninit(void)
 {
 	if (m_pVtxBuff != nullptr)
 	{
@@ -141,7 +141,7 @@ void CObject2D::Uninit(void)
 //=====================================================
 // 更新処理
 //=====================================================
-void CObject2D::Update(void)
+void CPolygon2D::Update(void)
 {
 
 }
@@ -149,7 +149,7 @@ void CObject2D::Update(void)
 //=====================================================
 // 頂点位置設定
 //=====================================================
-void CObject2D::SetVtx(void)
+void CPolygon2D::SetVtx(void)
 {
 	// 頂点情報のポインタ
 	VERTEX_2D *pVtx;
@@ -204,7 +204,7 @@ void CObject2D::SetVtx(void)
 //=====================================================
 // 描画
 //=====================================================
-void CObject2D::Draw(void)
+void CPolygon2D::Draw(void)
 {
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
@@ -230,7 +230,7 @@ void CObject2D::Draw(void)
 //=====================================================
 // 設定処理
 //=====================================================
-void CObject2D::SetPosition(D3DXVECTOR3 pos)
+void CPolygon2D::SetPosition(D3DXVECTOR3 pos)
 {
 	m_pos = pos;
 }
@@ -238,7 +238,7 @@ void CObject2D::SetPosition(D3DXVECTOR3 pos)
 //=====================================================
 // 中心の高さ
 //=====================================================
-void CObject2D::SetCenterHeight(float fHeight)
+void CPolygon2D::SetCenterHeight(float fHeight)
 {
 	m_fCenterHeight = fHeight;
 }
@@ -246,14 +246,14 @@ void CObject2D::SetCenterHeight(float fHeight)
 //=====================================================
 // 生成処理
 //=====================================================
-CObject2D *CObject2D::Create(int nPriority, float fCenterHeight)
+CPolygon2D *CPolygon2D::Create(int nPriority, float fCenterHeight)
 {
-	CObject2D *pObject2D = nullptr;
+	CPolygon2D *pObject2D = nullptr;
 
 	if (pObject2D == nullptr)
 	{
 		// インスタンス生成
-		pObject2D = new CObject2D(nPriority);
+		pObject2D = new CPolygon2D(nPriority);
 
 		if (pObject2D != nullptr)
 		{
@@ -270,7 +270,7 @@ CObject2D *CObject2D::Create(int nPriority, float fCenterHeight)
 //=====================================================
 // サイズ設定処理
 //=====================================================
-void CObject2D::SetSize(float width, float height)
+void CPolygon2D::SetSize(float width, float height)
 {
 	m_width = width;
 	m_heigth = height;
@@ -279,7 +279,7 @@ void CObject2D::SetSize(float width, float height)
 //=====================================================
 // テクスチャ座標設定処理
 //=====================================================
-void CObject2D::SetTex(D3DXVECTOR2 texLeftUp, D3DXVECTOR2 texRightDown)
+void CPolygon2D::SetTex(D3DXVECTOR2 texLeftUp, D3DXVECTOR2 texRightDown)
 {
 	if (m_pVtxBuff == nullptr)
 	{
@@ -305,7 +305,7 @@ void CObject2D::SetTex(D3DXVECTOR2 texLeftUp, D3DXVECTOR2 texRightDown)
 //=====================================================
 // アニメーション設定処理
 //=====================================================
-void CObject2D::SetAnim(int nAnim,int nNumAnim,int nNumV)
+void CPolygon2D::SetAnim(int nAnim,int nNumAnim,int nNumV)
 {
 	// 頂点情報のポインタ
 	VERTEX_2D *pVtx;
@@ -345,7 +345,7 @@ void CObject2D::SetAnim(int nAnim,int nNumAnim,int nNumV)
 //=====================================================
 // 移動量設定処理
 //=====================================================
-void CObject2D::SetMove(D3DXVECTOR3 move)
+void CPolygon2D::SetMove(D3DXVECTOR3 move)
 {
 	m_move = move;
 }
@@ -353,7 +353,7 @@ void CObject2D::SetMove(D3DXVECTOR3 move)
 //=====================================================
 // 移動量加算処理
 //=====================================================
-void CObject2D::AddMove(D3DXVECTOR3 move)
+void CPolygon2D::AddMove(D3DXVECTOR3 move)
 {
 	m_move += move;
 }
@@ -361,7 +361,7 @@ void CObject2D::AddMove(D3DXVECTOR3 move)
 //=====================================================
 // 移動量減衰処理
 //=====================================================
-void CObject2D::DicMove(float fDicrease)
+void CPolygon2D::DicMove(float fDicrease)
 {
 	m_move.x *= fDicrease;
 	m_move.y *= fDicrease;
@@ -371,7 +371,7 @@ void CObject2D::DicMove(float fDicrease)
 //=====================================================
 // 向き設定処理
 //=====================================================
-void CObject2D::SetRotation(float fRot)
+void CPolygon2D::SetRotation(float fRot)
 {
 	m_fRot = fRot;
 }
@@ -379,7 +379,7 @@ void CObject2D::SetRotation(float fRot)
 //=====================================================
 // 色設定処理
 //=====================================================
-void CObject2D::SetCol(D3DXCOLOR col)
+void CPolygon2D::SetCol(D3DXCOLOR col)
 {
 	m_col = col;
 

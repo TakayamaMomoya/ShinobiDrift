@@ -18,7 +18,7 @@
 #include "UIManager.h"
 #include "UI.h"
 #include "meshfield.h"
-#include "object3D.h"
+#include "polygon3D.h"
 #include "renderer.h"
 #include "texture.h"
 #include "animEffect3D.h"

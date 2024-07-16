@@ -14,7 +14,7 @@
 //*****************************************************
 // 前方宣言
 //*****************************************************
-class CObject3D;
+class CPolygon3D;
 class CObjectX;
 class CStateEditMesh;
 
@@ -39,7 +39,7 @@ private:
 	void CollideRPRay(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it, D3DXVECTOR3 posFar, D3DXVECTOR3 posNear, D3DXVECTOR3 vecDiff);	// ロードポイントとレイの判定
 
 	// メンバ変数
-	CObject3D *m_pMesh;	// メッシュのポインタ
+	CPolygon3D *m_pMesh;	// メッシュのポインタ
 	CObjectX *m_pManipulator;	// マニピュレーター
 	CStateEditMesh *m_pState;	// ステイト
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itCurrent;	// 選択してるイテレイター

@@ -14,6 +14,7 @@
 // 前方宣言
 //*****************************************************
 class CFan3D;
+class CPolygon3D;
 
 //*****************************************************
 // クラスの定義
@@ -102,6 +103,10 @@ public:
 	void SetAngleOffset(float fAngle, int nIdx) { m_afAngleOffset[nIdx] = fAngle; }
 
 private:
+
+	// メンバ関数
+	void GrabPointUI(void);  // 鉤縄ポイントUI表示
+
 	// 定数
 	static const int NUM_OFFSET = 2;	// オフセットの数
 
@@ -110,6 +115,9 @@ private:
 	float m_fRadiusOffset;	// オフセットの半径
 	bool m_bCurrent;	// 選択されているかどうか
 	CFan3D *m_pFan;	// 判定可視化用の扇ポリゴン
+	CPolygon3D *m_pGrabPointUI;  // 鉤縄ポイントUI表示用ポリゴン
+	float m_fColA = 0.0f;  // 鉤縄ポイントUI表示用ポリゴンのα値
+
 };
 
 #endif

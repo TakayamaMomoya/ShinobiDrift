@@ -40,6 +40,7 @@ CEnemyBehaviourChasePlayer::CEnemyBehaviourChasePlayer()
 	m_state = STATE::STATE_NONE;
 	m_fTimerAttack = 0.0f;
 	m_pBigShuriken = nullptr;
+	m_pFlashEffect = nullptr;
 }
 
 //=====================================================
@@ -95,6 +96,8 @@ void CEnemyBehaviourChasePlayer::Uninit(CEnemy *pEnemy)
 	{
 		m_pSpline = nullptr;
 	}
+
+	m_pFlashEffect = nullptr;
 }
 
 //=====================================================
@@ -110,6 +113,9 @@ void CEnemyBehaviourChasePlayer::Update(CEnemy *pEnemy)
 
 	// 手裏剣の追従
 	FollowBigShuriken(pEnemy);
+
+	// エフェクトの追従
+	ThrowEffect(pEnemy);
 }
 
 //=====================================================
@@ -322,14 +328,7 @@ void CEnemyBehaviourChasePlayer::CreateBigShuriken(void)
 		m_pBigShuriken = nullptr;
 	}
 
-	m_pBigShuriken = CObjectX::Create();
-
-	if (m_pBigShuriken != nullptr)
-	{
-		// モデル読込
-		int nIdx = CModel::Load("data\\MODEL\\Player\\shuriken.x");
-		m_pBigShuriken->BindModel(nIdx);
-	}
+	m_pBigShuriken = MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_WINDSHURIKEN, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
 //=====================================================
@@ -342,19 +341,37 @@ void CEnemyBehaviourChasePlayer::FollowBigShuriken(CEnemy *pEnemy)
 
 	D3DXVECTOR3 posHand = pEnemy->GetMtxPos(5);
 
-	m_pBigShuriken->SetPosition(posHand);
+	m_pBigShuriken = m_pBigShuriken->FollowPosition(posHand);
+
+	if (m_pBigShuriken == nullptr)
+	{
+		CreateBigShuriken();
+	}
 }
 
 //=====================================================
-// 手裏剣を投げる
+// エフェクトの追従
+//=====================================================
+void CEnemyBehaviourChasePlayer::ThrowEffect(CEnemy *pEnemy)
+{
+	if (m_pFlashEffect == nullptr)
+		return;
+
+	m_pFlashEffect = m_pFlashEffect->FollowPosition(pEnemy->GetMtxPos(5));
+}
+
+//=====================================================
+// 手裏剣投げモーションが始まる
 //=====================================================
 void CEnemyBehaviourChasePlayer::ThrowShuriken(CEnemy *pEnemy)
 {
 	D3DXVECTOR3 pos = pEnemy->GetMtxPos(5);
 
-	CShuriken::Create(pos,pEnemy->GetForward());
+	CEnemy::SFragMotion *pFragMotion = pEnemy->GetFragMotion();
 
-	MyEffekseer::CreateEffect(CEffekseer::TYPE_FLASH00,pos);
+	pFragMotion->bAttack = true;
+	
+	m_pFlashEffect = MyEffekseer::CreateEffect(CEffekseer::TYPE_FLASH00,pos);
 }
 
 //=====================================================

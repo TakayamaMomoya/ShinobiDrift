@@ -12,12 +12,12 @@
 // インクルード
 //*****************************************************
 #include "main.h"
-#include "object2D.h"
+#include "polygon2D.h"
 
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CUI	: public CObject2D
+class CUI	: public CPolygon2D
 {
 public:
 	CUI(int nPriority = 7);

@@ -12,7 +12,7 @@
 // インクルード
 //*****************************************************
 #include "main.h"
-#include "object3D.h"
+#include "polygon3D.h"
 #include <vector>
 
 //*****************************************************
@@ -25,7 +25,7 @@ class CGuardRail;
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CMeshRoad : public CObject3D
+class CMeshRoad : public CPolygon3D
 {
 public:
 	struct SInfoRoadPoint

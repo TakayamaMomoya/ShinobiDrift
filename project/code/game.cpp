@@ -19,7 +19,7 @@
 #include "scene.h"
 #include "debugproc.h"
 #include "UIManager.h"
-#include "object3D.h"
+#include "polygon3D.h"
 #include "texture.h"
 #include "skybox.h"
 #include "block.h"
@@ -41,6 +41,7 @@
 #include "editBlock.h"
 #include "editGoal.h"
 #include "enemy.h"
+#include "meshCube.h"
 
 //*****************************************************
 // マクロ定義
@@ -109,13 +110,18 @@ HRESULT CGame::Init(void)
 	CMeter::Create();
 
 	// ゴール生成
-	CGoal::Create(D3DXVECTOR3(60970.0f, 1540.0f, 3980.0f), 3.07f);
+	CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), 0.0f);
 
 	// メッシュロード生成
 	CMeshRoad::Create();
 
 	// 敵の生成
 	CEnemy::Create();
+
+#ifdef _DEBUG
+	// メッシュキューブのテスト生成
+	CMeshCube::Create();
+#endif
 
 	return S_OK;
 }

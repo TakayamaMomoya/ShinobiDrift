@@ -8,12 +8,12 @@
 #ifndef _ANIM2D_H_
 #define _ANIM2D_H_
 
-#include "object2D.h"
+#include "polygon2D.h"
 
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CAnim2D : public CObject2D
+class CAnim2D : public CPolygon2D
 {
 public:
 	CAnim2D(int nPriotity = 5);	// コンストラクタ

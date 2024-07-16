@@ -17,7 +17,7 @@
 // 前方宣言
 //*****************************************************
 class CBlockGrab;
-class CObject3D;
+class CPolygon3D;
 class CPlayerNinja;
 
 //*****************************************************
@@ -94,7 +94,7 @@ private:
 		float fAngleDrift;	// ドリフト時の角度倍率の値
 		int nCntFlip;	// 弾きカウンター
 		CBlockGrab *pBlockGrab;	// 掴んでいるブロック
-		CObject3D *pRoap;
+		CPolygon3D *pRoap;
 		float fCntAngle;	// アングルのカウンター
 		bool bGrabOld;
 		bool bManual;		// マニュアル操作
@@ -125,7 +125,6 @@ private:
 	void ManageMotion(void);
 	void ManageMotionNinja(void);	// 忍者のモーション管理
 	void Event(EVENT_INFO *pEventInfo);
-	void ManagekatanaCollision(D3DXVECTOR3 pos);	// 刀の判定管理
 	void Debug(void);
 
 	SInfo m_info;	// 自身の情報

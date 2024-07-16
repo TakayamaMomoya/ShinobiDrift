@@ -24,7 +24,7 @@ const float SPEED_APPER = 0.05f;	// 出現速度
 //=====================================================
 // コンストラクタ
 //=====================================================
-CSmoke::CSmoke(int nPriority) : CObject3D(nPriority)
+CSmoke::CSmoke(int nPriority) : CPolygon3D(nPriority)
 {
 	m_move = { 0.0f,0.0f,0.0f };
 	m_bTurn = false;
@@ -62,7 +62,7 @@ CSmoke *CSmoke::Create(D3DXVECTOR3 pos)
 //=====================================================
 HRESULT CSmoke::Init(void)
 {
-	CObject3D::Init();
+	CPolygon3D::Init();
 
 	// 各種設定
 	SetMode(MODE::MODE_BILLBOARD);
@@ -96,7 +96,7 @@ HRESULT CSmoke::Init(void)
 //=====================================================
 void CSmoke::Uninit(void)
 {
-	CObject3D::Uninit();
+	CPolygon3D::Uninit();
 }
 
 //=====================================================
@@ -104,7 +104,7 @@ void CSmoke::Uninit(void)
 //=====================================================
 void CSmoke::Update(void)
 {
-	CObject3D::Update();
+	CPolygon3D::Update();
 
 	// 移動
 	D3DXVECTOR3 pos = GetPosition();
@@ -145,5 +145,5 @@ void CSmoke::Update(void)
 //=====================================================
 void CSmoke::Draw(void)
 {
-	CObject3D::Draw();
+	CPolygon3D::Draw();
 }

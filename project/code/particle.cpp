@@ -157,9 +157,9 @@ void CParticle::Update(void)
 
 		if (pEffect3D != nullptr)
 		{
-			pEffect3D->SetMode((CObject3D::MODE)m_apParticleInfo[m_type]->modeRender);
+			pEffect3D->SetMode((CPolygon3D::MODE)m_apParticleInfo[m_type]->modeRender);
 
-			if (m_apParticleInfo[m_type]->modeRender == CObject3D::MODE_STRETCHBILLBOARD)
+			if (m_apParticleInfo[m_type]->modeRender == CPolygon3D::MODE_STRETCHBILLBOARD)
 			{
 				pEffect3D->SetSize(fRadius, fRadius * 10.0f);
 			}

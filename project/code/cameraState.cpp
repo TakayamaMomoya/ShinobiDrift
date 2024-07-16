@@ -126,7 +126,7 @@ void CFollowPlayer::Update(CCamera *pCamera)
 
 		universal::LimitRot(&pInfoCamera->rot.y);
 
-		D3DXMATRIX *pMtx = pPlayer->GetMatrix();
+		D3DXMATRIX *pMtx = &pPlayer->GetMatrix();
 
 		D3DXVECTOR3 vecAddPosR = { pMtx->_31, pMtx->_32, pMtx->_33 };
 

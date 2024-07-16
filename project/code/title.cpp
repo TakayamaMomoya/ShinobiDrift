@@ -18,7 +18,7 @@
 #include "CameraState.h"
 #include "renderer.h"
 #include "sound.h"
-#include "object3D.h"
+#include "polygon3D.h"
 #include "objectX.h"
 #include "skybox.h"
 #include "player.h"
@@ -99,7 +99,7 @@ HRESULT CTitle::Init(void)
 	}
 
 	// ロゴの生成
-	m_pLogo = CObject2D::Create(7);
+	m_pLogo = CPolygon2D::Create(7);
 
 	if (m_pLogo != nullptr)
 	{
@@ -220,7 +220,7 @@ CTitleStart::CTitleStart()
 	m_pAfter = nullptr;
 
 	// スタート表示の生成
-	m_pStart = CObject2D::Create(7);
+	m_pStart = CPolygon2D::Create(7);
 
 	if (m_pStart != nullptr)
 	{
@@ -250,7 +250,7 @@ void CTitleStart::Update(CTitle *pTitle)
 		if (pInput->GetTrigger(CInputManager::BUTTON_ENTER))
 		{
 			// 残像の生成
-			m_pAfter = CObject2D::Create(6);
+			m_pAfter = CPolygon2D::Create(6);
 
 			if (m_pAfter != nullptr)
 			{
@@ -316,7 +316,7 @@ CTitleMenu::CTitleMenu()
 	{
 		int nCnt = i - 1;
 
-		m_apMenu[i] = CObject2D::Create(6);
+		m_apMenu[i] = CPolygon2D::Create(6);
 
 		if (m_apMenu[i] != nullptr)
 		{
@@ -335,7 +335,7 @@ CTitleMenu::CTitleMenu()
 	}
 
 	// カーソルの生成
-	m_pCursor = CObject2D::Create(6);
+	m_pCursor = CPolygon2D::Create(6);
 
 	if (m_pCursor != nullptr)
 	{

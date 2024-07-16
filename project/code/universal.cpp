@@ -563,28 +563,50 @@ float CrossProduct(D3DXVECTOR3 pos1, D3DXVECTOR3 pos2)
 //========================================
 bool IsCross(D3DXVECTOR3 posTarget, D3DXVECTOR3 vecSorce, D3DXVECTOR3 vecDest, float *pRate, D3DXVECTOR3 move)
 {
-	bool bHit = false;
 
-	D3DXVECTOR3 vecLine = vecDest - vecSorce;
-	D3DXVECTOR3 vecToPos = posTarget - vecSorce;
-	float fArea = CrossProduct(vecLine, vecToPos);
+	D3DXVECTOR3 vecLine = D3DXVECTOR3
+	(//一旦Y座標は平面
+		vecDest.x - vecSorce.x,
+		0.0f,
+		vecDest.z - vecSorce.z
+	);
 
-	if (fArea > 0)
+	D3DXVECTOR3 vecToPos = D3DXVECTOR3
+	(
+		posTarget.x - vecSorce.x,
+		0.0f,
+		posTarget.z - vecSorce.z
+	);
+
+	//計算用変数
+	float fAngle = atan2f(vecLine.x, vecLine.z);
+	float fAreaMax = (vecLine.z * move.x) - (vecLine.x * move.z);
+	float fArea = (vecToPos.z * move.x) - (vecToPos.x * move.z);
+	float fRate = fArea / fAreaMax;
+
+	if (pRate != nullptr)
 	{
-		if (pRate != nullptr)
-		{
-			// 割合を算出
-
-			float fAreaMax = CrossProduct(vecLine, move);
-			fArea = CrossProduct(vecToPos, move);
-
-			*pRate = fArea / fAreaMax;
-		}
-
-		bHit = true;
+		*pRate = fRate;
 	}
 
-	return bHit;
+	if ((vecLine.z * vecToPos.x) - (vecLine.x * vecToPos.z) > 0)
+	{//線分の左にめり込んでいる
+
+		float fLength = sqrtf(vecLine.x * vecLine.x + vecLine.z * vecLine.z) * fRate;
+
+		D3DXVECTOR3 posCross =
+		{//線分の交点
+			vecSorce.x + sinf(fAngle) * fLength,
+			posTarget.y,
+			vecSorce.z + cosf(fAngle) * fLength
+		};
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 //========================================
@@ -679,18 +701,38 @@ bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR
 	D3DXVECTOR3 vecP, vecTemp;
 	float fHeight, fDot;
 
+	D3DXVECTOR3 vecVtx[4];
+	vecVtx[0] = vtx2 - vtx1;
+	vecVtx[0].y = 0.0f;
+	vecVtx[1] = vtx3 - vtx2;
+	vecVtx[1].y = 0.0f;
+	vecVtx[2] = vtx4 - vtx3;
+	vecVtx[2].y = 0.0f;
+	vecVtx[3] = vtx1 - vtx4;
+	vecVtx[3].y = 0.0f;
+
+	D3DXVECTOR3 vecVtxTarget[4];
+	vecVtxTarget[0] = posTarget - vtx1;
+	vecVtxTarget[0].y = 0.0f;
+	vecVtxTarget[1] = posTarget - vtx2;
+	vecVtxTarget[1].y = 0.0f;
+	vecVtxTarget[2] = posTarget - vtx3;
+	vecVtxTarget[2].y = 0.0f;
+	vecVtxTarget[3] = posTarget - vtx4;
+	vecVtxTarget[3].y = 0.0f;
+
 	// ポリゴンと内外判定
-	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &(vtx2 - vtx1))->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &(vtx3 - vtx2))->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &(vtx4 - vtx3))->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx4), &(vtx1 - vtx4))->y <= 0)
+	if (D3DXVec3Cross(&vecTemp, &vecVtxTarget[0], &vecVtx[0])->y <= 0 &&
+		D3DXVec3Cross(&vecTemp, &vecVtxTarget[1], &vecVtx[1])->y <= 0 &&
+		D3DXVec3Cross(&vecTemp, &vecVtxTarget[2], &vecVtx[2])->y <= 0 &&
+		D3DXVec3Cross(&vecTemp, &vecVtxTarget[3], &vecVtx[3])->y <= 0)
 	{
 		// y軸法線が0ではないか判定
 		if (!vtxNor.y)
 			return false;
 
 		// 角から目標位置へのベクトル
-		vecP = posTarget - vtx1;
+		vecP = vecVtxTarget[0];
 
 		// 内積を計算
 		fDot = (vtxNor.x * vecP.x) + (vtxNor.z * vecP.z);

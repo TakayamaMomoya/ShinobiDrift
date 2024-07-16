@@ -24,6 +24,20 @@ class CBehaviourEnemy;
 class CEnemy : public CMotion
 {
 public:
+	// 列挙型定義
+	enum MOTION
+	{// モーション
+		MOTION_NEUTRAL = 0,	// 待機状態
+		MOTION_ATTACK,	// 投げモーション
+		MOTION_MAX
+	};
+
+	// 構造体定義
+	struct SFragMotion
+	{// モーションフラグ
+		bool bAttack;	// 攻撃
+	};
+
 	CEnemy(int nPriority = 4);	// コンストラクタ
 	~CEnemy();	                // デストラクタ
 
@@ -31,6 +45,8 @@ public:
 	void Uninit(void);          // 終了処理
 	void Update(void);          // 更新処理
 	void Draw(void);            // 描画処理
+	SFragMotion *GetFragMotion(void) { return &m_fragMotion; }	// モーションフラグの取得
+
 	static CEnemy* Create();    // 生成処理
 
 private:
@@ -46,10 +62,12 @@ private:
 	};
 
 	// メンバ関数
+	void ManageMotion(void);	// モーションの管理
 	void ReleaseAllBehaviour(void);	// 全てのビヘイビアの解放
 
 	// メンバ変数
 	SInfo m_Info;	// 情報
+	SFragMotion m_fragMotion;	// モーションフラグ
 	std::list<CEnemyBehaviour*> m_listBehaviour;	// ビヘイビアのリスト
 };
 

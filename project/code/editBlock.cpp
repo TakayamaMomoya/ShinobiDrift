@@ -97,14 +97,14 @@ void CEditBlock::AddBlockToMap(CBlock *pBlock)
 {
 	D3DXVECTOR3 pos = pBlock->GetPosition();
 
-	CObject3D *pIcon = CObject3D::Create(pos);
+	CPolygon3D *pIcon = CPolygon3D::Create(pos);
 
 	if (pIcon == nullptr)
 		return;
 
 	pIcon->SetPosition(pos);
 	pIcon->SetSize(SIZE_ICON, SIZE_ICON);
-	pIcon->SetMode(CObject3D::MODE::MODE_BILLBOARD);
+	pIcon->SetMode(CPolygon3D::MODE::MODE_BILLBOARD);
 	pIcon->SetVtx();
 	pIcon->EnableZtest(true);
 	pIcon->EnableFog(false);

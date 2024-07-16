@@ -104,6 +104,40 @@ void CEnemy::Update(void)
 	{
 		it->Update(this);
 	}
+
+	// モーションの管理
+	ManageMotion();
+}
+
+//=====================================================
+// モーションの管理
+//=====================================================
+void CEnemy::ManageMotion(void)
+{
+	int nMotion = GetMotion();
+	bool bFinish = IsFinish();
+
+	if (m_fragMotion.bAttack)
+	{// 攻撃モーション
+		if (nMotion != MOTION::MOTION_ATTACK)
+		{
+			SetMotion(MOTION::MOTION_ATTACK);
+		}
+
+		if (bFinish)
+		{
+			m_fragMotion.bAttack = false;
+
+			CShuriken::Create(GetMtxPos(5), GetForward());
+		}
+	}
+	else
+	{// ニュートラルモーション
+		if (nMotion != MOTION::MOTION_NEUTRAL)
+		{
+			SetMotion(MOTION::MOTION_NEUTRAL);
+		}
+	}
 }
 
 //=====================================================

@@ -40,7 +40,7 @@ CMeshRoad *CMeshRoad::m_pMeshRoad = nullptr;	// 自身のポインタ
 //=====================================================
 // コンストラクタ
 //=====================================================
-CMeshRoad::CMeshRoad(int nPriority) : CObject3D(nPriority), m_nNumVtx(0), m_pSpline(nullptr), m_pSplineL(nullptr), m_pSplineR(nullptr)
+CMeshRoad::CMeshRoad(int nPriority) : CPolygon3D(nPriority), m_nNumVtx(0), m_pSpline(nullptr), m_pSplineL(nullptr), m_pSplineR(nullptr)
 {
 
 }
@@ -95,7 +95,7 @@ HRESULT CMeshRoad::Init(void)
 	m_it = m_aRoadPoint.begin();
 
 #ifdef _DEBUG
-	//EnableWire(true);
+	EnableWire(true);
 #endif // _DEBUG
 
 	return S_OK;
@@ -720,10 +720,16 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 			if (fHeightDef < fHeight || !bColRoad)
 				fHeightDef = fHeight;
 
+#ifdef _DEBUG
+			CEffect3D::Create(pVtx[0].pos, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 			CEffect3D::Create(pVtx[0].pos + (pVtx[0].nor * 150.0f), 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+			CEffect3D::Create(pVtx[1].pos, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 			CEffect3D::Create(pVtx[1].pos + (pVtx[1].nor * 150.0f), 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+			CEffect3D::Create(pVtx[2].pos, 50.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 			CEffect3D::Create(pVtx[2].pos + (pVtx[2].nor * 150.0f), 50.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
+			CEffect3D::Create(pVtx[3].pos, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
 			CEffect3D::Create(pVtx[3].pos + (pVtx[3].nor * 150.0f), 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+#endif // _DEBUG
 
 			// 判定をtrueにする
 			bColRoad = true;

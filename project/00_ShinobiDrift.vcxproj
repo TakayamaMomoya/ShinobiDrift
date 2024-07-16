@@ -168,7 +168,6 @@
     <ClCompile Include="code\animEffect3D.cpp" />
     <ClCompile Include="code\backends\imgui_impl_dx9.cpp" />
     <ClCompile Include="code\backends\imgui_impl_win32.cpp" />
-    <ClCompile Include="code\billboard.cpp" />
     <ClCompile Include="code\block.cpp" />
     <ClCompile Include="code\blockManager.cpp" />
     <ClCompile Include="code\blur.cpp" />
@@ -184,6 +183,8 @@
     <ClCompile Include="code\editMesh.cpp" />
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
+    <ClCompile Include="code\gameObject.cpp" />
+    <ClCompile Include="code\meshCube.cpp" />
     <ClCompile Include="code\MyEffekseer.cpp" />
     <ClCompile Include="code\enemy.cpp" />
     <ClCompile Include="code\enemyBehaviour.cpp" />
@@ -217,8 +218,9 @@
     <ClCompile Include="code\number.cpp" />
     <ClCompile Include="code\number3D.cpp" />
     <ClCompile Include="code\object.cpp" />
-    <ClCompile Include="code\object2D.cpp" />
     <ClCompile Include="code\object3D.cpp" />
+    <ClCompile Include="code\polygon2D.cpp" />
+    <ClCompile Include="code\polygon3D.cpp" />
     <ClCompile Include="code\objectX.cpp" />
     <ClCompile Include="code\orbit.cpp" />
     <ClCompile Include="code\particle.cpp" />
@@ -256,7 +258,6 @@
     <ClInclude Include="code\animEffect3D.h" />
     <ClInclude Include="code\backends\imgui_impl_dx9.h" />
     <ClInclude Include="code\backends\imgui_impl_win32.h" />
-    <ClInclude Include="code\billboard.h" />
     <ClInclude Include="code\block.h" />
     <ClInclude Include="code\blockManager.h" />
     <ClInclude Include="code\blur.h" />
@@ -272,6 +273,8 @@
     <ClInclude Include="code\editMesh.h" />
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
+    <ClInclude Include="code\gameObject.h" />
+    <ClInclude Include="code\meshCube.h" />
     <ClInclude Include="code\MyEffekseer.h" />
     <ClInclude Include="code\enemy.h" />
     <ClInclude Include="code\enemyBehaviour.h" />
@@ -307,8 +310,9 @@
     <ClInclude Include="code\number.h" />
     <ClInclude Include="code\number3D.h" />
     <ClInclude Include="code\object.h" />
-    <ClInclude Include="code\object2D.h" />
     <ClInclude Include="code\object3D.h" />
+    <ClInclude Include="code\polygon2D.h" />
+    <ClInclude Include="code\polygon3D.h" />
     <ClInclude Include="code\objectX.h" />
     <ClInclude Include="code\orbit.h" />
     <ClInclude Include="code\particle.h" />

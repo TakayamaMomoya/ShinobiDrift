@@ -12,8 +12,7 @@
 #include "manager.h"
 #include "renderer.h"
 #include "texture.h"
-#include "object3D.h"
-#include "billboard.h"
+#include "polygon3D.h"
 
 //*****************************************************
 // Ã“Iƒƒ“ƒo•Ï”éŒ¾
@@ -57,7 +56,8 @@ HRESULT CNumber3D::Init(void)
 			m_apObject[nCount]->SetPosition(D3DXVECTOR3(GetPosition().x + 80.0f * nCount, GetPosition().y, GetPosition().z));
 			m_apObject[nCount]->SetIdxTexture(m_nIdxTexture);
 			m_apObject[nCount]->SetVtx();
-			m_apObject[nCount]->SetZTest(true);
+			m_apObject[nCount]->EnableZtest(true);
+			m_apObject[nCount]->SetMode(CPolygon3D::MODE_BILLBOARD);
 		}
 	}
 
@@ -187,7 +187,7 @@ CNumber3D *CNumber3D::Create(int nNumPlace,int nValue)
 
 				if (pNumber->m_apObject[nCnt] == nullptr)
 				{
-					pNumber->m_apObject[nCnt] = CBillboard::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f),0.0f,0.0f);
+					pNumber->m_apObject[nCnt] = CPolygon3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
 					pNumber->m_apObject[nCnt]->Init();
 				}

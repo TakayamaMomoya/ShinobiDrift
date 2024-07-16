@@ -16,7 +16,7 @@
 //*****************************************************
 class CObjectX;
 class CStateEditBlock;
-class CObject3D;
+class CPolygon3D;
 
 //*****************************************************
 // クラスの定義
@@ -47,7 +47,7 @@ private:
 	D3DXVECTOR3 m_posCurrent;
 	CBlock *m_pCurrentBlock;	// 選択ブロック
 	CBlock *m_pMoveBlock;	// 動かすブロック
-	std::map<CBlock*, CObject3D*> m_aIcon;	// アイコンのポインタ
+	std::map<CBlock*, CPolygon3D*> m_aIcon;	// アイコンのポインタ
 };
 
 //*****************************************************

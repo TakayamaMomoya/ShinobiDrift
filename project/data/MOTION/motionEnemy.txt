@@ -242,7 +242,7 @@ END_MOTIONSET
 # [1]番目のモーション：手裏剣を投げるモーション
 #===============================
 MOTIONSET
-    LOOP = 1
+    LOOP = 0
    NUM_KEY = 5
 
     KEYSET     #---<< 0 / 5 >>
