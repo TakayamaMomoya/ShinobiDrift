@@ -79,7 +79,7 @@ private:
 	float m_fRate;
 	float m_fRateOld;	// 前回のスプラインの割合
 	float m_fTimerAttack;	// 攻撃タイマー
-	CObjectX *m_pBigShuriken;	// 投げる前に手元に出す大きな手裏剣
+	CEffekseerEffect *m_pBigShuriken;	// 投げる前に手元に出す大きな手裏剣
 	CEffekseerEffect *m_pFlashEffect;	// 投げる前の閃光のエフェクト
 };
 

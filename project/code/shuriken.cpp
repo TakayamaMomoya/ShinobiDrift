@@ -14,6 +14,7 @@
 #include "player.h"
 #include "manager.h"
 #include "effect3D.h"
+#include "MyEffekseer.h"
 #include "debugproc.h"
 
 //*****************************************************
@@ -33,9 +34,9 @@ namespace
 //=====================================================
 // コンストラクタ
 //=====================================================
-CShuriken::CShuriken() : m_fLife(0.0f)
+CShuriken::CShuriken() : m_fLife(0.0f), m_pWindEffect(nullptr)
 {
-
+	
 }
 
 //=====================================================
@@ -79,6 +80,8 @@ HRESULT CShuriken::Init(void)
 
 	m_fLife = LIFE_DEFAULT;
 
+	m_pWindEffect = MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_WINDSHURIKEN, GetPosition());
+
 	return S_OK;
 }
 
@@ -115,6 +118,12 @@ void CShuriken::CalcMove(D3DXVECTOR3 vecForward)
 //=====================================================
 void CShuriken::Uninit(void)
 {
+	if (m_pWindEffect != nullptr)
+	{
+		m_pWindEffect->Uninit();
+		m_pWindEffect = nullptr;
+	}
+
 	CObjectX::Uninit();
 
 	m_aShuriken.remove(this);
@@ -147,6 +156,11 @@ void CShuriken::Update(void)
 		Uninit();
 
 		return;
+	}
+
+	if (m_pWindEffect != nullptr)
+	{
+		m_pWindEffect = m_pWindEffect->FollowPosition(GetPosition());
 	}
 
 #ifdef _DEBUG

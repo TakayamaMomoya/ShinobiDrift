@@ -14,6 +14,11 @@
 #include "objectX.h"
 
 //*****************************************************
+// 前方宣言
+//*****************************************************
+class CEffekseerEffect;
+
+//*****************************************************
 // クラスの定義
 //*****************************************************
 class CShuriken : public CObjectX
@@ -42,6 +47,7 @@ private:
 	float m_fLife;	// 寿命
 	D3DXVECTOR3 m_vecDest;	// 目標に向かうベクトル
 	D3DXVECTOR3 m_relativePos;	// 敵の位置からの相対座標
+	CEffekseerEffect *m_pWindEffect;	// 回転風のエフェクト
 
 	// 静的メンバ関数
 	static std::list<CShuriken*> m_aShuriken;  // 手裏剣のリスト

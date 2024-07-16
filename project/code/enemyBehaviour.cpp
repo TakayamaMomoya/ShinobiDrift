@@ -328,14 +328,7 @@ void CEnemyBehaviourChasePlayer::CreateBigShuriken(void)
 		m_pBigShuriken = nullptr;
 	}
 
-	m_pBigShuriken = CObjectX::Create();
-
-	if (m_pBigShuriken != nullptr)
-	{
-		// ƒ‚ƒfƒ‹“Çž
-		int nIdx = CModel::Load("data\\MODEL\\Player\\shuriken.x");
-		m_pBigShuriken->BindModel(nIdx);
-	}
+	m_pBigShuriken = MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_WINDSHURIKEN, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
 //=====================================================
@@ -348,7 +341,7 @@ void CEnemyBehaviourChasePlayer::FollowBigShuriken(CEnemy *pEnemy)
 
 	D3DXVECTOR3 posHand = pEnemy->GetMtxPos(5);
 
-	m_pBigShuriken->SetPosition(posHand);
+	m_pBigShuriken->FollowPosition(posHand);
 }
 
 //=====================================================
