@@ -17,6 +17,7 @@
 class CEnemy;
 class CCutMullSpline;
 class CObjectX;
+class CEffekseerEffect;
 
 //*****************************************************
 // クラスの定義
@@ -65,6 +66,7 @@ private:
 	void CreateBigShuriken(void);	// でかい手裏剣の生成
 	void FollowBigShuriken(CEnemy *pEnemy);	// でかい手裏剣の追従
 	void ThrowShuriken(CEnemy *pEnemy);	// 手裏剣を投げる
+	void ThrowEffect(CEnemy *pEnemy);	// エフェクトの追従
 	void Debug(CEnemy *pEnemy);	// デバッグ表示
 
 	// メンバ変数
@@ -78,6 +80,7 @@ private:
 	float m_fRateOld;	// 前回のスプラインの割合
 	float m_fTimerAttack;	// 攻撃タイマー
 	CObjectX *m_pBigShuriken;	// 投げる前に手元に出す大きな手裏剣
+	CEffekseerEffect *m_pFlashEffect;	// 投げる前の閃光のエフェクト
 };
 
 #endif

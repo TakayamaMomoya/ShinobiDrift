@@ -340,6 +340,29 @@ void CEffekseerEffect::Uninit()
 
 }
 
+//===========================================================
+// 位置の追従
+//===========================================================
+CEffekseerEffect *CEffekseerEffect::FollowPosition(D3DXVECTOR3 pos)
+{
+	CEffekseer *pEffekseer = CManager::GetMyEffekseer();
+
+	if (pEffekseer == nullptr)
+		return nullptr;
+
+	Effekseer::ManagerRef efkManager = pEffekseer->GetEfkManager();
+
+	// 毎フレーム、エフェクトが再生終了しているか確認する
+	if (efkManager->Exists(m_efkHandle) == false)
+	{
+		return nullptr;
+	}
+
+	SetPosition(Effekseer::Vector3D(pos.x, pos.y, pos.z));
+
+	return this;
+}
+
 namespace MyEffekseer
 {
 CEffekseerEffect *CreateEffect(CEffekseer::TYPE type, D3DXVECTOR3 pos, D3DXVECTOR3 rot, D3DXVECTOR3 scale)

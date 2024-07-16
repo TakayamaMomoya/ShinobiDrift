@@ -1182,23 +1182,6 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 
 	D3DXVECTOR3 pos = { mtxParent._41,mtxParent._42 ,mtxParent._43 };
 
-	if (nMotion == MOTION_NINJA::MOTION_NINJA_SLASHDOWN ||
-		nMotion == MOTION_NINJA::MOTION_NINJA_SLASHUP)
-	{// 斬撃時
-		ManagekatanaCollision(pos);
-	}
-}
-
-//=====================================================
-// 刀の判定の管理
-//=====================================================
-void CPlayer::ManagekatanaCollision(D3DXVECTOR3 pos)
-{
-	// 手裏剣リストの取得
-
-
-	// 範囲内なら、手裏剣のヒット処理を呼ぶ
-
 }
 
 //=====================================================

@@ -66,6 +66,7 @@ public:
 	// メンバ関数
 	void Init(::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot, ::Effekseer::Vector3D scale);
 	void Uninit(void);
+	CEffekseerEffect *FollowPosition(D3DXVECTOR3 pos);	// 位置の追従
 
 	// 変数取得・設定関数
 	void SetEffect(Effekseer::EffectRef effect) { m_effect = effect; }	// エフェクト参照

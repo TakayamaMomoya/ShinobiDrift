@@ -40,6 +40,7 @@ CEnemyBehaviourChasePlayer::CEnemyBehaviourChasePlayer()
 	m_state = STATE::STATE_NONE;
 	m_fTimerAttack = 0.0f;
 	m_pBigShuriken = nullptr;
+	m_pFlashEffect = nullptr;
 }
 
 //=====================================================
@@ -95,6 +96,8 @@ void CEnemyBehaviourChasePlayer::Uninit(CEnemy *pEnemy)
 	{
 		m_pSpline = nullptr;
 	}
+
+	m_pFlashEffect = nullptr;
 }
 
 //=====================================================
@@ -110,6 +113,9 @@ void CEnemyBehaviourChasePlayer::Update(CEnemy *pEnemy)
 
 	// 手裏剣の追従
 	FollowBigShuriken(pEnemy);
+
+	// エフェクトの追従
+	ThrowEffect(pEnemy);
 }
 
 //=====================================================
@@ -346,15 +352,28 @@ void CEnemyBehaviourChasePlayer::FollowBigShuriken(CEnemy *pEnemy)
 }
 
 //=====================================================
-// 手裏剣を投げる
+// エフェクトの追従
+//=====================================================
+void CEnemyBehaviourChasePlayer::ThrowEffect(CEnemy *pEnemy)
+{
+	if (m_pFlashEffect == nullptr)
+		return;
+
+	m_pFlashEffect = m_pFlashEffect->FollowPosition(pEnemy->GetMtxPos(5));
+}
+
+//=====================================================
+// 手裏剣投げモーションが始まる
 //=====================================================
 void CEnemyBehaviourChasePlayer::ThrowShuriken(CEnemy *pEnemy)
 {
 	D3DXVECTOR3 pos = pEnemy->GetMtxPos(5);
 
-	CShuriken::Create(pos,pEnemy->GetForward());
+	CEnemy::SFragMotion *pFragMotion = pEnemy->GetFragMotion();
 
-	MyEffekseer::CreateEffect(CEffekseer::TYPE_FLASH00,pos);
+	pFragMotion->bAttack = true;
+	
+	m_pFlashEffect = MyEffekseer::CreateEffect(CEffekseer::TYPE_FLASH00,pos);
 }
 
 //=====================================================
