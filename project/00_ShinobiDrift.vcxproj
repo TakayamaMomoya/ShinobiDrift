@@ -168,7 +168,6 @@
     <ClCompile Include="code\animEffect3D.cpp" />
     <ClCompile Include="code\backends\imgui_impl_dx9.cpp" />
     <ClCompile Include="code\backends\imgui_impl_win32.cpp" />
-    <ClCompile Include="code\billboard.cpp" />
     <ClCompile Include="code\block.cpp" />
     <ClCompile Include="code\blockManager.cpp" />
     <ClCompile Include="code\blur.cpp" />
@@ -259,7 +258,6 @@
     <ClInclude Include="code\animEffect3D.h" />
     <ClInclude Include="code\backends\imgui_impl_dx9.h" />
     <ClInclude Include="code\backends\imgui_impl_win32.h" />
-    <ClInclude Include="code\billboard.h" />
     <ClInclude Include="code\block.h" />
     <ClInclude Include="code\blockManager.h" />
     <ClInclude Include="code\blur.h" />

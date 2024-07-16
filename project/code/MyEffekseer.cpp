@@ -25,6 +25,7 @@ const char* CEffekseer::m_apEfkName[CEffekseer::TYPE_MAX] =
 	"data\\EFFEKSEER\\Effect\\slash00.efkefc",	// 斬撃
 	"data\\EFFEKSEER\\Effect\\parry.efkefc",	// パリィ
 	"data\\EFFEKSEER\\Effect\\flash00.efkefc",	// 手裏剣の光
+	"data\\EFFEKSEER\\Effect\\shuriken.efkefc",	// 手裏剣の回転風
 };
 
 //===========================================================
@@ -338,6 +339,29 @@ void CEffekseerEffect::Init(::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot
 void CEffekseerEffect::Uninit()
 {
 
+}
+
+//===========================================================
+// 位置の追従
+//===========================================================
+CEffekseerEffect *CEffekseerEffect::FollowPosition(D3DXVECTOR3 pos)
+{
+	CEffekseer *pEffekseer = CManager::GetMyEffekseer();
+
+	if (pEffekseer == nullptr)
+		return nullptr;
+
+	Effekseer::ManagerRef efkManager = pEffekseer->GetEfkManager();
+
+	// 毎フレーム、エフェクトが再生終了しているか確認する
+	if (efkManager->Exists(m_efkHandle) == false)
+	{
+		return nullptr;
+	}
+
+	SetPosition(Effekseer::Vector3D(pos.x, pos.y, pos.z));
+
+	return this;
 }
 
 namespace MyEffekseer

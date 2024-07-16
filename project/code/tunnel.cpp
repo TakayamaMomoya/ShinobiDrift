@@ -367,8 +367,8 @@ void CTunnel::CollidePlayerEnter(VERTEX_3D *pVtx)
 	D3DXVECTOR3 posNext = posPlayer + movePlayer;
 	float fRate;
 
-	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate, movePlayer);
-	bool bHit1Next = universal::IsCross(posNext, pos2, pos1, &fRate, movePlayer);
+	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate, posNext);
+	bool bHit1Next = universal::IsCross(posNext, pos2, pos1, &fRate, posNext + movePlayer);
 
 	if (fRate <= 1.0f && fRate >= 0.0f)
 	{
@@ -380,8 +380,8 @@ void CTunnel::CollidePlayerEnter(VERTEX_3D *pVtx)
 
 	CDebugProc::GetInstance()->Print("\nInfRate1[%f]", fRate);
 
-	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate, posPlayer);
-	bool bHit2Next = universal::IsCross(posNext, pos4, pos3, &fRate, posNext);
+	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate, posNext);
+	bool bHit2Next = universal::IsCross(posNext, pos4, pos3, &fRate, posNext + movePlayer);
 
 	if (fRate <= 1.0f && fRate >= 0.0f)
 	{
@@ -429,8 +429,8 @@ void CTunnel::CollidePlayerExit(VERTEX_3D *pVtx)
 	D3DXVECTOR3 posNext = posPlayer + movePlayer;
 	float fRate;
 
-	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate, posPlayer);
-	bool bHit1Next = universal::IsCross(posNext, pos2, pos1, &fRate, posNext);
+	bool bHit1 = universal::IsCross(posPlayer, pos2, pos1, &fRate, posNext);
+	bool bHit1Next = universal::IsCross(posNext, pos2, pos1, &fRate, posNext + movePlayer);
 
 	if (fRate <= 1.0f && fRate >= 0.0f)
 	{
@@ -442,8 +442,8 @@ void CTunnel::CollidePlayerExit(VERTEX_3D *pVtx)
 
 	CDebugProc::GetInstance()->Print("\nOutfRate1[%f]", fRate);
 
-	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate,posPlayer);
-	bool bHit2Next = universal::IsCross(posNext, pos4, pos3, &fRate, posNext);
+	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate, movePlayer);
+	bool bHit2Next = universal::IsCross(posNext, pos4, pos3, &fRate, movePlayer);
 
 	if (fRate <= 1.0f && fRate >= 0.0f)
 	{
