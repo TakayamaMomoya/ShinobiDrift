@@ -229,6 +229,19 @@ std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void
 }
 
 //=====================================================
+// イテレーターからロードポイント番号を指定
+//=====================================================
+int CMeshRoad::GetIdxRoad(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
+{
+	//if ()
+	{
+
+	}
+
+	return 0;
+}
+
+//=====================================================
 // ロードポイントの削除
 //=====================================================
 void CMeshRoad::DeleteRoadPoint(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
@@ -680,6 +693,29 @@ CCutMullSpline *CMeshRoad::GetCenterSpline(void)
 }
 
 //=====================================================
+// 全ロードイベントの削除
+//=====================================================
+void CMeshRoad::DeleteAllRoadEvent(void)
+{
+	if (ImGui::Button("DeleteAllRoadEvent", ImVec2(200, 100)))
+	{
+		for (auto it : m_aGR)
+		{
+			it->Uninit();
+		}
+
+		m_aGR.clear();
+
+		for (auto it : m_aTunnel)
+		{
+			it->Uninit();
+		}
+
+		m_aTunnel.clear();
+	}
+}
+
+//=====================================================
 // 当たり判定処理
 //=====================================================
 bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
@@ -751,10 +787,10 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 //=====================================================
 // 保存処理
 //=====================================================
-void CMeshRoad::Save(void)
+void CMeshRoad::Save(const char* pPath)
 {
 	// ファイルを開く
-	std::ofstream outputFile(PATH_SAVE, std::ios::binary);
+	std::ofstream outputFile(pPath, std::ios::binary);
 
 	if (!outputFile.is_open())
 		assert(("メッシュロードのファイルを開けませんでした", false));

@@ -25,7 +25,9 @@ const char* CEffekseer::m_apEfkName[CEffekseer::TYPE_MAX] =
 	"data\\EFFEKSEER\\Effect\\slash00.efkefc",	// a‚
 	"data\\EFFEKSEER\\Effect\\parry.efkefc",	// ƒpƒƒB
 	"data\\EFFEKSEER\\Effect\\flash00.efkefc",	// θ— •‚Μυ
-	"data\\EFFEKSEER\\Effect\\shuriken.efkefc",	// θ— •‚Μ‰ρ“]•—
+	"data\\EFFEKSEER\\Effect\\shuriken.efkefc",	// θ— •‚Μ“‚°
+	"data\\EFFEKSEER\\Effect\\WindShuriken.efkefc",	// θ— •‚Μ‰ρ“]•—
+	"data\\EFFEKSEER\\Effect\\grapple.efkefc",	// ηκ“κ
 };
 
 //===========================================================

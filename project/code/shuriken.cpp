@@ -80,7 +80,7 @@ HRESULT CShuriken::Init(void)
 
 	m_fLife = LIFE_DEFAULT;
 
-	m_pWindEffect = MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_WINDSHURIKEN, GetPosition());
+	m_pWindEffect = MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_THROWSHURIKEN, GetPosition());
 
 	return S_OK;
 }

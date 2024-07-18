@@ -64,6 +64,8 @@ CEnemy* CEnemy::Create()
 //=====================================================
 HRESULT CEnemy::Init(void)
 {
+	m_info.nIdxSpline = 1;
+
 	// Œp³ƒNƒ‰ƒX‚Ì‰Šú‰»
 	CMotion::Init();
 

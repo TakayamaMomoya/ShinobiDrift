@@ -47,6 +47,11 @@ public:
 	void Draw(void);            // 描画処理
 	SFragMotion *GetFragMotion(void) { return &m_fragMotion; }	// モーションフラグの取得
 
+	// 変数取得・設定関数
+	int GetIdxSpline(void) { return m_info.nIdxSpline; }	// スプライン番号
+	void SetIdxSpline(int nIdx) { m_info.nIdxSpline = nIdx; }
+
+	// 静的メンバ関数
 	static CEnemy* Create();    // 生成処理
 
 private:
@@ -58,7 +63,8 @@ private:
 	};
 	struct SInfo
 	{// 情報
-		STATE state;             // 状態
+		STATE state;             // 状態[
+		int nIdxSpline;	// スプラインの番号
 	};
 
 	// メンバ関数
@@ -66,7 +72,7 @@ private:
 	void ReleaseAllBehaviour(void);	// 全てのビヘイビアの解放
 
 	// メンバ変数
-	SInfo m_Info;	// 情報
+	SInfo m_info;	// 情報
 	SFragMotion m_fragMotion;	// モーションフラグ
 	std::list<CEnemyBehaviour*> m_listBehaviour;	// ビヘイビアのリスト
 };

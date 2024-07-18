@@ -54,6 +54,7 @@ private:
 		STATE_NONE = 0,	// 何もしていない状態
 		STATE_CHASE,	// 追跡状態
 		STATE_ATTACK,	// 攻撃状態
+		STATE_ESCAPE,   // 逃走状態
 		STATE_MAX
 	};
 
@@ -73,12 +74,12 @@ private:
 	STATE m_state;	// 状態
 	CCutMullSpline *m_pSpline;	// スプライン
 	std::vector<D3DXVECTOR3> m_vPos;	// データ点のベクター
-	int m_nIdx = 1;	// スプラインの番号
 	float m_fSpeed;	// 速度
 	float m_fSpeedDefault;	// 基準にする速度
 	float m_fRate;
 	float m_fRateOld;	// 前回のスプラインの割合
 	float m_fTimerAttack;	// 攻撃タイマー
+	int m_nNumShuriken;  // 投げてくる手裏剣の数
 	CEffekseerEffect *m_pBigShuriken;	// 投げる前に手元に出す大きな手裏剣
 	CEffekseerEffect *m_pFlashEffect;	// 投げる前の閃光のエフェクト
 };

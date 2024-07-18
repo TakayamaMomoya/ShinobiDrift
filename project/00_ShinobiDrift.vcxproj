@@ -183,6 +183,7 @@
     <ClCompile Include="code\editMesh.cpp" />
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
+    <ClCompile Include="code\enemySpawner.cpp" />
     <ClCompile Include="code\gameObject.cpp" />
     <ClCompile Include="code\meshCube.cpp" />
     <ClCompile Include="code\MyEffekseer.cpp" />
@@ -273,6 +274,7 @@
     <ClInclude Include="code\editMesh.h" />
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
+    <ClInclude Include="code\enemySpawner.h" />
     <ClInclude Include="code\gameObject.h" />
     <ClInclude Include="code\meshCube.h" />
     <ClInclude Include="code\MyEffekseer.h" />
