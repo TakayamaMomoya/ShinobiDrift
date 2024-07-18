@@ -579,9 +579,10 @@ bool IsCross(D3DXVECTOR3 posTarget, D3DXVECTOR3 vecSorce, D3DXVECTOR3 vecDest, f
 	);
 
 	//ŒvŽZ—p•Ï”
+	D3DXVECTOR3 vecTemp;
 	float fAngle = atan2f(vecLine.x, vecLine.z);
-	float fAreaMax = (vecLine.z * move.x) - (vecLine.x * move.z);
-	float fArea = (vecToPos.z * move.x) - (vecToPos.x * move.z);
+	float fAreaMax = D3DXVec3Cross(&vecTemp, &vecLine, &move)->y;
+	float fArea = D3DXVec3Cross(&vecTemp, &vecToPos, &move)->y;
 	float fRate = fArea / fAreaMax;
 
 	if (pRate != nullptr)
