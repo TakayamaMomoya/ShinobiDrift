@@ -747,10 +747,10 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 //=====================================================
 // 保存処理
 //=====================================================
-void CMeshRoad::Save(void)
+void CMeshRoad::Save(const char* pPath)
 {
 	// ファイルを開く
-	std::ofstream outputFile(PATH_SAVE, std::ios::binary);
+	std::ofstream outputFile(pPath, std::ios::binary);
 
 	if (!outputFile.is_open())
 		assert(("メッシュロードのファイルを開けませんでした", false));

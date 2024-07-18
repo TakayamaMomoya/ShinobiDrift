@@ -31,6 +31,7 @@ public:
 	void Uninit(void) override;
 	void Update(void) override;
 	void ChangeState(CStateEditMesh *pState);
+	const char* GetSavepath(void) { return &m_aPathSave[0]; }
 
 private:
 	// メンバ関数
@@ -45,6 +46,7 @@ private:
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator m_itCurrent;	// 選択してるイテレイター
 	bool m_bCurrent;	// 選択フラグ
 	D3DXVECTOR3 m_posCurrent;	// 選択ブロック位置
+	char m_aPathSave[256] = {};	// 保存パス
 };
 
 //*****************************************************
