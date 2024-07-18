@@ -20,6 +20,7 @@
 #include "tunnel.h"
 #include "guardRail.h"
 #include "game.h"
+#include "enemySpawner.h"
 
 //*****************************************************
 // 定数定義
@@ -133,6 +134,14 @@ void CEditMesh::Update(void)
 		ChangeState(new CStateEditMeshDeleteRoadPoint);
 
 	ImGui::InputText("SavePath", &m_aPathSave[0], 256);
+
+	// 全ロードポイントの削除
+	CMeshRoad *pMesh = CMeshRoad::GetInstance();
+
+	if (pMesh != nullptr)
+	{
+		pMesh->DeleteAllRoadEvent();
+	}
 
 	// イテレイター選択
 	SelectIterator();
@@ -677,7 +686,10 @@ void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 
 	if (ImGui::TreeNode("Enemy"))
 	{
-
+		if (ImGui::Button("CreateEnemy", ImVec2(100, 50)))
+		{// 敵生成
+			CEnemySpawner::Create();
+		}
 
 		ImGui::TreePop();
 	}
