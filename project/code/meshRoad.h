@@ -56,7 +56,7 @@ public:
 	std::vector<SInfoRoadPoint> *GetArrayRP(void) { return &m_aRoadPoint; }
 	std::vector<CTunnel*> *GetArrayTunnnel(void) { return &m_aTunnel; }
 	std::vector<CGuardRail*> *GetArrayGR(void) { return &m_aGR; }
-	int GetIdxRoad(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
+	size_t GetIdxRoad(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void DeleteRoadPoint(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void ResetIterator(void);
 	void AjustRoadEvent(void);	// “¹ƒCƒxƒ“ƒg‚Ì’²®
