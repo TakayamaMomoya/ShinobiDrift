@@ -231,16 +231,12 @@ std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void
 //=====================================================
 // イテレーターからロードポイント番号を指定
 //=====================================================
-int CMeshRoad::GetIdxRoad(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
+size_t CMeshRoad::GetIdxRoad(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
 {
 	if (m_aRoadPoint.empty())
-	{
+		return 0;
 
-	}
-
-	//std::distance()
-
-	return 0;
+	return std::distance(m_aRoadPoint.begin(), it);
 }
 
 //=====================================================
