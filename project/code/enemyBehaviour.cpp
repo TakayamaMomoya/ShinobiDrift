@@ -184,7 +184,7 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 				{
 					m_state = STATE_ESCAPE;
 					D3DXVECTOR3 pos = pEnemy->GetMtxPos(1);
-					MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_SPARK, pos);
+					MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_ENGINE, pos);
 					break;
 				}
 					
@@ -221,7 +221,8 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 		if (TIME_ESCAPE <= m_fTimerAttack)
 		{
 			pEnemy->Uninit();
-
+			D3DXVECTOR3 pos = pEnemy->GetMtxPos(1);
+			MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_SMOKE, pos);
 			return;
 		}
 
