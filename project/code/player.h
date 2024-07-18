@@ -19,6 +19,7 @@
 class CBlockGrab;
 class CPolygon3D;
 class CPlayerNinja;
+class COrbit;
 
 //*****************************************************
 // クラスの定義
@@ -103,6 +104,7 @@ private:
 		float fTimerDriftChange;
 		float fSizeBlurDrift;	// ドリフト時のブラーの強さ
 		float fDesityBlurDrift;	// ドリフト時のブラーの濃さ
+		COrbit* pOrbit;	// テールランプの軌跡
 	};
 
 	void Load(void);
