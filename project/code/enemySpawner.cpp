@@ -76,13 +76,13 @@ CEnemySpawner* CEnemySpawner::Create(int nIdxSpline,float fRot, float fLength)
 //=====================================================
 HRESULT CEnemySpawner::Init()
 {
-#if 1
+#ifdef _DEBUG
 	// テープの生成
 	m_pObj3D = CPolygon3D::Create(m_pos);
+#endif
 
 	// ポリゴンの設定
 	SetPolygon();
-#endif
 
 	return S_OK;
 }
@@ -114,7 +114,7 @@ void CEnemySpawner::SetPositionSpline(void)
 
 	float fRot = atan2f(vecDiff.x, vecDiff.z);
 
-	SetRotation(fRot + D3DX_PI * 0.5f);
+	SetRotation(fRot - D3DX_PI * 0.5f);
 }
 
 //=====================================================

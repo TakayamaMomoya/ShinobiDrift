@@ -120,7 +120,7 @@ HRESULT CGame::Init(void)
 	CEnemy::Create();
 
 	// 敵スポナー
-	CEnemySpawner::Create(10);
+	CEnemySpawner::Create(12);
 
 #ifdef _DEBUG
 	// メッシュキューブのテスト生成
