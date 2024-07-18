@@ -29,6 +29,7 @@ namespace
 const float SPEED_MOVE = 5.0f;	// 移動速度
 const float SPEED_ROLL = 0.05f;	// 回転速度
 const float DEFAULT_HEIGHT_GR = 600.0f;	// ガードレールのデフォルト高さ
+const char* PATH_SAVE = "data\\MAP\\road00.bin";	// 保存ファイルのパス
 }
 
 //=====================================================
@@ -55,6 +56,8 @@ CEditMesh::~CEditMesh()
 //=====================================================
 HRESULT CEditMesh::Init(void)
 {
+	strcpy(&m_aPathSave[0], (char*)PATH_SAVE);
+
 	CEdit::Init();
 
 	// マニピュレータの生成
@@ -128,6 +131,8 @@ void CEditMesh::Update(void)
 
 	if (ImGui::Button("DeleteRoadPoint", ImVec2(70, 30)))	// 辺の削除
 		ChangeState(new CStateEditMeshDeleteRoadPoint);
+
+	ImGui::InputText("SavePath", &m_aPathSave[0], 256);
 
 	// イテレイター選択
 	SelectIterator();
@@ -362,7 +367,7 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		if (pMesh != nullptr)
-			pMesh->Save();
+			pMesh->Save(pEdit->GetSavepath());
 	}
 }
 
@@ -415,7 +420,7 @@ void CStateEditMeshCreateTunnel::Update(CEditMesh *pEdit)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		if (pMesh != nullptr)
-			pMesh->Save();
+			pMesh->Save(pEdit->GetSavepath());
 	}
 }
 
@@ -520,7 +525,7 @@ void CStateEditMeshCreateGR::Update(CEditMesh *pEdit)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		if (pMesh != nullptr)
-			pMesh->Save();
+			pMesh->Save(pEdit->GetSavepath());
 	}
 }
 
@@ -662,12 +667,19 @@ void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		if (pMesh != nullptr)
-			pMesh->Save();
+			pMesh->Save(pEdit->GetSavepath());
 	}
 
 	if (ImGui::Button("AjustRoadEvent", ImVec2(100, 50)))
 	{// 道イベントを調整
 		pMesh->AjustRoadEvent();
+	}
+
+	if (ImGui::TreeNode("Enemy"))
+	{
+
+
+		ImGui::TreePop();
 	}
 }
 
@@ -688,7 +700,7 @@ void CStateEditMeshDeleteRoadPoint::Update(CEditMesh *pEdit)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		if (pMesh != nullptr)
-			pMesh->Save();
+			pMesh->Save(pEdit->GetSavepath());
 	}
 
 	CMeshRoad *pMesh = CMeshRoad::GetInstance();

@@ -49,7 +49,7 @@ public:
 
 	bool CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld);
 
-	void Save(void);	// エディターのみ。ゲームでは消してね
+	void Save(const char* pPath);	// エディターのみ。ゲームでは消してね
 	void Load(void);	// エディターのみ。ゲームでは消してね
 
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectRoadPoint(void);

@@ -28,17 +28,22 @@ public:
 	void Update();	// 更新
 	void Draw();	// 描画
 
-	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }	// 位置設定
-	D3DXVECTOR3 GetPosition(void) { return m_pos; }	// 位置取得
+	// 変数取得・設定関数
+	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }	// 位置
+	D3DXVECTOR3 GetPosition(void) { return m_pos; }
 	void SetRotation(float fRot) { m_fRot = fRot; }	// 向き取得設定
-	float GetRotation() { return m_fRot; }	// 向き取得処理
+	float GetRotation() { return m_fRot; }
+	void SetIdxSpline(int nIdx) { m_nIdxSpline = nIdx; }	// スプラインの番号
+	int GetIdxSpline(void) { return m_nIdxSpline; }
 
 	// 静的メンバ関数
-	static CEnemySpawner* Create(D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f }, float fRot = 0.0f, float fLength = 1000.0f);	// 生成
+	static CEnemySpawner* Create(int nIdxSpline = 0, float fRot = 0.0f, float fLength = 1000.0f);	// 生成
 
 private:
 	// メンバ関数
+	void SetPositionSpline(void);	// スプラインに対応した位置設定
 	void SetPolygon(void);
+	void CreateEnemy(void);	// 敵の生成
 
 	// メンバ変数
 	int m_nTransitionTime;		// 遷移時間
@@ -47,6 +52,7 @@ private:
 	D3DXVECTOR3 m_posEnd;	// ゴールの終点
 	float m_fRot;		// 向き
 	float m_fLength;	// 長さ
+	int m_nIdxSpline;	// スプラインの番号
 	CPolygon3D* m_pObj3D;	// オブジェクト3Dのポインタ
 };
 
