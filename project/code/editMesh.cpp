@@ -688,7 +688,9 @@ void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 	{
 		if (ImGui::Button("CreateEnemy", ImVec2(100, 50)))
 		{// “G¶¬
-			CEnemySpawner::Create();
+			size_t idx = pMesh->GetIdxRoad(it);
+
+			CEnemySpawner::Create(idx + 1);
 		}
 
 		ImGui::TreePop();
