@@ -228,6 +228,19 @@ std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void
 }
 
 //=====================================================
+// イテレーターからロードポイント番号を指定
+//=====================================================
+int CMeshRoad::GetIdxRoad(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
+{
+	//if ()
+	{
+
+	}
+
+	return 0;
+}
+
+//=====================================================
 // ロードポイントの削除
 //=====================================================
 void CMeshRoad::DeleteRoadPoint(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it)
@@ -676,6 +689,29 @@ void CMeshRoad::AjustRoadEvent(void)
 CCutMullSpline *CMeshRoad::GetCenterSpline(void)
 {
 	return m_pSpline;
+}
+
+//=====================================================
+// 全ロードイベントの削除
+//=====================================================
+void CMeshRoad::DeleteAllRoadEvent(void)
+{
+	if (ImGui::Button("DeleteAllRoadEvent", ImVec2(200, 100)))
+	{
+		for (auto it : m_aGR)
+		{
+			it->Uninit();
+		}
+
+		m_aGR.clear();
+
+		for (auto it : m_aTunnel)
+		{
+			it->Uninit();
+		}
+
+		m_aTunnel.clear();
+	}
 }
 
 //=====================================================

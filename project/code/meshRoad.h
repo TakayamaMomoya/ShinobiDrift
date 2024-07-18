@@ -56,10 +56,12 @@ public:
 	std::vector<SInfoRoadPoint> *GetArrayRP(void) { return &m_aRoadPoint; }
 	std::vector<CTunnel*> *GetArrayTunnnel(void) { return &m_aTunnel; }
 	std::vector<CGuardRail*> *GetArrayGR(void) { return &m_aGR; }
+	int GetIdxRoad(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void DeleteRoadPoint(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it);
 	void ResetIterator(void);
 	void AjustRoadEvent(void);	// 道イベントの調整
 	CCutMullSpline *GetCenterSpline(void);
+	void DeleteAllRoadEvent(void);	// 全ロードイベントの削除
 
 private:
 	void SetNormal(VERTEX_3D *pVtx);	// 法線の設定
