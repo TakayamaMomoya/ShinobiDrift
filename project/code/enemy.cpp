@@ -13,6 +13,7 @@
 #include "effect3D.h"
 #include "shuriken.h"
 #include "player.h"
+#include "orbit.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -78,6 +79,8 @@ HRESULT CEnemy::Init(void)
 
 	m_listBehaviour.push_back(pBehaviour);
 
+	m_info.pOrbit = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60);
+
 	return S_OK;
 }
 
@@ -109,6 +112,9 @@ void CEnemy::Update(void)
 		if (m_listBehaviour.empty())
 			break;
 	}
+
+	if (m_info.pOrbit != nullptr)
+		m_info.pOrbit->SetPositionOffset(GetMatrix(), m_info.pOrbit->GetID());
 
 	// ƒ‚[ƒVƒ‡ƒ“‚ÌŠÇ—
 	ManageMotion();

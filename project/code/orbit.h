@@ -39,6 +39,7 @@ public:
 	static COrbit *Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 posOffset1, D3DXVECTOR3 posOffset2, D3DXCOLOR col, int nNumEdge);
 	bool IsEnd(void) { return m_bEnd; }
 	void SetEnd(bool bEnd) { m_bEnd = bEnd; }
+	int GetID(void) { return m_nID; }
 
 private:
 	void UpdatePolygon(void);

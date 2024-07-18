@@ -29,6 +29,7 @@
 #include "sound.h"
 #include "guardRail.h"
 #include "playerNinja.h"
+#include "orbit.h"
 
 //*****************************************************
 // 定数定義
@@ -137,6 +138,9 @@ HRESULT CPlayer::Init(void)
 	// 初期トランスフォームの設定
 	SetPosition(DEFAULT_POS);
 	SetRotation(DEFAULT_ROT);
+
+	// テールランプ用軌跡の生成
+	m_info.pOrbit = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60);
 
 	// サウンドインスタンスの取得
 	CSound* pSound = CSound::GetInstance();
@@ -1066,6 +1070,9 @@ void CPlayer::ManageSpeed(void)
 	move.y += -0.3f;
 
 	SetMove(move);
+
+	if (m_info.pOrbit != nullptr)
+		m_info.pOrbit->SetPositionOffset(GetMatrix(), m_info.pOrbit->GetID());
 }
 
 //=====================================================
