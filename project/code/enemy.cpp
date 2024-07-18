@@ -105,6 +105,9 @@ void CEnemy::Update(void)
 	for (auto it : m_listBehaviour)
 	{
 		it->Update(this);
+
+		if (m_listBehaviour.empty())
+			break;
 	}
 
 	// ƒ‚[ƒVƒ‡ƒ“‚ÌŠÇ—
