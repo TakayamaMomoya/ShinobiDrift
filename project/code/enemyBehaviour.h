@@ -73,7 +73,6 @@ private:
 	STATE m_state;	// 状態
 	CCutMullSpline *m_pSpline;	// スプライン
 	std::vector<D3DXVECTOR3> m_vPos;	// データ点のベクター
-	int m_nIdx = 1;	// スプラインの番号
 	float m_fSpeed;	// 速度
 	float m_fSpeedDefault;	// 基準にする速度
 	float m_fRate;

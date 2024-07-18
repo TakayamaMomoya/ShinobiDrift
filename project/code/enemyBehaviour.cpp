@@ -238,14 +238,15 @@ bool CEnemyBehaviourChasePlayer::CollidePlayerFront(CEnemy *pEnemy)
 void CEnemyBehaviourChasePlayer::InterpolatePosition(CEnemy *pEnemy)
 {
 	D3DXVECTOR3 pos = pEnemy->GetPosition();
+	int nIdxSpline = pEnemy->GetIdxSpline();
 
 	if (m_fRate >= 1.0f)
 	{
-		m_nIdx++;
+		nIdxSpline++;
 
 		// サイズを超えたら戻す
-		if (m_nIdx >= (int)m_vPos.size())
-			m_nIdx = 1;
+		if (nIdxSpline >= (int)m_vPos.size())
+			nIdxSpline = 1;
 
 		// スピードの計算
 		CalcSpeed(pEnemy);
@@ -271,8 +272,10 @@ void CEnemyBehaviourChasePlayer::InterpolatePosition(CEnemy *pEnemy)
 				return;	// 再取得しても空だったら処理を通さない
 		}
 
-		pos = m_pSpline->Interpolate(m_fRate, m_nIdx);
+		pos = m_pSpline->Interpolate(m_fRate, nIdxSpline);
 	}
+
+	pEnemy->SetIdxSpline(nIdxSpline);
 
 	// 位置と向き更新
 	pEnemy->SetPosition(pos);
@@ -289,13 +292,15 @@ void CEnemyBehaviourChasePlayer::InterpolatePosition(CEnemy *pEnemy)
 //=====================================================
 void CEnemyBehaviourChasePlayer::CalcSpeed(CEnemy *pEnemy)
 {
+	int nIdxSpline = pEnemy->GetIdxSpline();
+
 	if (m_pSpline == nullptr)
 		return;
 
 	if (m_pSpline->IsEmpty())
 		return;
 
-	float fLength = m_pSpline->GetLength(m_nIdx, 50);
+	float fLength = m_pSpline->GetLength(nIdxSpline, 50);
 
 	if (fLength == 0)
 		return;	// 0割り防止
@@ -308,11 +313,13 @@ void CEnemyBehaviourChasePlayer::CalcSpeed(CEnemy *pEnemy)
 //=====================================================
 void CEnemyBehaviourChasePlayer::ControllRot(CEnemy *pEnemy)
 {
+	int nIdxSpline = pEnemy->GetIdxSpline();
+
 	D3DXVECTOR3 pos = pEnemy->GetPosition();
 	D3DXVECTOR3 rot = pEnemy->GetRotation();
 
 	// 次のデータ点の方を向く
-	universal::FactingRotTarget(&rot, pos, m_vPos[m_nIdx], 0.05f);
+	universal::FactingRotTarget(&rot, pos, m_vPos[nIdxSpline], 0.05f);
 
 	pEnemy->SetRotation(D3DXVECTOR3(0.0f, rot.y, 0.0f));
 }
