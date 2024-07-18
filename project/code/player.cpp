@@ -445,16 +445,13 @@ void CPlayer::InputWire(void)
 		// ロープの制御
 		ControlRoap();
 
-		// エフェクシア取得
-		CEffekseer* pEffekseer = CManager::GetMyEffekseer();
-
 		// 後輪の位置取得
 		float PosX = GetParts(3)->pParts->GetMatrix()._41;
 		float PosY = GetParts(3)->pParts->GetMatrix()._42;
 		float PosZ = GetParts(3)->pParts->GetMatrix()._43;
 
 		// エフェクトの再生
-		MyEffekseer::CreateEffect(CEffekseer::TYPE_DRIFT, D3DXVECTOR3(PosX, PosY, PosZ));
+		MyEffekseer::CreateEffect(CEffekseer::TYPE_DRIFT, D3DXVECTOR3(PosX, PosY, PosZ), D3DXVECTOR3(0.0f, fAngleDiff, 0.0f));
 		
 		// サウンドインスタンスの取得
 		CSound* pSound = CSound::GetInstance();

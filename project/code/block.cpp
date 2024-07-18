@@ -31,7 +31,7 @@ namespace
 	const float RADIUS_DRIFT_DEFAULT = 1000.0f;	// ドリフト半径のデフォルト値
 	const float POLYGON_SIZE_X = 100.0f;        // 鉤縄ポイントUIのサイズ
 	const float POLYGON_SIZE_Y = 100.0f;        // 鉤縄ポイントUIのサイズ
-	const float STANDARD_LENGHT = 4000.0f;      // 鉤縄ポイントUIが出る距離
+	const float STANDARD_LENGHT = 7000.0f;      // 鉤縄ポイントUIが出る距離
 }
 
 //*****************************************************
