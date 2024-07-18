@@ -25,8 +25,10 @@
 namespace
 {
 const float SPEED_DEFAULT_CHASE = 50.0f;	// 追跡の標準速度
-const float TIME_THROW_SHURIKEN = 2.0f;	// 手裏剣を投げる頻度
+const float TIME_THROW_SHURIKEN = 2.0f;	    // 手裏剣を投げる頻度
 const float LENGTH_PLAYER_FRONT = 3000.0f;	// プレイヤーの前とみなす距離
+const float SPEED_ESCAPE = 5.0f;            // 逃げるときに加算する速度
+const int MAX_SHURIKEN = 2;                 // 投げる手裏剣の数
 }
 
 //********************************************************************************
@@ -39,6 +41,7 @@ CEnemyBehaviourChasePlayer::CEnemyBehaviourChasePlayer()
 {
 	m_state = STATE::STATE_NONE;
 	m_fTimerAttack = 0.0f;
+	m_nNumShuriken = 0;
 	m_pBigShuriken = nullptr;
 	m_pFlashEffect = nullptr;
 }
@@ -80,6 +83,8 @@ void CEnemyBehaviourChasePlayer::Init(CEnemy *pEnemy)
 	// 初期スピードの計算
 	m_fSpeedDefault = SPEED_DEFAULT_CHASE;
 	CalcSpeed(pEnemy);
+
+	m_nNumShuriken = MAX_SHURIKEN;
 
 	pEnemy->SetPosition(D3DXVECTOR3(pRoadPoint[0].pos.x, pRoadPoint[0].pos.y, pRoadPoint[0].pos.z));
 
@@ -165,8 +170,17 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 				// タイマーリセット
 				m_fTimerAttack = 0.0f;
 
+				// 手裏剣をすべて投げたら逃げる
+				if (m_nNumShuriken <= 0)
+				{
+					m_state = STATE_ESCAPE;
+					break;
+				}
+					
 				// 手裏剣を投げる
 				ThrowShuriken(pEnemy);
+
+				m_nNumShuriken--;
 			}
 		}
 		else
@@ -180,6 +194,25 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 		CalcSpeed(pEnemy);
 
 		CDebugProc::GetInstance()->Print("\n敵[攻撃状態]");
+	}
+		break;
+	case CEnemyBehaviourChasePlayer::STATE_ESCAPE:	// 逃走状態
+	{
+		m_fSpeedDefault += SPEED_ESCAPE;
+
+		// スピードの計算
+		CalcSpeed(pEnemy);
+
+		// 一定時間ごとに手裏剣を投げる
+		float fDeltaTime = CManager::GetDeltaTime();
+		m_fTimerAttack += fDeltaTime;
+
+		if (TIME_THROW_SHURIKEN <= m_fTimerAttack)
+		{
+			
+		}
+
+		CDebugProc::GetInstance()->Print("\n敵逃走状態");
 	}
 		break;
 	default:
@@ -335,6 +368,7 @@ void CEnemyBehaviourChasePlayer::CreateBigShuriken(void)
 		m_pBigShuriken = nullptr;
 	}
 
+	if(m_nNumShuriken > 0)
 	m_pBigShuriken = MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_WINDSHURIKEN, D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 }
 
@@ -396,4 +430,5 @@ void CEnemyBehaviourChasePlayer::Debug(CEnemy *pEnemy)
 
 	pDebugProc->Print("\n敵のバイクの位置[%f,%f,%f]", pEnemy->GetPosition().x, pEnemy->GetPosition().y, pEnemy->GetPosition().z);
 	pDebugProc->Print("\n敵の速度[%f]", m_fSpeedDefault);
+	pDebugProc->Print("\n残りの手裏剣の数[%d]", m_nNumShuriken);
 }

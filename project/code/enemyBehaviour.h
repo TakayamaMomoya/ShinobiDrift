@@ -54,6 +54,7 @@ private:
 		STATE_NONE = 0,	// 何もしていない状態
 		STATE_CHASE,	// 追跡状態
 		STATE_ATTACK,	// 攻撃状態
+		STATE_ESCAPE,   // 逃走状態
 		STATE_MAX
 	};
 
@@ -78,6 +79,7 @@ private:
 	float m_fRate;
 	float m_fRateOld;	// 前回のスプラインの割合
 	float m_fTimerAttack;	// 攻撃タイマー
+	int m_nNumShuriken;  // 投げてくる手裏剣の数
 	CEffekseerEffect *m_pBigShuriken;	// 投げる前に手元に出す大きな手裏剣
 	CEffekseerEffect *m_pFlashEffect;	// 投げる前の閃光のエフェクト
 };
