@@ -17,6 +17,7 @@
 #include "inputkeyboard.h"
 #include "guardRail.h"
 #include <fstream>
+#include "debugproc.h"
 
 //*****************************************************
 // 定数定義
@@ -734,6 +735,7 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 
 	for (auto itRoadPoint : m_aRoadPoint)
 	{
+		// 道の区分の中にいなければ判定しない
 		if (D3DXVec3Dot(&(itRoadPoint.pos - posOldRoadPoint), &(*pPos - posOldRoadPoint)) < 0.0f)
 		{
 			posOldRoadPoint = itRoadPoint.pos;
@@ -746,8 +748,16 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 		{
 			pVtx += MeshRoad::NUM_VTX_IN_EDGE;
 
+			D3DXVECTOR3 posUpPolygon = *pPos;
+			posUpPolygon.y = pVtx[2].pos.y;
+
+			// ポリゴンの法線を計算
+			D3DXVECTOR3 vtxNor[2];
+			D3DXVec3Cross(&vtxNor[0], &(pVtx[1].pos - pVtx[0].pos), &(pVtx[2].pos - pVtx[0].pos));
+			D3DXVec3Cross(&vtxNor[1], &(pVtx[2].pos - pVtx[3].pos), &(pVtx[1].pos - pVtx[3].pos));
+
 			// ポリゴンの下に入っているか判定する
-			if (!universal::IsOnSquare(pVtx[2].pos, pVtx[0].pos, pVtx[1].pos, pVtx[3].pos, pVtx[2].nor, *pPos, posOld, fHeight))
+			if (!universal::IsOnSquarePolygon(pVtx[0].pos, pVtx[1].pos, pVtx[2].pos, pVtx[3].pos, vtxNor[0], vtxNor[1], *pPos, posUpPolygon, fHeight))
 				continue;
 
 			// 高さが一定の高さ以内か判定する
@@ -759,14 +769,7 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 				fHeightDef = fHeight;
 
 #ifdef _DEBUG
-			CEffect3D::Create(pVtx[0].pos, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-			CEffect3D::Create(pVtx[0].pos + (pVtx[0].nor * 150.0f), 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-			CEffect3D::Create(pVtx[1].pos, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-			CEffect3D::Create(pVtx[1].pos + (pVtx[1].nor * 150.0f), 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-			CEffect3D::Create(pVtx[2].pos, 50.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
-			CEffect3D::Create(pVtx[2].pos + (pVtx[2].nor * 150.0f), 50.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
-			CEffect3D::Create(pVtx[3].pos, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-			CEffect3D::Create(pVtx[3].pos + (pVtx[3].nor * 150.0f), 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+
 #endif // _DEBUG
 
 			// 判定をtrueにする
@@ -774,6 +777,7 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 		}
 	}
 
+	// 高さを代入する
 	pPos->y = fHeightDef;
 
 	// 頂点バッファをアンロック

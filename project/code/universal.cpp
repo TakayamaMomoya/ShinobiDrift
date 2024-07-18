@@ -722,10 +722,10 @@ bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR
 	vecVtxTarget[3].y = 0.0f;
 
 	// ƒ|ƒŠƒSƒ“‚Æ“àŠO”»’è
-	if (D3DXVec3Cross(&vecTemp, &vecVtxTarget[0], &vecVtx[0])->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &vecVtxTarget[1], &vecVtx[1])->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &vecVtxTarget[2], &vecVtx[2])->y <= 0 &&
-		D3DXVec3Cross(&vecTemp, &vecVtxTarget[3], &vecVtx[3])->y <= 0)
+	if (D3DXVec3Cross(&vecTemp, &vecVtxTarget[0], &vecVtx[0])->y < 0 &&
+		D3DXVec3Cross(&vecTemp, &vecVtxTarget[1], &vecVtx[1])->y < 0 &&
+		D3DXVec3Cross(&vecTemp, &vecVtxTarget[2], &vecVtx[2])->y < 0 &&
+		D3DXVec3Cross(&vecTemp, &vecVtxTarget[3], &vecVtx[3])->y < 0)
 	{
 		// yŽ²–@ü‚ª0‚Å‚Í‚È‚¢‚©”»’è
 		if (!vtxNor.y)
