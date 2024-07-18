@@ -849,29 +849,22 @@ void CPlayer::Collision(void)
 	CInputManager* pInputManager = CInputManager::GetInstance();
 
 	// ガードレールとの当たり判定
+	// ガードレールのvectorを取得
 	std::vector<CGuardRail*> *aGuardRail = CMeshRoad::GetInstance()->GetArrayGR();
+
+	// 計算用マトリックスを宣言
 	D3DXMATRIX* mtx = &GetMatrix();
 	D3DXMATRIX mtxTrans, mtxRot;
+
+	// プレイヤー側の当たり判定サイズを設定
 	D3DXVECTOR3 paramSize = m_param.sizeCollider;
 	D3DXVECTOR3 sizeX = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, rot.y, 0.0f), paramSize);
 	D3DXVECTOR3 sizeZ = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, -rot.y, 0.0f), D3DXVECTOR3(paramSize.x, 0.0f, paramSize.z));
 
-#ifdef _DEBUG
-	//D3DXVECTOR3 vecAxial = universal::VecToOffset(*mtx, paramSize);
-	CEffect3D::Create(D3DXVECTOR3(pos.x + sizeX.x, pos.y + sizeX.y + 100.0f, pos.z + sizeX.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-	/*CEffect3D::Create(D3DXVECTOR3(pos.x - sizeZ.x, pos.y + sizeX.y + 100.0f, pos.z + sizeZ.z), 50.0f, 2, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-	CEffect3D::Create(D3DXVECTOR3(pos.x + sizeZ.x, pos.y + sizeX.y + 100.0f, pos.z - sizeZ.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
-	CEffect3D::Create(D3DXVECTOR3(pos.x - sizeX.x, pos.y + sizeX.y + 100.0f, pos.z - sizeX.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	CEffect3D::Create(D3DXVECTOR3(pos.x + sizeX.x, pos.y - sizeX.y + 100.0f, pos.z + sizeX.z), 50.0f, 2, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-	CEffect3D::Create(D3DXVECTOR3(pos.x - sizeZ.x, pos.y - sizeX.y + 100.0f, pos.z + sizeZ.z), 50.0f, 2, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-	CEffect3D::Create(D3DXVECTOR3(pos.x + sizeZ.x, pos.y - sizeX.y + 100.0f, pos.z - sizeZ.z), 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));*/
-	CEffect3D::Create(D3DXVECTOR3(pos.x - sizeX.x, pos.y - sizeX.y + 100.0f, pos.z - sizeX.z), 50.0f, 2, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	
-	CDebugProc::GetInstance()->Print("\n当たり判定位置[%f,%f,%f]", sizeX.x, paramSize.y, sizeX.z);
-#endif // _DEBUG
-
+	// ガードレールの回数判定を回す
 	for (auto itGuardRail : *aGuardRail)
 	{
+		// 一か所判定するまで続ける
 		if (itGuardRail->CollideGuardRail(&pos, &move, sizeX, &m_info.fSpeed))
 		{
 			rot.y = atan2f(move.x, move.z);
@@ -900,8 +893,6 @@ void CPlayer::Collision(void)
 
 	CDebugProc::GetInstance()->Print("\nタイヤ1位置[%f,%f,%f]", posParts[0].x, posParts[0].y, posParts[0].z);
 	CDebugProc::GetInstance()->Print("\nタイヤ2位置[%f,%f,%f]", posParts[1].x, posParts[1].y, posParts[1].z);
-	CEffect3D::Create(posParts[0], 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
-	CEffect3D::Create(posParts[1], 50.0f, 2, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 
 	// タイヤそれぞれでblockと当たり判定をとる
 	// 先頭オブジェクトを代入
@@ -953,6 +944,7 @@ void CPlayer::Collision(void)
 			// ハンドルの操作
 			CInputManager::SAxis axis = pInputManager->GetAxis();
 
+			// 前後の回転処理
 			if (axis.axisMove.z > 0.0f)
 				rot.x += 0.015f;
 			else if (axis.axisMove.z < 0.0f)
