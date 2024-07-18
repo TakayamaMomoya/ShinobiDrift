@@ -29,7 +29,7 @@ public:
 		TYPE_FLASH00,	// θ— •‚Μυ
 		TYPE_THROWSHURIKEN,	// θ— •‚Μ“‚°
 		TYPE_WINDSHURIKEN,	// θ— •‚Μ‰ρ“]•—
-		TYPE_GRAPPLE,		// θ— •‚Μ‰ρ“]•—
+		TYPE_GRAPPLE,		// ηκ“κ
 		TYPE_MAX
 	};
 
