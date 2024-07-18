@@ -28,7 +28,8 @@ const float SPEED_DEFAULT_CHASE = 50.0f;	// 追跡の標準速度
 const float TIME_THROW_SHURIKEN = 2.0f;	    // 手裏剣を投げる頻度
 const float LENGTH_PLAYER_FRONT = 3000.0f;	// プレイヤーの前とみなす距離
 const float SPEED_ESCAPE = 5.0f;            // 逃げるときに加算する速度
-const int MAX_SHURIKEN = 2;                 // 投げる手裏剣の数
+const float TIME_ESCAPE = 2.0f;             // 手裏剣をすべて投げてから逃げるまでの時間
+const int MAX_SHURIKEN = 5;                 // 投げる手裏剣の数
 }
 
 //********************************************************************************
@@ -110,8 +111,16 @@ void CEnemyBehaviourChasePlayer::Uninit(CEnemy *pEnemy)
 //=====================================================
 void CEnemyBehaviourChasePlayer::Update(CEnemy *pEnemy)
 {
+	
 	// 状態の管理
 	ManageState(pEnemy);
+
+	// 死亡しているか取得
+	bool bDeath = pEnemy->IsDeath();
+
+	// 死亡していた場合処理を抜ける
+	if (bDeath)
+		return;
 
 	// 位置の補間
 	InterpolatePosition(pEnemy);
@@ -205,13 +214,15 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 		// スピードの計算
 		CalcSpeed(pEnemy);
 
-		// 一定時間ごとに手裏剣を投げる
+		// 一定時間経つと逃げる
 		float fDeltaTime = CManager::GetDeltaTime();
 		m_fTimerAttack += fDeltaTime;
 
-		if (TIME_THROW_SHURIKEN <= m_fTimerAttack)
+		if (TIME_ESCAPE <= m_fTimerAttack)
 		{
-			Uninit(pEnemy);
+			pEnemy->Uninit();
+
+			return;
 		}
 
 		CDebugProc::GetInstance()->Print("\n敵逃走状態");
