@@ -42,6 +42,7 @@
 #include "editGoal.h"
 #include "enemy.h"
 #include "meshCube.h"
+#include "enemySpawner.h"
 
 //*****************************************************
 // マクロ定義
@@ -117,6 +118,9 @@ HRESULT CGame::Init(void)
 
 	// 敵の生成
 	CEnemy::Create();
+
+	// 敵スポナー
+	CEnemySpawner::Create(10);
 
 #ifdef _DEBUG
 	// メッシュキューブのテスト生成
