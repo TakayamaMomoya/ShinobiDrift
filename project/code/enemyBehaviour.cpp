@@ -174,6 +174,8 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 				if (m_nNumShuriken <= 0)
 				{
 					m_state = STATE_ESCAPE;
+					D3DXVECTOR3 pos = pEnemy->GetMtxPos(1);
+					MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_SPARK, pos);
 					break;
 				}
 					
@@ -209,7 +211,7 @@ void CEnemyBehaviourChasePlayer::ManageState(CEnemy *pEnemy)
 
 		if (TIME_THROW_SHURIKEN <= m_fTimerAttack)
 		{
-			
+			Uninit(pEnemy);
 		}
 
 		CDebugProc::GetInstance()->Print("\nìGì¶ëñèÛë‘");
