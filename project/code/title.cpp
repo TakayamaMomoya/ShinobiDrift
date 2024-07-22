@@ -425,11 +425,6 @@ void CTitleMenu::Fade(void)
 		pFade->SetFade(CScene::MODE_GAME);
 
 		break;
-	case CTitleMenu::MENU_TRANING:
-
-		pFade->SetFade(CScene::MODE_TUTORIAL);
-
-		break;
 	default:
 		break;
 	}

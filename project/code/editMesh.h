@@ -17,6 +17,7 @@
 class CPolygon3D;
 class CObjectX;
 class CStateEditMesh;
+class CEnemySpawner;
 
 //*****************************************************
 // クラスの定義
@@ -31,7 +32,11 @@ public:
 	void Uninit(void) override;
 	void Update(void) override;
 	void ChangeState(CStateEditMesh *pState);
-	const char* GetSavepath(void) { return &m_aPathSave[0]; }
+	const char* GetSavePath(void) { return &m_aPathSave[0]; }
+	const char* GetSavePathEnemy(void) { return &m_aPathSaveEnemy[0]; }
+	void SaveEnemy(const char* pPath);
+	void LoadEnemy(const char* pPath);
+	void AddSpawner(CEnemySpawner* pSpawner) { m_listEnemySpawner.push_back(pSpawner); }
 
 private:
 	// メンバ関数
@@ -47,6 +52,8 @@ private:
 	bool m_bCurrent;	// 選択フラグ
 	D3DXVECTOR3 m_posCurrent;	// 選択ブロック位置
 	char m_aPathSave[256] = {};	// 保存パス
+	char m_aPathSaveEnemy[256] = {};	// 敵保存パス
+	std::list<CEnemySpawner*> m_listEnemySpawner;	// 敵スポナーのリスト
 };
 
 //*****************************************************
