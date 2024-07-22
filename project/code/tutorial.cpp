@@ -142,8 +142,17 @@ void CTutorial::ChangeState(CStateTutorial *pState)
 
 	if (m_pState != nullptr)
 	{
+		m_mapLimit.clear();
 		m_pState->Init(this);
 	}
+}
+
+//=====================================================
+// 制限値の追加
+//=====================================================
+void CTutorial::AddLimit(int nIdx, float fValue)
+{
+	m_mapLimit[nIdx] = fValue;
 }
 
 //=====================================================
@@ -165,6 +174,25 @@ void CStateTutorial::Uninit(CTutorial *pTutorial)
 	std::map<int, float> mapFloat;
 	mapFloat.clear();
 	pTutorial->SetMapCounter(mapFloat);
+}
+
+//=====================================================
+// 終了判定
+//=====================================================
+bool CStateTutorial::IsEndInput(int nNum, CTutorial *pTutorial)
+{
+	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
+	std::map<int, float> mapLimit = pTutorial->GetMapLimit();
+
+	for (int i = 0; i < nNum; i++)
+	{
+		if (mapLimit[i] > mapCounter[i])
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 //********************************************************************************
@@ -204,6 +232,18 @@ void CStateTutorialMove::Init(CTutorial *pTutorial)
 	mapUI[(int)MENU_BRAKE] = pBrake;
 
 	*pMapUI = mapUI;
+
+	// 制限値の設定
+	float aTime[MENU_MAX] =
+	{
+		TIME_ACCELE,
+		TIME_BRAKE
+	};
+
+	for (int i = 0; i < MENU_MAX; i++)
+	{
+		pTutorial->AddLimit(i, aTime[i]);
+	}
 }
 
 //=====================================================
@@ -248,34 +288,10 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 
 	CDebugProc::GetInstance()->Print("\nアクセルカウンター[%f]ブレーキカウンター[%f]", mapCounter[MENU_ACCELE], mapCounter[MENU_BRAKE]);
 	
-	if (IsEndInput(pTutorial))
+	if (IsEndInput(MENU_MAX,pTutorial))
 	{// 移動チュートリアルを終了
 		pTutorial->EnableEnd(true);
 	}
-}
-
-//=====================================================
-// 終了判定
-//=====================================================
-bool CStateTutorialMove::IsEndInput(CTutorial *pTutorial)
-{
-	float aTime[MENU_MAX] = 
-	{
-		TIME_ACCELE,
-		TIME_BRAKE
-	};
-
-	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
-
-	for (int i = 0; i < MENU_MAX; i++)
-	{
-		if (aTime[i] > mapCounter[i])
-		{
-			return false;
-		}
-	}
-
-	return true;
 }
 
 namespace Tutorial
