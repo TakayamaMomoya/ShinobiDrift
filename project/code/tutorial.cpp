@@ -9,40 +9,21 @@
 // インクルード
 //*****************************************************
 #include "tutorial.h"
-#include "object.h"
-#include "player.h"
-#include "slow.h"
-#include "manager.h"
-#include "camera.h"
-#include "CameraState.h"
-#include "UIManager.h"
+#include "meshRoad.h"
 #include "UI.h"
-#include "meshfield.h"
-#include "polygon3D.h"
-#include "renderer.h"
-#include "texture.h"
-#include "animEffect3D.h"
-#include "inputManager.h"
-#include "fade.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-const float TIME_SPAWN = 3.0f;	// スポーンまでの間隔
-const D3DXVECTOR3 POS_SKIP = { SCREEN_WIDTH * 0.9f,SCREEN_HEIGHT * 0.85f, 0.0f };	// スキップ表示の位置
-const D3DXVECTOR3 POS_GAUGE = { POS_SKIP.x + 2.0f,POS_SKIP.y + 28.0f, 0.0f };	// スキップ表示の位置
-const D3DXVECTOR2 SIZE_SKIP = { 80.0f,60.0f };	// スキップ表示のサイズ
-const D3DXVECTOR2 SIZE_GAUGE = { 70.0f,26.0f };	// スキップゲージのサイズ
-const char* PATH_SKIP = "data\\TEXTURE\\UI\\tutorial06.png";	// スキップ表示のパス
-const float TIME_SKIP = 2.0f;	// スキップにかかる時間
+const char* PATH_ROAD = "data\\MAP\\road01.bin";	// チュートリアルメッシュロードのパス
 }
 
 //=====================================================
 // コンストラクタ
 //=====================================================
-CTutorial::CTutorial()
+CTutorial::CTutorial() : m_pState(nullptr)
 {
 
 }
@@ -56,10 +37,32 @@ CTutorial::~CTutorial()
 }
 
 //=====================================================
+// 生成処理
+//=====================================================
+CTutorial *CTutorial::Create(void)
+{
+	CTutorial *pTutorial = nullptr;
+
+	pTutorial = new CTutorial;
+
+	if (pTutorial != nullptr)
+	{
+		pTutorial->Init();
+	}
+
+	return pTutorial;
+}
+
+//=====================================================
 // 初期化処理
 //=====================================================
 HRESULT CTutorial::Init(void)
 {
+	CMeshRoad::Create(PATH_ROAD);
+
+	// 初期ステイトに設定
+	ChangeState(new CStateTutorialMove);
+
 	return S_OK;
 }
 
@@ -68,8 +71,13 @@ HRESULT CTutorial::Init(void)
 //=====================================================
 void CTutorial::Uninit(void)
 {
-	// オブジェクト全棄
-	CObject::ReleaseAll();
+	if (m_pState != nullptr)
+	{
+		m_pState->Uninit(this);
+		m_pState = nullptr;
+	}
+
+	Release();
 }
 
 //=====================================================
@@ -77,7 +85,15 @@ void CTutorial::Uninit(void)
 //=====================================================
 void CTutorial::Update(void)
 {
+	if (m_pState != nullptr)
+	{
+		m_pState->Update(this);
+	}
 
+	if (true)
+	{// ゲートに入ったらゲームスタート
+		StartGame();
+	}
 }
 
 //=====================================================
@@ -86,4 +102,91 @@ void CTutorial::Update(void)
 void CTutorial::Draw(void)
 {
 
+}
+
+//=====================================================
+// ゲームの開始
+//=====================================================
+void CTutorial::StartGame(void)
+{
+
+}
+
+//=====================================================
+// ステイトの変更
+//=====================================================
+void CTutorial::ChangeState(CStateTutorial *pState)
+{
+	if (m_pState != nullptr)
+	{
+		delete m_pState;
+		m_pState = nullptr;
+	}
+
+	m_pState = pState;
+
+	if (m_pState != nullptr)
+	{
+		m_pState->Init(this);
+	}
+}
+
+//=====================================================
+// ステイトの終了
+//=====================================================
+void CStateTutorial::Uninit(CTutorial *pTutorial)
+{
+	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
+
+	for (auto it : *pMapUI)
+	{
+		it.second->Uninit();
+	}
+
+	pMapUI->clear();
+}
+
+//********************************************************************************
+// 移動チュートリアル
+//********************************************************************************
+//=====================================================
+// コンストラクタ
+//=====================================================
+CStateTutorialMove::CStateTutorialMove()
+{
+
+}
+
+//=====================================================
+// デストラクタ
+//=====================================================
+CStateTutorialMove::~CStateTutorialMove()
+{
+
+}
+
+//=====================================================
+// 初期化
+//=====================================================
+void CStateTutorialMove::Init(CTutorial *pTutorial)
+{
+	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
+
+	// UIの追加
+}
+
+//=====================================================
+// 終了
+//=====================================================
+void CStateTutorialMove::Uninit(CTutorial *pTutorial)
+{
+	CStateTutorial::Uninit(pTutorial);
+}
+
+//=====================================================
+// 更新
+//=====================================================
+void CStateTutorialMove::Update(CTutorial *pTutorial)
+{
+	
 }
