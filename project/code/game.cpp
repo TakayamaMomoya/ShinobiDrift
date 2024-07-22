@@ -109,9 +109,6 @@ HRESULT CGame::Init(void)
 	// スロー管理の生成
 	CSlow::Create();
 
-	// タイマー生成
-	CTimer::Create();
-
 	// メーター生成
 	CMeter::Create();
 

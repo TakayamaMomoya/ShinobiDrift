@@ -32,8 +32,14 @@ public:
 	virtual void Uninit(void);	// 終了
 	virtual void Update();	// 更新
 	virtual void Draw();	// 描画
-	std::map<int, CUI*> *GetMap(void) { return &m_mapUI; }	// マップコンテナ取得
 	void ChangeState(CStateTutorial *pState);	// ステイトの変更
+
+	// 変数取得・設定関数
+	void EnableEnd(bool bEnd) { m_bEnd = bEnd; }	// 終了フラグ
+	bool IsEnd(void) { return m_bEnd; }
+	std::map<int, CUI*> *GetMap(void) { return &m_mapUI; }	// UIのマップコンテナ取得
+	std::map<int, float> GetMapCounter(void) { return m_mapCounter; }	// カウンターのマップコンテナ取得
+	void SetMapCounter(std::map<int, float> map) { m_mapCounter = map; }	// カウンターのマップコンテナ取得
 
 	// 静的メンバ関数
 	static CTutorial *Create(void);	// 生成処理
@@ -42,8 +48,10 @@ private:
 	void StartGame(void);	// ゲーム開始の処理
 
 	// メンバ変数
-	std::map<int,CUI*> m_mapUI;	// UIのマップコンテナ
+	std::map<int, CUI*> m_mapUI;	// UIのマップコンテナ
+	std::map<int, float> m_mapCounter;	// カウンターのマップコンテナ
 	CStateTutorial *m_pState;	// ステイトのポインタ
+	bool m_bEnd;	// 終了フラグ
 };
 
 class CStateTutorial
@@ -56,6 +64,7 @@ public:
 	virtual void Init(CTutorial *pTutorial) = 0;	// 初期化処理
 	virtual void Uninit(CTutorial *pTutorial);	// 終了処理
 	virtual void Update(CTutorial *pTutorial) = 0;	// 更新処理
+	virtual bool IsEndInput(void) { return false; }	// 終了しているかどうか
 private:
 };
 
@@ -69,8 +78,20 @@ public:
 	void Init(CTutorial *pTutorial) override;	// 初期化処理
 	void Uninit(CTutorial *pTutorial) override;	// 終了処理
 	void Update(CTutorial *pTutorial) override;	// 更新処理
+	bool IsEndInput(CTutorial *pTutorial);	// 終了判定
 
 private:
+	enum E_MENU
+	{// メニュー項目
+		MENU_ACCELE = 0,	// アクセル
+		MENU_BRAKE,	// ブレーキ
+		MENU_MAX
+	};
 };
+
+namespace Tutorial
+{
+CUI *CreateUIDefault(void);
+}
 
 #endif
