@@ -30,6 +30,7 @@ public:
 		TYPE_THROWSHURIKEN,	// θ— •‚Μ“‚°
 		TYPE_WINDSHURIKEN,	// θ— •‚Μ‰ρ“]•—
 		TYPE_GRAPPLE,		// ηκ“κ
+		TYPE_SMOKE,		// “G“P‘ή‚Μ‰
 		TYPE_MAX
 	};
 
