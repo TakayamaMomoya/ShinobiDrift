@@ -38,7 +38,7 @@ public:
 	CMeshRoad(int nPriority = 3);	// コンストラクタ
 	~CMeshRoad();	// デストラクタ
 
-	static CMeshRoad *Create(void);
+	static CMeshRoad *Create(const char* pPath);
 	static CMeshRoad *GetInstance(void) { return m_pMeshRoad; }
 	HRESULT Init(void);
 	void Uninit(void);
@@ -50,7 +50,7 @@ public:
 	bool CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld);
 
 	void Save(const char* pPath);	// エディターのみ。ゲームでは消してね
-	void Load(void);	// エディターのみ。ゲームでは消してね
+	void Load(const char* pPath);	// エディターのみ。ゲームでは消してね
 
 	std::vector<CMeshRoad::SInfoRoadPoint>::iterator SelectRoadPoint(void);
 	std::vector<SInfoRoadPoint> *GetArrayRP(void) { return &m_aRoadPoint; }
@@ -62,6 +62,9 @@ public:
 	void AjustRoadEvent(void);	// 道イベントの調整
 	CCutMullSpline *GetCenterSpline(void);
 	void DeleteAllRoadEvent(void);	// 全ロードイベントの削除
+
+	// 静的メンバ関数
+	static std::list<CMeshRoad*> GetArray(void) { return s_aRoad; }	// コンテナの取得
 
 private:
 	void SetNormal(VERTEX_3D *pVtx);	// 法線の設定
@@ -81,6 +84,7 @@ private:
 	std::vector<CGuardRail*> m_aGR;	// ガードレールのポインタの配列
 
 	static CMeshRoad *m_pMeshRoad;
+	static std::list<CMeshRoad*> s_aRoad;	// メッシュロードのコンテナ
 };
 
 namespace MeshRoad

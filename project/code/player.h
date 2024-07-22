@@ -19,6 +19,7 @@
 class CBlockGrab;
 class CPolygon3D;
 class CPlayerNinja;
+class CMeshRoad;
 
 //*****************************************************
 // ƒNƒ‰ƒX‚Ì’è‹`
@@ -107,7 +108,7 @@ private:
 
 	void Load(void);
 	void Input(void);
-	void Collision(void);
+	void Collision(CMeshRoad *pMesh);
 	void InputMove(void);
 	void InputWire(void);
 	void InputKatana(void);

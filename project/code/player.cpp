@@ -246,8 +246,14 @@ void CPlayer::Update(void)
 	// 入力
 	Input();
 
-	//当たり判定
-	Collision();
+	// メッシュロードの配列取得
+	std::list<CMeshRoad*> listRoad = CMeshRoad::GetArray();
+
+	for (auto it : listRoad)
+	{
+		//当たり判定
+		Collision(it);
+	}
 
 	// 前回の位置を保存
 	D3DXVECTOR3 pos = GetPosition();
@@ -832,7 +838,7 @@ void CPlayer::LimitDrift(float fLength)
 //=====================================================
 // 当たり判定処理
 //=====================================================
-void CPlayer::Collision(void)
+void CPlayer::Collision(CMeshRoad *pMesh)
 {
 	// 前回の位置を保存
 	D3DXVECTOR3 pos = GetPosition();
@@ -847,7 +853,7 @@ void CPlayer::Collision(void)
 
 	// ガードレールとの当たり判定
 	// ガードレールのvectorを取得
-	std::vector<CGuardRail*> *aGuardRail = CMeshRoad::GetInstance()->GetArrayGR();
+	std::vector<CGuardRail*> *aGuardRail = pMesh->GetArrayGR();
 
 	// 計算用マトリックスを宣言
 	D3DXMATRIX* mtx = &GetMatrix();
@@ -885,8 +891,8 @@ void CPlayer::Collision(void)
 	posDef = (posParts[0] + posParts[1]) * 0.5f;
 
 	// タイヤそれぞれでmeshRoadと当たり判定をとる
-	bRoad[0] = CMeshRoad::GetInstance()->CollideRoad(&posParts[0], posOldParts[0]);
-	bRoad[1] = CMeshRoad::GetInstance()->CollideRoad(&posParts[1], posOldParts[1]);
+	bRoad[0] = pMesh->CollideRoad(&posParts[0], posOldParts[0]);
+	bRoad[1] = pMesh->CollideRoad(&posParts[1], posOldParts[1]);
 
 	CDebugProc::GetInstance()->Print("\nタイヤ1位置[%f,%f,%f]", posParts[0].x, posParts[0].y, posParts[0].z);
 	CDebugProc::GetInstance()->Print("\nタイヤ2位置[%f,%f,%f]", posParts[1].x, posParts[1].y, posParts[1].z);

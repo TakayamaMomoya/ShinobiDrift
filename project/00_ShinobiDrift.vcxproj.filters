@@ -87,9 +87,6 @@
     <ClCompile Include="code\title.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
-    <ClCompile Include="code\tutorial.cpp">
-      <Filter>ソース ファイル\scene</Filter>
-    </ClCompile>
     <ClCompile Include="code\result.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
@@ -306,6 +303,9 @@
     <ClCompile Include="code\enemySpawner.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="code\tutorial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\block.h">
@@ -351,9 +351,6 @@
       <Filter>ソース ファイル\scene</Filter>
     </ClInclude>
     <ClInclude Include="code\title.h">
-      <Filter>ソース ファイル\scene</Filter>
-    </ClInclude>
-    <ClInclude Include="code\tutorial.h">
       <Filter>ソース ファイル\scene</Filter>
     </ClInclude>
     <ClInclude Include="code\result.h">
@@ -573,6 +570,9 @@
       <Filter>ソース ファイル</Filter>
     </ClInclude>
     <ClInclude Include="code\enemySpawner.h">
+      <Filter>ソース ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="code\tutorial.h">
       <Filter>ソース ファイル</Filter>
     </ClInclude>
   </ItemGroup>
