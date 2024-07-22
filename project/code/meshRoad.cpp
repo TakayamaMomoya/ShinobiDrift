@@ -193,6 +193,40 @@ void CMeshRoad::Draw(void)
 }
 
 //=====================================================
+// メッシュロードの選択
+//=====================================================
+void CMeshRoad::SelectMeshRoad(void)
+{
+	ImGui::Text("[SelectMeshRoad]");
+
+	std::list<CMeshRoad*>::iterator it = std::find(s_aRoad.begin(), s_aRoad.end(), m_pMeshRoad);
+	int nDist = std::distance(s_aRoad.begin(), it);
+	int nSize = s_aRoad.size();
+
+	if (ImGui::DragInt("RoadIndex", &nDist, 1.0f, 0, nSize - 1))
+	{
+		// イテレータを再初期化して指定番号の要素に移動
+		it = s_aRoad.begin();
+		std::advance(it, nDist);
+
+		m_pMeshRoad = (*it);
+	}
+
+	if (ImGui::Button("NextRoad", ImVec2(70, 30)))
+	{
+		if (it != s_aRoad.end() && std::next(it) != s_aRoad.end())
+			std::advance(it, 1);
+	}
+	if (ImGui::Button("PrevRoad", ImVec2(70, 30)))
+	{
+		if (it != s_aRoad.begin())
+			std::advance(it, -1);
+	}
+
+	m_pMeshRoad = (*it);
+}
+
+//=====================================================
 // ロードポイントの選択
 //=====================================================
 std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void)

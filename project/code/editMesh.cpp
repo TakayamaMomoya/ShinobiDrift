@@ -138,6 +138,9 @@ void CEditMesh::Update(void)
 	ImGui::InputText("SavePath", &m_aPathSave[0], 256);	// メッシュデータの保存パス
 	ImGui::InputText("SavePathEnemy", &m_aPathSaveEnemy[0], 256);	// 敵データの保存パス
 
+	// メッシュロードの選択
+	CMeshRoad::SelectMeshRoad();
+
 	// 全ロードポイントの削除
 	CMeshRoad *pMesh = CMeshRoad::GetInstance();
 

@@ -65,6 +65,7 @@ public:
 
 	// 静的メンバ関数
 	static std::list<CMeshRoad*> GetArray(void) { return s_aRoad; }	// コンテナの取得
+	static void SelectMeshRoad(void);	// メッシュロードの選択
 
 private:
 	void SetNormal(VERTEX_3D *pVtx);	// 法線の設定
