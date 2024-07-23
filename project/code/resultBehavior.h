@@ -15,7 +15,7 @@
 //*****************************************************
 // ‘O•ûéŒ¾
 //*****************************************************
-class CResult;
+class CRanking;
 class CNumber;
 class CPolygon2D;
 
@@ -28,9 +28,9 @@ public:
 	CResultBehavior();
 	virtual ~CResultBehavior();
 
-	virtual void Init(CResult *pResult) = 0;
-	virtual void Update(CResult *pResult) = 0;
-	virtual void Uninit(CResult *pResult) = 0;
+	virtual void Init(CRanking *pResult) = 0;
+	virtual void Update(CRanking *pResult) = 0;
+	virtual void Uninit(CRanking *pResult) = 0;
 private:
 
 };
@@ -51,9 +51,9 @@ public:
 	~CResultPlayerScore() override;
 
 private:
-	void Init(CResult *pResult) override;
-	void Update(CResult *pResult) override;
-	void Uninit(CResult *pResult) override;
+	void Init(CRanking *pResult) override;
+	void Update(CRanking *pResult) override;
+	void Uninit(CRanking *pResult) override;
 
 	CNumber *m_apNumber[TYPE_MAX];	// ”’l
 	CPolygon2D *m_apCaption[TYPE_MAX];	// €–Ú‚ÌŒ©o‚µ
@@ -67,9 +67,9 @@ public:
 	~CResultRanking() override;
 
 private:
-	void Init(CResult *pResult) override;
-	void Update(CResult *pResult) override;
-	void Uninit(CResult *pResult) override {};
+	void Init(CRanking *pResult) override;
+	void Update(CRanking *pResult) override;
+	void Uninit(CRanking *pResult) override {};
 };
 
 #endif

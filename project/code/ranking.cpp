@@ -1,6 +1,6 @@
 //*****************************************************
 //
-// ƒŠƒUƒ‹ƒg‚Ìˆ—[result.cpp]
+// ƒ‰ƒ“ƒLƒ“ƒO‚Ìˆ—[ranking.cpp]
 // Author:‚R“–ç
 //
 //*****************************************************
@@ -8,7 +8,7 @@
 //*****************************************************
 // ƒCƒ“ƒNƒ‹[ƒh
 //*****************************************************
-#include "result.h"
+#include "ranking.h"
 #include "resultBehavior.h"
 #include "fade.h"
 #include "inputManager.h"
@@ -34,7 +34,7 @@ const D3DXVECTOR3 POS_CAPTION = { SCRN_MID.x,SIZE_CAPTION.y,0.0f };	// Œ©o‚µ‚Ìˆ
 //=====================================================
 // ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 //=====================================================
-CResult::CResult()
+CRanking::CRanking()
 {
 	m_pCylinder = nullptr;
 	m_pBehavior = nullptr;
@@ -43,7 +43,7 @@ CResult::CResult()
 //=====================================================
 // ƒfƒXƒgƒ‰ƒNƒ^
 //=====================================================
-CResult::~CResult()
+CRanking::~CRanking()
 {
 
 }
@@ -51,7 +51,7 @@ CResult::~CResult()
 //=====================================================
 // ‰Šú‰»ˆ—
 //=====================================================
-HRESULT CResult::Init(void)
+HRESULT CRanking::Init(void)
 {
 	if (m_pCylinder == nullptr)
 	{
@@ -105,7 +105,7 @@ HRESULT CResult::Init(void)
 //=====================================================
 // ƒ‰ƒ“ƒLƒ“ƒO‚Ì“Ç
 //=====================================================
-void CResult::LoadRanking(void)
+void CRanking::LoadRanking(void)
 {
 	std::ifstream file(PATH_RANKING);
 
@@ -159,7 +159,7 @@ void CResult::LoadRanking(void)
 //=====================================================
 // I—¹ˆ—
 //=====================================================
-void CResult::Uninit(void)
+void CRanking::Uninit(void)
 {
 	if (m_pCylinder != nullptr)
 	{
@@ -179,7 +179,7 @@ void CResult::Uninit(void)
 //=====================================================
 // XVˆ—
 //=====================================================
-void CResult::Update(void)
+void CRanking::Update(void)
 {
 	if (m_pCylinder != nullptr)
 	{
@@ -201,7 +201,7 @@ void CResult::Update(void)
 //=====================================================
 // •`‰æˆ—
 //=====================================================
-void CResult::Draw(void)
+void CRanking::Draw(void)
 {
 
 }
@@ -209,7 +209,7 @@ void CResult::Draw(void)
 //=====================================================
 // ƒrƒwƒCƒrƒA‚Ì•ÏX
 //=====================================================
-void CResult::ChangeBehavior(CResultBehavior *pBehavior)
+void CRanking::ChangeBehavior(CResultBehavior *pBehavior)
 {
 	if (m_pBehavior != nullptr)
 	{

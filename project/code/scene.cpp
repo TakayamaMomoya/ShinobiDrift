@@ -12,7 +12,7 @@
 #include "game.h"
 #include "title.h"
 #include "tutorial.h"
-#include "result.h"
+#include "ranking.h"
 #include "manager.h"
 #include "renderer.h"
 
@@ -90,9 +90,9 @@ CScene *CScene::Create(MODE mode)
 		pScene = new CGame;
 
 		break;
-	case CScene::MODE_RESULT:
+	case CScene::MODE_RANKING:
 
-		pScene = new CResult;
+		pScene = new CRanking;
 
 		break;
 	default:

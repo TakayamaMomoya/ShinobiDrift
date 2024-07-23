@@ -1,12 +1,11 @@
 //*****************************************************
 //
-// リザルトの処理[result.h]
+// ランキングの処理[ranking.h]
 // Author:高山桃也
 //
 //*****************************************************
-
-#ifndef _RESULT_H_
-#define _RESULT_H_
+#ifndef _RANKING_H_
+#define _RANKING_H_
 
 //*****************************************************
 // インクルード
@@ -30,7 +29,7 @@ class CResultBehavior;
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CResult : public CScene
+class CRanking : public CScene
 {
 public:
 	struct SInfoRanking
@@ -40,8 +39,8 @@ public:
 		int nReward;	// 報酬
 	};
 
-	CResult();	// コンストラクタ
-	~CResult();	// デストラクタ
+	CRanking();	// コンストラクタ
+	~CRanking();	// デストラクタ
 
 	HRESULT Init(void);
 	void Uninit(void);

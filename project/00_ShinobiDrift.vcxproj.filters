@@ -87,7 +87,7 @@
     <ClCompile Include="code\title.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
-    <ClCompile Include="code\result.cpp">
+    <ClCompile Include="code\ranking.cpp">
       <Filter>ソース ファイル\scene</Filter>
     </ClCompile>
     <ClCompile Include="code\resultBehavior.cpp">
@@ -353,7 +353,7 @@
     <ClInclude Include="code\title.h">
       <Filter>ソース ファイル\scene</Filter>
     </ClInclude>
-    <ClInclude Include="code\result.h">
+    <ClInclude Include="code\ranking.h">
       <Filter>ソース ファイル\scene</Filter>
     </ClInclude>
     <ClInclude Include="code\resultBehavior.h">
