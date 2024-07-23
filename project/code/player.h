@@ -21,6 +21,7 @@ class CPolygon3D;
 class CPlayerNinja;
 class CMeshRoad;
 class COrbit;
+class CEffekseerEffect;
 
 //*****************************************************
 // クラスの定義
@@ -128,9 +129,11 @@ private:
 	void ManageState(void);
 	void ManageMotion(void);
 	void ManageMotionNinja(void);	// 忍者のモーション管理
+	void ManageSlashEffect(void);	// 斬撃エフェクトの管理
 	void Event(EVENT_INFO *pEventInfo);
 	void Debug(void);
 
+	// メンバ変数
 	SInfo m_info;	// 自身の情報
 	SParam m_param;	// パラメータ情報
 	SFragMotion m_fragMotion;	// モーションのフラグ
@@ -138,7 +141,9 @@ private:
 	CMotion* m_pPlayerNinja;  // バイクに乗っている忍者
 	bool m_bMove = false;     // 移動しているかどうか
 	bool m_bDrift = false;    // ドリフトしているかどうか
+	std::list<CEffekseerEffect*> m_listSlashEffect;	// 斬撃エフェクトのリスト
 
+	// 静的メンバ変数
 	static CPlayer *m_pPlayer;	// 自身のポインタ
 };
 

@@ -305,10 +305,13 @@ void CPlayer::Input(void)
 	// スピードの管理
 	ManageSpeed();
 
+	// 斬撃エフェクトの管理
+	ManageSlashEffect();
+
 	CInputManager *pInputManager = CInputManager::GetInstance();
 
 	if (pInputManager != nullptr)
-	{
+	{// ポーズの発生
 		if (pInputManager->GetTrigger(CInputManager::BUTTON_PAUSE))
 		{
 			CPause::Create();
@@ -1160,7 +1163,9 @@ void CPlayer::ManageMotionNinja(void)
 			float PosZ = m_pPlayerNinja->GetParts(1)->pParts->GetMatrix()._43;
 
 			// エフェクトの再生
-			MyEffekseer::CreateEffect(CEffekseer::TYPE_SLASH, D3DXVECTOR3(PosX, PosY, PosZ));
+			CEffekseerEffect *pEffect = MyEffekseer::CreateEffect(CEffekseer::TYPE_SLASH, D3DXVECTOR3(PosX, PosY, PosZ));
+
+			m_listSlashEffect.push_back(pEffect);
 
 			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_SLASHDOWN);
 		}
@@ -1174,6 +1179,23 @@ void CPlayer::ManageMotionNinja(void)
 		{
 			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_NEUTRAL);
 		}
+	}
+}
+
+//=====================================================
+// 斬撃エフェクトの管理
+//=====================================================
+void CPlayer::ManageSlashEffect(void)
+{
+	if (m_pPlayerNinja == nullptr)
+		return;
+
+	D3DXVECTOR3 posEfect = m_pPlayerNinja->GetMtxPos(0);
+
+	for (auto it : m_listSlashEffect)
+	{
+		if(it != nullptr)
+			it = it->FollowPosition(posEfect);
 	}
 }
 
