@@ -27,7 +27,6 @@ namespace
 const UINT NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
 const float WIDTH_DEFAULT = 200.0f;	// デフォルトの幅
 const float LENGTH_DEFAULT = 200.0f;	// デフォルトの長さ
-const char PATH_SAVE[] = "data\\MAP\\road00.bin";	// 保存ファイルのパス
 const char* PATH_TEXTURE = "data\\TEXTURE\\MATERIAL\\road.jpg";	// テクスチャパス
 const float DIST_DEFAULT = 200.0f;	// デフォルトの辺間の距離
 const float WIDTH_ROAD = 600.0f;	// 道の幅
@@ -37,13 +36,14 @@ const float WIDTH_ROAD = 600.0f;	// 道の幅
 // 静的メンバ変数宣言
 //*****************************************************
 CMeshRoad *CMeshRoad::m_pMeshRoad = nullptr;	// 自身のポインタ
+std::list<CMeshRoad*> CMeshRoad::s_aRoad;	// メッシュロードのコンテナ
 
 //=====================================================
 // コンストラクタ
 //=====================================================
 CMeshRoad::CMeshRoad(int nPriority) : CPolygon3D(nPriority), m_nNumVtx(0), m_pSpline(nullptr), m_pSplineL(nullptr), m_pSplineR(nullptr)
 {
-
+	s_aRoad.push_back(this);
 }
 
 //=====================================================
@@ -51,13 +51,13 @@ CMeshRoad::CMeshRoad(int nPriority) : CPolygon3D(nPriority), m_nNumVtx(0), m_pSp
 //=====================================================
 CMeshRoad::~CMeshRoad()
 {
-
+	s_aRoad.remove(this);
 }
 
 //=====================================================
 // 生成処理
 //=====================================================
-CMeshRoad *CMeshRoad::Create(void)
+CMeshRoad *CMeshRoad::Create(const char* pPath)
 {
 	CMeshRoad *pMeshRoad = nullptr;
 
@@ -72,6 +72,9 @@ CMeshRoad *CMeshRoad::Create(void)
 
 			// 初期化処理
 			pMeshRoad->Init();
+
+			// 読込処理
+			pMeshRoad->Load(pPath);
 		}
 	}
 
@@ -83,17 +86,9 @@ CMeshRoad *CMeshRoad::Create(void)
 //=====================================================
 HRESULT CMeshRoad::Init(void)
 {
-	// リストの初期化
-	m_aRoadPoint.clear();
-
 	// テクスチャ読み込み
 	int nIdx = Texture::GetIdx(PATH_TEXTURE);
 	SetIdxTexture(nIdx);
-
-	// 読み込み処理
-	Load();
-
-	m_it = m_aRoadPoint.begin();
 
 #ifdef _DEBUG
 	//EnableWire(true);
@@ -124,6 +119,8 @@ void CMeshRoad::Uninit(void)
 		delete m_pSplineR;
 		m_pSplineR = nullptr;
 	}
+
+	m_pMeshRoad = nullptr;
 
 	Release();
 }
@@ -193,6 +190,40 @@ void CMeshRoad::Draw(void)
 
 	// カリングを有効化
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+}
+
+//=====================================================
+// メッシュロードの選択
+//=====================================================
+void CMeshRoad::SelectMeshRoad(void)
+{
+	ImGui::Text("[SelectMeshRoad]");
+
+	std::list<CMeshRoad*>::iterator it = std::find(s_aRoad.begin(), s_aRoad.end(), m_pMeshRoad);
+	int nDist = std::distance(s_aRoad.begin(), it);
+	int nSize = s_aRoad.size();
+
+	if (ImGui::DragInt("RoadIndex", &nDist, 1.0f, 0, nSize - 1))
+	{
+		// イテレータを再初期化して指定番号の要素に移動
+		it = s_aRoad.begin();
+		std::advance(it, nDist);
+
+		m_pMeshRoad = (*it);
+	}
+
+	if (ImGui::Button("NextRoad", ImVec2(70, 30)))
+	{
+		if (it != s_aRoad.end() && std::next(it) != s_aRoad.end())
+			std::advance(it, 1);
+	}
+	if (ImGui::Button("PrevRoad", ImVec2(70, 30)))
+	{
+		if (it != s_aRoad.begin())
+			std::advance(it, -1);
+	}
+
+	m_pMeshRoad = (*it);
 }
 
 //=====================================================
@@ -853,12 +884,12 @@ void CMeshRoad::Save(const char* pPath)
 //=====================================================
 // 読み込み処理
 //=====================================================
-void CMeshRoad::Load(void)
+void CMeshRoad::Load(const char* pPath)
 {
 	m_aRoadPoint.clear();
 
 	// ファイルを開く
-	std::ifstream inputFile(PATH_SAVE, std::ios::binary);
+	std::ifstream inputFile(pPath, std::ios::binary);
 
 	if (!inputFile.is_open())
 		assert(("メッシュロードのファイルを開けませんでした", false));
@@ -951,6 +982,8 @@ void CMeshRoad::Load(void)
 	}
 
 	inputFile.close();
+
+	m_it = m_aRoadPoint.begin();
 }
 
 namespace MeshRoad

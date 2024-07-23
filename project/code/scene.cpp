@@ -85,11 +85,6 @@ CScene *CScene::Create(MODE mode)
 		pScene = new CTitle;
 
 		break;
-	case CScene::MODE_TUTORIAL:
-
-		pScene = new CTutorial;
-
-		break;
 	case CScene::MODE_GAME:
 
 		pScene = new CGame;

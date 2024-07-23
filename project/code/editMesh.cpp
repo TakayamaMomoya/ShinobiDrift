@@ -31,6 +31,7 @@ const float SPEED_MOVE = 5.0f;	// 移動速度
 const float SPEED_ROLL = 0.05f;	// 回転速度
 const float DEFAULT_HEIGHT_GR = 600.0f;	// ガードレールのデフォルト高さ
 const char* PATH_SAVE = "data\\MAP\\road00.bin";	// 保存ファイルのパス
+const char* PATH_SAVE_ENEMY = "data\\MAP\\enemy00.txt";	// 敵保存ファイルのデフォルトパス
 }
 
 //=====================================================
@@ -58,6 +59,7 @@ CEditMesh::~CEditMesh()
 HRESULT CEditMesh::Init(void)
 {
 	strcpy(&m_aPathSave[0], (char*)PATH_SAVE);
+	strcpy(&m_aPathSaveEnemy[0], (char*)PATH_SAVE_ENEMY);
 
 	CEdit::Init();
 
@@ -133,7 +135,11 @@ void CEditMesh::Update(void)
 	if (ImGui::Button("DeleteRoadPoint", ImVec2(70, 30)))	// 辺の削除
 		ChangeState(new CStateEditMeshDeleteRoadPoint);
 
-	ImGui::InputText("SavePath", &m_aPathSave[0], 256);
+	ImGui::InputText("SavePath", &m_aPathSave[0], 256);	// メッシュデータの保存パス
+	ImGui::InputText("SavePathEnemy", &m_aPathSaveEnemy[0], 256);	// 敵データの保存パス
+
+	// メッシュロードの選択
+	CMeshRoad::SelectMeshRoad();
 
 	// 全ロードポイントの削除
 	CMeshRoad *pMesh = CMeshRoad::GetInstance();
@@ -236,6 +242,98 @@ void CEditMesh::CollideRPRay(std::vector<CMeshRoad::SInfoRoadPoint>::iterator it
 
 			return;
 		}
+	}
+}
+
+//=====================================================
+// 敵の保存
+//=====================================================
+void CEditMesh::SaveEnemy(const char* pPath)
+{
+	FILE *pFile = nullptr;
+
+	pFile = fopen(pPath, "w");
+
+	if (pFile != nullptr)
+	{
+		fprintf(pFile, "#====================================================================\n");
+		fprintf(pFile, "#\n");
+		fprintf(pFile, "# 敵配置情報[enemy.txt]\n");
+		fprintf(pFile, "# Author：Momoya Takayama\n");
+		fprintf(pFile, "#\n");
+		fprintf(pFile, "#====================================================================\n");
+		fprintf(pFile, "SCRIPT\n\n");
+
+		fprintf(pFile, "#====================================================================\n");
+		fprintf(pFile, "# 配置情報\n");
+		fprintf(pFile, "#====================================================================\n");
+
+		for (auto it : m_listEnemySpawner)
+		{
+			fprintf(pFile, "SETSPAWNER\n");
+
+			int nIdx = it->GetIdxSpline();
+
+			fprintf(pFile, " IDX = %d\n", nIdx);
+
+			fprintf(pFile, "END_SETSPAWNER\n\n");
+		}
+
+		fprintf(pFile, "END_SCRIPT\n");
+
+		fclose(pFile);
+	}
+}
+
+//=====================================================
+// 敵の読込処理
+//=====================================================
+void CEditMesh::LoadEnemy(const char* pPath)
+{
+	char cTemp[256];
+	int nCntBlock = 0;
+
+	//ファイルから読み込む
+	FILE *pFile = fopen(pPath, "r");
+
+	if (pFile != nullptr)
+	{//ファイルが開けた場合
+		while (true)
+		{
+			//文字読み込み
+			(void)fscanf(pFile, "%s", &cTemp[0]);
+
+			if (strcmp(cTemp, "SETSPAWNER") == 0)
+			{
+				int nIdx = 0;
+
+				while (true)
+				{
+					(void)fscanf(pFile, "%s", &cTemp[0]);
+
+					if (strcmp(cTemp, "IDX") == 0)
+					{// 番号
+						(void)fscanf(pFile, "%s", &cTemp[0]);
+
+						(void)fscanf(pFile, "%d", &nIdx);
+					}
+
+					if (strcmp(cTemp, "END_SETSPAWNER") == 0)
+					{// 設定終わり
+						CEnemySpawner *pSpawner = CEnemySpawner::Create(nIdx);
+
+						break;
+					}
+				}
+			}
+
+			if (strcmp(cTemp, "END_SCRIPT") == 0)
+			{
+				break;
+			}
+		}
+
+		fclose(pFile);
 	}
 }
 
@@ -376,7 +474,7 @@ void CStateEditMeshCreateMesh::Update(CEditMesh *pEdit)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		if (pMesh != nullptr)
-			pMesh->Save(pEdit->GetSavepath());
+			pMesh->Save(pEdit->GetSavePath());
 	}
 }
 
@@ -429,7 +527,7 @@ void CStateEditMeshCreateTunnel::Update(CEditMesh *pEdit)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		if (pMesh != nullptr)
-			pMesh->Save(pEdit->GetSavepath());
+			pMesh->Save(pEdit->GetSavePath());
 	}
 }
 
@@ -534,7 +632,7 @@ void CStateEditMeshCreateGR::Update(CEditMesh *pEdit)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		if (pMesh != nullptr)
-			pMesh->Save(pEdit->GetSavepath());
+			pMesh->Save(pEdit->GetSavePath());
 	}
 }
 
@@ -676,7 +774,7 @@ void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		if (pMesh != nullptr)
-			pMesh->Save(pEdit->GetSavepath());
+			pMesh->Save(pEdit->GetSavePath());
 	}
 
 	if (ImGui::Button("AjustRoadEvent", ImVec2(100, 50)))
@@ -690,7 +788,17 @@ void CStateEditMeshAdjustRoadPoint::Update(CEditMesh *pEdit)
 		{// 敵生成
 			size_t idx = pMesh->GetIdxRoad(it);
 
-			CEnemySpawner::Create(idx + 1);
+			CEnemySpawner *pSpawner = CEnemySpawner::Create(idx + 1);
+
+			if (pSpawner != nullptr)
+			{
+				pEdit->AddSpawner(pSpawner);
+			}
+		}
+
+		if (ImGui::Button("SaveEnemy", ImVec2(100, 50)))
+		{
+			pEdit->SaveEnemy(pEdit->GetSavePathEnemy());
 		}
 
 		ImGui::TreePop();
@@ -714,7 +822,7 @@ void CStateEditMeshDeleteRoadPoint::Update(CEditMesh *pEdit)
 		CMeshRoad *pMesh = CMeshRoad::GetInstance();
 
 		if (pMesh != nullptr)
-			pMesh->Save(pEdit->GetSavepath());
+			pMesh->Save(pEdit->GetSavePath());
 	}
 
 	CMeshRoad *pMesh = CMeshRoad::GetInstance();
