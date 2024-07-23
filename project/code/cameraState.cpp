@@ -331,3 +331,22 @@ void CMoveControl::Update(CCamera *pCamera)
 
 	pCamera->MoveDist(FACT_CORRECT_CONTOROLLL);
 }
+
+//=====================================================
+// 更新
+//=====================================================
+void CTitleMoveControl::Update(CCamera* pCamera)
+{
+	CCamera::Camera* pInfoCamera = pCamera->GetCamera();
+
+	pInfoCamera->rot.y += 0.005f;
+
+	universal::LimitRot(&pInfoCamera->rot.y);
+
+	pCamera->SetPosV();
+
+	CDebugProc::GetInstance()->Print("\n視点  [%f, %f, %f]", pInfoCamera->posV.x, pInfoCamera->posV.y, pInfoCamera->posV.z);
+	CDebugProc::GetInstance()->Print("\n注視点[%f, %f, %f]", pInfoCamera->posR.x, pInfoCamera->posR.y, pInfoCamera->posR.z);
+	CDebugProc::GetInstance()->Print("\nカメラ距離[%f]", pInfoCamera->fLength);
+	CDebugProc::GetInstance()->Print("\n角度  [%f, %f, %f]", pInfoCamera->rot.x, pInfoCamera->rot.y, pInfoCamera->rot.z);
+}
