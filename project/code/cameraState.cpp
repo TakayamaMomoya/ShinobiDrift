@@ -33,6 +33,7 @@ const float LENGTHPOSR_FOLLOW = 4126.0f;	// 追従時の先を見る距離
 const float FOV_FOLLOW = 93.0f;	// 追従時の視野角
 const float SPEED_MOVE_ABOVE = 20.0f;	// 上空視点時の移動速度
 const float SPEED_ZOOM_ABOVE = 10.0f;	// ズーム速度
+const D3DXVECTOR3 POS_RESULT = { 12726.0f, 2500.7f, -27695.0f };	// リザルト演出を行う位置
 }
 
 //***********************************************************************************
@@ -330,4 +331,48 @@ void CMoveControl::Update(CCamera *pCamera)
 
 
 	pCamera->MoveDist(FACT_CORRECT_CONTOROLLL);
+}
+
+//=====================================================
+// 更新
+//=====================================================
+void CTitleMoveControl::Update(CCamera* pCamera)
+{
+	CCamera::Camera* pInfoCamera = pCamera->GetCamera();
+
+	pInfoCamera->rot.y += 0.005f;
+
+	universal::LimitRot(&pInfoCamera->rot.y);
+
+	pCamera->SetPosV();
+
+	CDebugProc::GetInstance()->Print("\n視点  [%f, %f, %f]", pInfoCamera->posV.x, pInfoCamera->posV.y, pInfoCamera->posV.z);
+	CDebugProc::GetInstance()->Print("\n注視点[%f, %f, %f]", pInfoCamera->posR.x, pInfoCamera->posR.y, pInfoCamera->posR.z);
+	CDebugProc::GetInstance()->Print("\nカメラ距離[%f]", pInfoCamera->fLength);
+	CDebugProc::GetInstance()->Print("\n角度  [%f, %f, %f]", pInfoCamera->rot.x, pInfoCamera->rot.y, pInfoCamera->rot.z);
+}
+
+//**************************************************************************
+// リザルト
+//**************************************************************************
+//=====================================================
+// コンストラクタ
+//=====================================================
+CCameraStateResult::CCameraStateResult()
+{
+}
+
+//=====================================================
+// 更新
+//=====================================================
+void CCameraStateResult::Update(CCamera* pCamera)
+{
+	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+
+	if (pInfoCamera == nullptr)
+		return;
+
+	// カメラ位置の設定
+	pInfoCamera->posR = POS_RESULT;
+	pCamera->SetPosV();
 }

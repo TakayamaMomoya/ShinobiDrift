@@ -1,61 +1,98 @@
 //*****************************************************
 //
-// リザルトの処理[result.h]
-// Author:高山桃也
+// リザルト処理[result.h]
+// Author:髙山桃也
 //
 //*****************************************************
-
 #ifndef _RESULT_H_
 #define _RESULT_H_
 
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "scene.h"
-
-//*****************************************************
-// 定数定義
-//*****************************************************
-namespace Result
-{
-const int BASE_REWARD = 100000;	// 基本報酬
-}
+#include "object.h"
 
 //*****************************************************
 // 前方宣言
 //*****************************************************
-class CMeshCylinder;
-class CResultBehavior;
+class CUI;
+class CStateResult;
+class CNumber;
 
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CResult : public CScene
-{
+class CResult : public CObject
+{// チュートリアルのクラス
 public:
-	struct SInfoRanking
-	{// ランキングの情報
-		int nRank;	// ランク
-		std::string name;	// 名前
-		int nReward;	// 報酬
-	};
-
 	CResult();	// コンストラクタ
 	~CResult();	// デストラクタ
 
-	HRESULT Init(void);
-	void Uninit(void);
-	void Update(void);
-	void Draw(void);
-	void ChangeBehavior(CResultBehavior *pBehavior);
-	std::list<SInfoRanking> GetListRanking(void) { return m_listRanking; }
+	// メンバ関数
+	virtual HRESULT Init(void);	// 初期化
+	virtual void Uninit(void);	// 終了
+	virtual void Update();	// 更新
+	virtual void Draw();	// 描画
+	void ChangeState(CStateResult *pState);	// ステイトの変更
+	void StartFade(void);	// フェード
+
+	// 変数取得・設定関数
+
+	// 静的メンバ関数
+	static CResult *Create(void);	// 生成処理
+private:
+	// メンバ関数
+	void SetPlayer(void);	// プレイヤー設定
+	void SetCamera(void);	// カメラ設定
+
+	// メンバ変数
+	CStateResult *m_pState;
+};
+
+class CStateResult
+{// ステイトの基底クラス
+public:
+	CStateResult() {};	// コンストラクタ
+	virtual ~CStateResult() {};	 // デストラクタ
+
+	// メンバ関数
+	virtual void Init(CResult *pResult) = 0;	// 初期化処理
+	virtual void Uninit(CResult *pResult);	// 終了処理
+	virtual void Update(CResult *pResult) = 0;	// 更新処理
 
 private:
-	void LoadRanking(void);
-
-	std::list<SInfoRanking> m_listRanking;	// ランキングのリスト
-	CResultBehavior *m_pBehavior;
-	CMeshCylinder *m_pCylinder;	// 背景のシリンダー
 };
+
+class CStateResultDispTime : public CStateResult
+{// タイム表示
+public:
+	CStateResultDispTime();	// コンストラクタ
+	virtual ~CStateResultDispTime();	 // デストラクタ
+
+	// メンバ関数
+	void Init(CResult *pResult) override;	// 初期化処理
+	void Uninit(CResult *pResult) override;	// 終了処理
+	void Update(CResult *pResult) override;	// 更新処理
+
+private:
+	enum E_NUMBER
+	{
+		NUMBER_MINUTE = 0,	// 分表示
+		NUMBER_SECOND,	// 秒表示
+		NUMBER_MILLISSEC,	// ミリ秒表示
+		NUMBER_MAX
+	};
+
+	// メンバ関数
+	void SetNumber(void);	// 数字の設定
+
+	// メンバ変数
+	CNumber *m_apTime[NUMBER_MAX];	// 数字のポインタ配列
+};
+
+namespace Tutorial
+{
+CUI *CreateUIDefault(void);
+}
 
 #endif

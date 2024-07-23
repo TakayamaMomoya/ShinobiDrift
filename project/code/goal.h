@@ -25,7 +25,6 @@ public:
 	~CGoal();	//	デストラクタ
 
 	// メンバ関数
-
 	HRESULT Init();
 	void Uninit();
 	void Update();

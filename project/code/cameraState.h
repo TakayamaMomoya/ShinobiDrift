@@ -51,5 +51,26 @@ private:
 	bool m_bAbove = false;	// 上空視点かどうか
 };
 
+// タイトル
+class CTitleMoveControl : public CCameraState
+{
+public:
+	CTitleMoveControl() {};
+	void Update(CCamera* pCamera) override;
+
+private:
+
+};
+
+// リザルト
+class CCameraStateResult : public CCameraState
+{
+public:
+	CCameraStateResult();
+	void Update(CCamera* pCamera) override;
+
+private:
+
+};
 
 #endif

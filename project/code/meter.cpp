@@ -20,10 +20,10 @@
 //*****************************************************
 namespace
 {
-	const int SECOND = 140;		// メーターの表示値
-	const int PLACE = 3;		// 桁数
-	const float WIDTH = SCREEN_WIDTH * 0.80f;		// 幅
-	const float HEIGHT = SCREEN_HEIGHT * 0.83f;		// 高さ
+const int SECOND = 140;		// メーターの表示値
+const int PLACE = 3;		// 桁数
+const float WIDTH = SCREEN_WIDTH * 0.80f;		// 幅
+const float HEIGHT = SCREEN_HEIGHT * 0.9f;		// 高さ
 }
 
 //=====================================================
@@ -85,43 +85,53 @@ HRESULT CMeter::Init()
 	m_nIdxTexture = 0;
 
 	// プレイヤーの情報取得
-	m_pPlayer = CPlayer::GetInstance();
+	if (m_pPlayer == nullptr)
+		m_pPlayer = CPlayer::GetInstance();
 
 	// テクスチャ情報の取得
 	CTexture* pTexture = CTexture::GetInstance();
 
 	// テクスチャ番号
-	m_nIdxTexture = pTexture->Regist("data\\TEXTURE\\UI\\1st.png");
+	m_nIdxTexture = pTexture->Regist("data\\TEXTURE\\UI\\Needle.png");
 
-	// 生成
-	m_pNumber = CNumber::Create(PLACE, 0);
+	if (m_pUI == nullptr)
+	{
+		// 生成
+		m_pUI = CUI::Create();
 
-	// 位置設定
-	m_pNumber->SetPosition(D3DXVECTOR3(WIDTH, HEIGHT, 0.0f));
+		// テクスチャ設定
+		m_pUI->SetIdxTexture(m_nIdxTexture);
 
-	// サイズ調整
-	m_pNumber->SetSizeAll(35.0f, 35.0f);
+		// 位置設定
+		m_pUI->SetPosition(D3DXVECTOR3(1100, 600.0f, 0.0f));
 
-	// 色設定
-	m_pNumber->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		// サイズ設定
+		m_pUI->SetSize(75.0f, 100.0f);
 
-	// 生成
-	m_pUI = CUI::Create();
+		// 向き設定
+		m_pUI->SetRotation(0.0f);
 
-	// テクスチャ設定
-	m_pUI->SetIdxTexture(m_nIdxTexture);
+		// 頂点情報設定
+		m_pUI->SetVtx();
 
-	// 位置設定
-	m_pUI->SetPosition(D3DXVECTOR3(1100, 600.0f, 0.0f));
+		// 色設定
+		m_pUI->SetCol(D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f));
+	}
 
-	// サイズ設定
-	m_pUI->SetSize(50.0f, 35.0f);
+	if (m_pNumber == nullptr)
+	{
+		// 生成
+		m_pNumber = CNumber::Create(PLACE, 0);
 
-	// 向き設定
-	m_pUI->SetRotation(0.0f);
+		// 位置設定
+		m_pNumber->SetPosition(D3DXVECTOR3(WIDTH, HEIGHT, 0.0f));
 
-	// 頂点情報設定
-	m_pUI->SetVtx();
+		// サイズ調整
+		m_pNumber->SetSizeAll(30.0f, 30.0f);
+
+		// 色設定
+		m_pNumber->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	}
 
 	return S_OK;
 }
@@ -131,13 +141,20 @@ HRESULT CMeter::Init()
 //=====================================================
 void CMeter::Uninit(void)
 {
-	m_pNumber = nullptr;
+	if (m_pNumber != nullptr)
+		m_pNumber = nullptr;
 
-	m_pMeter = nullptr;
+	if (m_pPlayer != nullptr)
+	{
+		m_pPlayer->Uninit();
+		m_pPlayer = nullptr;
+	}
 
-	m_pPlayer = nullptr;
+	if (m_pUI != nullptr)
+		m_pUI = nullptr;
 
-	m_pUI = nullptr;
+	if (m_pMeter != nullptr)
+		m_pMeter = nullptr;
 
 	// 自身の破棄
 	Release();
@@ -162,18 +179,22 @@ void CMeter::Acceleration()
 	// デルタタイム取得
 	float fDeltaTime = CManager::GetDeltaTime();
 
-	// 速度取得
-	float fPlayerSpeed = m_pPlayer->GetSpeed();
+	if (m_pPlayer != nullptr)
+	{
+		// 速度取得
+		float fPlayerSpeed = m_pPlayer->GetSpeed();
 
-	// 最高速度
-	float fMaxSpeed = m_pPlayer->GetParam().fSpeedMax;
+		// 最高速度
+		float fMaxSpeed = m_pPlayer->GetParam().fSpeedMax;
 
-	// 速度取得
-	m_NowMeter = (int)fPlayerSpeed;
 
-	if (m_NowMeter >= fMaxSpeed)
-	{// プレイヤーパラメーターの速度を超えないように
-		m_NowMeter = (int)fMaxSpeed;
+		// 速度取得
+		m_NowMeter = (int)fPlayerSpeed;
+
+		if (m_NowMeter >= fMaxSpeed)
+		{// プレイヤーパラメーターの速度を超えないように
+			m_NowMeter = (int)fMaxSpeed;
+		}
 	}
 
 	// メーター値の計算
@@ -195,12 +216,15 @@ void CMeter::Acceleration()
 //=====================================================
 void CMeter::Needle()
 {
-	// 向き取得
-	m_fRot = m_pUI->GetRotation();
+	if (m_pUI != nullptr)
+	{
+		// 向き取得
+		m_fRot = m_pUI->GetRotation();
 
-	// 
-	m_fRot;
+		// 
+		m_fRot;
 
-	// 向き設定
-	m_pUI->SetRotation(m_fRot);
+		// 向き設定
+		m_pUI->SetRotation(m_fRot);
+	}
 }

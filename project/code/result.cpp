@@ -1,7 +1,7 @@
 //*****************************************************
 //
-// リザルトの処理[result.cpp]
-// Author:高山桃也
+// リザルト処理[result.cpp]
+// Author:髙山桃也
 //
 //*****************************************************
 
@@ -9,35 +9,29 @@
 // インクルード
 //*****************************************************
 #include "result.h"
-#include "resultBehavior.h"
-#include "fade.h"
-#include "inputManager.h"
-#include "object.h"
-#include "polygon2D.h"
-#include "meshcylinder.h"
-#include "texture.h"
+#include "player.h"
 #include "camera.h"
 #include "manager.h"
+#include "cameraState.h"
+#include "inputManager.h"
+#include "game.h"
+#include "number.h"
+#include "timer.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-const float SPEED_ROTATION = 0.003f;	// 回るスピード
-const float HEIGHT_CYLINDER = 800.0f;	// シリンダーの高さ
-const std::string PATH_RANKING = "data\\TEXT\\ranking.txt";	// ランキングのパス
-const D3DXVECTOR2 SIZE_CAPTION = { SCREEN_WIDTH * 0.5f,100.0f };	// 見出しのサイズ
-const D3DXVECTOR3 POS_CAPTION = { SCRN_MID.x,SIZE_CAPTION.y,0.0f };	// 見出しの位置
+const D3DXVECTOR3 POS_DISP_TIME = { SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.4f, 0.0f };	// タイムの表示位置
 }
 
 //=====================================================
 // コンストラクタ
 //=====================================================
-CResult::CResult()
+CResult::CResult() : CObject(1), m_pState(nullptr)
 {
-	m_pCylinder = nullptr;
-	m_pBehavior = nullptr;
+
 }
 
 //=====================================================
@@ -49,111 +43,64 @@ CResult::~CResult()
 }
 
 //=====================================================
+// 生成処理
+//=====================================================
+CResult *CResult::Create(void)
+{
+	CResult *pResult = nullptr;
+
+	pResult = new CResult;
+
+	if (pResult != nullptr)
+	{
+		pResult->Init();
+	}
+
+	return pResult;
+}
+
+//=====================================================
 // 初期化処理
 //=====================================================
 HRESULT CResult::Init(void)
 {
-	if (m_pCylinder == nullptr)
-	{
-		// シリンダーの生成
-		m_pCylinder = CMeshCylinder::Create();
-
-		if (m_pCylinder != nullptr)
-		{
-			m_pCylinder->SetRadius(1500.0f);
-			m_pCylinder->SetHeight(HEIGHT_CYLINDER);
-			m_pCylinder->SetVtx();
-
-			int nIdx = Texture::GetIdx("data\\TEXTURE\\BG\\result.jpg");
-			m_pCylinder->SetIdxTexture(nIdx);
-		}
-	}
-
-	// 見出しの生成
-	CPolygon2D *pCaption = nullptr;
-
-	pCaption = CPolygon2D::Create(4);
-
-	if (pCaption != nullptr)
-	{
-		pCaption->SetPosition(POS_CAPTION);
-		pCaption->SetSize(SIZE_CAPTION.x, SIZE_CAPTION.y);
-		pCaption->SetVtx();
-
-		int nIdx = Texture::GetIdx("data\\TEXTURE\\UI\\result.png");
-		pCaption->SetIdxTexture(nIdx);
-	}
+	// プレイヤーの設定
+	SetPlayer();
 
 	// カメラ位置の設定
-	CCamera *pCamera = CManager::GetCamera();
+	SetCamera();
 
-	if (pCamera == nullptr)
-		return E_FAIL;
-
-	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
-
-	pInfoCamera->posV = { 0.0f,HEIGHT_CYLINDER * 0.5f,0.0f };
-	pInfoCamera->posR = { 0.0f,HEIGHT_CYLINDER * 0.5f,1.0f };
-
-	LoadRanking();
-
-	ChangeBehavior(new CResultPlayerScore);
+	// ステイトの変更
+	ChangeState(new CStateResultDispTime);
 
 	return S_OK;
 }
 
 //=====================================================
-// ランキングの読込
+// プレイヤー設定
 //=====================================================
-void CResult::LoadRanking(void)
+void CResult::SetPlayer(void)
 {
-	std::ifstream file(PATH_RANKING);
+	CPlayer *pPlayer = CPlayer::GetInstance();
 
-	if (file.is_open())
-	{
-		std::string temp;
+	if (pPlayer == nullptr)
+		return;
+	
+	// プレイヤーを操作できないようにする
+	pPlayer->SetEnableInput(false);
+}
 
-		while (std::getline(file, temp))
-		{// 読み込むものがなくなるまで読込
-			if (temp == "PLAYER")
-			{// プレイヤー情報読込
-				SInfoRanking info;
+//=====================================================
+// カメラ設定
+//=====================================================
+void CResult::SetCamera(void)
+{
+	CCamera *pCamera = CManager::GetCamera();
 
-				while (std::getline(file, temp))
-				{
-					std::istringstream iss(temp);
-					std::string key;
-					iss >> key;
-
-					if (key == "RANK")
-					{// ランク
-						iss >> info.nRank;
-					}
-
-					if (key == "NAME")
-					{// 名前
-						iss >> info.name;
-					}
-
-					if (key == "REWARD")
-					{// 報酬額
-						iss >> info.nReward;
-					}
-
-					if (temp == "END_PLAYER")
-					{
-						m_listRanking.push_back(info);
-
-						break;
-					}
-				}
-			}
-		}
-	}
-	else
-	{
-		assert(("ランキングファイルが開けませんでした", false));
-	}
+	if (pCamera == nullptr)
+		return;
+	
+	pCamera->ChangeState(new CCameraStateResult);
 }
 
 //=====================================================
@@ -161,19 +108,7 @@ void CResult::LoadRanking(void)
 //=====================================================
 void CResult::Uninit(void)
 {
-	if (m_pCylinder != nullptr)
-	{
-		m_pCylinder->Uninit();
-		m_pCylinder = nullptr;
-	}
-
-	if (m_pBehavior != nullptr)
-	{
-		delete m_pBehavior;
-		m_pBehavior = nullptr;
-	}
-
-	CObject::ReleaseAll();
+	Release();
 }
 
 //=====================================================
@@ -181,20 +116,9 @@ void CResult::Uninit(void)
 //=====================================================
 void CResult::Update(void)
 {
-	if (m_pCylinder != nullptr)
+	if (m_pState != nullptr)
 	{
-		D3DXVECTOR3 rot = m_pCylinder->GetRotation();
-
-		rot.y += SPEED_ROTATION;
-
-		universal::LimitRot(&rot.y);
-
-		m_pCylinder->SetRotation(rot);
-	}
-
-	if (m_pBehavior != nullptr)
-	{
-		m_pBehavior->Update(this);
+		m_pState->Update(this);
 	}
 }
 
@@ -207,21 +131,118 @@ void CResult::Draw(void)
 }
 
 //=====================================================
-// ビヘイビアの変更
+// ステイトの変更
 //=====================================================
-void CResult::ChangeBehavior(CResultBehavior *pBehavior)
+void CResult::ChangeState(CStateResult *pState)
 {
-	if (m_pBehavior != nullptr)
+	if (m_pState != nullptr)
 	{
-		m_pBehavior->Uninit(this);
-
-		delete m_pBehavior;
+		m_pState->Uninit(this);
+		delete m_pState;
+		m_pState = nullptr;
 	}
 
-	m_pBehavior = pBehavior;
+	m_pState = pState;
 
-	if (m_pBehavior != nullptr)
+	if (m_pState != nullptr)
 	{
-		m_pBehavior->Init(this);
+		m_pState->Init(this);
 	}
+}
+
+//=====================================================
+// フェードを始める処理
+//=====================================================
+void CResult::StartFade(void)
+{
+	CGame *pGame = CGame::GetInstance();
+
+	if (pGame == nullptr)
+		return;
+
+	pGame->SetState(CGame::STATE::STATE_END);
+}
+
+//=====================================================
+// ステイトの終了
+//=====================================================
+void CStateResult::Uninit(CResult *pResult)
+{
+
+}
+
+//********************************************************************************
+// タイム表示
+//********************************************************************************
+//=====================================================
+// コンストラクタ
+//=====================================================
+CStateResultDispTime::CStateResultDispTime() : m_apTime()
+{
+
+}
+
+//=====================================================
+// デストラクタ
+//=====================================================
+CStateResultDispTime::~CStateResultDispTime()
+{
+
+}
+
+//=====================================================
+// 初期化
+//=====================================================
+void CStateResultDispTime::Init(CResult *pResult)
+{
+	// 数字の設定
+	SetNumber();
+}
+
+//=====================================================
+// 数字の設定
+//=====================================================
+void CStateResultDispTime::SetNumber(void)
+{
+	CTimer *pTime = CTimer::GetInstance();
+
+	if (pTime == nullptr)
+		return;
+
+	int aTime[NUMBER_MAX] =
+	{
+		pTime->GetMinutes(),
+		(int)pTime->GetSecond(),
+		(int)pTime->GetMilli()
+	};
+
+	for (int i = 0; i < NUMBER_MAX; i++)
+	{
+		m_apTime[i] = CNumber::Create(2, aTime[i]);
+
+
+	}
+}
+
+//=====================================================
+// 終了
+//=====================================================
+void CStateResultDispTime::Uninit(CResult *pResult)
+{
+	CStateResult::Uninit(pResult);
+}
+
+//=====================================================
+// 更新
+//=====================================================
+void CStateResultDispTime::Update(CResult *pResult)
+{
+	CInputManager *pInputManager = CInputManager::GetInstance();
+
+	if (pInputManager == nullptr)
+		return;
+
+	// フェードを始める
+	if (pInputManager->GetTrigger(CInputManager::BUTTON_ENTER))
+		pResult->StartFade();
 }

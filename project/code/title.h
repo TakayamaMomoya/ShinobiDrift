@@ -46,11 +46,15 @@ public:
 	virtual void Draw(void);
 	void ChangeBehavior(CTitleBehavior *pBehavior);
 	STATE GetState(void) { return m_state; }
-
+	CMotion *GetPlayer(void) { return m_pPlayer; }
+	CMotion *GetBike(void) { return m_pBike; }
+	
 private:
 	STATE m_state;				// 状態
-	CPolygon2D* m_pLogo;		// タイトルロゴのポインタ
-	CMotion *m_pMotion;	// プレイヤーモデル
+	CPolygon2D *m_pTitleLogo;   // タイトルロゴのポインタ
+	CPolygon2D *m_pTeamLogo;    // チームロゴのポインタ
+	CMotion *m_pPlayer;	// プレイヤーモデル
+	CMotion *m_pBike;   // バイクモデル
 	CTitleBehavior *m_pBehavior;	// ビヘイビア
 	float m_fTImerSmoke;	// 煙のスポーンタイマー
 };
@@ -95,11 +99,25 @@ public:
 private:
 	void Input(void);
 	void ManageCursor(void);
-	void Fade(void);
-
+	//void Fade(void);
+	
 	CPolygon2D *m_apMenu[MENU_MAX];	// メニュー項目
 	CPolygon2D *m_pCursor;	// カーソル
 	MENU m_menu;	// 選択メニュー項目
+
+	bool m_bFade = false;
+};
+
+class CTitleMovePlayer : public CTitleBehavior
+{
+public:
+	CTitleMovePlayer();  // コンストラクタ
+	virtual ~CTitleMovePlayer();  // デストラクタ
+	void Update(CTitle* pTItle) override;
+
+private:
+	void Fade(void);
+
 };
 
 #endif

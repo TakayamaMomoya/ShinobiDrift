@@ -13,16 +13,17 @@
 #include "debugproc.h"
 #include "effect3D.h"
 #include "fade.h"
-#include "polygon3D.h"
 #include "game.h"
+#include "timer.h"
+#include "result.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-	const float MOVESPEED = 4.0f;	// 移動速度
-	const float WIDTH_GOAL = 100.0f;	// ゴールの幅
+const float MOVESPEED = 4.0f;	// 移動速度
+const float WIDTH_GOAL = 100.0f;	// ゴールの幅
 }
 
 //*****************************************************
@@ -120,6 +121,7 @@ void CGoal::Uninit()
 
 	if (m_pObj3D != nullptr)
 	{
+		m_pObj3D->Uninit();
 		m_pObj3D = nullptr;
 	}
 
@@ -144,33 +146,45 @@ void CGoal::Update()
 	// 移動量取得
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
 
+	// タイマーの取得
+	CTimer* pTimer = CTimer::GetInstance();
+
 	// 交点の割合
 	float fCross = 0.0f;
 
-	// 外積の判定
-	if (universal::IsCross(posPlayer,		// プレイヤーの位置
+	bool bHit = universal::IsCross(posPlayer,		// プレイヤーの位置
 		m_posStart,		// ゴールの始点
 		m_posEnd,			// ゴールの終点
 		&fCross,		// 交点の割合
-		posPlayer + movePlayer))	// プレイヤーの移動量
+		posPlayer + movePlayer);	// プレイヤーの移動量
+
+	bool bHitNext = universal::IsCross(posPlayer + movePlayer,		// プレイヤーの次回の位置
+		m_posStart,		// ゴールの始点
+		m_posEnd,			// ゴールの終点
+		nullptr,		// 交点の割合
+		posPlayer + movePlayer);	// プレイヤーの移動量
+
+	// 外積の判定
+	if (!bHit && bHitNext)
 	{
 		if (fCross >= 0.0f && fCross <= 1.0f)
 		{// 始点と終点の間を通った時
-			//CGame::SetState(CGame::STATE::STATE_END);
-
-			CDebugProc::GetInstance()->Print("\nゴールした");
+			// リザルトの生成
+			CResult::Create();
 		}
 	}
 
 #ifdef _DEBUG
-	CEffect3D::Create(m_posStart, 200.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CEffect3D::Create(m_posStart, 400.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
 	CEffect3D::Create(m_posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif
 
 #if 0
 	CDebugProc::GetInstance()->Print("\nfCrossの値[%f]", fCross);
-	CDebugProc::GetInstance()->Print("\nstartPosの位置[%f, %f, %f]", m_posStart.x, m_posStart.y, m_posStart.z);
-	CDebugProc::GetInstance()->Print("\nendPosの位置[%f, %f, %f]", m_posEnd.x, m_posEnd.y, m_posEnd.z);
+	CDebugProc::GetInstance()->Print("\nbHit[%d]", bHit);
+	CDebugProc::GetInstance()->Print("\nbHitOld[%d]", bHitNext);
+	//CDebugProc::GetInstance()->Print("\nstartPosの位置[%f, %f, %f]", m_posStart.x, m_posStart.y, m_posStart.z);
+	//CDebugProc::GetInstance()->Print("\nendPosの位置[%f, %f, %f]", m_posEnd.x, m_posEnd.y, m_posEnd.z);
 #endif
 }
 

@@ -43,11 +43,16 @@
 #include "enemy.h"
 #include "meshCube.h"
 #include "enemySpawner.h"
+#include "tutorial.h"
 
 //*****************************************************
 // マクロ定義
 //*****************************************************
 #define TRANS_TIME	(100)	// 終了までの余韻のフレーム数
+namespace
+{
+const char* PATH_GAME_ROAD = "data\\MAP\\road00.bin";	// ゲームメッシュロードのパス
+}
 
 //*****************************************************
 // 静的メンバ変数宣言
@@ -104,23 +109,18 @@ HRESULT CGame::Init(void)
 	// スロー管理の生成
 	CSlow::Create();
 
-	// タイマー生成
-	CTimer::Create();
-
 	// メーター生成
 	CMeter::Create();
 
 	// ゴール生成
-	CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), 0.0f);
+	//CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), 0.0f);
+	CGoal::Create(D3DXVECTOR3(12726.0f, 2500.7f, -27695.0f), D3DX_PI);
 
 	// メッシュロード生成
-	CMeshRoad::Create();
+	CMeshRoad::Create(PATH_GAME_ROAD);
 
-	// 敵の生成
-	CEnemy::Create();
-
-	// 敵スポナー
-	//CEnemySpawner::Create(12);
+	// チュートリアルの生成
+	CTutorial::Create();
 
 #ifdef _DEBUG
 	// メッシュキューブのテスト生成
@@ -205,7 +205,7 @@ void CGame::ManageState(void)
 
 		if (m_nCntState >= TRANS_TIME && pFade != nullptr)
 		{
-			pFade->SetFade(CScene::MODE_TITLE);
+			pFade->SetFade(CScene::MODE_RANKING);
 		}
 
 		break;

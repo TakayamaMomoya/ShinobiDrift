@@ -23,6 +23,7 @@
 #include "skybox.h"
 #include "player.h"
 #include "smoke.h"
+#include "debugproc.h"
 
 //*****************************************************
 // マクロ定義
@@ -33,10 +34,15 @@
 //*****************************************************
 namespace
 {
-	const D3DXVECTOR3 LOGO_POS = D3DXVECTOR3(SCREEN_WIDTH * 0.27f, 150.0f, 0.0f);	// ロゴの位置
-	const float LOGO_WIDTH = 875.0f * 0.35f;	// ロゴの幅
-	const float LOGO_HEIGHT = 320.0f * 0.35f;	// ロゴの高さ
-	const char* LOGO_PATH = "data\\TEXTURE\\UI\\logo000.png";	// ロゴのパス
+	const D3DXVECTOR3 TITLE_LOGO_POS = D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 200.0f, 0.0f);	// タイトルロゴの位置
+	const float TITLE_LOGO_WIDTH = 875.0f * 0.35f;	// タイトルロゴの幅
+	const float TITLE_LOGO_HEIGHT = 320.0f * 0.35f;	// タイトルロゴの高さ
+	const char* TITLE_LOGO_PATH = "data\\TEXTURE\\UI\\title_logo00.png";	// タイトルロゴのパス
+
+	const D3DXVECTOR3 TEAM_LOGO_POS = D3DXVECTOR3(SCREEN_WIDTH * 0.9f, 75.0f, 0.0f);	// チームロゴの位置
+	float TEAM_LOGO_WIDTH = 100.0f;         // チームロゴの幅
+	const float TEAM_LOGO_HEIGHT = 35.0f;	// チームロゴの高さ
+	const char* TEAM_LOGO_PATH = "data\\TEXTURE\\UI\\logoTeam.png";	// チームロゴのパス
 
 	const D3DXVECTOR3 STATE_POS = D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.7f, 0.0f);	// スタート表示の位置
 	const float START_WIDTH = 400.0f;	// スタート表示の幅
@@ -47,7 +53,8 @@ namespace
 	D3DXVECTOR2 SIZE_MENU = { 200.0f,60.0f };	//　メニューのサイズ
 	const D3DXCOLOR COL_INITIAL_MENU = { 0.4f,0.4f,0.4f,1.0f };	// メニュー項目の初期色
 	const D3DXCOLOR COL_CURRENT_MENU = { 1.0f,1.0f,1.0f,1.0f };	// メニュー項目の選択色
-	const D3DXVECTOR3 POS_PLAYER = { -154.31f, 82.62f, 600.51f };	// プレイヤーモデルの位置
+	const D3DXVECTOR3 POS_PLAYER = { -154.31f, 130.62f, 570.51f };	// プレイヤーモデルの位置
+	const D3DXVECTOR3 POS_BIKE = { -154.31f, 82.62f, 600.51f };	    // バイクモデルの位置
 }
 
 //=====================================================
@@ -56,8 +63,9 @@ namespace
 CTitle::CTitle()
 {
 	m_state = STATE_NONE;
-	m_pLogo = nullptr;
-	m_pMotion = nullptr;
+	m_pTitleLogo = nullptr;
+	m_pTeamLogo = nullptr;
+	m_pPlayer = nullptr;
 	m_pBehavior = nullptr;
 	m_fTImerSmoke = 0.0f;
 }
@@ -98,16 +106,28 @@ HRESULT CTitle::Init(void)
 		return E_FAIL;
 	}
 
-	// ロゴの生成
-	m_pLogo = CPolygon2D::Create(7);
+	// タイトルロゴの生成
+	m_pTitleLogo = CPolygon2D::Create(7);
 
-	if (m_pLogo != nullptr)
+	if (m_pTitleLogo != nullptr)
 	{
-		m_pLogo->SetSize(LOGO_WIDTH, LOGO_HEIGHT);
-		m_pLogo->SetPosition(LOGO_POS);
-		int nIdx = CTexture::GetInstance()->Regist(LOGO_PATH);
-		m_pLogo->SetIdxTexture(nIdx);
-		m_pLogo->SetVtx();
+		m_pTitleLogo->SetSize(TITLE_LOGO_WIDTH, TITLE_LOGO_HEIGHT);
+		m_pTitleLogo->SetPosition(TITLE_LOGO_POS);
+		int nIdx = CTexture::GetInstance()->Regist(TITLE_LOGO_PATH);
+		m_pTitleLogo->SetIdxTexture(nIdx);
+		m_pTitleLogo->SetVtx();
+	}
+
+	// チームロゴの生成
+	m_pTeamLogo = CPolygon2D::Create(7);
+
+	if (m_pTeamLogo != nullptr)
+	{
+		m_pTeamLogo->SetSize(TEAM_LOGO_WIDTH, TEAM_LOGO_HEIGHT);
+		m_pTeamLogo->SetPosition(TEAM_LOGO_POS);
+		int nIdx = CTexture::GetInstance()->Regist(TEAM_LOGO_PATH);
+		m_pTeamLogo->SetIdxTexture(nIdx);
+		m_pTeamLogo->SetVtx();
 	}
 
 	// カメラ位置の設定
@@ -118,8 +138,10 @@ HRESULT CTitle::Init(void)
 
 	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
 
-	pInfoCamera->posV = { 45.38f,84.71f,270.10f };
-	pInfoCamera->posR = { -454.28f,331.03f,878.09f };
+	pInfoCamera->posV = { 45.38f, 500.0f, 270.10f };
+	pInfoCamera->posR = { POS_PLAYER.x, 300.0f, POS_PLAYER.z };
+
+	Camera::ChangeState(new CTitleMoveControl);
 
 	// 背景オブジェクトの生成
 	CObjectX* pArsenal = CObjectX::Create();
@@ -130,14 +152,24 @@ HRESULT CTitle::Init(void)
 		pArsenal->BindModel(nIdx);
 	}
 
-	// プレイヤーモデルの設置
-	m_pMotion = CMotion::Create("data\\MOTION\\motionArms01.txt");
+	// バイクモデルの設置
+	m_pBike = CMotion::Create("data\\MOTION\\motionBike.txt");
 
-	if (m_pMotion != nullptr)
+	if (m_pBike != nullptr)
 	{
-		m_pMotion->SetPosition(POS_PLAYER);
-		m_pMotion->SetMotion(CPlayer::MOTION::MOTION_NEUTRAL);
-		m_pMotion->InitPose(CPlayer::MOTION::MOTION_NEUTRAL);
+		m_pBike->SetPosition(POS_BIKE);
+		m_pBike->SetMotion(CPlayer::MOTION::MOTION_NEUTRAL);
+	}
+
+	// プレイヤーモデルの設置
+	m_pPlayer = CMotion::Create("data\\MOTION\\motionPlayer.txt");
+
+	if (m_pPlayer != nullptr)
+	{
+		m_pPlayer->SetPosition(POS_PLAYER);
+		m_pPlayer->SetMotion(CPlayer::MOTION::MOTION_NEUTRAL);
+		m_pPlayer->InitPose(CPlayer::MOTION::MOTION_NEUTRAL);
+		m_pPlayer->SetMatrix(m_pBike->GetMatrix());
 	}
 
 	return S_OK;
@@ -148,7 +180,8 @@ HRESULT CTitle::Init(void)
 //=====================================================
 void CTitle::Uninit(void)
 {
-	Object::DeleteObject((CObject**)&m_pLogo);
+	Object::DeleteObject((CObject**)&m_pTitleLogo);
+	Object::DeleteObject((CObject**)&m_pTeamLogo);
 
 	if (m_pBehavior != nullptr)
 	{
@@ -172,6 +205,14 @@ void CTitle::Update(void)
 	{
 		m_pBehavior->Update(this);
 	}
+
+	CCamera* pCamera = CManager::GetCamera();
+
+	if (pCamera == nullptr)
+		return;
+
+	// カメラの更新
+	pCamera->Update();
 }
 
 //=====================================================
@@ -179,7 +220,7 @@ void CTitle::Update(void)
 //=====================================================
 void CTitle::Draw(void)
 {
-
+	
 }
 
 //=====================================================
@@ -334,17 +375,17 @@ CTitleMenu::CTitleMenu()
 		}
 	}
 
-	// カーソルの生成
-	m_pCursor = CPolygon2D::Create(6);
+	//// カーソルの生成
+	//m_pCursor = CPolygon2D::Create(6);
 
-	if (m_pCursor != nullptr)
-	{
-		m_pCursor->SetSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-		m_pCursor->SetVtx();
+	//if (m_pCursor != nullptr)
+	//{
+	//	m_pCursor->SetSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	//	m_pCursor->SetVtx();
 
-		int nIdx = CTexture::GetInstance()->Regist("data\\TEXTURE\\UI\\cursorMenu.png");
-		m_pCursor->SetIdxTexture(nIdx);
-	}
+	//	int nIdx = CTexture::GetInstance()->Regist("data\\TEXTURE\\UI\\cursorMenu.png");
+	//	m_pCursor->SetIdxTexture(nIdx);
+	//}
 }
 
 CTitleMenu::~CTitleMenu()
@@ -379,6 +420,9 @@ void CTitleMenu::Update(CTitle *pTitle)
 			m_apMenu[i]->SetCol(col);
 		}
 	}
+
+	if (m_bFade)
+		pTitle->ChangeBehavior(new CTitleMovePlayer);
 }
 
 void CTitleMenu::Input(void)
@@ -404,36 +448,33 @@ void CTitleMenu::Input(void)
 
 	if (pInput->GetTrigger(CInputManager::BUTTON_ENTER))
 	{// フェード処理
-		Fade();
+		//Fade();
+
+		m_bFade = true;
 	}
 }
 
-void CTitleMenu::Fade(void)
-{// 各種フェード
-	CFade *pFade = CFade::GetInstance();
-
-	if (pFade == nullptr)
-		return;
-
-	if (pFade->GetState() != CFade::FADE_NONE)
-		return;
-
-	switch (m_menu)
-	{
-	case CTitleMenu::MENU_GAME:
-
-		pFade->SetFade(CScene::MODE_GAME);
-
-		break;
-	case CTitleMenu::MENU_TRANING:
-
-		pFade->SetFade(CScene::MODE_TUTORIAL);
-
-		break;
-	default:
-		break;
-	}
-}
+//void CTitleMenu::Fade(void)
+//{// 各種フェード
+//	CFade *pFade = CFade::GetInstance();
+//
+//	if (pFade == nullptr)
+//		return;
+//
+//	if (pFade->GetState() != CFade::FADE_NONE)
+//		return;
+//
+//	switch (m_menu)
+//	{
+//	case CTitleMenu::MENU_GAME:
+//
+//		//pFade->SetFade(CScene::MODE_GAME);
+//		m_bFade = true;
+//		break;
+//	default:
+//		break;
+//	}
+//}
 
 void CTitleMenu::ManageCursor(void)
 {// カーソルの制御
@@ -451,4 +492,80 @@ void CTitleMenu::ManageCursor(void)
 
 	m_pCursor->SetPosition(pos);
 	m_pCursor->SetVtx();
+}
+
+CTitleMovePlayer::CTitleMovePlayer()
+{// コンストラクタ
+
+	// カメラ位置の設定
+	CCamera* pCamera = CManager::GetCamera();
+
+	if (pCamera == nullptr)
+		return;
+
+	CCamera::Camera* pInfoCamera = pCamera->GetCamera();
+
+	Camera::ChangeState(nullptr);
+
+	pInfoCamera->posVDest = { -30.0f, 225.0f, 350.0f };
+	pInfoCamera->posRDest = { -154.31f, 250.62f, 600.51f };
+	//pInfoCamera->posR = { -154.31f, 82.62f, 600.51f };
+}
+
+CTitleMovePlayer::~CTitleMovePlayer()
+{// デストラクタ
+
+}
+
+void CTitleMovePlayer::Update(CTitle* pTItle)
+{// 更新処理
+
+	if(pTItle->GetPlayer()->GetMotion() != CPlayer::MOTION_NINJA_SLASHDOWN)
+	   pTItle->GetPlayer()->SetMotion(CPlayer::MOTION_NINJA_SLASHDOWN);
+
+	// カメラ位置の設定
+	CCamera* pCamera = CManager::GetCamera();
+
+	if (pCamera == nullptr)
+		return;
+
+	pCamera->MoveDist(0.07f);
+
+	D3DXVECTOR3 BikePos = pTItle->GetBike()->GetPosition();
+
+	// モーションが終了していたらバイクの前進させる
+	if (pTItle->GetPlayer()->IsFinish())
+	{
+		float f = pTItle->GetPlayer()->GetMove().z;
+		float MoveZ = (f + 0.03f) * 1.1f;
+
+		pTItle->GetPlayer()->SetMove({ 0.0f, 0.0f, MoveZ });
+
+		BikePos.z += MoveZ;
+
+		// バイクの位置設定
+		pTItle->GetBike()->SetPosition(BikePos);
+
+		// バイクに乗った忍者の追従
+		pTItle->GetPlayer()->SetPosition(D3DXVECTOR3(0.0f, 50.0f, -10.0f));
+		pTItle->GetPlayer()->SetMatrixParent(pTItle->GetBike()->GetMatrix());
+	}
+
+	// フェード処理
+	if (BikePos.z >= 2000.0f)
+		Fade();
+}
+
+void CTitleMovePlayer::Fade(void)
+{// フェード
+
+	CFade* pFade = CFade::GetInstance();
+
+	if (pFade == nullptr)
+		return;
+
+	if (pFade->GetState() != CFade::FADE_NONE)
+		return;
+
+	pFade->SetFade(CScene::MODE_GAME);
 }

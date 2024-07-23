@@ -10,7 +10,7 @@
 //*****************************************************
 #include "resultBehavior.h"
 #include "number.h"
-#include "result.h"
+#include "ranking.h"
 #include "inputManager.h"
 #include "fade.h"
 #include "texture.h"
@@ -71,12 +71,12 @@ CResultPlayerScore::~CResultPlayerScore()
 
 }
 
-void CResultPlayerScore::Init(CResult *pResult)
+void CResultPlayerScore::Init(CRanking *pResult)
 {// 初期化
 
 }
 
-void CResultPlayerScore::Uninit(CResult *pResult)
+void CResultPlayerScore::Uninit(CRanking *pResult)
 {// 終了
 	for (int i = 0; i < TYPE_NUMBER::TYPE_MAX; i++)
 	{
@@ -100,7 +100,7 @@ void CResultPlayerScore::Uninit(CResult *pResult)
 	}
 }
 
-void CResultPlayerScore::Update(CResult *pResult)
+void CResultPlayerScore::Update(CRanking *pResult)
 {// 更新
 	// フェードする操作
 	CInputManager *pInputManager = CInputManager::GetInstance();
@@ -134,12 +134,12 @@ CResultRanking::~CResultRanking()
 
 }
 
-void CResultRanking::Init(CResult *pResult)
+void CResultRanking::Init(CRanking *pResult)
 {// 初期化
 
 }
 
-void CResultRanking::Update(CResult *pResult)
+void CResultRanking::Update(CRanking *pResult)
 {// 更新
 	// フェードする操作
 	CInputManager *pInputManager = CInputManager::GetInstance();
