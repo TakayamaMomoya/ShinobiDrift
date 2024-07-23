@@ -49,8 +49,10 @@ public:
 
 private:
 	STATE m_state;				// 状態
-	CPolygon2D* m_pLogo;		// タイトルロゴのポインタ
-	CMotion *m_pMotion;	// プレイヤーモデル
+	CPolygon2D* m_pTitleLogo;   // タイトルロゴのポインタ
+	CPolygon2D *m_pTeamLogo;    // チームロゴのポインタ
+	CMotion *m_pPlayer;	// プレイヤーモデル
+	CMotion *m_pBike;   // バイクモデル
 	CTitleBehavior *m_pBehavior;	// ビヘイビア
 	float m_fTImerSmoke;	// 煙のスポーンタイマー
 };
