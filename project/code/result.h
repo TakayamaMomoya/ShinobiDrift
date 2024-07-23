@@ -33,6 +33,7 @@ public:
 	virtual void Update();	// 更新
 	virtual void Draw();	// 描画
 	void ChangeState(CStateResult *pState);	// ステイトの変更
+	void StartFade(void);	// フェード
 
 	// 変数取得・設定関数
 
@@ -40,6 +41,8 @@ public:
 	static CResult *Create(void);	// 生成処理
 private:
 	// メンバ関数
+	void SetPlayer(void);	// プレイヤー設定
+	void SetCamera(void);	// カメラ設定
 
 	// メンバ変数
 	CStateResult *m_pState;
@@ -55,6 +58,7 @@ public:
 	virtual void Init(CResult *pResult) = 0;	// 初期化処理
 	virtual void Uninit(CResult *pResult);	// 終了処理
 	virtual void Update(CResult *pResult) = 0;	// 更新処理
+
 private:
 };
 

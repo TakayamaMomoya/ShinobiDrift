@@ -62,4 +62,15 @@ private:
 
 };
 
+// ƒŠƒUƒ‹ƒg
+class CCameraStateResult : public CCameraState
+{
+public:
+	CCameraStateResult();
+	void Update(CCamera* pCamera) override;
+
+private:
+
+};
+
 #endif
