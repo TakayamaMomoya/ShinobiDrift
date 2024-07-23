@@ -43,21 +43,17 @@ public:
 	std::map<int, float> GetMapCounter(void) { return m_mapCounter; }	// カウンターのマップコンテナ取得
 	std::map<int, float> GetMapLimit(void) { return m_mapLimit; }	// リミットのマップコンテナ取得
 	void SetMapCounter(std::map<int, float> map) { m_mapCounter = map; }	// カウンターのマップコンテナ取得
+	void StartGame(void);	// ゲーム開始の処理
 
 	// 静的メンバ関数
 	static CTutorial *Create(void);	// 生成処理
 private:
-	// メンバ関数
-	void StartGame(void);	// ゲーム開始の処理
-	void CollidePlayer(void);	// プレイヤーとの判定
-
 	// メンバ変数
 	std::map<int, CUI*> m_mapUI;	// UIのマップコンテナ
 	std::map<int, float> m_mapCounter;	// カウンターのマップコンテナ
 	std::map<int, float> m_mapLimit;	// リミットのマップコンテナ
 	CStateResult *m_pState;	// ステイトのポインタ
 	bool m_bEnd;	// 終了フラグ
-	CPolygon3D *m_pGate;	// ゲートのポリゴン
 };
 
 class CStateResult
@@ -132,11 +128,11 @@ private:
 	};
 };
 
-class CStateTutorialFree : public CStateResult
-{// フリーのチュートリアル
+class CStateTutorialEnd : public CStateResult
+{// チュートリアルの終了
 public:
-	CStateTutorialFree();	// コンストラクタ
-	virtual ~CStateTutorialFree();	 // デストラクタ
+	CStateTutorialEnd();	// コンストラクタ
+	virtual ~CStateTutorialEnd();	 // デストラクタ
 
 	// メンバ関数
 	void Init(CTutorial *pTutorial) override;	// 初期化処理
@@ -144,11 +140,11 @@ public:
 	void Update(CTutorial *pTutorial) override;	// 更新処理
 
 private:
-	enum E_MENU
-	{// メニュー項目
-		MENU_FREE = 0,	// フリー
-		MENU_MAX
-	};
+	// メンバ関数
+	void CollidePlayer(CTutorial *pTutorial);	// プレイヤーとゲートの判定
+
+	// メンバ変数
+	CPolygon3D *m_pGate;	// ゲートのポリゴン
 };
 
 namespace Tutorial

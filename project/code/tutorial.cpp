@@ -30,12 +30,15 @@ const D3DXVECTOR2 SIZE_DEFAULT_UI = { SCREEN_WIDTH * 0.1f, SCREEN_HEIGHT * 0.1f}
 const float LINE_INPUT = 0.3f;	// 入力と判定するスピード
 const float TIME_ACCELE = 5.0f;	// アクセルに必要な時間
 const float TIME_BRAKE = 3.0f;	// ブレーキに必要な時間
+const D3DXVECTOR2 SIZE_GATE = { 200.0f,500.0f };	// ゲートのサイズ
+const float DIST_GATE = 500.0f;	// ゲートの距離
+const D3DXVECTOR3 ROT_GATE = { D3DX_PI * 0.5f, D3DX_PI * 0.5f, 0.0f };	// ゲートの向き
 }
 
 //=====================================================
 // コンストラクタ
 //=====================================================
-CTutorial::CTutorial() : CObject(1), m_pState(nullptr), m_pGate(nullptr)
+CTutorial::CTutorial() : CObject(1), m_pState(nullptr)
 {
 
 }
@@ -73,7 +76,7 @@ HRESULT CTutorial::Init(void)
 	CMeshRoad::Create(PATH_ROAD);
 
 	// 初期ステイトに設定
-	ChangeState(new CStateTutorialMove);
+	ChangeState(new CStateTutorialParry);
 
 	return S_OK;
 }
@@ -101,11 +104,6 @@ void CTutorial::Update(void)
 	{
 		m_pState->Update(this);
 	}
-
-	if (IsEnd())
-	{// チュートリアルの終了
-		CollidePlayer();
-	}
 }
 
 //=====================================================
@@ -123,63 +121,6 @@ void CTutorial::StartGame(void)
 {
 	// タイマーの生成
 	CTimer::Create();
-}
-
-//=====================================================
-// プレイヤーとの判定
-//=====================================================
-void CTutorial::CollidePlayer(void)
-{
-	CPlayer *pPlayer = CPlayer::GetInstance();
-
-	if (m_pGate == nullptr || pPlayer == nullptr)
-		return;
-
-	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
-	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
-	D3DXVECTOR3 pos = m_pGate->GetPosition();
-	D3DXVECTOR3 rot = m_pGate->GetRotation();
-	float fWidth = m_pGate->GetWidth();
-
-	D3DXVECTOR3 posStart = { pos.x + sinf(rot.y) * fWidth, pos.y, pos.z + cosf(rot.y) * fWidth };
-	D3DXVECTOR3 posEnd = { pos.x - sinf(rot.y) * fWidth, pos.y, pos.z - cosf(rot.y) * fWidth };
-
-	float fCross = 0.0f;
-
-	bool bHit = universal::IsCross(posPlayer,		// プレイヤーの位置
-		posStart,		// ゴールの始点
-		posEnd,			// ゴールの終点
-		&fCross,		// 交点の割合
-		posPlayer + movePlayer);	// プレイヤーの移動量
-
-	bool bHitNext = universal::IsCross(posPlayer + movePlayer,		// プレイヤーの次回の位置
-		posStart,		// ゴールの始点
-		posEnd,			// ゴールの終点
-		nullptr,		// 交点の割合
-		posPlayer + movePlayer);	// プレイヤーの移動量
-
-	// 外積の判定
-	if (!bHit && bHitNext)
-	{
-		if (fCross >= 0.0f && fCross <= 1.0f)
-		{// 始点と終点の間を通った時、ゲームを開始
-			StartGame();
-		}
-	}
-
-#ifdef _DEBUG
-	CEffect3D::Create(posStart, 400.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	CEffect3D::Create(posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-#endif
-
-	if (false)
-	{// ゲームが始まる瞬間
-		StartGame();
-
-		Uninit();
-
-		return;
-	}
 }
 
 //=====================================================
@@ -564,7 +505,7 @@ void CStateTutorialParry::Update(CTutorial *pTutorial)
 
 	if (IsEndInput(MENU_MAX, pTutorial))
 	{// パリィチュートリアルを終了
-		pTutorial->ChangeState(new CStateTutorialFree);
+		pTutorial->ChangeState(new CStateTutorialEnd);
 	}
 }
 
@@ -574,7 +515,7 @@ void CStateTutorialParry::Update(CTutorial *pTutorial)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateTutorialFree::CStateTutorialFree()
+CStateTutorialEnd::CStateTutorialEnd() : m_pGate(nullptr)
 {
 
 }
@@ -582,7 +523,7 @@ CStateTutorialFree::CStateTutorialFree()
 //=====================================================
 // デストラクタ
 //=====================================================
-CStateTutorialFree::~CStateTutorialFree()
+CStateTutorialEnd::~CStateTutorialEnd()
 {
 
 }
@@ -590,70 +531,110 @@ CStateTutorialFree::~CStateTutorialFree()
 //=====================================================
 // 初期化
 //=====================================================
-void CStateTutorialFree::Init(CTutorial *pTutorial)
+void CStateTutorialEnd::Init(CTutorial *pTutorial)
 {
-	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
-	std::map<int, CUI*> mapUI = *pMapUI;
+	// ゲートの生成
+	m_pGate = CPolygon3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-	// パスの一覧
-	const char* apPath[MENU_MAX] =
-	{
-		"data\\TEXTURE\\UI\\tutorial04.png",
-	};
+	if (m_pGate == nullptr)
+		return;
 
-	// 制限値の一覧
-	float aTime[MENU_MAX] =
-	{
-		TIME_ACCELE,
-	};
+	CPlayer *pPlayer = CPlayer::GetInstance();
 
-	for (int i = 0; i < MENU_MAX; i++)
-	{
-		// 各UIの設定
-		CUI *pUI = Tutorial::CreateUIDefault();
+	if (pPlayer == nullptr)
+		return;
 
-		if (pUI == nullptr)
-			continue;
+	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	D3DXVECTOR3 posGate = posPlayer + pPlayer->GetForward() * DIST_GATE;
 
-		int nIdx = Texture::GetIdx(apPath[i]);
-		pUI->SetIdxTexture(nIdx);
-		mapUI[i] = pUI;
+	m_pGate->SetSize(SIZE_GATE.x, SIZE_GATE.y);
+	m_pGate->SetPosition(posGate);
 
-		D3DXVECTOR3 posUI = pUI->GetPosition();
-		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
-		pUI->SetPosition(posUI);
-		pUI->SetVtx();
+	float fAngle = atan2f(pPlayer->GetForward().x, pPlayer->GetForward().z);
 
-		// 制限値の設定
-		pTutorial->AddLimit(i, aTime[i]);
-	}
+	m_pGate->SetRotation(D3DXVECTOR3(ROT_GATE.x, fAngle, 0.0f));
 
-	*pMapUI = mapUI;
+	m_pGate->EnableCull(false);
 }
 
 //=====================================================
 // 終了
 //=====================================================
-void CStateTutorialFree::Uninit(CTutorial *pTutorial)
+void CStateTutorialEnd::Uninit(CTutorial *pTutorial)
 {
+	if (m_pGate != nullptr)
+	{
+		m_pGate->Uninit();
+		m_pGate = nullptr;
+	}
+
 	CStateResult::Uninit(pTutorial);
 }
 
 //=====================================================
 // 更新
 //=====================================================
-void CStateTutorialFree::Update(CTutorial *pTutorial)
+void CStateTutorialEnd::Update(CTutorial *pTutorial)
 {
-	CInputManager *pInputManager = CInputManager::GetInstance();
 	CPlayer *pPlayer = CPlayer::GetInstance();
 
-	if (pInputManager == nullptr || pPlayer == nullptr)
+	if (pPlayer == nullptr)
 		return;
-	
-	if (pInputManager->GetTrigger(CInputManager::BUTTON_ENTER))
-	{// チュートリアルを終了
-		pTutorial->EnableEnd(true);
+
+	// ゲートに入ったら本編へ
+	CollidePlayer(pTutorial);
+}
+
+//=====================================================
+// ゲートとプレイヤーとの判定
+//=====================================================
+void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (m_pGate == nullptr || pPlayer == nullptr)
+		return;
+
+	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
+	D3DXVECTOR3 pos = m_pGate->GetPosition();
+	D3DXVECTOR3 rot = m_pGate->GetRotation();
+	float fWidth = m_pGate->GetWidth();
+
+	D3DXVECTOR3 posStart = { pos.x + sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z + cosf(rot.y) * fWidth };
+	D3DXVECTOR3 posEnd = { pos.x - sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z - cosf(rot.y) * fWidth };
+
+	float fCross = 0.0f;
+
+	bool bHit = universal::IsCross(posPlayer,		// プレイヤーの位置
+		posStart,		// ゴールの始点
+		posEnd,			// ゴールの終点
+		&fCross,		// 交点の割合
+		posPlayer + movePlayer);	// プレイヤーの移動量
+
+	bool bHitNext = universal::IsCross(posPlayer + movePlayer,		// プレイヤーの次回の位置
+		posStart,		// ゴールの始点
+		posEnd,			// ゴールの終点
+		nullptr,		// 交点の割合
+		posPlayer + movePlayer);	// プレイヤーの移動量
+
+	// 外積の判定
+	if (!bHit && bHitNext)
+	{
+		if (fCross >= 0.0f && fCross <= 1.0f)
+		{// 始点と終点の間を通った時、ゲームを開始
+			pTutorial->StartGame();
+
+			pTutorial->Uninit();
+
+			return;
+		}
 	}
+
+#ifdef _DEBUG
+	CEffect3D::Create(posStart, 400.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CEffect3D::Create(posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+#endif
 }
 
 namespace Tutorial

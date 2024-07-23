@@ -171,7 +171,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 
 			if ((dwCurrentTime - dwExecLastTime) >= (1000 / 60))
 			{//60分の1秒経過
-				float fDeltaTime = ((long)dwCurrentTime - (long)dwExecLastTime) * 0.001f;
+				float fDeltaTime = (dwCurrentTime - dwExecLastTime) * 0.001f;
 
 				CDebugProc::GetInstance()->Print("\nデルタタイム[%f]", fDeltaTime);
 				CDebugProc::GetInstance()->Print("\nCurrentTime[%d]", dwCurrentTime);
