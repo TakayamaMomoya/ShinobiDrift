@@ -91,6 +91,63 @@ private:
 	};
 };
 
+class CStateTutorialDrift : public CStateTutorial
+{// ドリフトのチュートリアル
+public:
+	CStateTutorialDrift();	// コンストラクタ
+	virtual ~CStateTutorialDrift();	 // デストラクタ
+
+	// メンバ関数
+	void Init(CTutorial *pTutorial) override;	// 初期化処理
+	void Uninit(CTutorial *pTutorial) override;	// 終了処理
+	void Update(CTutorial *pTutorial) override;	// 更新処理
+
+private:
+	enum E_MENU
+	{// メニュー項目
+		MENU_DRIFT = 0,	// ドリフト
+		MENU_MAX
+	};
+};
+
+class CStateTutorialParry : public CStateTutorial
+{// パリィのチュートリアル
+public:
+	CStateTutorialParry();	// コンストラクタ
+	virtual ~CStateTutorialParry();	 // デストラクタ
+
+	// メンバ関数
+	void Init(CTutorial *pTutorial) override;	// 初期化処理
+	void Uninit(CTutorial *pTutorial) override;	// 終了処理
+	void Update(CTutorial *pTutorial) override;	// 更新処理
+
+private:
+	enum E_MENU
+	{// メニュー項目
+		MENU_PARRY = 0,	// パリィ
+		MENU_MAX
+	};
+};
+
+class CStateTutorialFree : public CStateTutorial
+{// フリーのチュートリアル
+public:
+	CStateTutorialFree();	// コンストラクタ
+	virtual ~CStateTutorialFree();	 // デストラクタ
+
+	// メンバ関数
+	void Init(CTutorial *pTutorial) override;	// 初期化処理
+	void Uninit(CTutorial *pTutorial) override;	// 終了処理
+	void Update(CTutorial *pTutorial) override;	// 更新処理
+
+private:
+	enum E_MENU
+	{// メニュー項目
+		MENU_FREE = 0,	// フリー
+		MENU_MAX
+	};
+};
+
 namespace Tutorial
 {
 CUI *CreateUIDefault(void);
