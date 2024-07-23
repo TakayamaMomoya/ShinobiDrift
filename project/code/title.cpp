@@ -220,7 +220,7 @@ void CTitle::Update(void)
 //=====================================================
 void CTitle::Draw(void)
 {
-
+	
 }
 
 //=====================================================
@@ -420,6 +420,9 @@ void CTitleMenu::Update(CTitle *pTitle)
 			m_apMenu[i]->SetCol(col);
 		}
 	}
+
+	if (m_bFade)
+		pTitle->ChangeBehavior(new CTitleMovePlayer);
 }
 
 void CTitleMenu::Input(void)
@@ -445,31 +448,33 @@ void CTitleMenu::Input(void)
 
 	if (pInput->GetTrigger(CInputManager::BUTTON_ENTER))
 	{// フェード処理
-		Fade();
+		//Fade();
+
+		m_bFade = true;
 	}
 }
 
-void CTitleMenu::Fade(void)
-{// 各種フェード
-	CFade *pFade = CFade::GetInstance();
-
-	if (pFade == nullptr)
-		return;
-
-	if (pFade->GetState() != CFade::FADE_NONE)
-		return;
-
-	switch (m_menu)
-	{
-	case CTitleMenu::MENU_GAME:
-
-		pFade->SetFade(CScene::MODE_GAME);
-
-		break;
-	default:
-		break;
-	}
-}
+//void CTitleMenu::Fade(void)
+//{// 各種フェード
+//	CFade *pFade = CFade::GetInstance();
+//
+//	if (pFade == nullptr)
+//		return;
+//
+//	if (pFade->GetState() != CFade::FADE_NONE)
+//		return;
+//
+//	switch (m_menu)
+//	{
+//	case CTitleMenu::MENU_GAME:
+//
+//		//pFade->SetFade(CScene::MODE_GAME);
+//		m_bFade = true;
+//		break;
+//	default:
+//		break;
+//	}
+//}
 
 void CTitleMenu::ManageCursor(void)
 {// カーソルの制御
@@ -487,4 +492,45 @@ void CTitleMenu::ManageCursor(void)
 
 	m_pCursor->SetPosition(pos);
 	m_pCursor->SetVtx();
+}
+
+CTitleMovePlayer::CTitleMovePlayer()
+{// コンストラクタ
+
+}
+
+CTitleMovePlayer::~CTitleMovePlayer()
+{// デストラクタ
+
+}
+
+void CTitleMovePlayer::Update(CTitle* pTItle)
+{// 更新処理
+
+	D3DXVECTOR3 BikePos = pTItle->GetBike()->GetPosition();
+
+	BikePos.z += 20.0f;
+
+	pTItle->GetBike()->SetPosition(BikePos);
+
+	pTItle->GetPlayer()->SetPosition(D3DXVECTOR3(0.0f, 50.0f, -10.0f));
+	pTItle->GetPlayer()->SetMatrixParent(pTItle->GetBike()->GetMatrix());
+
+	// フェード処理
+	if (BikePos.z >= 900.0f)
+		Fade();
+}
+
+void CTitleMovePlayer::Fade(void)
+{// フェード
+
+	CFade* pFade = CFade::GetInstance();
+
+	if (pFade == nullptr)
+		return;
+
+	if (pFade->GetState() != CFade::FADE_NONE)
+		return;
+
+	pFade->SetFade(CScene::MODE_GAME);
 }
