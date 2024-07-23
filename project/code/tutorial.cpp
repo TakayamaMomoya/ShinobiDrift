@@ -17,6 +17,7 @@
 #include "debugproc.h"
 #include "manager.h"
 #include "texture.h"
+#include "effect3D.h"
 
 //*****************************************************
 // 定数定義
@@ -34,7 +35,7 @@ const float TIME_BRAKE = 3.0f;	// ブレーキに必要な時間
 //=====================================================
 // コンストラクタ
 //=====================================================
-CTutorial::CTutorial() : CObject(1), m_pState(nullptr)
+CTutorial::CTutorial() : CObject(1), m_pState(nullptr), m_pGate(nullptr)
 {
 
 }
@@ -103,11 +104,7 @@ void CTutorial::Update(void)
 
 	if (IsEnd())
 	{// チュートリアルの終了
-		StartGame();
-
-		Uninit();
-
-		return;
+		CollidePlayer();
 	}
 }
 
@@ -126,6 +123,63 @@ void CTutorial::StartGame(void)
 {
 	// タイマーの生成
 	CTimer::Create();
+}
+
+//=====================================================
+// プレイヤーとの判定
+//=====================================================
+void CTutorial::CollidePlayer(void)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (m_pGate == nullptr || pPlayer == nullptr)
+		return;
+
+	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
+	D3DXVECTOR3 pos = m_pGate->GetPosition();
+	D3DXVECTOR3 rot = m_pGate->GetRotation();
+	float fWidth = m_pGate->GetWidth();
+
+	D3DXVECTOR3 posStart = { pos.x + sinf(rot.y) * fWidth, pos.y, pos.z + cosf(rot.y) * fWidth };
+	D3DXVECTOR3 posEnd = { pos.x - sinf(rot.y) * fWidth, pos.y, pos.z - cosf(rot.y) * fWidth };
+
+	float fCross = 0.0f;
+
+	bool bHit = universal::IsCross(posPlayer,		// プレイヤーの位置
+		posStart,		// ゴールの始点
+		posEnd,			// ゴールの終点
+		&fCross,		// 交点の割合
+		posPlayer + movePlayer);	// プレイヤーの移動量
+
+	bool bHitNext = universal::IsCross(posPlayer + movePlayer,		// プレイヤーの次回の位置
+		posStart,		// ゴールの始点
+		posEnd,			// ゴールの終点
+		nullptr,		// 交点の割合
+		posPlayer + movePlayer);	// プレイヤーの移動量
+
+	// 外積の判定
+	if (!bHit && bHitNext)
+	{
+		if (fCross >= 0.0f && fCross <= 1.0f)
+		{// 始点と終点の間を通った時、ゲームを開始
+			StartGame();
+		}
+	}
+
+#ifdef _DEBUG
+	CEffect3D::Create(posStart, 400.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CEffect3D::Create(posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+#endif
+
+	if (false)
+	{// ゲームが始まる瞬間
+		StartGame();
+
+		Uninit();
+
+		return;
+	}
 }
 
 //=====================================================

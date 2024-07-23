@@ -17,6 +17,7 @@
 //*****************************************************
 class CUI;
 class CStateResult;
+class CPolygon3D;
 
 //*****************************************************
 // クラスの定義
@@ -48,6 +49,7 @@ public:
 private:
 	// メンバ関数
 	void StartGame(void);	// ゲーム開始の処理
+	void CollidePlayer(void);	// プレイヤーとの判定
 
 	// メンバ変数
 	std::map<int, CUI*> m_mapUI;	// UIのマップコンテナ
@@ -55,7 +57,7 @@ private:
 	std::map<int, float> m_mapLimit;	// リミットのマップコンテナ
 	CStateResult *m_pState;	// ステイトのポインタ
 	bool m_bEnd;	// 終了フラグ
-
+	CPolygon3D *m_pGate;	// ゲートのポリゴン
 };
 
 class CStateResult

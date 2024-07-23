@@ -13,6 +13,7 @@
 #include "inputkeyboard.h"
 #include "object.h"
 #include "renderer.h"
+#include "debugproc.h"
 
 //*****************************************************
 // プロトタイプ宣言
@@ -170,7 +171,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hInstancePrev, LPSTR lpCmdLine
 
 			if ((dwCurrentTime - dwExecLastTime) >= (1000 / 60))
 			{//60分の1秒経過
-				float fDeltaTime = ((float)dwCurrentTime - (float)dwExecLastTime) * 0.001f;
+				float fDeltaTime = ((long)dwCurrentTime - (long)dwExecLastTime) * 0.001f;
+
+				CDebugProc::GetInstance()->Print("\nデルタタイム[%f]", fDeltaTime);
+				CDebugProc::GetInstance()->Print("\nCurrentTime[%d]", dwCurrentTime);
+				CDebugProc::GetInstance()->Print("\nLastTime[%dw]", dwExecLastTime);
 
 				//処理開始の時刻を計算
 				dwExecLastTime = dwCurrentTime;
