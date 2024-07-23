@@ -23,7 +23,7 @@ namespace
 const int SECOND = 140;		// メーターの表示値
 const int PLACE = 3;		// 桁数
 const float WIDTH = SCREEN_WIDTH * 0.80f;		// 幅
-const float HEIGHT = SCREEN_HEIGHT * 0.83f;		// 高さ
+const float HEIGHT = SCREEN_HEIGHT * 0.9f;		// 高さ
 }
 
 //=====================================================
@@ -92,22 +92,7 @@ HRESULT CMeter::Init()
 	CTexture* pTexture = CTexture::GetInstance();
 
 	// テクスチャ番号
-	m_nIdxTexture = pTexture->Regist("data\\TEXTURE\\UI\\1st.png");
-
-	if (m_pNumber == nullptr)
-	{
-		// 生成
-		m_pNumber = CNumber::Create(PLACE, 0);
-
-		// 位置設定
-		m_pNumber->SetPosition(D3DXVECTOR3(WIDTH, HEIGHT, 0.0f));
-
-		// サイズ調整
-		m_pNumber->SetSizeAll(35.0f, 35.0f);
-
-		// 色設定
-		m_pNumber->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-	}
+	m_nIdxTexture = pTexture->Regist("data\\TEXTURE\\UI\\Needle.png");
 
 	if (m_pUI == nullptr)
 	{
@@ -121,13 +106,31 @@ HRESULT CMeter::Init()
 		m_pUI->SetPosition(D3DXVECTOR3(1100, 600.0f, 0.0f));
 
 		// サイズ設定
-		m_pUI->SetSize(50.0f, 35.0f);
+		m_pUI->SetSize(75.0f, 100.0f);
 
 		// 向き設定
 		m_pUI->SetRotation(0.0f);
 
 		// 頂点情報設定
 		m_pUI->SetVtx();
+
+		// 色設定
+		m_pUI->SetCol(D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f));
+	}
+
+	if (m_pNumber == nullptr)
+	{
+		// 生成
+		m_pNumber = CNumber::Create(PLACE, 0);
+
+		// 位置設定
+		m_pNumber->SetPosition(D3DXVECTOR3(WIDTH, HEIGHT, 0.0f));
+
+		// サイズ調整
+		m_pNumber->SetSizeAll(30.0f, 30.0f);
+
+		// 色設定
+		m_pNumber->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 	}
 
 	return S_OK;
@@ -193,6 +196,7 @@ void CMeter::Acceleration()
 			m_NowMeter = (int)fMaxSpeed;
 		}
 	}
+
 	// メーター値の計算
 	int Meter = m_NowMeter % SECOND;
 
