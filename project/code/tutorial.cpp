@@ -16,6 +16,7 @@
 #include "player.h"
 #include "debugproc.h"
 #include "manager.h"
+#include "texture.h"
 
 //*****************************************************
 // 定数定義
@@ -222,18 +223,14 @@ void CStateTutorialMove::Init(CTutorial *pTutorial)
 	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
 	std::map<int, CUI*> mapUI = *pMapUI;
 
-	// UIの追加
-	// アクセル
-	CUI *pAccel = Tutorial::CreateUIDefault();
-	mapUI[(int)MENU_ACCELE] = pAccel;
+	// パスの一覧
+	const char* apPath[MENU_MAX] =
+	{
+		"data\\TEXTURE\\UI\\tutorial00.png",
+		"data\\TEXTURE\\UI\\tutorial01.png"
+	};
 
-	// ブレーキ
-	CUI *pBrake = Tutorial::CreateUIDefault();
-	mapUI[(int)MENU_BRAKE] = pBrake;
-
-	*pMapUI = mapUI;
-
-	// 制限値の設定
+	// 制限値の一覧
 	float aTime[MENU_MAX] =
 	{
 		TIME_ACCELE,
@@ -242,8 +239,26 @@ void CStateTutorialMove::Init(CTutorial *pTutorial)
 
 	for (int i = 0; i < MENU_MAX; i++)
 	{
+		// 各UIの設定
+		CUI *pUI = Tutorial::CreateUIDefault();
+
+		if (pUI == nullptr)
+			continue;
+
+		int nIdx = Texture::GetIdx(apPath[i]);
+		pUI->SetIdxTexture(nIdx);
+		mapUI[i] = pUI;
+		
+		D3DXVECTOR3 posUI = pUI->GetPosition();
+		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
+		pUI->SetPosition(posUI);
+		pUI->SetVtx();
+
+		// 制限値の設定
 		pTutorial->AddLimit(i, aTime[i]);
 	}
+
+	*pMapUI = mapUI;
 }
 
 //=====================================================
