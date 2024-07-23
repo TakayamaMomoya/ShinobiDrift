@@ -74,6 +74,7 @@ public:
 	CBlockGrab *GetBlock(void) { return m_info.pBlockGrab; }
 	float GetSpeed() { return m_info.fSpeed; }
 	CMotion *GetNInjaBody(void) { return m_pPlayerNinja; }	// ã‚Éæ‚Á‚Ä‚¢‚é”EÒ‚Ìæ“¾
+	bool IsDrift(void) { return m_info.pBlockGrab != nullptr; }	// ƒhƒŠƒtƒg‚µ‚Ä‚¢‚é‚©‚Ç‚¤‚©
 
 private:
 	struct SFragMotion
