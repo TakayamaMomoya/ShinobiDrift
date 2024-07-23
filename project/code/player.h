@@ -77,6 +77,10 @@ public:
 	CMotion *GetNInjaBody(void) { return m_pPlayerNinja; }	// 上に乗っている忍者の取得
 	bool IsDrift(void) { return m_info.pBlockGrab != nullptr; }	// ドリフトしているかどうか
 
+	// 変数取得・設定関数
+	bool IsEnableInput(void) { return m_info.bEnableInput; }	// 入力有効フラグ
+	void SetEnableInput(bool bEnable) { m_info.bEnableInput = bEnable; }
+
 private:
 	struct SFragMotion
 	{
@@ -103,6 +107,7 @@ private:
 		bool bGrabOld;
 		bool bManual;		// マニュアル操作
 		bool bAir;			// 空中にいるかどうか
+		bool bEnableInput;	// 入力有効フラグ
 		float fLengthDrift;
 		float fTimerDriftChange;
 		float fSizeBlurDrift;	// ドリフト時のブラーの強さ

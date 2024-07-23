@@ -149,6 +149,8 @@ HRESULT CPlayer::Init(void)
 	if (pSound != nullptr)
 		pSound->Play(pSound->LABEL_SE_ENGIN);
 
+	m_info.bEnableInput = true;
+
 	return S_OK;
 }
 
@@ -247,16 +249,19 @@ void CPlayer::Update(void)
 		return;
 #endif
 
-	// 入力
-	Input();
-
-	// メッシュロードの配列取得
-	std::list<CMeshRoad*> listRoad = CMeshRoad::GetArray();
-
-	for (auto it : listRoad)
+	if (m_info.bEnableInput)
 	{
-		//当たり判定
-		Collision(it);
+		// 入力
+		Input();
+
+		// メッシュロードの配列取得
+		std::list<CMeshRoad*> listRoad = CMeshRoad::GetArray();
+
+		for (auto it : listRoad)
+		{
+			//当たり判定
+			Collision(it);
+		}
 	}
 
 	// 前回の位置を保存

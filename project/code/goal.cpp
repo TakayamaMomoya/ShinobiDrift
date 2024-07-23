@@ -15,6 +15,7 @@
 #include "fade.h"
 #include "game.h"
 #include "timer.h"
+#include "result.h"
 
 //*****************************************************
 // 定数定義
@@ -151,9 +152,6 @@ void CGoal::Update()
 	// 交点の割合
 	float fCross = 0.0f;
 
-	// 停止フラグ
-	bool IsStop = pTimer->GetFlag();
-
 	// 外積の判定
 	if (universal::IsCross(posPlayer,		// プレイヤーの位置
 		m_posStart,		// ゴールの始点
@@ -165,7 +163,8 @@ void CGoal::Update()
 		{// 始点と終点の間を通った時
 			//CGame::SetState(CGame::STATE::STATE_END);
 
-			IsStop = true;
+			// リザルトの生成
+			CResult::Create();
 
 			CDebugProc::GetInstance()->Print("\nゴールした");
 		}
