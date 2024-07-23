@@ -55,6 +55,7 @@ private:
 	std::map<int, float> m_mapLimit;	// リミットのマップコンテナ
 	CStateResult *m_pState;	// ステイトのポインタ
 	bool m_bEnd;	// 終了フラグ
+
 };
 
 class CStateResult

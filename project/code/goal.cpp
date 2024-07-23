@@ -152,21 +152,25 @@ void CGoal::Update()
 	// 交点の割合
 	float fCross = 0.0f;
 
-	// 外積の判定
-	if (universal::IsCross(posPlayer,		// プレイヤーの位置
+	bool bHit = universal::IsCross(posPlayer,		// プレイヤーの位置
 		m_posStart,		// ゴールの始点
 		m_posEnd,			// ゴールの終点
 		&fCross,		// 交点の割合
-		posPlayer + movePlayer))	// プレイヤーの移動量
+		posPlayer + movePlayer);	// プレイヤーの移動量
+
+	bool bHitNext = universal::IsCross(posPlayer + movePlayer,		// プレイヤーの次回の位置
+		m_posStart,		// ゴールの始点
+		m_posEnd,			// ゴールの終点
+		nullptr,		// 交点の割合
+		posPlayer + movePlayer);	// プレイヤーの移動量
+
+	// 外積の判定
+	if (!bHit && bHitNext)
 	{
 		if (fCross >= 0.0f && fCross <= 1.0f)
 		{// 始点と終点の間を通った時
-			//CGame::SetState(CGame::STATE::STATE_END);
-
 			// リザルトの生成
 			CResult::Create();
-
-			CDebugProc::GetInstance()->Print("\nゴールした");
 		}
 	}
 
@@ -175,10 +179,12 @@ void CGoal::Update()
 	CEffect3D::Create(m_posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif
 
-#if 0
+#if 1
 	CDebugProc::GetInstance()->Print("\nfCrossの値[%f]", fCross);
-	CDebugProc::GetInstance()->Print("\nstartPosの位置[%f, %f, %f]", m_posStart.x, m_posStart.y, m_posStart.z);
-	CDebugProc::GetInstance()->Print("\nendPosの位置[%f, %f, %f]", m_posEnd.x, m_posEnd.y, m_posEnd.z);
+	CDebugProc::GetInstance()->Print("\nbHit[%d]", bHit);
+	CDebugProc::GetInstance()->Print("\nbHitOld[%d]", bHitNext);
+	//CDebugProc::GetInstance()->Print("\nstartPosの位置[%f, %f, %f]", m_posStart.x, m_posStart.y, m_posStart.z);
+	//CDebugProc::GetInstance()->Print("\nendPosの位置[%f, %f, %f]", m_posEnd.x, m_posEnd.y, m_posEnd.z);
 #endif
 }
 
