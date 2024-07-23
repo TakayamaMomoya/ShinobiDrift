@@ -113,8 +113,8 @@ HRESULT CGame::Init(void)
 	CMeter::Create();
 
 	// ゴール生成
-	CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), 0.0f);
-	//CGoal::Create(D3DXVECTOR3(12726.0f, 2500.7f, -27695.0f), 0.0f);
+	//CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), 0.0f);
+	CGoal::Create(D3DXVECTOR3(12726.0f, 2500.7f, -27695.0f), 0.0f);
 
 	// メッシュロード生成
 	CMeshRoad::Create(PATH_GAME_ROAD);
@@ -205,7 +205,7 @@ void CGame::ManageState(void)
 
 		if (m_nCntState >= TRANS_TIME && pFade != nullptr)
 		{
-			pFade->SetFade(CScene::MODE_TITLE);
+			pFade->SetFade(CScene::MODE_RANKING);
 		}
 
 		break;

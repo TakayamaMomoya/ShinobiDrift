@@ -15,13 +15,15 @@
 #include "cameraState.h"
 #include "inputManager.h"
 #include "game.h"
+#include "number.h"
+#include "timer.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-
+const D3DXVECTOR3 POS_DISP_TIME = { SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.4f, 0.0f };	// タイムの表示位置
 }
 
 //=====================================================
@@ -175,7 +177,7 @@ void CStateResult::Uninit(CResult *pResult)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateResultDispTime::CStateResultDispTime()
+CStateResultDispTime::CStateResultDispTime() : m_apTime()
 {
 
 }
@@ -193,7 +195,33 @@ CStateResultDispTime::~CStateResultDispTime()
 //=====================================================
 void CStateResultDispTime::Init(CResult *pResult)
 {
+	// 数字の設定
+	SetNumber();
+}
 
+//=====================================================
+// 数字の設定
+//=====================================================
+void CStateResultDispTime::SetNumber(void)
+{
+	CTimer *pTime = CTimer::GetInstance();
+
+	if (pTime == nullptr)
+		return;
+
+	int aTime[NUMBER_MAX] =
+	{
+		pTime->GetMinutes(),
+		(int)pTime->GetSecond(),
+		(int)pTime->GetMilli()
+	};
+
+	for (int i = 0; i < NUMBER_MAX; i++)
+	{
+		m_apTime[i] = CNumber::Create(2, aTime[i]);
+
+
+	}
 }
 
 //=====================================================

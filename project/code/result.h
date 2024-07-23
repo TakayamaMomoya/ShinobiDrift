@@ -17,6 +17,7 @@
 //*****************************************************
 class CUI;
 class CStateResult;
+class CNumber;
 
 //*****************************************************
 // クラスの定義
@@ -74,6 +75,19 @@ public:
 	void Update(CResult *pResult) override;	// 更新処理
 
 private:
+	enum E_NUMBER
+	{
+		NUMBER_MINUTE = 0,	// 分表示
+		NUMBER_SECOND,	// 秒表示
+		NUMBER_MILLISSEC,	// ミリ秒表示
+		NUMBER_MAX
+	};
+
+	// メンバ関数
+	void SetNumber(void);	// 数字の設定
+
+	// メンバ変数
+	CNumber *m_apTime[NUMBER_MAX];	// 数字のポインタ配列
 };
 
 namespace Tutorial
