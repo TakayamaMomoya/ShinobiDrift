@@ -497,6 +497,19 @@ void CTitleMenu::ManageCursor(void)
 CTitleMovePlayer::CTitleMovePlayer()
 {// コンストラクタ
 
+	// カメラ位置の設定
+	CCamera* pCamera = CManager::GetCamera();
+
+	if (pCamera == nullptr)
+		return;
+
+	CCamera::Camera* pInfoCamera = pCamera->GetCamera();
+
+	Camera::ChangeState(nullptr);
+
+	pInfoCamera->posVDest = { -30.0f, 225.0f, 350.0f };
+	pInfoCamera->posRDest = { -154.31f, 250.62f, 600.51f };
+	//pInfoCamera->posR = { -154.31f, 82.62f, 600.51f };
 }
 
 CTitleMovePlayer::~CTitleMovePlayer()
@@ -507,17 +520,39 @@ CTitleMovePlayer::~CTitleMovePlayer()
 void CTitleMovePlayer::Update(CTitle* pTItle)
 {// 更新処理
 
+	if(pTItle->GetPlayer()->GetMotion() != CPlayer::MOTION_NINJA_SLASHDOWN)
+	   pTItle->GetPlayer()->SetMotion(CPlayer::MOTION_NINJA_SLASHDOWN);
+
+	// カメラ位置の設定
+	CCamera* pCamera = CManager::GetCamera();
+
+	if (pCamera == nullptr)
+		return;
+
+	pCamera->MoveDist(0.07f);
+
 	D3DXVECTOR3 BikePos = pTItle->GetBike()->GetPosition();
 
-	BikePos.z += 20.0f;
+	// モーションが終了していたらバイクの前進させる
+	if (pTItle->GetPlayer()->IsFinish())
+	{
+		float f = pTItle->GetPlayer()->GetMove().z;
+		float MoveZ = (f + 0.03f) * 1.1f;
 
-	pTItle->GetBike()->SetPosition(BikePos);
+		pTItle->GetPlayer()->SetMove({ 0.0f, 0.0f, MoveZ });
 
-	pTItle->GetPlayer()->SetPosition(D3DXVECTOR3(0.0f, 50.0f, -10.0f));
-	pTItle->GetPlayer()->SetMatrixParent(pTItle->GetBike()->GetMatrix());
+		BikePos.z += MoveZ;
+
+		// バイクの位置設定
+		pTItle->GetBike()->SetPosition(BikePos);
+
+		// バイクに乗った忍者の追従
+		pTItle->GetPlayer()->SetPosition(D3DXVECTOR3(0.0f, 50.0f, -10.0f));
+		pTItle->GetPlayer()->SetMatrixParent(pTItle->GetBike()->GetMatrix());
+	}
 
 	// フェード処理
-	if (BikePos.z >= 900.0f)
+	if (BikePos.z >= 2000.0f)
 		Fade();
 }
 
