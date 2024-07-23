@@ -11,6 +11,8 @@
 #include "timer.h"
 #include "manager.h"
 #include "debugproc.h"
+#include "goal.h"
+#include "player.h"
 
 //*****************************************************
 // 定数定義
@@ -18,7 +20,7 @@
 namespace
 {
 const int MINUTES_LIMIT = 9;		// 分の上限値
-const int SECOND_LIMIT = 60;		// 秒の上限値
+const int SECOND_LIMIT = 59;		// 秒の上限値
 const int MILLI_LIMIT = 99;			// ミリ秒の上限
 const int MINUTES_DIGIT = 1;		// 分表示の桁数
 const int TIME_DIGIT = 2;			// それぞれの桁数
@@ -40,6 +42,7 @@ CTimer::CTimer(int nPriority) : CObject(nPriority)
 {
 	m_fSecond = 0.0f;			// 現在の時間(秒)
 	m_fMilli = 0.0f;			// 現在の時間(ミリ秒)
+	m_IsStop = false;
 	m_pMinutes = nullptr;		// 分表示のポインタ
 	m_pSecond = nullptr;		// 秒表示用のポインタ
 	m_pMilli = nullptr;			// ミリセカンド表示用のポインタ
@@ -103,6 +106,8 @@ HRESULT CTimer::Init(void)
 	m_fSecond = 0.0f;
 	m_fMilli = 0.0f;
 
+	m_IsStop = false;	// タイマー停止のフラグ
+
 	return S_OK;
 }
 
@@ -143,7 +148,10 @@ void CTimer::Uninit(void)
 void CTimer::Update(void)
 {
 	// 分の更新
-	Minutes();
+	if (!m_IsStop)
+	{
+		Minutes();
+	}
 }
 
 //=====================================================
