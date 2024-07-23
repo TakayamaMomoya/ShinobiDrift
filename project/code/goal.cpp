@@ -13,16 +13,17 @@
 #include "debugproc.h"
 #include "effect3D.h"
 #include "fade.h"
-#include "polygon3D.h"
 #include "game.h"
+#include "timer.h"
+#include "result.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-	const float MOVESPEED = 4.0f;	// 移動速度
-	const float WIDTH_GOAL = 100.0f;	// ゴールの幅
+const float MOVESPEED = 4.0f;	// 移動速度
+const float WIDTH_GOAL = 100.0f;	// ゴールの幅
 }
 
 //*****************************************************
@@ -120,6 +121,7 @@ void CGoal::Uninit()
 
 	if (m_pObj3D != nullptr)
 	{
+		m_pObj3D->Uninit();
 		m_pObj3D = nullptr;
 	}
 
@@ -144,6 +146,9 @@ void CGoal::Update()
 	// 移動量取得
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
 
+	// タイマーの取得
+	CTimer* pTimer = CTimer::GetInstance();
+
 	// 交点の割合
 	float fCross = 0.0f;
 
@@ -158,12 +163,15 @@ void CGoal::Update()
 		{// 始点と終点の間を通った時
 			//CGame::SetState(CGame::STATE::STATE_END);
 
+			// リザルトの生成
+			CResult::Create();
+
 			CDebugProc::GetInstance()->Print("\nゴールした");
 		}
 	}
 
 #ifdef _DEBUG
-	CEffect3D::Create(m_posStart, 200.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CEffect3D::Create(m_posStart, 400.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
 	CEffect3D::Create(m_posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif
 

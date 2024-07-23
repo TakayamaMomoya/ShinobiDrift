@@ -18,6 +18,7 @@
 class CBlockGrab;
 class CPolygon3D;
 class CPlayerNinja;
+class CEffekseerEffect;
 
 //*****************************************************
 // クラスの定義
@@ -28,15 +29,19 @@ public:
 	CPlayerNinja(int nPriority = 4);	// コンストラクタ
 	~CPlayerNinja();	// デストラクタ
 
-	static CPlayerNinja *Create(void);
-	HRESULT Init(void);
-	void Uninit(void);
-	void Update(void);
-	void Draw(void);
+	// メンバ関数
+	HRESULT Init(void);	// 初期化
+	void Uninit(void);	// 終了
+	void Update(void);	// 更新
+	void Draw(void);	// 描画
+
+	// 静的メンバ関数
+	static CPlayerNinja *Create(void);	// 生成
 
 private:
-	void Event(EVENT_INFO *pEventInfo);
-	void ManagekatanaCollision(D3DXVECTOR3 pos);
+	// メンバ関数
+	void Event(EVENT_INFO *pEventInfo);	// イベント
+	void ManagekatanaCollision(D3DXVECTOR3 pos);	// 刀の判定の管理
 };
 
 #endif

@@ -16,7 +16,7 @@
 // 前方宣言
 //*****************************************************
 class CUI;
-class CStateTutorial;
+class CStateResult;
 
 //*****************************************************
 // クラスの定義
@@ -32,7 +32,7 @@ public:
 	virtual void Uninit(void);	// 終了
 	virtual void Update();	// 更新
 	virtual void Draw();	// 描画
-	void ChangeState(CStateTutorial *pState);	// ステイトの変更
+	void ChangeState(CStateResult *pState);	// ステイトの変更
 	void AddLimit(int nIdx, float fValue);	// 制限値の追加
 
 	// 変数取得・設定関数
@@ -53,15 +53,15 @@ private:
 	std::map<int, CUI*> m_mapUI;	// UIのマップコンテナ
 	std::map<int, float> m_mapCounter;	// カウンターのマップコンテナ
 	std::map<int, float> m_mapLimit;	// リミットのマップコンテナ
-	CStateTutorial *m_pState;	// ステイトのポインタ
+	CStateResult *m_pState;	// ステイトのポインタ
 	bool m_bEnd;	// 終了フラグ
 };
 
-class CStateTutorial
+class CStateResult
 {// ステイトの基底クラス
 public:
-	CStateTutorial() {};	// コンストラクタ
-	virtual ~CStateTutorial() {};	 // デストラクタ
+	CStateResult() {};	// コンストラクタ
+	virtual ~CStateResult() {};	 // デストラクタ
 
 	// メンバ関数
 	virtual void Init(CTutorial *pTutorial) = 0;	// 初期化処理
@@ -71,7 +71,7 @@ public:
 private:
 };
 
-class CStateTutorialMove : public CStateTutorial
+class CStateTutorialMove : public CStateResult
 {// 移動のチュートリアル
 public:
 	CStateTutorialMove();	// コンストラクタ
@@ -91,7 +91,7 @@ private:
 	};
 };
 
-class CStateTutorialDrift : public CStateTutorial
+class CStateTutorialDrift : public CStateResult
 {// ドリフトのチュートリアル
 public:
 	CStateTutorialDrift();	// コンストラクタ
@@ -110,7 +110,7 @@ private:
 	};
 };
 
-class CStateTutorialParry : public CStateTutorial
+class CStateTutorialParry : public CStateResult
 {// パリィのチュートリアル
 public:
 	CStateTutorialParry();	// コンストラクタ
@@ -129,7 +129,7 @@ private:
 	};
 };
 
-class CStateTutorialFree : public CStateTutorial
+class CStateTutorialFree : public CStateResult
 {// フリーのチュートリアル
 public:
 	CStateTutorialFree();	// コンストラクタ
