@@ -328,7 +328,7 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3* move, D3DXVECTO
 			continue;
 
 		// ƒK[ƒhƒŒ[ƒ‹‚Ì‚‚³ˆÈ“à‚Å”»’è‚·‚é
-		if (m_fHeight < pos->y - pVtx[0].pos.y)
+		if (m_fHeight < pos->y - pVtx[0].pos.y || pos->y < pVtx[0].pos.y - m_fHeight)
 			continue;
 
 		if (D3DXVec3Dot(&(*pos - pVtx[0].pos), &(pVtx[2].pos - pVtx[0].pos)) < 0.0f ||

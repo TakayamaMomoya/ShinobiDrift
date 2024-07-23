@@ -35,7 +35,7 @@ public:
 	void Update(void);
 	void Draw(void);
 
-	void SetPositionOffset(D3DXMATRIX mtxWorld, int nIdxOrbit);
+	void SetOffset(D3DXMATRIX mtxWorld, D3DXCOLOR col, int nIdxOrbit);
 	static COrbit *Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 posOffset1, D3DXVECTOR3 posOffset2, D3DXCOLOR col, int nNumEdge);
 	bool IsEnd(void) { return m_bEnd; }
 	void SetEnd(bool bEnd) { m_bEnd = bEnd; }
@@ -49,7 +49,7 @@ private:
 	D3DXMATRIX m_mtxWorld;		// ワールドマトリックス
 	D3DXVECTOR3 m_posOffset[NUM_OFFSET];	// オフセット位置
 	D3DXVECTOR3 m_aPosPoint[MAX_EDGE][NUM_OFFSET];	// 頂点座標保存用
-	D3DXCOLOR m_col;	// 色
+	D3DXCOLOR m_colOffset[NUM_OFFSET];	// 色
 	D3DXCOLOR m_aColPoint[MAX_EDGE][NUM_OFFSET];	// 頂点カラー保存用
 	D3DXMATRIX m_aMtxOffset[NUM_OFFSET];	// オフセットのマトリックス
 	int m_nNumEdge;	//辺の数

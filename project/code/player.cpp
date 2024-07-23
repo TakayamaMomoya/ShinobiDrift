@@ -38,7 +38,7 @@ namespace
 {
 const std::string PATH_PARAM = "data\\TEXT\\playerParam.txt";	// パラメーターデータのパス
 const float NOTROTATE = 1.0f;		// 回転しないようにする値
-const float DIST_LIMIT = 3000.0f;	// ワイヤー制限距離
+const float DIST_LIMIT = 5000.0f;	// ワイヤー制限距離
 const float LINE_CORRECT_DRIFT = 40.0f;	// ドリフト補正のしきい値
 const float SIZE_BLUR = -20.0f;	// ブラーのサイズ
 const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
@@ -47,6 +47,7 @@ const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,2.0f,0.0f };	// 初期向き
 const float SE_CHANGE_SPEED = 10.0f;  // エンジン音とアクセル音が切り替わる速度の値
 const float HANDLE_INERTIA = 0.03f;  // カーブ時の角度変更慣性
 const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性
+const float HANDLE_INERTIA_DRIFT = 0.08f;  // ドリフト時の角度変更慣性
 const float HANDLE_CURVE_MAG = -0.04f;  // 体勢からカーブへの倍率
 }
 
@@ -140,7 +141,8 @@ HRESULT CPlayer::Init(void)
 	SetRotation(DEFAULT_ROT);
 
 	// テールランプ用軌跡の生成
-	m_info.pOrbit = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60);
+	m_info.orbitColor = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+	m_info.pOrbit = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), m_info.orbitColor, 60);
 
 	// サウンドインスタンスの取得
 	CSound* pSound = CSound::GetInstance();
@@ -225,6 +227,7 @@ void CPlayer::Load(void)
 void CPlayer::Uninit(void)
 {
 	m_pPlayer = nullptr;
+	m_info.pOrbit->Uninit();
 
 	// 継承クラスの終了
 	CMotion::Uninit();
@@ -567,11 +570,11 @@ void CPlayer::ManageRotateGrab(float fAngleDiff)
 {
 	D3DXVECTOR3 rot = GetRotation();
 
-	float fDiff = rot.y - fAngleDiff;
+	float fDiff = m_info.rotDriftStart.y - fAngleDiff;
 
 	universal::LimitRot(&fDiff);
 
-	D3DXVECTOR3 rotDest = rot;
+	D3DXVECTOR3 rotDest = m_info.rotDriftStart;
 
 	if (fDiff > 0.0f)
 	{
@@ -590,9 +593,10 @@ void CPlayer::ManageRotateGrab(float fAngleDiff)
 
 	universal::LimitRot(&rotDest.y);
 
-	universal::FactingRot(&rot.y, rotDest.y, 0.15f);
-
-	SetRotation(rot);
+	//universal::FactingRot(&rot.y, rotDest.y, 0.15f);
+	universal::FactingRot(&m_info.rotDriftStart.y, rotDest.y, 0.15f);
+	
+	//SetRotation(rot);
 }
 
 //=====================================================
@@ -743,6 +747,9 @@ void CPlayer::SarchGrab(void)
 			m_info.pBlockGrab = pBlockGrab;
 
 			m_info.fTimerDriftChange = 0.7f;
+
+			m_info.rotDriftStart = GetRotation();
+			m_info.rotDriftStart.x += D3DX_PI * 0.5f;
 		}
 	}
 }
@@ -758,6 +765,9 @@ void CPlayer::RemoveWire(void)
 	m_info.pBlockGrab = nullptr;
 
 	m_info.fLengthDrift = 0.0f;
+
+	m_info.rotDriftStart.x -= D3DX_PI * 0.5f;
+	universal::LimitRot(&m_info.rotDriftStart.x);
 
 	// ブラーを戻す
 	Blur::ResetBlur();
@@ -1020,6 +1030,7 @@ void CPlayer::ManageSpeed(void)
 	D3DXVECTOR3 pos = GetPosition();
 	D3DXVECTOR3 move = GetMove();
 	D3DXVECTOR3 rot = GetRotation();
+	float rotBlock;
 
 	// スロー状態を考慮した移動量の調整
 	if (pSlow != nullptr)
@@ -1035,7 +1046,37 @@ void CPlayer::ManageSpeed(void)
 		SetPosition(pos);
 	}
 
-	if (m_info.fSpeed >= NOTROTATE)
+	m_info.orbitColor = D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.0f);
+
+	if (m_info.pBlockGrab != nullptr)
+	{
+		// 差分角度の計算
+		D3DXVECTOR3 posPlayer = GetPosition();
+		D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
+		rotBlock = atan2f((posBlock.x - posPlayer.x), (posBlock.z - posPlayer.z));
+		universal::LimitRot(&rotBlock);
+
+		if (D3DXVec3Cross(&posPlayer, &GetMove(), &(posBlock - posPlayer))->y > 0.0f)
+		{
+			rot.z += (-1.0f - rot.z) * HANDLE_INERTIA_DRIFT;
+			m_info.rotDriftDest = 1.57f;
+		}
+		else
+		{
+			rot.z += (1.0f - rot.z) * HANDLE_INERTIA_DRIFT;
+			m_info.rotDriftDest = -1.57f;
+		}
+		
+		universal::LimitRot(&rot.z);
+
+		float rotDef = rotBlock - rot.y;
+		universal::LimitRot(&rotDef);
+		rot.y += (rotDef) * 1.0f;
+		universal::LimitRot(&rot.y);
+
+		m_info.orbitColor = D3DXCOLOR(1.0f, 0.15f, 0.0f, 1.0f);
+	}
+	else if (m_info.fSpeed >= NOTROTATE)
 	{// ハンドルの回転を追加
 		if (m_info.fAngleHandle == 0.0f)
 			rot.z += (m_info.fAngleHandle * m_param.fAngleMaxCurve - rot.z) * HANDLE_INERTIA_RESET;
@@ -1044,8 +1085,11 @@ void CPlayer::ManageSpeed(void)
 		
 		universal::LimitRot(&rot.z);
 
-		rot.y += rot.z * HANDLE_CURVE_MAG;
-		universal::LimitRot(&rot.y);
+		if (fabsf(m_info.rotDriftDest) < 0.02f)
+		{
+			rot.y += rot.z * HANDLE_CURVE_MAG;
+			universal::LimitRot(&rot.y);
+		}
 	}
 	else
 	{
@@ -1053,12 +1097,25 @@ void CPlayer::ManageSpeed(void)
 		universal::LimitRot(&rot.z);
 	}
 
+	if (m_info.pBlockGrab == nullptr)
+	{
+		rot.y += (0.0f - m_info.rotDriftDest) * 0.1f;
+		m_info.rotDriftDest += (0.0f - m_info.rotDriftDest) * 0.1f;
+	}
+
 	SetRotation(rot);
 
 	// 極座標が上を向いている分を補正
 	rot.x += D3DX_PI * 0.5f;
 
-	D3DXVECTOR3 vecForward = universal::PolarCoordinates(rot);
+	if (m_info.pBlockGrab == nullptr)
+	{
+		m_info.rotDriftStart = rot;
+	}
+
+	CDebugProc::GetInstance()->Print("\n調整角度 %f", m_info.rotDriftDest);
+
+	D3DXVECTOR3 vecForward = universal::PolarCoordinates(m_info.rotDriftStart);
 
 	// 現在のスピードと前方ベクトルをかけて移動量に適用
 	move.x = vecForward.x * m_info.fSpeed;
@@ -1067,12 +1124,12 @@ void CPlayer::ManageSpeed(void)
 	move.z = vecForward.z * m_info.fSpeed;
 
 	// 移動量に重力を適用
-	move.y += -0.3f;
+	move.y += -0.5f;
 
 	SetMove(move);
 
 	if (m_info.pOrbit != nullptr)
-		m_info.pOrbit->SetPositionOffset(GetMatrix(), m_info.pOrbit->GetID());
+		m_info.pOrbit->SetOffset(GetMatrix(), m_info.orbitColor, m_info.pOrbit->GetID());
 }
 
 //=====================================================

@@ -89,6 +89,8 @@ HRESULT CEnemy::Init(void)
 //=====================================================
 void CEnemy::Uninit(void)
 {
+	m_info.pOrbit->SetEnd(true);
+
 	// 全ビヘイビア解放
 	ReleaseAllBehaviour();
 
@@ -114,7 +116,7 @@ void CEnemy::Update(void)
 	}
 
 	if (m_info.pOrbit != nullptr)
-		m_info.pOrbit->SetPositionOffset(GetMatrix(), m_info.pOrbit->GetID());
+		m_info.pOrbit->SetOffset(GetMatrix(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), m_info.pOrbit->GetID());
 
 	// モーションの管理
 	ManageMotion();

@@ -27,8 +27,8 @@ COrbit::COrbit(int nPriority) : CObject(nPriority)
 	ZeroMemory(&m_aColPoint[0], sizeof(m_aColPoint));
 	ZeroMemory(&m_aMtxOffset[0], sizeof(m_aMtxOffset));
 	ZeroMemory(&m_aPosPoint[0], sizeof(m_aPosPoint));
-	ZeroMemory(&m_posOffset[0],sizeof(m_posOffset));
-	m_col = { 0.0f,0.0f,0.0f,0.0f };
+	ZeroMemory(&m_posOffset[0], sizeof(m_posOffset));
+	ZeroMemory(&m_colOffset[0],sizeof(m_colOffset));
 	m_nIdxTexture = 0;
 	m_nNumEdge = 0;
 	m_nID = -1;
@@ -141,6 +141,7 @@ void COrbit::UpdatePolygon(void)
 		{
 			//一つ前の座標にずれる
 			m_aPosPoint[nCntVtx - 1][nCntOffset] = m_aPosPoint[nCntVtx][nCntOffset];
+			m_aColPoint[nCntVtx - 1][nCntOffset] = m_aColPoint[nCntVtx][nCntOffset];
 		}
 	}
 
@@ -153,6 +154,7 @@ void COrbit::UpdatePolygon(void)
 			m_aMtxOffset[nCntOffset]._42,
 			m_aMtxOffset[nCntOffset]._43
 		};
+		m_aColPoint[m_nNumEdge - 1][nCntOffset] = m_colOffset[nCntOffset];
 	}
 	//保存した座標をずらす==========
 
@@ -187,7 +189,8 @@ void COrbit::UpdatePolygon(void)
 			pVtx[nCntOffset].pos = m_aPosPoint[nCntVtx][nCntOffset];
 
 			//頂点カラーの設定
-			pVtx[nCntOffset].col = D3DXCOLOR(m_col.r, m_col.g, m_col.b, (float)nCntVtx / m_nNumEdge);
+			D3DXCOLOR col = m_aColPoint[nCntVtx][nCntOffset];
+			pVtx[nCntOffset].col = D3DXCOLOR(col.r, col.g, col.b, col.a * ((float)nCntVtx / m_nNumEdge));
 		}
 
 		//ポインタを進める
@@ -268,7 +271,7 @@ void COrbit::Draw()
 //==========================================
 // 生成処理
 //==========================================
-COrbit *COrbit::Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 m_posOffset1, D3DXVECTOR3 m_posOffset2, D3DXCOLOR col,int nNumEdge)
+COrbit *COrbit::Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 posOffset1, D3DXVECTOR3 posOffset2, D3DXCOLOR col,int nNumEdge)
 {
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
@@ -290,11 +293,12 @@ COrbit *COrbit::Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 m_posOffset1, D3DXVECTOR
 			pOrbit->Init();
 
 			// 色の代入
-			pOrbit->m_col = col;
+			pOrbit->m_colOffset[0] = col;
+			pOrbit->m_colOffset[1] = col;
 
 			// オフセットの代入
-			pOrbit->m_posOffset[0] = m_posOffset1;
-			pOrbit->m_posOffset[1] = m_posOffset2;
+			pOrbit->m_posOffset[0] = posOffset1;
+			pOrbit->m_posOffset[1] = posOffset2;
 
 			// 辺の数の代入
 			pOrbit->m_nNumEdge = nNumEdge;
@@ -303,17 +307,20 @@ COrbit *COrbit::Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 m_posOffset1, D3DXVECTOR
 			{
 				D3DXMATRIX mtx;
 
-				universal::SetOffSet(&mtx, mtxWorld, m_posOffset1);
+				universal::SetOffSet(&mtx, mtxWorld, posOffset1);
 
 				D3DXVECTOR3 pos = { mtx._41,mtx._42 ,mtx._43 };
 
 				pOrbit->m_aPosPoint[nCntVtx][0] = pos;
 
-				universal::SetOffSet(&mtx, mtxWorld, m_posOffset2);
+				universal::SetOffSet(&mtx, mtxWorld, posOffset2);
 
 				pos = { mtx._41,mtx._42 ,mtx._43 };
 
 				pOrbit->m_aPosPoint[nCntVtx][1] = pos;
+
+				pOrbit->m_aColPoint[nCntVtx][0] = col;
+				pOrbit->m_aColPoint[nCntVtx][1] = col;
 			}
 
 			VERTEX_3D *pVtx;		//頂点情報のポインタ
@@ -343,7 +350,7 @@ COrbit *COrbit::Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 m_posOffset1, D3DXVECTOR
 //==========================================
 // 位置設定処理
 //==========================================
-void COrbit::SetPositionOffset(D3DXMATRIX mtxWorld,int nIdxOrbit)
+void COrbit::SetOffset(D3DXMATRIX mtxWorld, D3DXCOLOR col,int nIdxOrbit)
 {
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
@@ -365,6 +372,8 @@ void COrbit::SetPositionOffset(D3DXMATRIX mtxWorld,int nIdxOrbit)
 
 		//ワールドマトリックスの設定
 		pDevice->SetTransform(D3DTS_WORLD, &m_aMtxOffset[nCntOffset]);
+
+		m_colOffset[nCntOffset] = col;
 	}
 
 	//ポリゴン更新処理

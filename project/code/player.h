@@ -105,6 +105,9 @@ private:
 		float fSizeBlurDrift;	// ドリフト時のブラーの強さ
 		float fDesityBlurDrift;	// ドリフト時のブラーの濃さ
 		COrbit* pOrbit;	// テールランプの軌跡
+		D3DXCOLOR orbitColor;	// テールランプの軌跡
+		D3DXVECTOR3 rotDriftStart;	// ドリフトスタート時の角度
+		float rotDriftDest;	// ドリフト終了時の角度補正値
 	};
 
 	void Load(void);
