@@ -21,6 +21,7 @@ class CPolygon3D;
 class CPlayerNinja;
 class CMeshRoad;
 class COrbit;
+class CEffekseerEffect;
 
 //*****************************************************
 // クラスの定義
@@ -76,6 +77,10 @@ public:
 	CMotion *GetNInjaBody(void) { return m_pPlayerNinja; }	// 上に乗っている忍者の取得
 	bool IsDrift(void) { return m_info.pBlockGrab != nullptr; }	// ドリフトしているかどうか
 
+	// 変数取得・設定関数
+	bool IsEnableInput(void) { return m_info.bEnableInput; }	// 入力有効フラグ
+	void SetEnableInput(bool bEnable) { m_info.bEnableInput = bEnable; }
+
 private:
 	struct SFragMotion
 	{
@@ -102,6 +107,7 @@ private:
 		bool bGrabOld;
 		bool bManual;		// マニュアル操作
 		bool bAir;			// 空中にいるかどうか
+		bool bEnableInput;	// 入力有効フラグ
 		float fLengthDrift;
 		float fTimerDriftChange;
 		float fSizeBlurDrift;	// ドリフト時のブラーの強さ
@@ -128,9 +134,11 @@ private:
 	void ManageState(void);
 	void ManageMotion(void);
 	void ManageMotionNinja(void);	// 忍者のモーション管理
+	void ManageSlashEffect(void);	// 斬撃エフェクトの管理
 	void Event(EVENT_INFO *pEventInfo);
 	void Debug(void);
 
+	// メンバ変数
 	SInfo m_info;	// 自身の情報
 	SParam m_param;	// パラメータ情報
 	SFragMotion m_fragMotion;	// モーションのフラグ
@@ -138,7 +146,9 @@ private:
 	CMotion* m_pPlayerNinja;  // バイクに乗っている忍者
 	bool m_bMove = false;     // 移動しているかどうか
 	bool m_bDrift = false;    // ドリフトしているかどうか
+	std::list<CEffekseerEffect*> m_listSlashEffect;	// 斬撃エフェクトのリスト
 
+	// 静的メンバ変数
 	static CPlayer *m_pPlayer;	// 自身のポインタ
 };
 

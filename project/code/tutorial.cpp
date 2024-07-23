@@ -131,7 +131,7 @@ void CTutorial::StartGame(void)
 //=====================================================
 // ステイトの変更
 //=====================================================
-void CTutorial::ChangeState(CStateTutorial *pState)
+void CTutorial::ChangeState(CStateResult *pState)
 {
 	if (m_pState != nullptr)
 	{
@@ -159,7 +159,7 @@ void CTutorial::AddLimit(int nIdx, float fValue)
 //=====================================================
 // ステイトの終了
 //=====================================================
-void CStateTutorial::Uninit(CTutorial *pTutorial)
+void CStateResult::Uninit(CTutorial *pTutorial)
 {
 	// UIのマップコンテナクリア
 	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
@@ -180,7 +180,7 @@ void CStateTutorial::Uninit(CTutorial *pTutorial)
 //=====================================================
 // 終了判定
 //=====================================================
-bool CStateTutorial::IsEndInput(int nNum, CTutorial *pTutorial)
+bool CStateResult::IsEndInput(int nNum, CTutorial *pTutorial)
 {
 	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
 	std::map<int, float> mapLimit = pTutorial->GetMapLimit();
@@ -266,7 +266,7 @@ void CStateTutorialMove::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialMove::Uninit(CTutorial *pTutorial)
 {
-	CStateTutorial::Uninit(pTutorial);
+	CStateResult::Uninit(pTutorial);
 }
 
 //=====================================================
@@ -377,7 +377,7 @@ void CStateTutorialDrift::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialDrift::Uninit(CTutorial *pTutorial)
 {
-	CStateTutorial::Uninit(pTutorial);
+	CStateResult::Uninit(pTutorial);
 }
 
 //=====================================================
@@ -479,7 +479,7 @@ void CStateTutorialParry::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialParry::Uninit(CTutorial *pTutorial)
 {
-	CStateTutorial::Uninit(pTutorial);
+	CStateResult::Uninit(pTutorial);
 }
 
 //=====================================================
@@ -582,7 +582,7 @@ void CStateTutorialFree::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialFree::Uninit(CTutorial *pTutorial)
 {
-	CStateTutorial::Uninit(pTutorial);
+	CStateResult::Uninit(pTutorial);
 }
 
 //=====================================================
