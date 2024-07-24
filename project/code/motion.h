@@ -73,16 +73,17 @@ public:
 		int nIdxParent;
 		CParts *pParts;
 	}Parts;
-
-	// メンバ関数
+	
 	CMotion(int nPriority = 5);	// コンストラクタ
 	~CMotion();	// デストラクタ
+
+	// メンバ関数
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
 	void Load(char *pPath);
-	void MultiplyMtx(void);
+	void MultiplyMtx(bool bDrawParts = true);	// マトリックスをかけ合わせる
 	void SetPosShadow(D3DXVECTOR3 pos) { m_posShadow = pos; }	// 設定処理
 	void SetPositionOld(D3DXVECTOR3 pos) { m_posOld = pos; }	// 設定処理
 	D3DXVECTOR3 GetPositionOld(void) { return m_posOld; }

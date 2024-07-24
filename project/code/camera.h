@@ -50,6 +50,7 @@ public:
 		float fQuakeSizeH;	// 振動のサイズ
 	}Camera;
 
+	// メンバ関数
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
@@ -69,10 +70,11 @@ public:
 	void SetRoll(float fRoll) { m_camera.fRoll = fRoll; }
 	D3DXVECTOR3 GetPosAbove(void) { return m_posAbove; }
 	void SetPosAbove(D3DXVECTOR3 posAbove) { m_posAbove = posAbove; }
+	void SkipToDest(void);	// 目標位置までカメラの視点注視点を動かす
 
 private:
 	Camera m_camera;	// 構造体の情報
-	CCameraState *m_pBehavior;	// 行動のポインタ
+	CCameraState *m_pState;	// ステイトのポインタ
 	D3DXVECTOR3 m_posAbove;	// 上空視点位置
 };
 

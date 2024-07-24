@@ -18,6 +18,7 @@
 #include "manager.h"
 #include "texture.h"
 #include "effect3D.h"
+#include "camera.h"
 
 //*****************************************************
 // 定数定義
@@ -121,6 +122,23 @@ void CTutorial::StartGame(void)
 {
 	// タイマーの生成
 	CTimer::Create();
+
+	// プレイヤーのトランスフォームを設定
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer == nullptr)
+		return;
+
+	pPlayer->SetPosition(Player::DEFAULT_POS);
+	pPlayer->SetRotation(Player::DEFAULT_ROT);
+
+	// カメラの位置を設定
+	CCamera *pCamera = CManager::GetCamera();
+
+	if (pCamera == nullptr)
+		return;
+
+	pCamera->SkipToDest();	// 目標位置までカメラを飛ばす
 }
 
 //=====================================================
@@ -581,7 +599,7 @@ void CStateTutorialEnd::Update(CTutorial *pTutorial)
 	if (pPlayer == nullptr)
 		return;
 
-	// ゲートに入ったら本編へ
+	// ゲートとプレイヤーの判定
 	CollidePlayer(pTutorial);
 }
 
@@ -601,8 +619,8 @@ void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
 	D3DXVECTOR3 rot = m_pGate->GetRotation();
 	float fWidth = m_pGate->GetWidth();
 
-	D3DXVECTOR3 posStart = { pos.x + sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z + cosf(rot.y) * fWidth };
-	D3DXVECTOR3 posEnd = { pos.x - sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z - cosf(rot.y) * fWidth };
+	D3DXVECTOR3 posStart = { pos.x + sinf(rot.y) * fWidth, pos.y, pos.z + cosf(rot.y) * fWidth };
+	D3DXVECTOR3 posEnd = { pos.x - sinf(rot.y) * fWidth, pos.y, pos.z - cosf(rot.y) * fWidth };
 
 	float fCross = 0.0f;
 

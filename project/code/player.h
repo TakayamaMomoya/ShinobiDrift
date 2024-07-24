@@ -155,4 +155,10 @@ private:
 	static CPlayer *m_pPlayer;	// 自身のポインタ
 };
 
+namespace Player
+{
+const D3DXVECTOR3 DEFAULT_POS = { 6329.1f,2477.7f,-28621.6f };	// 初期位置
+const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,2.0f,0.0f };	// 初期向き
+}
+
 #endif
