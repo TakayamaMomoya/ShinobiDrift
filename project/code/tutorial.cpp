@@ -619,8 +619,8 @@ void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
 	D3DXVECTOR3 rot = m_pGate->GetRotation();
 	float fWidth = m_pGate->GetWidth();
 
-	D3DXVECTOR3 posStart = { pos.x + sinf(rot.y) * fWidth, pos.y, pos.z + cosf(rot.y) * fWidth };
-	D3DXVECTOR3 posEnd = { pos.x - sinf(rot.y) * fWidth, pos.y, pos.z - cosf(rot.y) * fWidth };
+	D3DXVECTOR3 posStart = { pos.x + sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z + cosf(rot.y + D3DX_PI * 0.5f) * fWidth };
+	D3DXVECTOR3 posEnd = { pos.x - sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z - cosf(rot.y + D3DX_PI * 0.5f) * fWidth };
 
 	float fCross = 0.0f;
 
