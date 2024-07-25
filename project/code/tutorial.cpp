@@ -604,11 +604,11 @@ void CStateTutorialEnd::Update(CTutorial *pTutorial)
 	// ゲートのスケーリングの補正
 	ScalingGate();
 
-	// ゲートとプレイヤーの判定
-	CollidePlayer(pTutorial);
-
 	// プレイヤーを直進させる処理
 	ForwardPlayer();
+
+	// ゲートとプレイヤーの判定
+	CollidePlayer(pTutorial);
 }
 
 //=====================================================
@@ -668,16 +668,13 @@ void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
 	if (pFade == nullptr)
 		return;
 
-	if (!bHit)
+	if (bHit)
 	{
-		if (bHitNext)
-		{
-			pFade->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-			pFade->SetFade(CScene::MODE_GAME, false);
+		pFade->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+		pFade->SetFade(CScene::MODE_GAME, false);
 
-			// ブラーをかける
-			CBlurEvent::Create(1.0f, 0.8f, 10.0f);
-		}	
+		// ブラーをかける
+		CBlurEvent::Create(1.0f, 0.8f, 10.0f);
 	}
 
 	if (pFade->GetState() == CFade::FADE::FADE_OUT)
@@ -707,7 +704,8 @@ void CStateTutorialEnd::ForwardPlayer(void)
 
 	if (pPlayer == nullptr)
 		return;
-
+	
+	// プレイヤーを直進させる
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
 
@@ -716,6 +714,13 @@ void CStateTutorialEnd::ForwardPlayer(void)
 	posPlayer += pPlayer->GetForward() * fSpeed;
 
 	pPlayer->SetPosition(posPlayer);
+
+	// 最大速度まで加速させる
+	float fSpeedMax = pPlayer->GetParam().fSpeedMaxInitial;
+	float fFactAccele = pPlayer->GetParam().fFactAccele;
+	fSpeed += (fSpeedMax - fSpeed) * fFactAccele;
+
+	pPlayer->SetSpeed(fSpeed);
 }
 
 namespace Tutorial

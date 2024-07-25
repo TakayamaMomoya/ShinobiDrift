@@ -73,13 +73,14 @@ public:
 	SParam GetParam(void) { return m_param; }
 	void SetParam(SParam param) { m_param = param; }
 	CBlockGrab *GetBlock(void) { return m_info.pBlockGrab; }
-	float GetSpeed() { return m_info.fSpeed; }
 	CMotion *GetNInjaBody(void) { return m_pPlayerNinja; }	// 上に乗っている忍者の取得
 	bool IsDrift(void) { return m_info.pBlockGrab != nullptr; }	// ドリフトしているかどうか
 
 	// 変数取得・設定関数
 	bool IsEnableInput(void) { return m_info.bEnableInput; }	// 入力有効フラグ
 	void SetEnableInput(bool bEnable) { m_info.bEnableInput = bEnable; }
+	float GetSpeed(void) { return m_info.fSpeed; }	// スピード
+	void SetSpeed(float fSpeed) { m_info.fSpeed = fSpeed; }
 
 private:
 	struct SFragMotion
