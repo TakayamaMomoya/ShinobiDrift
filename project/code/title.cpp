@@ -23,6 +23,9 @@
 #include "skybox.h"
 #include "player.h"
 #include "smoke.h"
+#include "meshcylinder.h"
+#include "fan3D.h"
+#include "meshfield.h"
 #include "debugproc.h"
 
 //*****************************************************
@@ -56,6 +59,12 @@ namespace
 	const D3DXVECTOR3 POS_PLAYER = { -154.31f, 130.62f, 570.51f };	// プレイヤーモデルの位置
 	const D3DXVECTOR3 POS_BIKE = { -154.31f, 82.62f, 600.51f };	    // バイクモデルの位置
 }
+
+//*****************************************************
+// 静的メンバ変数
+//*****************************************************
+CMotion* CTitle::m_pBike = nullptr;
+CMotion* CTitle::m_pPlayer = nullptr;
 
 //=====================================================
 // コンストラクタ
@@ -106,17 +115,17 @@ HRESULT CTitle::Init(void)
 		return E_FAIL;
 	}
 
-	// タイトルロゴの生成
-	m_pTitleLogo = CPolygon2D::Create(7);
+	//// タイトルロゴの生成
+	//m_pTitleLogo = CPolygon2D::Create(7);
 
-	if (m_pTitleLogo != nullptr)
-	{
-		m_pTitleLogo->SetSize(TITLE_LOGO_WIDTH, TITLE_LOGO_HEIGHT);
-		m_pTitleLogo->SetPosition(TITLE_LOGO_POS);
-		int nIdx = CTexture::GetInstance()->Regist(TITLE_LOGO_PATH);
-		m_pTitleLogo->SetIdxTexture(nIdx);
-		m_pTitleLogo->SetVtx();
-	}
+	//if (m_pTitleLogo != nullptr)
+	//{
+	//	m_pTitleLogo->SetSize(TITLE_LOGO_WIDTH, TITLE_LOGO_HEIGHT);
+	//	m_pTitleLogo->SetPosition(TITLE_LOGO_POS);
+	//	int nIdx = CTexture::GetInstance()->Regist(TITLE_LOGO_PATH);
+	//	m_pTitleLogo->SetIdxTexture(nIdx);
+	//	m_pTitleLogo->SetVtx();
+	//}
 
 	// チームロゴの生成
 	m_pTeamLogo = CPolygon2D::Create(7);
@@ -141,15 +150,44 @@ HRESULT CTitle::Init(void)
 	pInfoCamera->posV = { 45.38f, 500.0f, 270.10f };
 	pInfoCamera->posR = { POS_PLAYER.x, 300.0f, POS_PLAYER.z };
 
-	Camera::ChangeState(new CTitleMoveControl);
+	Camera::ChangeState(new CCameraStateTitle);
 
-	// 背景オブジェクトの生成
-	CObjectX* pArsenal = CObjectX::Create();
+	//// 背景オブジェクトの生成
+	//CObjectX* pArsenal = CObjectX::Create();
 
-	if (pArsenal != nullptr)
+	//if (pArsenal != nullptr)
+	//{
+	//	int nIdx = CModel::Load("data\\MODEL\\other\\arsenal.x");
+	//	pArsenal->BindModel(nIdx);
+	//}
+
+	CMeshCylinder *pCylinder = CMeshCylinder::Create(32, 1000);
+
+	if (pCylinder != nullptr)
 	{
-		int nIdx = CModel::Load("data\\MODEL\\other\\arsenal.x");
-		pArsenal->BindModel(nIdx);
+		pCylinder->SetPosition(D3DXVECTOR3(0.0f, -200.0f, 3000.0f));
+		pCylinder->SetRotation(D3DXVECTOR3(D3DX_PI * 0.5f, 0.0f, 0.0f));
+		pCylinder->SetRadius(2000.0f);
+		pCylinder->SetVtx();
+		pCylinder->SetIdxTexture(Texture::GetIdx("data\\TEXTURE\\MATERIAL\\concrete.jpg"));
+	}
+
+	m_pFan3D = CFan3D::Create();
+
+	if (m_pFan3D != nullptr)
+	{
+		m_pFan3D->SetPosition(D3DXVECTOR3(0.0f, 0.0f, 3000.0f));
+		m_pFan3D->SetRotation(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		m_pFan3D->SetRadius(2000.0f);
+		m_pFan3D->SetVtx();
+		m_pFan3D->SetIdxTexture(Texture::GetIdx("data\\TEXTURE\\MATERIAL\\potal00.png"));
+	}
+
+	CMeshField *pField = CMeshField::Create();
+
+	if (pField != nullptr)
+	{
+		pField->SetPosition(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	}
 
 	// バイクモデルの設置
@@ -200,6 +238,9 @@ void CTitle::Update(void)
 {
 	// シーンの更新
 	CScene::Update();
+
+	/*if(m_pFan3D != nullptr)
+	   m_pFan3D->SetTex(0.001f, 0.01f);*/
 
 	if (m_pBehavior != nullptr)
 	{
@@ -505,11 +546,10 @@ CTitleMovePlayer::CTitleMovePlayer()
 
 	CCamera::Camera* pInfoCamera = pCamera->GetCamera();
 
-	Camera::ChangeState(nullptr);
+	Camera::ChangeState(new CCameraStateFollowPlayerTitle);
 
-	pInfoCamera->posVDest = { -30.0f, 225.0f, 350.0f };
-	pInfoCamera->posRDest = { -154.31f, 250.62f, 600.51f };
-	//pInfoCamera->posR = { -154.31f, 82.62f, 600.51f };
+	/*pInfoCamera->posVDest = { -30.0f, 225.0f, 350.0f };
+	pInfoCamera->posRDest = { -154.31f, 250.62f, 600.51f };*/
 }
 
 CTitleMovePlayer::~CTitleMovePlayer()
@@ -529,7 +569,7 @@ void CTitleMovePlayer::Update(CTitle* pTItle)
 	if (pCamera == nullptr)
 		return;
 
-	pCamera->MoveDist(0.07f);
+	//pCamera->MoveDist(0.07f);
 
 	D3DXVECTOR3 BikePos = pTItle->GetBike()->GetPosition();
 

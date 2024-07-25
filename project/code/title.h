@@ -20,7 +20,7 @@
 //*****************************************************
 class CMenu;
 class CPolygon2D;
-class CMotion;
+class CFan3D;
 class CMotion;
 class CTitleBehavior;
 
@@ -46,15 +46,16 @@ public:
 	virtual void Draw(void);
 	void ChangeBehavior(CTitleBehavior *pBehavior);
 	STATE GetState(void) { return m_state; }
-	CMotion *GetPlayer(void) { return m_pPlayer; }
-	CMotion *GetBike(void) { return m_pBike; }
+	static CMotion *GetPlayer(void) { return m_pPlayer; }
+	static CMotion *GetBike(void) { return m_pBike; }
 	
 private:
 	STATE m_state;				// 状態
 	CPolygon2D *m_pTitleLogo;   // タイトルロゴのポインタ
 	CPolygon2D *m_pTeamLogo;    // チームロゴのポインタ
-	CMotion *m_pPlayer;	// プレイヤーモデル
-	CMotion *m_pBike;   // バイクモデル
+	CFan3D *m_pFan3D;           // トンネルの扉のポインタ
+	static CMotion *m_pPlayer;	// プレイヤーモデル
+	static CMotion *m_pBike;   // バイクモデル
 	CTitleBehavior *m_pBehavior;	// ビヘイビア
 	float m_fTImerSmoke;	// 煙のスポーンタイマー
 };
