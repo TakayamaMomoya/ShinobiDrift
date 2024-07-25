@@ -86,6 +86,9 @@ HRESULT CTutorial::Init(void)
 	// 初期ステイトに設定
 	ChangeState(new CStateTutorialParry);
 
+	// プレイヤーをチュートリアルマップにテレポート
+
+
 	return S_OK;
 }
 
