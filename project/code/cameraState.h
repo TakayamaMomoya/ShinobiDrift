@@ -52,10 +52,21 @@ private:
 };
 
 // タイトル
-class CTitleMoveControl : public CCameraState
+class CCameraStateTitle : public CCameraState
 {
 public:
-	CTitleMoveControl() {};
+	CCameraStateTitle() {};
+	void Update(CCamera* pCamera) override;
+
+private:
+
+};
+
+// タイトルでプレイヤーを追従
+class CCameraStateFollowPlayerTitle : public CCameraState
+{
+public:
+	CCameraStateFollowPlayerTitle() {};
 	void Update(CCamera* pCamera) override;
 
 private:
