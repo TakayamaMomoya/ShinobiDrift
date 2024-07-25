@@ -1320,16 +1320,16 @@ void CPlayer::Debug(void)
 		return;
 	}
 
-#if 0
+#if 1
 	pDebugProc->Print("\nプレイヤーの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	pDebugProc->Print("\nプレイヤーの移動量[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
-	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);
+	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);/*
 	pDebugProc->Print("\n目標速度[%f]", m_info.fSpeedDest);
 	pDebugProc->Print("\n現在の速度[%f]", m_info.fSpeed);
 	pDebugProc->Print("\n弾きカウンター[%d]", m_info.nCntFlip);
 	pDebugProc->Print("\n角度カウンター[%f]", m_info.fCntAngle);
 	pDebugProc->Print("\nブラーのサイズ[%f]", m_info.fSizeBlurDrift);
-	pDebugProc->Print("\nブラーの濃さ[%f]", m_info.fDesityBlurDrift);
+	pDebugProc->Print("\nブラーの濃さ[%f]", m_info.fDesityBlurDrift);*/
 #endif
 
 	// ブラーのサイズ調整
