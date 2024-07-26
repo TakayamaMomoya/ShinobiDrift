@@ -94,7 +94,7 @@ HRESULT CMeshField::Init(void)
 	m_col = { 1.0f,1.0f,1.0f,1.0f };
 
 	// “Çˆ—
-	Load("data\\MAP\\field00.bin");
+	//Load("data\\MAP\\field00.bin");
 
 	//Reset();
 

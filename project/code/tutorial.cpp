@@ -18,6 +18,10 @@
 #include "manager.h"
 #include "texture.h"
 #include "effect3D.h"
+#include "camera.h"
+#include "fade.h"
+#include "blurEvent.h"
+#include "MyEffekseer.h"
 
 //*****************************************************
 // 定数定義
@@ -30,9 +34,13 @@ const D3DXVECTOR2 SIZE_DEFAULT_UI = { SCREEN_WIDTH * 0.1f, SCREEN_HEIGHT * 0.1f}
 const float LINE_INPUT = 0.3f;	// 入力と判定するスピード
 const float TIME_ACCELE = 5.0f;	// アクセルに必要な時間
 const float TIME_BRAKE = 3.0f;	// ブレーキに必要な時間
-const D3DXVECTOR2 SIZE_GATE = { 200.0f,500.0f };	// ゲートのサイズ
-const float DIST_GATE = 500.0f;	// ゲートの距離
+const D3DXVECTOR2 SIZE_GATE = { 3000.0f,3000.0f };	// ゲートのサイズ
+const float DIST_GATE = 3000.0f;	// ゲートの距離
 const D3DXVECTOR3 ROT_GATE = { D3DX_PI * 0.5f, D3DX_PI * 0.5f, 0.0f };	// ゲートの向き
+const float SPEED_RATE_PLAYER = 0.8f;	// プレイヤーがゲートに入るときのスピードの割合
+const float SPEED_EXPAND_GATE = 0.2f;	// ゲートの拡張速度
+const float SIZE_GATE_EFFECT = 1000.0f;	// ゲートエフェクトの目標サイズ
+const float HEIGTH_GATE = 500.0f;	// ゲートの高さ
 }
 
 //=====================================================
@@ -78,6 +86,9 @@ HRESULT CTutorial::Init(void)
 	// 初期ステイトに設定
 	ChangeState(new CStateTutorialParry);
 
+	// プレイヤーをチュートリアルマップにテレポート
+
+
 	return S_OK;
 }
 
@@ -121,6 +132,25 @@ void CTutorial::StartGame(void)
 {
 	// タイマーの生成
 	CTimer::Create();
+
+	// プレイヤーのトランスフォームを設定
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer == nullptr)
+		return;
+
+	pPlayer->SetPosition(Player::DEFAULT_POS);
+	pPlayer->SetRotation(Player::DEFAULT_ROT);
+
+	pPlayer->MultiplyMtx(false);
+
+	// カメラの位置を設定
+	CCamera *pCamera = CManager::GetCamera();
+
+	if (pCamera == nullptr)
+		return;
+
+	pCamera->SkipToDest();	// 目標位置までカメラを飛ばす
 }
 
 //=====================================================
@@ -515,7 +545,7 @@ void CStateTutorialParry::Update(CTutorial *pTutorial)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateTutorialEnd::CStateTutorialEnd() : m_pGate(nullptr)
+CStateTutorialEnd::CStateTutorialEnd() : m_pEffect(nullptr)
 {
 
 }
@@ -533,12 +563,6 @@ CStateTutorialEnd::~CStateTutorialEnd()
 //=====================================================
 void CStateTutorialEnd::Init(CTutorial *pTutorial)
 {
-	// ゲートの生成
-	m_pGate = CPolygon3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
-
-	if (m_pGate == nullptr)
-		return;
-
 	CPlayer *pPlayer = CPlayer::GetInstance();
 
 	if (pPlayer == nullptr)
@@ -546,15 +570,14 @@ void CStateTutorialEnd::Init(CTutorial *pTutorial)
 
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	D3DXVECTOR3 posGate = posPlayer + pPlayer->GetForward() * DIST_GATE;
+	posGate.y += HEIGTH_GATE;
 
-	m_pGate->SetSize(SIZE_GATE.x, SIZE_GATE.y);
-	m_pGate->SetPosition(posGate);
+	float fAngle = atan2f(pPlayer->GetForward().x, pPlayer->GetForward().z);	// プレイヤーの方を向かせる
 
-	float fAngle = atan2f(pPlayer->GetForward().x, pPlayer->GetForward().z);
+	m_pEffect = MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_GATE00, posGate, D3DXVECTOR3(0.0f, fAngle, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 
-	m_pGate->SetRotation(D3DXVECTOR3(ROT_GATE.x, fAngle, 0.0f));
-
-	m_pGate->EnableCull(false);
+	// プレイヤーを操作不可にする
+	pPlayer->SetEnableInput(false);
 }
 
 //=====================================================
@@ -562,10 +585,10 @@ void CStateTutorialEnd::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialEnd::Uninit(CTutorial *pTutorial)
 {
-	if (m_pGate != nullptr)
+	if (m_pEffect != nullptr)
 	{
-		m_pGate->Uninit();
-		m_pGate = nullptr;
+		m_pEffect->Uninit();
+		m_pEffect = nullptr;
 	}
 
 	CStateResult::Uninit(pTutorial);
@@ -581,8 +604,32 @@ void CStateTutorialEnd::Update(CTutorial *pTutorial)
 	if (pPlayer == nullptr)
 		return;
 
-	// ゲートに入ったら本編へ
+	// ゲートのスケーリングの補正
+	ScalingGate();
+
+	// プレイヤーを直進させる処理
+	ForwardPlayer();
+
+	// ゲートとプレイヤーの判定
 	CollidePlayer(pTutorial);
+}
+
+//=====================================================
+// ゲートのスケーリング補正
+//=====================================================
+void CStateTutorialEnd::ScalingGate(void)
+{
+	if (m_pEffect == nullptr)
+		return;
+
+	// ゲートエフェクトの補正
+	Effekseer::Vector3D scale = m_pEffect->GetScale();
+
+	scale.X += (SIZE_GATE_EFFECT - scale.X) * SPEED_EXPAND_GATE;
+	scale.Y += (SIZE_GATE_EFFECT - scale.X) * SPEED_EXPAND_GATE;
+	scale.Z += (SIZE_GATE_EFFECT - scale.X) * SPEED_EXPAND_GATE;
+
+	m_pEffect->SetScale(scale);
 }
 
 //=====================================================
@@ -592,17 +639,17 @@ void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
 {
 	CPlayer *pPlayer = CPlayer::GetInstance();
 
-	if (m_pGate == nullptr || pPlayer == nullptr)
+	if (pPlayer == nullptr)
 		return;
 
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
-	D3DXVECTOR3 pos = m_pGate->GetPosition();
-	D3DXVECTOR3 rot = m_pGate->GetRotation();
-	float fWidth = m_pGate->GetWidth();
+	D3DXVECTOR3 pos = m_pEffect->GetPositionD3D();
+	D3DXVECTOR3 rot = m_pEffect->GetRotationD3D();
+	float fWidth = SIZE_GATE_EFFECT;
 
-	D3DXVECTOR3 posStart = { pos.x + sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z + cosf(rot.y) * fWidth };
-	D3DXVECTOR3 posEnd = { pos.x - sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z - cosf(rot.y) * fWidth };
+	D3DXVECTOR3 posStart = { pos.x + sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z + cosf(rot.y + D3DX_PI * 0.5f) * fWidth };
+	D3DXVECTOR3 posEnd = { pos.x - sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z - cosf(rot.y + D3DX_PI * 0.5f) * fWidth };
 
 	float fCross = 0.0f;
 
@@ -618,23 +665,65 @@ void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
 		nullptr,		// 交点の割合
 		posPlayer + movePlayer);	// プレイヤーの移動量
 
-	// 外積の判定
-	if (!bHit && bHitNext)
+	// 白フェードをかける
+	CFade *pFade = CFade::GetInstance();
+
+	if (pFade == nullptr)
+		return;
+
+	if (bHit)
 	{
-		if (fCross >= 0.0f && fCross <= 1.0f)
-		{// 始点と終点の間を通った時、ゲームを開始
-			pTutorial->StartGame();
+		pFade->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+		pFade->SetFade(CScene::MODE_GAME, false);
 
-			pTutorial->Uninit();
+		// ブラーをかける
+		CBlurEvent::Create(1.0f, 0.8f, 10.0f);
+	}
 
-			return;
-		}
+	if (pFade->GetState() == CFade::FADE::FADE_OUT)
+	{// フェードが消え始める瞬間でゲームをスタートする
+		pTutorial->StartGame();
+
+		pTutorial->Uninit();
+
+		// プレイヤーを操作可能にする
+		pPlayer->SetEnableInput(true);
+
+		return;
 	}
 
 #ifdef _DEBUG
 	CEffect3D::Create(posStart, 400.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
 	CEffect3D::Create(posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif
+}
+
+//=====================================================
+// プレイヤーを直進させる処理
+//=====================================================
+void CStateTutorialEnd::ForwardPlayer(void)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer == nullptr)
+		return;
+	
+	// プレイヤーを直進させる
+	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
+	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
+
+	float fSpeed = pPlayer->GetSpeed();
+
+	posPlayer += pPlayer->GetForward() * fSpeed;
+
+	pPlayer->SetPosition(posPlayer);
+
+	// 最大速度まで加速させる
+	float fSpeedMax = pPlayer->GetParam().fSpeedMaxInitial;
+	float fFactAccele = pPlayer->GetParam().fFactAccele;
+	fSpeed += (fSpeedMax - fSpeed) * fFactAccele;
+
+	pPlayer->SetSpeed(fSpeed);
 }
 
 namespace Tutorial

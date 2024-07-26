@@ -48,7 +48,7 @@ HRESULT CCamera::Init(void)
 	m_camera.fLength = INITIAL_DIST;
 
 	// 自身のポインタをヌルにする
-	m_pBehavior = nullptr;
+	m_pState = nullptr;
 
 	m_posAbove = { 0.0f,ABOVE_DEFAULT,0.0f };
 
@@ -68,9 +68,9 @@ void CCamera::Uninit(void)
 //====================================================
 void CCamera::Update(void)
 {
-	if (m_pBehavior != nullptr)
+	if (m_pState != nullptr)
 	{
-		m_pBehavior->Update(this);
+		m_pState->Update(this);
 	}
 }
 
@@ -147,6 +147,18 @@ void CCamera::SetPosR(void)
 }
 
 //====================================================
+// 目標地点まで位置情報をスキップする
+//====================================================
+void CCamera::SkipToDest(void)
+{
+	if (m_pState != nullptr)
+		m_pState->Update(this);	// カメラの位置などを決めるためステイトの更新を入れる
+
+	m_camera.posV = m_camera.posVDest;
+	m_camera.posR = m_camera.posRDest;
+}
+
+//====================================================
 // 設定処理
 //====================================================
 void CCamera::SetCamera(void)
@@ -213,13 +225,13 @@ CCamera::Camera *CCamera::GetCamera(void)
 //====================================================
 void CCamera::ChangeState(CCameraState *pBehavior)
 {
-	if (m_pBehavior != nullptr)
+	if (m_pState != nullptr)
 	{
-		delete m_pBehavior;
-		m_pBehavior = nullptr;
+		delete m_pState;
+		m_pState = nullptr;
 	}
 
-	m_pBehavior = pBehavior;
+	m_pState = pBehavior;
 }
 
 namespace Camera

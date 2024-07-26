@@ -42,8 +42,6 @@ const float DIST_LIMIT = 5000.0f;	// ワイヤー制限距離
 const float LINE_CORRECT_DRIFT = 40.0f;	// ドリフト補正のしきい値
 const float SIZE_BLUR = -20.0f;	// ブラーのサイズ
 const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
-const D3DXVECTOR3 DEFAULT_POS = { 6329.1f,2477.7f,-28621.6f };	// 初期位置
-const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,2.0f,0.0f };	// 初期向き
 const float SE_CHANGE_SPEED = 10.0f;  // エンジン音とアクセル音が切り替わる速度の値
 const float HANDLE_INERTIA = 0.03f;  // カーブ時の角度変更慣性
 const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性
@@ -108,9 +106,6 @@ HRESULT CPlayer::Init(void)
 
 	SetMotion(MOTION_WALK_FRONT);
 
-	// カメラの行動設定
-	Camera::ChangeState(new CFollowPlayer);
-
 	// 読込
 	Load();
 
@@ -137,8 +132,20 @@ HRESULT CPlayer::Init(void)
 	m_info.fSizeBlurDrift = SIZE_BLUR;
 
 	// 初期トランスフォームの設定
-	SetPosition(DEFAULT_POS);
-	SetRotation(DEFAULT_ROT);
+	SetPosition(Player::DEFAULT_POS);
+	SetRotation(Player::DEFAULT_ROT);
+
+	MultiplyMtx(false);	// 階層構造のマトリックスをかけ合わせる
+
+	// カメラの行動設定
+	Camera::ChangeState(new CFollowPlayer);
+
+	CCamera *pCamera = CManager::GetCamera();
+
+	if (pCamera == nullptr)
+		return E_FAIL;
+
+	pCamera->SkipToDest();	// 目標位置までカメラを飛ばす
 
 	// テールランプ用軌跡の生成
 	m_info.orbitColor = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
@@ -1292,16 +1299,16 @@ void CPlayer::Debug(void)
 		return;
 	}
 
-#if 0
+#if 1
 	pDebugProc->Print("\nプレイヤーの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	pDebugProc->Print("\nプレイヤーの移動量[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
-	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);
+	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);/*
 	pDebugProc->Print("\n目標速度[%f]", m_info.fSpeedDest);
 	pDebugProc->Print("\n現在の速度[%f]", m_info.fSpeed);
 	pDebugProc->Print("\n弾きカウンター[%d]", m_info.nCntFlip);
 	pDebugProc->Print("\n角度カウンター[%f]", m_info.fCntAngle);
 	pDebugProc->Print("\nブラーのサイズ[%f]", m_info.fSizeBlurDrift);
-	pDebugProc->Print("\nブラーの濃さ[%f]", m_info.fDesityBlurDrift);
+	pDebugProc->Print("\nブラーの濃さ[%f]", m_info.fDesityBlurDrift);*/
 #endif
 
 	// ブラーのサイズ調整

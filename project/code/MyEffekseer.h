@@ -31,6 +31,7 @@ public:
 		TYPE_WINDSHURIKEN,	// 手裏剣の回転風
 		TYPE_GRAPPLE,		// 鉤縄
 		TYPE_SMOKE,		// 敵撤退時の煙
+		TYPE_GATE00,		// ゲート
 		TYPE_MAX
 	};
 
@@ -46,6 +47,7 @@ public:
 	void Release(int idx);
 	void ReleaseEffect(CEffekseerEffect *pEffect);	// エフェクトの解放
 	const char* GetPathEffect(CEffekseer::TYPE type);
+	std::list<CEffekseerEffect*> *GetList(void) { return &m_listEffect; };	// リストの取得
 
 private:
 	// メンバ変数 
@@ -80,9 +82,13 @@ public:
 	void SetTime(int32_t time) { m_time = time; }	// 時間
 	int32_t GetTime(void) { return m_time; }
 	Effekseer::Vector3D GetPosition(void) { return m_pos; }	// 位置
+	D3DXVECTOR3 GetPositionD3D(void) { return D3DXVECTOR3(m_pos.X, m_pos.Y, m_pos.Z); }
 	void SetPosition(Effekseer::Vector3D pos) { m_pos = pos; }
 	Effekseer::Vector3D GetRotation(void) { return m_rot; }	// 向き
+	D3DXVECTOR3 GetRotationD3D(void) { return D3DXVECTOR3(m_rot.X, m_rot.Y, m_rot.Z); }
 	void SetRotation(Effekseer::Vector3D rot) { m_rot = rot; }
+	Effekseer::Vector3D GetScale(void) { return m_scale; }	// スケール
+	void SetScale(Effekseer::Vector3D scale) { m_scale = scale; }
 
 private:
 	// メンバ変数

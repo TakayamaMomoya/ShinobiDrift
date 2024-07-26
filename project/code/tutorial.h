@@ -18,6 +18,7 @@
 class CUI;
 class CStateResult;
 class CPolygon3D;
+class CEffekseerEffect;
 
 //*****************************************************
 // クラスの定義
@@ -141,10 +142,12 @@ public:
 
 private:
 	// メンバ関数
+	void ScalingGate(void);	// ゲートのスケーリング補正
 	void CollidePlayer(CTutorial *pTutorial);	// プレイヤーとゲートの判定
+	void ForwardPlayer(void);	// プレイヤーを進める処理
 
 	// メンバ変数
-	CPolygon3D *m_pGate;	// ゲートのポリゴン
+	CEffekseerEffect *m_pEffect;	// エフェクトのポインタ
 };
 
 namespace Tutorial

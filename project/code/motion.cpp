@@ -386,7 +386,7 @@ void CMotion::CalcMatrix(void)
 //=====================================================
 // マトリックスをかけ合わせる処理
 //=====================================================
-void CMotion::MultiplyMtx(void)
+void CMotion::MultiplyMtx(bool bDrawParts)
 {
 	if (m_bInde == false)
 	{
@@ -441,7 +441,8 @@ void CMotion::MultiplyMtx(void)
 		//ワールドマトリックス設定
 		pDevice->SetTransform(D3DTS_WORLD, &mtx);
 
-		m_apParts[nCntParts]->pParts->JustDraw();
+		if(bDrawParts)
+			m_apParts[nCntParts]->pParts->JustDraw();
 	}
 }
 

@@ -28,6 +28,12 @@ public:
 		FADE_OUT,					//フェードアウト状態
 		FADE_MAX
 	}FADE;
+	typedef enum
+	{// モード
+		MODE_NORMAL = 0,	// 通常
+		MODE_WHITEOUT,	// ホワイトアウト
+		MODE_MAX
+	}MODE;
 
 	CFade();	// コンストラクタ
 	~CFade();	// デストラクタ
@@ -44,10 +50,11 @@ public:
 
 private:
 	bool m_bTrans;	// 遷移するかどうか
-	FADE m_fade;									//フェードの状態
-	CScene::MODE m_modeNext;								//次の画面
+	FADE m_fade;	//フェードの状態
+	CScene::MODE m_modeNext;	//次の画面
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;	// 頂点バッファ
 	D3DXCOLOR m_col;	// 色
 	static CFade *m_pFade;	// 自身のポインタ
 };
+
 #endif
