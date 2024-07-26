@@ -25,16 +25,13 @@ class CUI;
 class CMeter : public CObject
 {
 public:
-	CMeter(int nPriority = 7);	// コンストラクタ
+	CMeter(int nPriority = 0);	// コンストラクタ
 	~CMeter();	//	デストラクタ
 
 	// メンバ関数
 	HRESULT Init();
 	void Uninit();
 	void Update();
-
-	// 変数取得・設定関数
-	int GetMeter() { return m_NowMeter; }	// メーター値
 
 	// 静的メンバ関数
 	static CMeter* Create();	// 生成
@@ -46,12 +43,11 @@ private:
 	void Needle();
 
 	//メンバ変数
-	int m_NowMeter;		// 現在のメーター値
-	int m_nCntMeter;	// カウント加算
-	float m_fRot;		// 向き
 	CNumber* m_pNumber;	// ナンバーのポインタ
-	CUI* m_pNeedle;			// 針UIのポインタ
-	CUI* m_pBackMeter;			// メーター背景のポインタ
+	CUI* m_pNeedle;	// 針UIのポインタ
+	CUI* m_pBackMeter;	// メーター背景のポインタ
+
+	// 静的メンバ変数
 	static CMeter* m_pMeter;	// 自身のポインタ
 };
 

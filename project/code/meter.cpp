@@ -27,6 +27,8 @@ const D3DXVECTOR2 SIZE_METER = { SCREEN_WIDTH * 0.13f, SCREEN_WIDTH * 0.13f };	/
 const D3DXVECTOR3 POS_METER = { SCREEN_WIDTH - SIZE_METER.x - 10.0f, SCREEN_HEIGHT - SIZE_METER.y - 10.0f, 0.0f };	// メーターの位置
 const D3DXVECTOR2 SIZE_NUMBER = { SCREEN_WIDTH * 0.015f, SCREEN_WIDTH * 0.02f };	// メーターの数字のサイズ
 const D3DXVECTOR2 SIZE_NEEDLE = { SIZE_METER.x * 0.2f, SIZE_METER.y * 0.9f };	// 針のサイズ
+const float MIN_ANGLE_NEEDLE = D3DX_PI * 0.7f;	// 針の最低速度時の角度
+const float MAX_ANGLE_NEEDLE = -D3DX_PI * 0.7f;	// 針の最高速度時の角度
 }
 
 //=====================================================
@@ -39,9 +41,6 @@ CMeter* CMeter::m_pMeter = nullptr;
 //=====================================================
 CMeter::CMeter(int nPriority)
 {
-	m_NowMeter = 0;			// 現在のメーター値
-	m_nCntMeter = 0;		// メーター加算
-	m_fRot = 0.0f;			// 向き
 	m_pNumber = nullptr;	// ナンバーのポインタ
 	m_pNeedle = nullptr;		// 針のポインタ
 	m_pBackMeter = nullptr;	// メーター背景のポインタ
@@ -78,12 +77,6 @@ CMeter* CMeter::Create(void)
 //=====================================================
 HRESULT CMeter::Init()
 {
-	// 速度
-	m_NowMeter = 0;
-
-	// カウント加算
-	m_nCntMeter = 0;
-
 	if (m_pBackMeter == nullptr)
 	{
 		m_pBackMeter = CUI::Create();
@@ -167,8 +160,6 @@ void CMeter::Update(void)
 
 	// 針を動かす処理
 	Needle();
-
-	CDebugProc::GetInstance()->Print("\n現在の向き[%f]", m_fRot);
 }
 
 //=====================================================
@@ -195,8 +186,21 @@ void CMeter::Acceleration()
 //=====================================================
 void CMeter::Needle()
 {
-	if (m_pNeedle == nullptr)
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (m_pNeedle == nullptr || pPlayer == nullptr)
 		return;
 
+	float fSpeed = pPlayer->GetSpeed();
+	float fSpeedMax = pPlayer->GetParam().fSpeedMaxInitial;
 
+	float fRate = fSpeed / fSpeedMax;
+	universal::LimitValuefloat(&fRate, 1.0f, 0.0f);
+
+	float fDiffAngle = MAX_ANGLE_NEEDLE - MIN_ANGLE_NEEDLE;
+
+	float fRot = MIN_ANGLE_NEEDLE + fDiffAngle * fRate;
+
+	m_pNeedle->SetRotation(fRot);
+	m_pNeedle->SetVtx();
 }
