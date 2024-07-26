@@ -249,35 +249,35 @@ INFOBLOCK
  SNAG = 0
 END_INFOBLOCK
 
-#33番目のブロック
+#34番目のブロック
 INFOBLOCK
  TAG = Husuma
  MODEL = data\MODEL\block\husumatobira.x
  SNAG = 0
 END_INFOBLOCK
 
-#34番目のブロック
+#35番目のブロック
 INFOBLOCK
  TAG = Irori
  MODEL = data\MODEL\block\irori.x
  SNAG = 0
 END_INFOBLOCK
 
-#35番目のブロック
+#36番目のブロック
 INFOBLOCK
  TAG = Kakeziku
  MODEL = data\MODEL\block\kakeziku000.x
  SNAG = 0
 END_INFOBLOCK
 
-#36番目のブロック
+#37番目のブロック
 INFOBLOCK
  TAG = Rousoku
  MODEL = data\MODEL\block\rousoku.x
  SNAG = 0
 END_INFOBLOCK
 
-#37番目のブロック
+#38番目のブロック
 INFOBLOCK
  TAG = Rousokudai
  MODEL = data\MODEL\block\rousokudai.x
