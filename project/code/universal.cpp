@@ -640,25 +640,29 @@ bool IsOnTrianglePolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D
 	D3DXVECTOR3 vecP, vecTemp;
 	float fHeight, fDot;
 
+	// ポリゴンの外周ベクトルを設定
 	D3DXVECTOR3 vecVtx[3];
 	vecVtx[0] = vtx2 - vtx1;
 	vecVtx[1] = vtx3 - vtx2;
 	vecVtx[2] = vtx1 - vtx3;
 
-	// ポリゴンと内外判定
-	if (D3DXVec3Cross(&vecTemp, &(posTarget - vtx1), &vecVtx[0])->y < 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx2), &vecVtx[1])->y < 0 &&
-		D3DXVec3Cross(&vecTemp, &(posTarget - vtx3), &vecVtx[2])->y < 0)
+	// ポリゴンの各点から目標へのベクトルを設定
+	D3DXVECTOR3 vecVtxTarget[3];
+	vecVtxTarget[0] = posTarget - vtx1;
+	vecVtxTarget[1] = posTarget - vtx2;
+	vecVtxTarget[2] = posTarget - vtx3;
+
+	// 目標位置がポリゴンの内側にいるか判定
+	if (D3DXVec3Cross(&vecTemp, &vecVtxTarget[0], &vecVtx[0])->y < 0 &&
+		D3DXVec3Cross(&vecTemp, &vecVtxTarget[1], &vecVtx[1])->y < 0 &&
+		D3DXVec3Cross(&vecTemp, &vecVtxTarget[2], &vecVtx[2])->y < 0)
 	{
 		// y軸法線が0ではないか判定
 		if (!vtxNor.y)
 			return false;
 
-		// 角から目標位置へのベクトル
-		vecP = posTarget - vtx1;
-
 		// 内積を計算
-		fDot = (vtxNor.x * vecP.x) + (vtxNor.z * vecP.z);
+		fDot = (vtxNor.x * vecVtxTarget[0].x) + (vtxNor.z * vecVtxTarget[0].z);
 
 		// 内積を用いて高さを計算
 		fHeight = -(fDot / vtxNor.y) + vtx1.y;
@@ -702,27 +706,21 @@ bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR
 	D3DXVECTOR3 vecP, vecTemp;
 	float fHeight, fDot;
 
+	// ポリゴンの外周ベクトルを設定
 	D3DXVECTOR3 vecVtx[4];
 	vecVtx[0] = vtx2 - vtx1;
-	vecVtx[0].y = 0.0f;
 	vecVtx[1] = vtx3 - vtx2;
-	vecVtx[1].y = 0.0f;
 	vecVtx[2] = vtx4 - vtx3;
-	vecVtx[2].y = 0.0f;
 	vecVtx[3] = vtx1 - vtx4;
-	vecVtx[3].y = 0.0f;
 
+	// ポリゴンの各点から目標へのベクトルを設定
 	D3DXVECTOR3 vecVtxTarget[4];
 	vecVtxTarget[0] = posTarget - vtx1;
-	vecVtxTarget[0].y = 0.0f;
 	vecVtxTarget[1] = posTarget - vtx2;
-	vecVtxTarget[1].y = 0.0f;
 	vecVtxTarget[2] = posTarget - vtx3;
-	vecVtxTarget[2].y = 0.0f;
 	vecVtxTarget[3] = posTarget - vtx4;
-	vecVtxTarget[3].y = 0.0f;
 
-	// ポリゴンと内外判定
+	// 目標位置がポリゴンの内側にいるか判定
 	if (D3DXVec3Cross(&vecTemp, &vecVtxTarget[0], &vecVtx[0])->y < 0 &&
 		D3DXVec3Cross(&vecTemp, &vecVtxTarget[1], &vecVtx[1])->y < 0 &&
 		D3DXVec3Cross(&vecTemp, &vecVtxTarget[2], &vecVtx[2])->y < 0 &&
@@ -732,11 +730,8 @@ bool IsOnSquare(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D3DXVECTOR
 		if (!vtxNor.y)
 			return false;
 
-		// 角から目標位置へのベクトル
-		vecP = vecVtxTarget[0];
-
 		// 内積を計算
-		fDot = (vtxNor.x * vecP.x) + (vtxNor.z * vecP.z);
+		fDot = (vtxNor.x * vecVtxTarget[0].x) + (vtxNor.z * vecVtxTarget[0].z);
 
 		// 内積を用いて高さを計算
 		fHeight = -(fDot / vtxNor.y) + vtx1.y;
@@ -1045,13 +1040,13 @@ D3DXVECTOR3 Lerp(D3DXVECTOR3 start, D3DXVECTOR3 end, float fTime)
 //========================================
 // 線分に対するの射影変換
 //========================================
-float lengthAxis(D3DXVECTOR3 sep, D3DXVECTOR3 e1, D3DXVECTOR3 e2, D3DXVECTOR3 e3)
+float lengthAxis(D3DXVECTOR3 separationAxis, D3DXVECTOR3 e1, D3DXVECTOR3 e2, D3DXVECTOR3 e3)
 {
 	float length1, length2, length3;
 
-	length1 = fabs(D3DXVec3Dot(&sep, &e1));
-	length2 = fabs(D3DXVec3Dot(&sep, &e2));
-	length3 = fabs(D3DXVec3Dot(&sep, &e3));
+	length1 = fabs(D3DXVec3Dot(&separationAxis, &e1));
+	length2 = fabs(D3DXVec3Dot(&separationAxis, &e2));
+	length3 = fabs(D3DXVec3Dot(&separationAxis, &e3));
 
 	return length1 + length2 + length3;
 }

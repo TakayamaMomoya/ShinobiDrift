@@ -316,6 +316,9 @@ bool CBlock::Collide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 	BlockNor = universal::NorRelativeMtx(pos, rot, BlockMax, BlockMin);
 
 	// ƒ|ƒŠƒSƒ“‚Ì‰º‚É“ü‚Á‚Ä‚¢‚é‚©”»’è‚·‚é
+	if (D3DXVec3Length(&(pos - *pPos)) > 10000.0f)
+		return false;
+
 	if (!universal::IsOnSquare(BlockCorner[0], BlockCorner[1], BlockCorner[2], BlockCorner[3], BlockNor, *pPos, posOld, fHeight))
 		return false;
 

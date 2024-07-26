@@ -12,6 +12,7 @@
 #include "texture.h"
 #include "effect3D.h"
 #include "renderer.h"
+#include "MyEffekseer.h"
 
 //*****************************************************
 // 定数定義
@@ -349,6 +350,15 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3* move, D3DXVECTO
 		*move -= vecReturn * D3DXVec3Dot(&vecReturn, move) * 0.15f;
 		*fSpeed *= 0.98f;
 		bCollision = true;
+
+		D3DXVECTOR3 posEffect = pVtx[0].pos;
+		D3DXVECTOR3 vecWall = pVtx[2].pos - pVtx[0].pos;
+		D3DXVec3Normalize(&vecWall, &vecWall);
+		posEffect += vecWall * D3DXVec3Dot(&(*pos - pVtx[0].pos), &vecWall);
+		float rotEffect = atan2f(pVtx[2].pos.x - pVtx[0].pos.x, pVtx[2].pos.z - pVtx[0].pos.z);
+
+		// エフェクトの再生
+		MyEffekseer::CreateEffect(CEffekseer::TYPE_DRIFT, D3DXVECTOR3(posEffect.x, posEffect.y + 100.0f, posEffect.z), D3DXVECTOR3(0.0f, rotEffect, 0.0f));
 
 		break;
 	}

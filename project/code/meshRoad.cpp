@@ -765,6 +765,7 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 		// “¹‚Ì‹æ•ª‚Ì’†‚É‚¢‚È‚¯‚ê‚Î”»’è‚µ‚È‚¢
 		if (D3DXVec3Dot(&(itRoadPoint.pos - posOldRoadPoint), &(*pPos - posOldRoadPoint)) < 0.0f)
 		{
+			// ‹æ•ª”»’è—p•Ï”‚É‘ã“ü
 			posOldRoadPoint = itRoadPoint.pos;
 			pVtx += MeshRoad::NUM_VTX_IN_EDGE * MeshRoad::NUM_EDGE_IN_ROADPOINT;
 			continue;
@@ -774,7 +775,8 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 		for (int i = 0; i < MeshRoad::NUM_EDGE_IN_ROADPOINT; i++)
 		{
 			pVtx += MeshRoad::NUM_VTX_IN_EDGE;
-
+			
+			// ”»’è—p‚ÌˆÊ’u‚ðÝ’è
 			D3DXVECTOR3 posUpPolygon = *pPos;
 			posUpPolygon.y = pVtx[2].pos.y;
 
