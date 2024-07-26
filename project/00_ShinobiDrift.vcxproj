@@ -184,6 +184,7 @@
     <ClCompile Include="code\editBlock.cpp" />
     <ClCompile Include="code\editGoal.cpp" />
     <ClCompile Include="code\editMesh.cpp" />
+    <ClCompile Include="code\editMeshfield.cpp" />
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
     <ClCompile Include="code\enemySpawner.cpp" />
@@ -277,6 +278,7 @@
     <ClInclude Include="code\editBlock.h" />
     <ClInclude Include="code\editGoal.h" />
     <ClInclude Include="code\editMesh.h" />
+    <ClInclude Include="code\editMeshfield.h" />
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
     <ClInclude Include="code\enemySpawner.h" />

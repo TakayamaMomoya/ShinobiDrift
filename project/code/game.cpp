@@ -38,6 +38,7 @@
 #include "goal.h"
 #include "edit.h"
 #include "editMesh.h"
+#include "editMeshfield.h"
 #include "editBlock.h"
 #include "editGoal.h"
 #include "enemy.h"
@@ -53,6 +54,7 @@
 namespace
 {
 const char* PATH_GAME_ROAD = "data\\MAP\\road00.bin";	// ゲームメッシュロードのパス
+const D3DXVECTOR3 POS_MESHFIELD = { 342028.0f,1000.0f, -30640.0f };	// メッシュフィールドの位置
 }
 
 //*****************************************************
@@ -127,6 +129,14 @@ HRESULT CGame::Init(void)
 	// メッシュキューブのテスト生成
 	CMeshCube::Create();
 #endif
+
+	// メッシュフィールドの生成
+	CMeshField *pMeshField = CMeshField::Create();
+
+	if (pMeshField != nullptr)
+	{
+		pMeshField->SetPosition(POS_MESHFIELD);
+	}
 
 	return S_OK;
 }
@@ -277,8 +287,11 @@ void CGame::Debug(void)
 
 	ImGui::Text("[EditMode]");
 
-	if (ImGui::Button("Mesh", ImVec2(70, 30)))	// メッシュエディット
+	if (ImGui::Button("MeshRoad", ImVec2(70, 30)))	// メッシュロードエディット
 		ChangeEdit(new CEditMesh);
+
+	if (ImGui::Button("MeshField", ImVec2(70, 30)))	// メッシュフィールドエディット
+		ChangeEdit(new CEditMeshfield);
 
 	if (ImGui::Button("Block", ImVec2(70, 30)))	// ブロックエディット
 		ChangeEdit(new CEditBlock);

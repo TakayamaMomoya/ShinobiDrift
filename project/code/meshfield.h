@@ -11,12 +11,12 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "object.h"
+#include "object3D.h"
 
 //*****************************************************
 // クラス定義
 //*****************************************************
-class CMeshField : public CObject
+class CMeshField : public CObject3D
 {
 public:
 	CMeshField();	// コンストラクタ
@@ -24,9 +24,6 @@ public:
 
 	typedef struct
 	{
-		D3DXVECTOR3 pos;						//位置
-		D3DXVECTOR3 rot;						//向き
-		D3DXMATRIX mtxWorld;					//ワールドマトリックス
 		int nNumIdx;							//インデックス数
 		int nNumVtx;							//頂点数
 	}MeshField;
