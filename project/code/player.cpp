@@ -52,8 +52,8 @@ const float SIZE_SPEEDBLUR = 13.0f;	// スピードブラーのサイズ
 const float DENSITY_SPEEDBLUR = 0.3f;	// スピードブラーの濃さ
 const float ROT_CURVE_LIMIT = 0.02f;  // ハンドル操作がきく用になる角度の限界
 const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
-const float GRAVITY = -0.7f;  // 重力の倍率
-const float GRAVITY_GROUND = -20.0f;  // 接地時の重力
+const float GRAVITY = -0.2f;  // 重力の倍率
+const float GRAVITY_GROUND = -9.0f;  // 接地時の重力
 const float HEIGH_FRONT_WHEEL = 55.0f;  // 前輪の高さ
 const float HEIGH_REAR_WHEEL = 65.0f;  // 後輪の高さ
 const float ROT_BIKE_FRONT_LIMIT = 1.5f;  // 前回りの角度限界
@@ -925,12 +925,15 @@ void CPlayer::Collision(void)
 		// 次のアドレスを保存
 		CBlock* pBlockNext = pBlock->GetNext();
 
-		// タイヤとblockで当たり判定をとる
-		if (pBlock->Collide(&posParts[0], posOldParts[0]))
-			bRoad[0] = true;
+		if (D3DXVec3Length(&(pBlock->GetPosition() - pos)) < 10000.0f)
+		{
+			// タイヤとblockで当たり判定をとる
+			if (pBlock->Collide(&posParts[0], posOldParts[0]))
+				bRoad[0] = true;
 
-		if (pBlock->Collide(&posParts[1], posOldParts[1]))
-			bRoad[1] = true;
+			if (pBlock->Collide(&posParts[1], posOldParts[1]))
+				bRoad[1] = true;
+		}
 
 		// 両方が判定を通っていたら抜ける
 		if (bRoad[0] && bRoad[1])
@@ -1140,6 +1143,7 @@ void CPlayer::ManageSpeed(void)
 	move.y += GRAVITY;
 
 	SetMove(move);
+	CDebugProc::GetInstance()->Print("\nプレイヤーの移動量[%f,%f,%f]", move.x, move.y, move.z);;
 
 	if (m_info.pOrbitLamp != nullptr)
 		m_info.pOrbitLamp->SetOffset(GetMatrix(), m_info.orbitColor, m_info.pOrbitLamp->GetID());
