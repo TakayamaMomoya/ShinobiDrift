@@ -75,6 +75,7 @@ HRESULT CTexture::Load(void)
 		"data\\TEXTURE\\UI\\menu_resume.png",
 		"data\\TEXTURE\\UI\\menu_retry.png",
 		"data\\TEXTURE\\UI\\menu_quit.png",
+		"data\\TEXTURE\\BG\\sky01.jpg",
 	};
 
 	for ( int nCntTex = 0;nCntTex < MAX_TEX;nCntTex++)

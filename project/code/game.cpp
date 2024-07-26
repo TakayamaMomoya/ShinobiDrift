@@ -44,6 +44,7 @@
 #include "meshCube.h"
 #include "enemySpawner.h"
 #include "tutorial.h"
+#include "blur.h"
 
 //*****************************************************
 // É}ÉNÉçíËã`

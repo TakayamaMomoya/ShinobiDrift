@@ -23,6 +23,8 @@ const char* TEX_PATH = "data\\TEXTURE\\MATERIAL\\wall00.jpeg";	// テクスチャパス
 const int NUM_VTX_ON_POINT = 2;	// メッシュロードの頂点上にある頂点数
 const float HEIGHT_GR = 600.0f;	// ガードレールの高さ
 const int NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
+const float DECELERATION_MAG = 0.98f;	// 衝突時の減速倍率
+const float MOVE_MAG = 0.15f;	// 衝突時の移動量反射倍率
 }
 
 //=====================================================
@@ -325,6 +327,7 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3* move, D3DXVECTO
 		if(i != 0)
 			pVtx += NUM_VTX_ON_POINT;
 
+		// 法線の大きさが0の時は判定しない
 		if (D3DXVec3Length(&pVtx[0].nor) == 0.0f)
 			continue;
 
@@ -332,10 +335,12 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3* move, D3DXVECTO
 		if (m_fHeight < pos->y - pVtx[0].pos.y || pos->y < pVtx[0].pos.y - m_fHeight)
 			continue;
 
+		// ガードレールの範囲内に存在する
 		if (D3DXVec3Dot(&(*pos - pVtx[0].pos), &(pVtx[2].pos - pVtx[0].pos)) < 0.0f ||
 			D3DXVec3Dot(&(*pos - pVtx[2].pos), &(pVtx[0].pos - pVtx[2].pos)) < 0.0f)
 			continue;
 
+		// 押し戻された座標を計算する
 		D3DXVECTOR3 vecReturn;
 		if (m_bLeft)
 			vecReturn = universal::CollideOBBToPlane(pos, vecAxial, pVtx[0].pos, pVtx[2].nor);
@@ -345,16 +350,21 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3* move, D3DXVECTO
 		if (D3DXVec3Length(&vecReturn) == 0.0f)
 			continue;
 
+		// 計算した距離分押し戻す
 		*pos += vecReturn;
+
+		// 押し戻し距離から移動方向と距離を計算する
 		D3DXVec3Normalize(&vecReturn, &vecReturn);
-		*move -= vecReturn * D3DXVec3Dot(&vecReturn, move) * 0.15f;
-		*fSpeed *= 0.98f;
+		*move -= vecReturn * D3DXVec3Dot(&vecReturn, move) * MOVE_MAG;
+		*fSpeed *= DECELERATION_MAG;
 		bCollision = true;
 
-		D3DXVECTOR3 posEffect = pVtx[0].pos;
+		// 衝突エフェクトを出す位置を計算する
 		D3DXVECTOR3 vecWall = pVtx[2].pos - pVtx[0].pos;
 		D3DXVec3Normalize(&vecWall, &vecWall);
-		posEffect += vecWall * D3DXVec3Dot(&(*pos - pVtx[0].pos), &vecWall);
+		D3DXVECTOR3 posEffect = pVtx[0].pos + (vecWall * D3DXVec3Dot(&(*pos - pVtx[0].pos), &vecWall));
+
+		// 衝突エフェクトを出す角度を計算する
 		float rotEffect = atan2f(pVtx[2].pos.x - pVtx[0].pos.x, pVtx[2].pos.z - pVtx[0].pos.z);
 
 		// エフェクトの再生
