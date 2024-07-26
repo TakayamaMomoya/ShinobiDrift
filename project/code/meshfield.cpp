@@ -709,7 +709,7 @@ void CMeshField::Dent(D3DXVECTOR3 pos,float fRadius,float fDepth)
 	for (int nCnt = 0; nCnt < m_MeshField.nNumVtx; nCnt++)
 	{
 		// ·•ª‚Ì’·‚³‚ðŽæ“¾
-		vecDiff = pos - pVtx[nCnt].pos;
+		vecDiff = pos - (pVtx[nCnt].pos + GetPosition());
 		fLength = D3DXVec3Length(&vecDiff);
 
 		float fRate = fLength / fRadius;

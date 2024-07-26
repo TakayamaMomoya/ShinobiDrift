@@ -38,6 +38,7 @@
 #include "goal.h"
 #include "edit.h"
 #include "editMesh.h"
+#include "editMeshfield.h"
 #include "editBlock.h"
 #include "editGoal.h"
 #include "enemy.h"
@@ -286,8 +287,11 @@ void CGame::Debug(void)
 
 	ImGui::Text("[EditMode]");
 
-	if (ImGui::Button("Mesh", ImVec2(70, 30)))	// メッシュエディット
+	if (ImGui::Button("MeshRoad", ImVec2(70, 30)))	// メッシュロードエディット
 		ChangeEdit(new CEditMesh);
+
+	if (ImGui::Button("MeshField", ImVec2(70, 30)))	// メッシュフィールドエディット
+		ChangeEdit(new CEditMeshfield);
 
 	if (ImGui::Button("Block", ImVec2(70, 30)))	// ブロックエディット
 		ChangeEdit(new CEditBlock);
