@@ -149,7 +149,7 @@ HRESULT CPlayer::Init(void)
 
 	// テールランプ用軌跡の生成
 	m_info.orbitColor = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-	m_info.pOrbit = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), m_info.orbitColor, 60);
+	m_info.pOrbitLamp = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), m_info.orbitColor, 60);
 
 	// サウンドインスタンスの取得
 	CSound* pSound = CSound::GetInstance();
@@ -236,7 +236,7 @@ void CPlayer::Load(void)
 void CPlayer::Uninit(void)
 {
 	m_pPlayer = nullptr;
-	m_info.pOrbit->Uninit();
+	m_info.pOrbitLamp->Uninit();
 
 	// 継承クラスの終了
 	CMotion::Uninit();
@@ -264,14 +264,9 @@ void CPlayer::Update(void)
 		// 入力
 		Input();
 
-		// メッシュロードの配列取得
-		std::list<CMeshRoad*> listRoad = CMeshRoad::GetArray();
-
-		for (auto it : listRoad)
-		{
+		
 			//当たり判定
-			Collision(it);
-		}
+			Collision();
 	}
 
 	// 前回の位置を保存
@@ -453,9 +448,6 @@ void CPlayer::InputWire(void)
 		D3DXVECTOR3 move = GetMove();
 		universal::VecConvertLength(&vecDiff, fabs(D3DXVec3Dot(&move, &vecDiffNormal)));
 
-		// ワイヤーに沿って進める
-		ForwardFollowWire(vecLength, vecDiff);
-
 		float fAngleDiff = atan2f(vecDiff.x, vecDiff.z);
 
 		// ドリフトを変えるかの判定
@@ -520,25 +512,6 @@ void CPlayer::InputWire(void)
 }
 
 //=====================================================
-// ワイヤーに沿って進める
-//=====================================================
-void CPlayer::ForwardFollowWire(float vecLength,D3DXVECTOR3 vecDiff)
-{
-	D3DXVECTOR3 move = GetMove();
-
-	if (vecLength < 1000.0f && m_info.fLengthDrift < 500.0f)
-	{
-		move -= vecDiff * 0.1f;
-	}
-	else
-	{
-		move += vecDiff;
-	}
-
-	SetMove(move);
-}
-
-//=====================================================
 // ドリフトを変えるかの判定
 //=====================================================
 void CPlayer::JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength)
@@ -589,8 +562,6 @@ void CPlayer::JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength)
 //=====================================================
 void CPlayer::ManageRotateGrab(float fAngleDiff)
 {
-	D3DXVECTOR3 rot = GetRotation();
-
 	float fDiff = m_info.rotDriftStart.y - fAngleDiff;
 
 	universal::LimitRot(&fDiff);
@@ -614,10 +585,7 @@ void CPlayer::ManageRotateGrab(float fAngleDiff)
 
 	universal::LimitRot(&rotDest.y);
 
-	//universal::FactingRot(&rot.y, rotDest.y, 0.15f);
 	universal::FactingRot(&m_info.rotDriftStart.y, rotDest.y, 0.15f);
-	
-	//SetRotation(rot);
 }
 
 //=====================================================
@@ -867,7 +835,7 @@ void CPlayer::LimitDrift(float fLength)
 //=====================================================
 // 当たり判定処理
 //=====================================================
-void CPlayer::Collision(CMeshRoad *pMesh)
+void CPlayer::Collision(void)
 {
 	// 前回の位置を保存
 	D3DXVECTOR3 pos = GetPosition();
@@ -880,29 +848,14 @@ void CPlayer::Collision(CMeshRoad *pMesh)
 	bool bRoad[2];
 	CInputManager* pInputManager = CInputManager::GetInstance();
 
-	// ガードレールとの当たり判定
-	// ガードレールのvectorを取得
-	std::vector<CGuardRail*> *aGuardRail = pMesh->GetArrayGR();
-
 	// 計算用マトリックスを宣言
 	D3DXMATRIX* mtx = &GetMatrix();
 	D3DXMATRIX mtxTrans, mtxRot;
 
-	// プレイヤー側の当たり判定サイズを設定
+	// プレイヤー側の当たり判定サイズから判定用OBBを設定
 	D3DXVECTOR3 paramSize = m_param.sizeCollider;
 	D3DXVECTOR3 sizeX = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, rot.y, 0.0f), paramSize);
 	D3DXVECTOR3 sizeZ = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, -rot.y, 0.0f), D3DXVECTOR3(paramSize.x, 0.0f, paramSize.z));
-
-	// ガードレールの回数判定を回す
-	for (auto itGuardRail : *aGuardRail)
-	{
-		// 一か所判定するまで続ける
-		if (itGuardRail->CollideGuardRail(&pos, &move, sizeX, &m_info.fSpeed))
-		{
-			rot.y = atan2f(move.x, move.z);
-			break;
-		}
-	}
 
 	// タイヤの位置保存
 	posParts[0] = universal::GetMtxPos(GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
@@ -919,29 +872,54 @@ void CPlayer::Collision(CMeshRoad *pMesh)
 	// タイヤの中点を計算
 	posDef = (posParts[0] + posParts[1]) * 0.5f;
 
-	// タイヤそれぞれでmeshRoadと当たり判定をとる
-	bRoad[0] = pMesh->CollideRoad(&posParts[0], posOldParts[0]);
-	bRoad[1] = pMesh->CollideRoad(&posParts[1], posOldParts[1]);
+	// メッシュロードのリスト取得
+	std::list<CMeshRoad*> listRoad = CMeshRoad::GetArray();
+	for (auto it : listRoad)
+	{
+		// ガードレールとの当たり判定
+		// ガードレールのvectorを取得
+		std::vector<CGuardRail*>* aGuardRail = it->GetArrayGR();
+		for (auto itGuardRail : *aGuardRail)
+		{
+			// ガードレールと当たっているか判定する
+			if (!itGuardRail->CollideGuardRail(&pos, &move, sizeX, &m_info.fSpeed))
+				continue;
 
-	CDebugProc::GetInstance()->Print("\nタイヤ1位置[%f,%f,%f]", posParts[0].x, posParts[0].y, posParts[0].z);
-	CDebugProc::GetInstance()->Print("\nタイヤ2位置[%f,%f,%f]", posParts[1].x, posParts[1].y, posParts[1].z);
+			// 一か所判定したら抜ける
+			rot.y = atan2f(move.x, move.z);
+
+			// ドリフト中の時ドリフト状態を解除する
+			m_info.rotDriftDest = 0.0f;
+			RemoveWire();
+
+			break;
+		}
+
+		// タイヤそれぞれでmeshRoadと当たり判定をとる
+		bRoad[0] = it->CollideRoad(&posParts[0], posOldParts[0]);
+		bRoad[1] = it->CollideRoad(&posParts[1], posOldParts[1]);
+
+		// どちらかのタイヤがmeshRoadと当たっていたらループを抜ける
+		if (bRoad[0] || bRoad[1])
+			break;
+	}
 
 	// タイヤそれぞれでblockと当たり判定をとる
 	// 先頭オブジェクトを代入
 	CBlock* pBlock = CBlockManager::GetInstance()->GetHead();
-
 	while (pBlock)
 	{
 		// 次のアドレスを保存
 		CBlock* pBlockNext = pBlock->GetNext();
 
-		// 当たり判定処理
+		// タイヤとblockで当たり判定をとる
 		if (pBlock->Collide(&posParts[0], posOldParts[0]))
 			bRoad[0] = true;
 
 		if (pBlock->Collide(&posParts[1], posOldParts[1]))
 			bRoad[1] = true;
 
+		// 両方が判定を通っていたら抜ける
 		if (bRoad[0] && bRoad[1])
 			break;
 
@@ -956,6 +934,7 @@ void CPlayer::Collision(CMeshRoad *pMesh)
 	if ((posParts[1].y - posParts[0].y) < D3DXVec3Length(&(posParts[0] - posParts[1])) && (bRoad[0] || bRoad[1]))
 		rot.x = asinf((posParts[1].y - posParts[0].y) / D3DXVec3Length(&(posParts[0] - posParts[1])));
 
+	// タイヤの状態を判定する
 	if (bRoad[0] && bRoad[1])
 	{// タイヤが両方道に触れているとき
 		move.y = -20.0f;
@@ -976,7 +955,7 @@ void CPlayer::Collision(CMeshRoad *pMesh)
 			// ハンドルの操作
 			CInputManager::SAxis axis = pInputManager->GetAxis();
 
-			// 前後の回転処理
+			// 空中での前後の回転処理
 			if (axis.axisMove.z > 0.0f)
 				rot.x += 0.015f;
 			else if (axis.axisMove.z < 0.0f)
@@ -1145,12 +1124,12 @@ void CPlayer::ManageSpeed(void)
 	move.z = vecForward.z * m_info.fSpeed;
 
 	// 移動量に重力を適用
-	move.y += -0.5f;
+	move.y += -0.7f;
 
 	SetMove(move);
 
-	if (m_info.pOrbit != nullptr)
-		m_info.pOrbit->SetOffset(GetMatrix(), m_info.orbitColor, m_info.pOrbit->GetID());
+	if (m_info.pOrbitLamp != nullptr)
+		m_info.pOrbitLamp->SetOffset(GetMatrix(), m_info.orbitColor, m_info.pOrbitLamp->GetID());
 }
 
 //=====================================================
