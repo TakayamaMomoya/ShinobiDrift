@@ -44,11 +44,21 @@ const float SIZE_BLUR = -20.0f;	// ブラーのサイズ
 const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
 const float SE_CHANGE_SPEED = 10.0f;  // エンジン音とアクセル音が切り替わる速度の値
 const float HANDLE_INERTIA = 0.03f;  // カーブ時の角度変更慣性
-const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性
-const float HANDLE_INERTIA_DRIFT = 0.08f;  // ドリフト時の角度変更慣性
+const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性倍率
+const float HANDLE_INERTIA_DRIFT = 0.08f;  // ドリフト時の角度変更慣性倍率
+const float HANDLE_INERTIA_DEFAULT = 0.1f;  // ドリフト姿勢から通常姿勢に戻る時の角度変更慣性倍率
 const float HANDLE_CURVE_MAG = -0.04f;  // 体勢からカーブへの倍率
 const float SIZE_SPEEDBLUR = 13.0f;	// スピードブラーのサイズ
 const float DENSITY_SPEEDBLUR = 0.3f;	// スピードブラーの濃さ
+const float ROT_CURVE_LIMIT = 0.02f;  // ハンドル操作がきく用になる角度の限界
+const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
+const float GRAVITY = -0.7f;  // 重力の倍率
+const float GRAVITY_GROUND = -20.0f;  // 接地時の重力
+const float HEIGH_FRONT_WHEEL = 55.0f;  // 前輪の高さ
+const float HEIGH_REAR_WHEEL = 65.0f;  // 後輪の高さ
+const float ROT_BIKE_FRONT_LIMIT = 1.5f;  // 前回りの角度限界
+const float ROT_BIKE_REAR_LIMIT = -1.35f;  // 後ろ回りの角度限界
+const float ROT_AIRBIKE_MAG = 0.015f;  // 空中での回転倍率
 }
 
 //*****************************************************
@@ -720,14 +730,7 @@ void CPlayer::SarchGrab(void)
 
 		m_info.fLengthDrift = fLengthMin;
 
-		if (fLengthMin < 500.0f)
-		{
-			m_info.fAngleDrift = 0.4f;
-		}
-		else
-		{
-			m_info.fAngleDrift = 0.4f;
-		}
+		m_info.fAngleDrift = 0.4f;
 	}
 
 	if (pBlockGrab != nullptr)
@@ -863,15 +866,15 @@ void CPlayer::Collision(void)
 
 	// タイヤの位置保存
 	posParts[0] = universal::GetMtxPos(GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
-	posParts[0].y -= 55.0f;
+	posParts[0].y -= HEIGH_FRONT_WHEEL;
 	posParts[1] = universal::GetMtxPos(GetParts(3)->pParts->GetMatrix()) + (pos - posOld);
-	posParts[1].y -= 65.0f;
+	posParts[1].y -= HEIGH_REAR_WHEEL;
 
 	// タイヤの過去位置保存
 	posOldParts[0] = universal::GetMtxPos(*GetParts(2)->pParts->GetMatrixOld()) + (pos - posOld);
-	posOldParts[0].y -= 55.0f;
+	posOldParts[0].y -= HEIGH_FRONT_WHEEL;
 	posOldParts[1] = universal::GetMtxPos(*GetParts(3)->pParts->GetMatrixOld()) + (pos - posOld);
-	posOldParts[1].y -= 65.0f;
+	posOldParts[1].y -= HEIGH_REAR_WHEEL;
 
 	// タイヤの中点を計算
 	posDef = (posParts[0] + posParts[1]) * 0.5f;
@@ -898,6 +901,12 @@ void CPlayer::Collision(void)
 
 			break;
 		}
+
+		// ガードレールの判定分タイヤの位置を計算する
+		posParts[0] += pos - posOld;
+		posParts[1] += pos - posOld;
+		posOldParts[0] += pos - posOld;
+		posOldParts[1] += pos - posOld;
 
 		// タイヤそれぞれでmeshRoadと当たり判定をとる
 		bRoad[0] = it->CollideRoad(&posParts[0], posOldParts[0]);
@@ -941,13 +950,13 @@ void CPlayer::Collision(void)
 	// タイヤの状態を判定する
 	if (bRoad[0] && bRoad[1])
 	{// タイヤが両方道に触れているとき
-		move.y = -20.0f;
+		move.y = GRAVITY_GROUND;
 
 		m_info.bAir = false;
 	}
 	else if (bRoad[0] || bRoad[1])
 	{// タイヤが片方だけ道に触れているとき
-		move.y = -20.0f;
+		move.y = GRAVITY_GROUND;
 
 		m_info.bAir = true;
 	}
@@ -961,12 +970,12 @@ void CPlayer::Collision(void)
 
 			// 空中での前後の回転処理
 			if (axis.axisMove.z > 0.0f)
-				rot.x += 0.015f;
+				rot.x += ROT_AIRBIKE_MAG;
 			else if (axis.axisMove.z < 0.0f)
-				rot.x -= 0.015f;
+				rot.x -= ROT_AIRBIKE_MAG;
 			else
 			{
-				rot.x += 0.01f;
+				rot.x += ROT_AIRBIKE_MAG;
 			}
 		}
 
@@ -974,11 +983,11 @@ void CPlayer::Collision(void)
 	}
 
 	// 角度制限
-	if (rot.x > 1.50f)
-		rot.x = 1.50f;
+	if (rot.x > ROT_BIKE_FRONT_LIMIT)
+		rot.x = ROT_BIKE_FRONT_LIMIT;
 
-	if (rot.x < -1.35f)
-		rot.x = -1.35f;
+	if (rot.x < ROT_BIKE_REAR_LIMIT)
+		rot.x = ROT_BIKE_REAR_LIMIT;
 
 #ifdef _DEBUG
 	if (CInputJoypad::GetInstance() != nullptr)
@@ -1062,20 +1071,20 @@ void CPlayer::ManageSpeed(void)
 
 		if (D3DXVec3Cross(&posPlayer, &GetMove(), &(posBlock - posPlayer))->y > 0.0f)
 		{
-			rot.z += (-1.0f - rot.z) * HANDLE_INERTIA_DRIFT;
-			m_info.rotDriftDest = 1.57f;
+			rot.z += (-ROT_Z_DRIFT - rot.z) * HANDLE_INERTIA_DRIFT;
+			m_info.rotDriftDest = D3DX_PI * 0.5f;
 		}
 		else
 		{
-			rot.z += (1.0f - rot.z) * HANDLE_INERTIA_DRIFT;
-			m_info.rotDriftDest = -1.57f;
+			rot.z += (ROT_Z_DRIFT - rot.z) * HANDLE_INERTIA_DRIFT;
+			m_info.rotDriftDest = D3DX_PI * -0.5f;
 		}
 		
 		universal::LimitRot(&rot.z);
 
 		float rotDef = rotBlock - rot.y;
 		universal::LimitRot(&rotDef);
-		rot.y += (rotDef) * 1.0f;
+		rot.y += rotDef;
 		universal::LimitRot(&rot.y);
 
 		m_info.orbitColor = D3DXCOLOR(1.0f, 0.15f, 0.0f, 1.0f);
@@ -1089,7 +1098,7 @@ void CPlayer::ManageSpeed(void)
 		
 		universal::LimitRot(&rot.z);
 
-		if (fabsf(m_info.rotDriftDest) < 0.02f)
+		if (fabsf(m_info.rotDriftDest) < ROT_CURVE_LIMIT)
 		{
 			rot.y += rot.z * HANDLE_CURVE_MAG;
 			universal::LimitRot(&rot.y);
@@ -1103,8 +1112,8 @@ void CPlayer::ManageSpeed(void)
 
 	if (m_info.pBlockGrab == nullptr)
 	{
-		rot.y += (0.0f - m_info.rotDriftDest) * 0.1f;
-		m_info.rotDriftDest += (0.0f - m_info.rotDriftDest) * 0.1f;
+		rot.y += (0.0f - m_info.rotDriftDest) * HANDLE_INERTIA_DEFAULT;
+		m_info.rotDriftDest += (0.0f - m_info.rotDriftDest) * HANDLE_INERTIA_DEFAULT;
 	}
 
 	SetRotation(rot);
@@ -1128,7 +1137,7 @@ void CPlayer::ManageSpeed(void)
 	move.z = vecForward.z * m_info.fSpeed;
 
 	// 移動量に重力を適用
-	move.y += -0.7f;
+	move.y += GRAVITY;
 
 	SetMove(move);
 

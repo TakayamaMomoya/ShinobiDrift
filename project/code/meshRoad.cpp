@@ -30,6 +30,7 @@ const float LENGTH_DEFAULT = 200.0f;	// デフォルトの長さ
 const char* PATH_TEXTURE = "data\\TEXTURE\\MATERIAL\\road.jpg";	// テクスチャパス
 const float DIST_DEFAULT = 200.0f;	// デフォルトの辺間の距離
 const float WIDTH_ROAD = 600.0f;	// 道の幅
+const float HEIGHT_LIMIT = 200.0f;	// 判定する高さの限界
 }
 
 //*****************************************************
@@ -790,7 +791,7 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 				continue;
 
 			// 高さが一定の高さ以内か判定する
-			if (200.0f < fHeight - pPos->y)
+			if (HEIGHT_LIMIT < fHeight - pPos->y)
 				continue;
 
 			// 高さが一番高い場所で判定する
