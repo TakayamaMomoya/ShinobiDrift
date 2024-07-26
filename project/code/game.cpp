@@ -53,6 +53,7 @@
 namespace
 {
 const char* PATH_GAME_ROAD = "data\\MAP\\road00.bin";	// ゲームメッシュロードのパス
+const D3DXVECTOR3 POS_MESHFIELD = { 342028.0f,1000.0f, -30640.0f };	// メッシュフィールドの位置
 }
 
 //*****************************************************
@@ -127,6 +128,14 @@ HRESULT CGame::Init(void)
 	// メッシュキューブのテスト生成
 	CMeshCube::Create();
 #endif
+
+	// メッシュフィールドの生成
+	CMeshField *pMeshField = CMeshField::Create();
+
+	if (pMeshField != nullptr)
+	{
+		pMeshField->SetPosition(POS_MESHFIELD);
+	}
 
 	return S_OK;
 }

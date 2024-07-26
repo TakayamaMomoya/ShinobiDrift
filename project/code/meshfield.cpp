@@ -23,9 +23,9 @@
 //*****************************************************
 // マクロ定義
 //*****************************************************
-#define MESHFIELD_TEX_FILE			"data\\TEXTURE\\MATERIAL\\field01.jpg"				// テクスチャファイル名
+#define MESHFIELD_TEX_FILE			"data\\TEXTURE\\BG\\field00.jpg"				// テクスチャファイル名
 #define MOVE_SPEED					(1.0f)										// 移動速度
-#define MESH_LENGTH					(300.0f)									// メッシュの一辺の長さ
+#define MESH_LENGTH					(800.0f)									// メッシュの一辺の長さ
 #define MESH_U						(254)											// 横のブロック数
 #define MESH_V						(254)											// 縦のブロック数
 #define SPLIT_TEX					(10)										// テクスチャ分割数
@@ -84,6 +84,8 @@ CMeshField *CMeshField::Create(void)
 //=====================================================
 HRESULT CMeshField::Init(void)
 {
+	CObject3D::Init();
+
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
 
@@ -215,7 +217,7 @@ void CMeshField::Uninit(void)
 		m_pIdxBuff = nullptr;
 	}
 
-	Release();
+	CObject3D::Uninit();
 }
 
 //=====================================================
@@ -710,14 +712,13 @@ void CMeshField::Dent(D3DXVECTOR3 pos,float fRadius,float fDepth)
 		vecDiff = pos - pVtx[nCnt].pos;
 		fLength = D3DXVec3Length(&vecDiff);
 
+		float fRate = fLength / fRadius;
+
 		if (fLength < fRadius)
 		{
-			pVtx[nCnt].pos.y -= fDepth - (fDepth * (fLength / fRadius));
+			pVtx[nCnt].pos.y += fDepth - (fDepth * (fLength / fRadius));
 		}
 	}
-
-	// 法線設定
-	SetNormal();
 
 	// 頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
@@ -855,28 +856,10 @@ void CMeshField::Reset(void)
 //=====================================================
 void CMeshField::Draw(void)
 {
+	CObject3D::Draw();
+
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
-	D3DXMATRIX mtxRot, mtxTrans;
-
-	// 入力情報入手
-	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
-
-	//ワールドマトリックス初期化
-	D3DXMatrixIdentity(&m_MeshField.mtxWorld);
-
-	//向きを反映
-	D3DXMatrixRotationYawPitchRoll (&mtxRot,
-		m_MeshField.rot.y, m_MeshField.rot.x, m_MeshField.rot.z);
-	D3DXMatrixMultiply(&m_MeshField.mtxWorld, &m_MeshField.mtxWorld,&mtxRot);
-
-	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans,
-		m_MeshField.pos.x, m_MeshField.pos.y, m_MeshField.pos.z);
-	D3DXMatrixMultiply(&m_MeshField.mtxWorld, &m_MeshField.mtxWorld, &mtxTrans);
-
-	//ワールドマトリックス設定
-	pDevice->SetTransform(D3DTS_WORLD,&m_MeshField.mtxWorld);
 
 	//頂点バッファをデータストリームに設定
 	pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_3D));
