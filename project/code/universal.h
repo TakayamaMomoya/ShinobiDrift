@@ -17,7 +17,8 @@ namespace universal
 //======================================
 // êßå¿ån
 //======================================
-void LimitValue(float *pValue, float fMax, float fMin);
+void LimitValuefloat(float *pValue, float fMax, float fMin);
+void LimitValueInt(int *pValue, int nMax, int nMin);
 void LimitRot(float *fRot);	//âÒì]êßå‰èàóù
 void LimitSpeed(D3DXVECTOR3 *pVec, float fSpeedMax);
 void LimitPosInSq(float fWidth, float fHeight, D3DXVECTOR3 *pPos);
@@ -51,7 +52,7 @@ D3DXVECTOR3 VecToRot(D3DXVECTOR3 vec);
 D3DXVECTOR3 GetMtxPos(D3DXMATRIX mtx);
 int RandRange(int nMax, int nMin);
 void VecConvertLength(D3DXVECTOR3 *pVec, float fLength);
-float lengthAxis(D3DXVECTOR3 sep, D3DXVECTOR3 e1, D3DXVECTOR3 e2, D3DXVECTOR3 e3);
+float lengthAxis(D3DXVECTOR3 separationAxis, D3DXVECTOR3 e1, D3DXVECTOR3 e2, D3DXVECTOR3 e3);
 D3DXVECTOR3 PosRelativeMtx(D3DXVECTOR3 posO, D3DXVECTOR3 rot, D3DXVECTOR3 offset);
 D3DXVECTOR3 NorRelativeMtx(D3DXVECTOR3 posO, D3DXVECTOR3 rot, D3DXVECTOR3 offsetMax, D3DXVECTOR3 offsetMin);
 

@@ -29,6 +29,7 @@ const char* CEffekseer::m_apEfkName[CEffekseer::TYPE_MAX] =
 	"data\\EFFEKSEER\\Effect\\WindShuriken.efkefc",	// 手裏剣の回転風
 	"data\\EFFEKSEER\\Effect\\grapple.efkefc",	// 鉤縄
 	"data\\EFFEKSEER\\Effect\\smoke.efkefc",	// 敵撤退時の煙
+	"data\\EFFEKSEER\\Effect\\gate00.efkefc",	// ゲート
 };
 
 //===========================================================
@@ -111,6 +112,10 @@ void CEffekseer::Update(void)
 		Effekseer::Vector3D rot = (*it)->GetRotation();
 		m_efkManager->SetRotation(handle, rot.X, rot.Y, rot.Z);
 
+		// エフェクトのスケール反映
+		Effekseer::Vector3D scale = (*it)->GetScale();
+		m_efkManager->SetScale(handle, scale.X, scale.Y, scale.Z);
+
 		// レイヤーパラメータの設定
 		Effekseer::Manager::LayerParameter layerParameter;
 		layerParameter.ViewerPosition = viewerPosition;
@@ -134,9 +139,10 @@ void CEffekseer::Update(void)
 		// 毎フレーム、エフェクトが再生終了しているか確認する
 		if (m_efkManager->Exists(handle) == false)
 		{
-			// エフェクトの解放
-			m_efkManager->StopEffect(handle);
-			ReleaseEffect((*it));
+			(*it)->Uninit();
+
+			// リストから除外
+			m_listEffect.remove((*it));
 		}
 
 		it = itNext;
@@ -341,7 +347,15 @@ void CEffekseerEffect::Init(::Effekseer::Vector3D pos, ::Effekseer::Vector3D rot
 //===========================================================
 void CEffekseerEffect::Uninit()
 {
+	CEffekseer *pEffekseer = CManager::GetMyEffekseer();
 
+	if (pEffekseer == nullptr)
+		return;
+
+	Effekseer::ManagerRef efkManager = pEffekseer->GetEfkManager();
+
+	// エフェクトの解放
+	efkManager->StopEffect(m_efkHandle);
 }
 
 //===========================================================

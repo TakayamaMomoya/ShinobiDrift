@@ -30,6 +30,7 @@ const float LENGTH_DEFAULT = 200.0f;	// デフォルトの長さ
 const char* PATH_TEXTURE = "data\\TEXTURE\\MATERIAL\\road.jpg";	// テクスチャパス
 const float DIST_DEFAULT = 200.0f;	// デフォルトの辺間の距離
 const float WIDTH_ROAD = 600.0f;	// 道の幅
+const float HEIGHT_LIMIT = 200.0f;	// 判定する高さの限界
 }
 
 //*****************************************************
@@ -765,6 +766,7 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 		// 道の区分の中にいなければ判定しない
 		if (D3DXVec3Dot(&(itRoadPoint.pos - posOldRoadPoint), &(*pPos - posOldRoadPoint)) < 0.0f)
 		{
+			// 区分判定用変数に代入
 			posOldRoadPoint = itRoadPoint.pos;
 			pVtx += MeshRoad::NUM_VTX_IN_EDGE * MeshRoad::NUM_EDGE_IN_ROADPOINT;
 			continue;
@@ -774,7 +776,8 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 		for (int i = 0; i < MeshRoad::NUM_EDGE_IN_ROADPOINT; i++)
 		{
 			pVtx += MeshRoad::NUM_VTX_IN_EDGE;
-
+			
+			// 判定用の位置を設定
 			D3DXVECTOR3 posUpPolygon = *pPos;
 			posUpPolygon.y = pVtx[2].pos.y;
 
@@ -788,7 +791,7 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 				continue;
 
 			// 高さが一定の高さ以内か判定する
-			if (200.0f < fHeight - pPos->y)
+			if (HEIGHT_LIMIT < fHeight - pPos->y)
 				continue;
 
 			// 高さが一番高い場所で判定する
