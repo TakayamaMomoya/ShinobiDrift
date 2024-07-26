@@ -9,21 +9,26 @@
 // インクルード
 //*****************************************************
 #include "meter.h"
-#include "manager.h"
 #include "debugproc.h"
 #include "texture.h"
-#include "input.h"
-#include "inputkeyboard.h"
+#include "UI.h"
+#include "number.h"
+#include "player.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-const int SECOND = 140;		// メーターの表示値
+const char* PATH_TEX_BACKMETER = "data\\TEXTURE\\UI\\meter00.png";	// メーター背景のテクスチャパス
+const char* PATH_TEX_NEEDLE = "data\\TEXTURE\\UI\\Needle.png";	// 針のテクスチャパス
 const int PLACE = 3;		// 桁数
-const float WIDTH = SCREEN_WIDTH * 0.80f;		// 幅
-const float HEIGHT = SCREEN_HEIGHT * 0.9f;		// 高さ
+const D3DXVECTOR2 SIZE_METER = { SCREEN_WIDTH * 0.13f, SCREEN_WIDTH * 0.13f };	// メーター背景のサイズ
+const D3DXVECTOR3 POS_METER = { SCREEN_WIDTH - SIZE_METER.x - 10.0f, SCREEN_HEIGHT - SIZE_METER.y - 10.0f, 0.0f };	// メーターの位置
+const D3DXVECTOR2 SIZE_NUMBER = { SCREEN_WIDTH * 0.015f, SCREEN_WIDTH * 0.02f };	// メーターの数字のサイズ
+const D3DXVECTOR2 SIZE_NEEDLE = { SIZE_METER.x * 0.2f, SIZE_METER.y * 0.9f };	// 針のサイズ
+const float MIN_ANGLE_NEEDLE = D3DX_PI * 0.7f;	// 針の最低速度時の角度
+const float MAX_ANGLE_NEEDLE = -D3DX_PI * 0.7f;	// 針の最高速度時の角度
 }
 
 //=====================================================
@@ -36,13 +41,9 @@ CMeter* CMeter::m_pMeter = nullptr;
 //=====================================================
 CMeter::CMeter(int nPriority)
 {
-	m_NowMeter = 0;			// 現在のメーター値
-	m_nCntMeter = 0;		// メーター加算
-	m_nIdxTexture = 0;		// テクスチャ番号
-	m_fRot = 0.0f;			// 向き
 	m_pNumber = nullptr;	// ナンバーのポインタ
-	m_pPlayer = nullptr;	// プレイヤーのポインタ
-	m_pUI = nullptr;		// UIのポインタ
+	m_pNeedle = nullptr;		// 針のポインタ
+	m_pBackMeter = nullptr;	// メーター背景のポインタ
 }
 
 //=====================================================
@@ -50,6 +51,7 @@ CMeter::CMeter(int nPriority)
 //=====================================================
 CMeter::~CMeter()
 {
+
 }
 
 //=====================================================
@@ -75,62 +77,45 @@ CMeter* CMeter::Create(void)
 //=====================================================
 HRESULT CMeter::Init()
 {
-	// 速度
-	m_NowMeter = 0;
-
-	// カウント加算
-	m_nCntMeter = 0;
-
-	// テクスチャ番号
-	m_nIdxTexture = 0;
-
-	// プレイヤーの情報取得
-	if (m_pPlayer == nullptr)
-		m_pPlayer = CPlayer::GetInstance();
-
-	// テクスチャ情報の取得
-	CTexture* pTexture = CTexture::GetInstance();
-
-	// テクスチャ番号
-	m_nIdxTexture = pTexture->Regist("data\\TEXTURE\\UI\\Needle.png");
-
-	if (m_pUI == nullptr)
+	if (m_pBackMeter == nullptr)
 	{
-		// 生成
-		m_pUI = CUI::Create();
+		m_pBackMeter = CUI::Create();
 
 		// テクスチャ設定
-		m_pUI->SetIdxTexture(m_nIdxTexture);
+		int nIdx = Texture::GetIdx(PATH_TEX_BACKMETER);
+		m_pBackMeter->SetIdxTexture(nIdx);
 
-		// 位置設定
-		m_pUI->SetPosition(D3DXVECTOR3(1100, 600.0f, 0.0f));
+		// トランスフォーム設定
+		m_pBackMeter->SetPosition(POS_METER);
+		m_pBackMeter->SetSize(SIZE_METER.x, SIZE_METER.y);
+		m_pBackMeter->SetVtx();
+	}
 
-		// サイズ設定
-		m_pUI->SetSize(75.0f, 100.0f);
+	if (m_pNeedle == nullptr)
+	{// 針の生成
+		// 生成
+		m_pNeedle = CUI::Create();
 
-		// 向き設定
-		m_pUI->SetRotation(0.0f);
+		// テクスチャ設定
+		int nIdx = Texture::GetIdx(PATH_TEX_NEEDLE);
+		m_pNeedle->SetIdxTexture(nIdx);
 
-		// 頂点情報設定
-		m_pUI->SetVtx();
-
-		// 色設定
-		m_pUI->SetCol(D3DXCOLOR(1.0f, 0.5f, 0.0f, 1.0f));
+		// トランスフォーム設定
+		m_pNeedle->SetPosition(POS_METER);
+		m_pNeedle->SetSize(SIZE_NEEDLE.x, SIZE_NEEDLE.y);
+		m_pNeedle->SetVtx();
 	}
 
 	if (m_pNumber == nullptr)
-	{
+	{// メーター値の生成
 		// 生成
 		m_pNumber = CNumber::Create(PLACE, 0);
 
 		// 位置設定
-		m_pNumber->SetPosition(D3DXVECTOR3(WIDTH, HEIGHT, 0.0f));
+		m_pNumber->SetPosition(D3DXVECTOR3(POS_METER.x - SIZE_NUMBER.x * 2, POS_METER.y - SIZE_NUMBER.y * 1.8f, 0.0f));
 
 		// サイズ調整
-		m_pNumber->SetSizeAll(30.0f, 30.0f);
-
-		// 色設定
-		m_pNumber->SetColor(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+		m_pNumber->SetSizeAll(SIZE_NUMBER.x, SIZE_NUMBER.y);
 	}
 
 	return S_OK;
@@ -142,19 +127,24 @@ HRESULT CMeter::Init()
 void CMeter::Uninit(void)
 {
 	if (m_pNumber != nullptr)
-		m_pNumber = nullptr;
-
-	if (m_pPlayer != nullptr)
 	{
-		m_pPlayer->Uninit();
-		m_pPlayer = nullptr;
+		m_pNumber->Uninit();
+		m_pNumber = nullptr;
 	}
 
-	if (m_pUI != nullptr)
-		m_pUI = nullptr;
+	if (m_pNeedle != nullptr)
+	{
+		m_pNeedle->Uninit();
+		m_pNeedle = nullptr;
+	}
 
-	if (m_pMeter != nullptr)
-		m_pMeter = nullptr;
+	if (m_pBackMeter != nullptr)
+	{
+		m_pBackMeter->Uninit();
+		m_pBackMeter = nullptr;
+	}
+
+	m_pMeter = nullptr;
 
 	// 自身の破棄
 	Release();
@@ -168,7 +158,8 @@ void CMeter::Update(void)
 	// メーター値
 	Acceleration();
 
-	CDebugProc::GetInstance()->Print("\n現在の向き[%f]", m_fRot);
+	// 針を動かす処理
+	Needle();
 }
 
 //=====================================================
@@ -176,38 +167,17 @@ void CMeter::Update(void)
 //=====================================================
 void CMeter::Acceleration()
 {
-	// デルタタイム取得
-	float fDeltaTime = CManager::GetDeltaTime();
+	CPlayer *pPlayer = CPlayer::GetInstance();
 
-	if (m_pPlayer != nullptr)
-	{
-		// 速度取得
-		float fPlayerSpeed = m_pPlayer->GetSpeed();
+	if (pPlayer == nullptr)
+		return;
 
-		// 最高速度
-		float fMaxSpeed = m_pPlayer->GetParam().fSpeedMax;
-
-
-		// 速度取得
-		m_NowMeter = (int)fPlayerSpeed;
-
-		if (m_NowMeter >= fMaxSpeed)
-		{// プレイヤーパラメーターの速度を超えないように
-			m_NowMeter = (int)fMaxSpeed;
-		}
-	}
-
-	// メーター値の計算
-	int Meter = m_NowMeter % SECOND;
+	// 速度取得
+	float fPlayerSpeed = pPlayer->GetSpeed();
 
 	if (m_pNumber != nullptr)
 	{// 値表示の制御
-		m_pNumber->SetValue(Meter, PLACE);
-	}
-
-	if (m_NowMeter <= 0)
-	{// マイナスの値にいかないように
-		m_NowMeter = 0;
+		m_pNumber->SetValue((int)fPlayerSpeed, PLACE);
 	}
 }
 
@@ -216,15 +186,21 @@ void CMeter::Acceleration()
 //=====================================================
 void CMeter::Needle()
 {
-	if (m_pUI != nullptr)
-	{
-		// 向き取得
-		m_fRot = m_pUI->GetRotation();
+	CPlayer *pPlayer = CPlayer::GetInstance();
 
-		// 
-		m_fRot;
+	if (m_pNeedle == nullptr || pPlayer == nullptr)
+		return;
 
-		// 向き設定
-		m_pUI->SetRotation(m_fRot);
-	}
+	float fSpeed = pPlayer->GetSpeed();
+	float fSpeedMax = pPlayer->GetParam().fSpeedMaxInitial;
+
+	float fRate = fSpeed / fSpeedMax;
+	universal::LimitValuefloat(&fRate, 1.0f, 0.0f);
+
+	float fDiffAngle = MAX_ANGLE_NEEDLE - MIN_ANGLE_NEEDLE;
+
+	float fRot = MIN_ANGLE_NEEDLE + fDiffAngle * fRate;
+
+	m_pNeedle->SetRotation(fRot);
+	m_pNeedle->SetVtx();
 }

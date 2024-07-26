@@ -113,7 +113,8 @@ private:
 		float fTimerDriftChange;
 		float fSizeBlurDrift;	// ドリフト時のブラーの強さ
 		float fDesityBlurDrift;	// ドリフト時のブラーの濃さ
-		COrbit* pOrbit;	// テールランプの軌跡
+		COrbit* pOrbitLamp;	// テールランプの軌跡
+		COrbit* pOrbitRope;	// テールランプの軌跡
 		D3DXCOLOR orbitColor;	// テールランプの軌跡
 		D3DXVECTOR3 rotDriftStart;	// ドリフトスタート時の角度
 		float rotDriftDest;	// ドリフト終了時の角度補正値
@@ -121,12 +122,11 @@ private:
 
 	void Load(void);
 	void Input(void);
-	void Collision(CMeshRoad *pMesh);
+	void Collision(void);
 	void InputMove(void);
 	void InputWire(void);
 	void InputKatana(void);
 	void ManageKanataAtttack(void);	// 刀の攻撃管理
-	void ForwardFollowWire(float vecLength, D3DXVECTOR3 vecDiff);	// ワイヤーに沿って進める
 	void JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength);	// ドリフト変化の判定
 	void ControlRoap(void);	// ロープの制御
 	void SarchGrab(void);	// 掴むブロックの探知
