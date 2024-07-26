@@ -41,6 +41,8 @@ const float SPEED_RATE_PLAYER = 0.8f;	// ƒvƒŒƒCƒ„[‚ªƒQ[ƒg‚É“ü‚é‚Æ‚«‚ÌƒXƒs[ƒh‚
 const float SPEED_EXPAND_GATE = 0.2f;	// ƒQ[ƒg‚ÌŠg’£‘¬“x
 const float SIZE_GATE_EFFECT = 1000.0f;	// ƒQ[ƒgƒGƒtƒFƒNƒg‚Ì–Ú•WƒTƒCƒY
 const float HEIGTH_GATE = 500.0f;	// ƒQ[ƒg‚Ì‚‚³
+const D3DXVECTOR3 POS_PLAYER_INITIAL = { -11409.0f,0.0f,26395.0f };	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌƒvƒŒƒCƒ„[‰ŠúˆÊ’u
+const D3DXVECTOR3 ROT_PLAYER_INITIAL = { 0.0f,1.77f,0.0f };	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌƒvƒŒƒCƒ„[‰ŠúŒü‚«
 }
 
 //=====================================================
@@ -87,7 +89,21 @@ HRESULT CTutorial::Init(void)
 	ChangeState(new CStateTutorialParry);
 
 	// ƒvƒŒƒCƒ„[‚ðƒ`ƒ…[ƒgƒŠƒAƒ‹ƒ}ƒbƒv‚ÉƒeƒŒƒ|[ƒg
+	CPlayer *pPlayer = CPlayer::GetInstance();
 
+	if (pPlayer != nullptr)
+	{
+		pPlayer->SetPosition(POS_PLAYER_INITIAL);
+		pPlayer->SetRotation(ROT_PLAYER_INITIAL);
+		pPlayer->MultiplyMtx(false);
+
+		CCamera *pCamera = CManager::GetCamera();
+
+		if (pCamera != nullptr)
+		{
+			pCamera->SkipToDest();
+		}
+	}
 
 	return S_OK;
 }
