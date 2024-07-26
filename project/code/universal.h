@@ -17,7 +17,8 @@ namespace universal
 //======================================
 // êßå¿ån
 //======================================
-void LimitValue(float *pValue, float fMax, float fMin);
+void LimitValuefloat(float *pValue, float fMax, float fMin);
+void LimitValueInt(int *pValue, int nMax, int nMin);
 void LimitRot(float *fRot);	//âÒì]êßå‰èàóù
 void LimitSpeed(D3DXVECTOR3 *pVec, float fSpeedMax);
 void LimitPosInSq(float fWidth, float fHeight, D3DXVECTOR3 *pPos);

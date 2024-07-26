@@ -107,7 +107,7 @@ void CFollowPlayer::Update(CCamera *pCamera)
 		m_fTimerPosR += CManager::GetDeltaTime();
 
 		float fTime = m_fTimerPosR / 1.0f;
-		universal::LimitValue(&fTime, 1.0f, 0.0f);
+		universal::LimitValuefloat(&fTime, 1.0f, 0.0f);
 
 		pInfoCamera->posVDest = pos + vecPole * pInfoCamera->fLength;
 
@@ -304,7 +304,7 @@ void CMoveControl::Update(CCamera *pCamera)
 		posAbove.y += pMouse->GetMoveIZ() * SPEED_ZOOM_ABOVE;
 		pInfoCamera->posVDest.y = posAbove.y;
 
-		universal::LimitValue(&posAbove.y, FLT_MAX, 1000.0f);
+		universal::LimitValuefloat(&posAbove.y, FLT_MAX, 1000.0f);
 
 		pCamera->SetPosAbove(posAbove);
 

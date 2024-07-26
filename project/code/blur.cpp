@@ -550,8 +550,8 @@ void AddParameter(float fAddSize, float fAddDensity, float fMaxSize, float fMinS
         fSize += fAddSize;
         col.a += fAddDensity;
 
-        universal::LimitValue(&fSize, fMaxSize, fMinSize);
-        universal::LimitValue(&col.a, fMaxDesity, fMinDensity);
+        universal::LimitValuefloat(&fSize, fMaxSize, fMinSize);
+        universal::LimitValuefloat(&col.a, fMaxDesity, fMinDensity);
 
         pBlur->SetAddSizePolygon(fSize);
         pBlur->SetPolygonColor(col);
