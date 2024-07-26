@@ -33,6 +33,7 @@ public:
 private:
 	// メンバ関数
 	void FollowPlayer(void);	// プレイヤーの追従
+	void DetectionChangeTexture(void);	// テクスチャ変更の検知
 
 	static CSkybox *m_pSkybox;	// 自身のポインタ
 };
