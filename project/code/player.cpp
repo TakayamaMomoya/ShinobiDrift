@@ -925,12 +925,15 @@ void CPlayer::Collision(void)
 		// 次のアドレスを保存
 		CBlock* pBlockNext = pBlock->GetNext();
 
-		// タイヤとblockで当たり判定をとる
-		if (pBlock->Collide(&posParts[0], posOldParts[0]))
-			bRoad[0] = true;
+		if (D3DXVec3Length(&(pBlock->GetPosition() - pos)) < 10000.0f)
+		{
+			// タイヤとblockで当たり判定をとる
+			if (pBlock->Collide(&posParts[0], posOldParts[0]))
+				bRoad[0] = true;
 
-		if (pBlock->Collide(&posParts[1], posOldParts[1]))
-			bRoad[1] = true;
+			if (pBlock->Collide(&posParts[1], posOldParts[1]))
+				bRoad[1] = true;
+		}
 
 		// 両方が判定を通っていたら抜ける
 		if (bRoad[0] && bRoad[1])
