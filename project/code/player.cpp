@@ -1143,7 +1143,6 @@ void CPlayer::ManageSpeed(void)
 	move.y += GRAVITY;
 
 	SetMove(move);
-	CDebugProc::GetInstance()->Print("\nƒvƒŒƒCƒ„[‚ÌˆÚ“®—Ê[%f,%f,%f]", move.x, move.y, move.z);;
 
 	if (m_info.pOrbitLamp != nullptr)
 		m_info.pOrbitLamp->SetOffset(GetMatrix(), m_info.orbitColor, m_info.pOrbitLamp->GetID());

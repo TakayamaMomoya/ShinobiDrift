@@ -23,7 +23,7 @@ const char* TEX_PATH = "data\\TEXTURE\\MATERIAL\\wall00.jpeg";	// テクスチャパス
 const int NUM_VTX_ON_POINT = 2;	// メッシュロードの頂点上にある頂点数
 const float HEIGHT_GR = 600.0f;	// ガードレールの高さ
 const int NUMVTX_NOTDRAW = 4;	// この頂点数未満の場合、描画しない
-const float DECELERATION_MAG = 0.98f;	// 衝突時の減速倍率
+const float DECELERATION_MAG = 0.985f;	// 衝突時の減速倍率
 const float MOVE_MAG = 0.15f;	// 衝突時の移動量反射倍率
 }
 
@@ -365,7 +365,11 @@ bool CGuardRail::CollideGuardRail(D3DXVECTOR3* pos, D3DXVECTOR3* move, D3DXVECTO
 		D3DXVECTOR3 posEffect = pVtx[0].pos + (vecWall * D3DXVec3Dot(&(*pos - pVtx[0].pos), &vecWall));
 
 		// 衝突エフェクトを出す角度を計算する
-		float rotEffect = atan2f(pVtx[2].pos.x - pVtx[0].pos.x, pVtx[2].pos.z - pVtx[0].pos.z);
+		float rotEffect;
+		if (m_bLeft)
+			rotEffect = atan2f(-pVtx[2].nor.x, -pVtx[2].nor.z);
+		else
+			rotEffect = atan2f(pVtx[2].nor.x, pVtx[2].nor.z);
 
 		// エフェクトの再生
 		MyEffekseer::CreateEffect(CEffekseer::TYPE_SPARK, D3DXVECTOR3(posEffect.x, posEffect.y + 100.0f, posEffect.z), D3DXVECTOR3(0.0f, rotEffect, 0.0f));
