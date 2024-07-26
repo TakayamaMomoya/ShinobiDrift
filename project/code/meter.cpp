@@ -111,10 +111,8 @@ HRESULT CMeter::Init()
 		// 生成
 		m_pNumber = CNumber::Create(PLACE, 0);
 
-		// 位置設定
+		// トランスフォーム設定
 		m_pNumber->SetPosition(D3DXVECTOR3(POS_METER.x - SIZE_NUMBER.x * 2, POS_METER.y - SIZE_NUMBER.y * 1.8f, 0.0f));
-
-		// サイズ調整
 		m_pNumber->SetSizeAll(SIZE_NUMBER.x, SIZE_NUMBER.y);
 	}
 

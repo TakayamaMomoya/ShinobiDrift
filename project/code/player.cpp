@@ -47,6 +47,8 @@ const float HANDLE_INERTIA = 0.03f;  // カーブ時の角度変更慣性
 const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性
 const float HANDLE_INERTIA_DRIFT = 0.08f;  // ドリフト時の角度変更慣性
 const float HANDLE_CURVE_MAG = -0.04f;  // 体勢からカーブへの倍率
+const float SIZE_SPEEDBLUR = 13.0f;	// スピードブラーのサイズ
+const float DENSITY_SPEEDBLUR = 0.3f;	// スピードブラーの濃さ
 }
 
 //*****************************************************
@@ -264,9 +266,8 @@ void CPlayer::Update(void)
 		// 入力
 		Input();
 
-		
-			//当たり判定
-			Collision();
+		//当たり判定
+		Collision();
 	}
 
 	// 前回の位置を保存
@@ -291,6 +292,9 @@ void CPlayer::Update(void)
 		CObject3D::Draw();
 		m_pPlayerNinja->SetMatrixParent(GetMatrix());
 	}
+
+	// スピードによるブラーの管理
+	ManageSpeedBlur();
 
 // デバッグ処理
 #if _DEBUG
@@ -1130,6 +1134,16 @@ void CPlayer::ManageSpeed(void)
 
 	if (m_info.pOrbitLamp != nullptr)
 		m_info.pOrbitLamp->SetOffset(GetMatrix(), m_info.orbitColor, m_info.pOrbitLamp->GetID());
+}
+
+//=====================================================
+// スピードによるブラーの管理
+//=====================================================
+void CPlayer::ManageSpeedBlur(void)
+{
+	float fRate = m_info.fSpeed / m_param.fSpeedMaxInitial;
+
+	Blur::SetBlur(SIZE_SPEEDBLUR * fRate, fRate * DENSITY_SPEEDBLUR);
 }
 
 //=====================================================
