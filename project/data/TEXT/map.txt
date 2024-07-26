@@ -9,7 +9,7 @@ SCRIPT
 #====================================================================
 # モデル数
 #====================================================================
-NUM_BLOCK = 32
+NUM_BLOCK = 39
 
 #0番目のブロック
 INFOBLOCK
@@ -232,6 +232,55 @@ END_INFOBLOCK
 INFOBLOCK
  TAG = Pillar
  MODEL = data\MODEL\block\pillar.x
+ SNAG = 0
+END_INFOBLOCK
+
+#32番目のブロック
+INFOBLOCK
+ TAG = Andon
+ MODEL = data\MODEL\block\andon01.x
+ SNAG = 0
+END_INFOBLOCK
+
+#33番目のブロック
+INFOBLOCK
+ TAG = Tatami
+ MODEL = data\MODEL\block\husuma.x
+ SNAG = 0
+END_INFOBLOCK
+
+#33番目のブロック
+INFOBLOCK
+ TAG = Husuma
+ MODEL = data\MODEL\block\husumatobira.x
+ SNAG = 0
+END_INFOBLOCK
+
+#34番目のブロック
+INFOBLOCK
+ TAG = Irori
+ MODEL = data\MODEL\block\irori.x
+ SNAG = 0
+END_INFOBLOCK
+
+#35番目のブロック
+INFOBLOCK
+ TAG = Kakeziku
+ MODEL = data\MODEL\block\kakeziku000.x
+ SNAG = 0
+END_INFOBLOCK
+
+#36番目のブロック
+INFOBLOCK
+ TAG = Rousoku
+ MODEL = data\MODEL\block\rousoku.x
+ SNAG = 0
+END_INFOBLOCK
+
+#37番目のブロック
+INFOBLOCK
+ TAG = Rousokudai
+ MODEL = data\MODEL\block\rousokudai.x
  SNAG = 0
 END_INFOBLOCK
 

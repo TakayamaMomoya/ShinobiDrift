@@ -16,9 +16,9 @@
 namespace universal
 {
 //=========================================
-// ílÇÃêßå¿
+// floatílÇÃêßå¿
 //=========================================
-void LimitValue(float *pValue, float fMax, float fMin)
+void LimitValuefloat(float *pValue, float fMax, float fMin)
 {
 	if (fMax < *pValue)
 	{
@@ -28,6 +28,22 @@ void LimitValue(float *pValue, float fMax, float fMin)
 	if (fMin > *pValue)
 	{
 		*pValue = fMin;
+	}
+}
+
+//=========================================
+// intílÇÃêßå¿
+//=========================================
+void LimitValueInt(int *pValue, int nMax, int nMin)
+{
+	if (nMax < *pValue)
+	{
+		*pValue = nMax;
+	}
+
+	if (nMin > *pValue)
+	{
+		*pValue = nMin;
 	}
 }
 
@@ -79,8 +95,8 @@ void LimitPosInSq(float fWidth, float fHeight, D3DXVECTOR3 *pPos)
 	if (pPos == nullptr)
 		return;
 	
-	LimitValue(&pPos->x, fWidth, -fWidth);
-	LimitValue(&pPos->z, fHeight, -fHeight);
+	LimitValuefloat(&pPos->x, fWidth, -fWidth);
+	LimitValuefloat(&pPos->z, fHeight, -fHeight);
 }
 
 //========================================

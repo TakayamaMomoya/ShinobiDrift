@@ -135,6 +135,7 @@ private:
 	void RemoveWire(void);	// ワイヤーを外す処理
 	void LimitDrift(float fLength);
 	void ManageSpeed(void);
+	void ManageSpeedBlur(void);	// スピードによるブラーの管理
 	void ManageState(void);
 	void ManageMotion(void);
 	void ManageMotionNinja(void);	// 忍者のモーション管理

@@ -133,7 +133,7 @@ void CSlow::SetSlowTime(float fTime, float fScale)
 {
 	m_fTimeSlow = fTime;
 
-	universal::LimitValue(&m_fTimeSlow, FLT_MAX, 0.0f);
+	universal::LimitValuefloat(&m_fTimeSlow, FLT_MAX, 0.0f);
 	
 	SetScale(fScale);
 }

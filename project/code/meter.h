@@ -9,12 +9,15 @@
 #define _METER_H_
 
 //*****************************************************
+// 前方宣言
+//*****************************************************
+class CNumber;
+class CUI;
+
+//*****************************************************
 // インクルード
 //*****************************************************
-#include "main.h"
-#include "number.h"
-#include "player.h"
-#include "UI.h"
+#include "object.h"
 
 //*****************************************************
 // クラスの定義
@@ -22,34 +25,29 @@
 class CMeter : public CObject
 {
 public:
-	CMeter(int nPriority = 7);	// コンストラクタ
+	CMeter(int nPriority = 0);	// コンストラクタ
 	~CMeter();	//	デストラクタ
 
 	// メンバ関数
-	static CMeter* Create();	// 生成
-
 	HRESULT Init();
 	void Uninit();
 	void Update();
+
+	// 静的メンバ関数
+	static CMeter* Create();	// 生成
+	static CMeter* GetInstance() { return m_pMeter; }	// インスタンス取得
+
+private:
+	// メンバ関数
 	void Acceleration();
 	void Needle();
 
-	// メーターの取得
-	int GetMeter() { return m_NowMeter; }
-
-	static CMeter* GetInstance() { return m_pMeter; }
-
-private:
 	//メンバ変数
-	int m_NowMeter;		// 現在のメーター値
-	int m_nCntMeter;	// カウント加算
-	int m_nIdxTexture;	// テクスチャ番号
-
-	float m_fRot;		// 向き
-
 	CNumber* m_pNumber;	// ナンバーのポインタ
-	CPlayer* m_pPlayer;	// プレイヤーのポインタ
-	CUI* m_pUI;			// UIのポインタ
+	CUI* m_pNeedle;	// 針UIのポインタ
+	CUI* m_pBackMeter;	// メーター背景のポインタ
+
+	// 静的メンバ変数
 	static CMeter* m_pMeter;	// 自身のポインタ
 };
 

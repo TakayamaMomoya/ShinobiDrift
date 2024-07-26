@@ -48,6 +48,8 @@ const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性倍
 const float HANDLE_INERTIA_DRIFT = 0.08f;  // ドリフト時の角度変更慣性倍率
 const float HANDLE_INERTIA_DEFAULT = 0.1f;  // ドリフト姿勢から通常姿勢に戻る時の角度変更慣性倍率
 const float HANDLE_CURVE_MAG = -0.04f;  // 体勢からカーブへの倍率
+const float SIZE_SPEEDBLUR = 13.0f;	// スピードブラーのサイズ
+const float DENSITY_SPEEDBLUR = 0.3f;	// スピードブラーの濃さ
 const float ROT_CURVE_LIMIT = 0.02f;  // ハンドル操作がきく用になる角度の限界
 const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
 const float GRAVITY = -0.7f;  // 重力の倍率
@@ -274,9 +276,8 @@ void CPlayer::Update(void)
 		// 入力
 		Input();
 
-		
-			//当たり判定
-			Collision();
+		//当たり判定
+		Collision();
 	}
 
 	// 前回の位置を保存
@@ -301,6 +302,9 @@ void CPlayer::Update(void)
 		CObject3D::Draw();
 		m_pPlayerNinja->SetMatrixParent(GetMatrix());
 	}
+
+	// スピードによるブラーの管理
+	ManageSpeedBlur();
 
 // デバッグ処理
 #if _DEBUG
@@ -1139,6 +1143,16 @@ void CPlayer::ManageSpeed(void)
 
 	if (m_info.pOrbitLamp != nullptr)
 		m_info.pOrbitLamp->SetOffset(GetMatrix(), m_info.orbitColor, m_info.pOrbitLamp->GetID());
+}
+
+//=====================================================
+// スピードによるブラーの管理
+//=====================================================
+void CPlayer::ManageSpeedBlur(void)
+{
+	float fRate = m_info.fSpeed / m_param.fSpeedMaxInitial;
+
+	Blur::SetBlur(SIZE_SPEEDBLUR * fRate, fRate * DENSITY_SPEEDBLUR);
 }
 
 //=====================================================
