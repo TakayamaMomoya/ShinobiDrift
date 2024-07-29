@@ -85,9 +85,6 @@ HRESULT CTutorial::Init(void)
 {
 	CMeshRoad::Create(PATH_ROAD);
 
-	// 初期ステイトに設定
-	ChangeState(new CStateTutorialParry);
-
 	// プレイヤーをチュートリアルマップにテレポート
 	CPlayer *pPlayer = CPlayer::GetInstance();
 
@@ -104,6 +101,9 @@ HRESULT CTutorial::Init(void)
 			pCamera->SkipToDest();
 		}
 	}
+
+	// 初期ステイトに設定
+	ChangeState(new CStateTutorialEnd);
 
 	return S_OK;
 }
