@@ -43,15 +43,8 @@ const float LINE_CORRECT_DRIFT = 40.0f;	// ドリフト補正のしきい値
 const float SIZE_BLUR = -20.0f;	// ブラーのサイズ
 const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
 const float SE_CHANGE_SPEED = 10.0f;  // エンジン音とアクセル音が切り替わる速度の値
-const float HANDLE_INERTIA = 0.03f;  // カーブ時の角度変更慣性
-const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性倍率
-const float HANDLE_INERTIA_DRIFT = 0.08f;  // ドリフト時の角度変更慣性倍率
-const float HANDLE_INERTIA_DEFAULT = 0.1f;  // ドリフト姿勢から通常姿勢に戻る時の角度変更慣性倍率
-const float HANDLE_CURVE_MAG = -0.04f;  // 体勢からカーブへの倍率
 const float SIZE_SPEEDBLUR = 13.0f;	// スピードブラーのサイズ
 const float DENSITY_SPEEDBLUR = 0.3f;	// スピードブラーの濃さ
-const float ROT_CURVE_LIMIT = 0.02f;  // ハンドル操作がきく用になる角度の限界
-const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
 const float GRAVITY = -0.2f;  // 重力の倍率
 const float GRAVITY_GROUND = -9.0f;  // 接地時の重力
 const float HEIGH_FRONT_WHEEL = 55.0f;  // 前輪の高さ
@@ -59,6 +52,17 @@ const float HEIGH_REAR_WHEEL = 65.0f;  // 後輪の高さ
 const float ROT_BIKE_FRONT_LIMIT = 1.5f;  // 前回りの角度限界
 const float ROT_BIKE_REAR_LIMIT = -1.35f;  // 後ろ回りの角度限界
 const float ROT_AIRBIKE_MAG = 0.015f;  // 空中での回転倍率
+
+// ハンドリング関係
+const float HANDLE_INERTIA = 0.04f;  // カーブ時の角度変更慣性
+const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性倍率
+const float HANDLE_INERTIA_DRIFT = 0.08f;  // ドリフト時の角度変更慣性倍率
+const float HANDLE_INERTIA_DEFAULT = 0.1f;  // ドリフト姿勢から通常姿勢に戻る時の角度変更慣性倍率
+const float HANDLE_CURVE_MAG = -0.04f;  // 体勢からカーブへの倍率
+const float ROT_CURVE_LIMIT = 0.025f;  // ハンドル操作がきく用になる角度の限界
+const float ROT_Y_DRIFT = 0.5f;  // ドリフト中のZ軸の角度
+const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
+
 }
 
 //*****************************************************
@@ -1075,12 +1079,12 @@ void CPlayer::ManageSpeed(void)
 		if (D3DXVec3Cross(&posPlayer, &GetMove(), &(posBlock - posPlayer))->y > 0.0f)
 		{
 			rot.z += (-ROT_Z_DRIFT - rot.z) * HANDLE_INERTIA_DRIFT;
-			m_info.rotDriftDest = D3DX_PI * 0.5f;
+			m_info.rotDriftDest = D3DX_PI * ROT_Y_DRIFT;
 		}
 		else
 		{
 			rot.z += (ROT_Z_DRIFT - rot.z) * HANDLE_INERTIA_DRIFT;
-			m_info.rotDriftDest = D3DX_PI * -0.5f;
+			m_info.rotDriftDest = D3DX_PI * -ROT_Y_DRIFT;
 		}
 		
 		universal::LimitRot(&rot.z);
