@@ -90,7 +90,7 @@ HRESULT CGame::Init(void)
 	CSkybox::Create();
 
 	// ３Dアニメーション管理の生成
-	CAnimEffect3D::Create();
+	//CAnimEffect3D::Create();
 
 	// BGM再生
 	Sound::Play(CSound::LABEL_BGM_GAME01);

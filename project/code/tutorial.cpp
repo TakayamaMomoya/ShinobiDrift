@@ -103,7 +103,7 @@ HRESULT CTutorial::Init(void)
 	}
 
 	// 初期ステイトに設定
-	ChangeState(new CStateTutorialEnd);
+	ChangeState(new CStateTutorialParry);
 
 	return S_OK;
 }
@@ -477,7 +477,6 @@ CStateTutorialParry::~CStateTutorialParry()
 void CStateTutorialParry::Init(CTutorial *pTutorial)
 {
 	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
-	std::map<int, CUI*> mapUI = *pMapUI;
 
 	// パスの一覧
 	const char* apPath[MENU_MAX] =
@@ -501,7 +500,7 @@ void CStateTutorialParry::Init(CTutorial *pTutorial)
 
 		int nIdx = Texture::GetIdx(apPath[i]);
 		pUI->SetIdxTexture(nIdx);
-		mapUI[i] = pUI;
+		(*pMapUI)[i] = pUI;
 
 		D3DXVECTOR3 posUI = pUI->GetPosition();
 		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
@@ -511,8 +510,6 @@ void CStateTutorialParry::Init(CTutorial *pTutorial)
 		// 制限値の設定
 		pTutorial->AddLimit(i, aTime[i]);
 	}
-
-	*pMapUI = mapUI;
 }
 
 //=====================================================
