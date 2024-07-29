@@ -90,7 +90,7 @@ HRESULT CGame::Init(void)
 	CSkybox::Create();
 
 	// ３Dアニメーション管理の生成
-	CAnimEffect3D::Create();
+	//CAnimEffect3D::Create();
 
 	// BGM再生
 	Sound::Play(CSound::LABEL_BGM_GAME01);
@@ -116,8 +116,8 @@ HRESULT CGame::Init(void)
 	CMeter::Create();
 
 	// ゴール生成
-	CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), D3DX_PI);
-	//CGoal::Create(D3DXVECTOR3(12726.0f, 2500.7f, -27695.0f), D3DX_PI);
+	//CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), D3DX_PI);
+	CGoal::Create(D3DXVECTOR3(12726.0f, 2500.7f, -27695.0f), D3DX_PI);
 
 	// メッシュロード生成
 	CMeshRoad::Create(PATH_GAME_ROAD);

@@ -73,8 +73,6 @@ HRESULT CMeshCube::Init(void)
 		m_apPolygon3D[i] = CPolygon3D::Create(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 	}
 
-
-
 	return S_OK;
 }
 
