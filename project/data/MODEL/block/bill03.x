@@ -41877,7 +41877,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\stageEditor\\data\\TEXTURE\\MATERIAL\\concrete.jpg";
+    "data\\TEXTURE\\MATERIAL\\concrete.jpg";
    }
   }
   Material {
@@ -41886,7 +41886,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\stageEditor\\data\\TEXTURE\\MATERIAL\\Glass.png";
+    "data\\TEXTURE\\MATERIAL\\Glass.png";
    }
   }
   Material {
@@ -41895,7 +41895,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\stageEditor\\data\\TEXTURE\\MATERIAL\\concrete.jpg";
+    "data\\TEXTURE\\MATERIAL\\concrete.jpg";
    }
   }
   Material {
@@ -41904,7 +41904,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\stageEditor\\data\\TEXTURE\\MATERIAL\\concrete.jpg";
+    "data\\TEXTURE\\MATERIAL\\concrete.jpg";
    }
   }
   Material {
@@ -41913,7 +41913,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Documents\\âÊëúï“èW\\iron boke.png";
+    "data\\TEXTURE\\MATERIAL\\iron boke.png";
    }
   }
   Material {

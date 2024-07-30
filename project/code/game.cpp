@@ -123,7 +123,7 @@ HRESULT CGame::Init(void)
 	CMeshRoad::Create(PATH_GAME_ROAD);
 
 	// チュートリアルの生成
-	//CTutorial::Create();
+	CTutorial::Create();
 
 #ifdef _DEBUG
 	// メッシュキューブのテスト生成

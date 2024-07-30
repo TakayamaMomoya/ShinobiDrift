@@ -481,7 +481,7 @@ void CStateTutorialParry::Init(CTutorial *pTutorial)
 	// パスの一覧
 	const char* apPath[MENU_MAX] =
 	{
-		"data\\TEXTURE\\UI\\tutorial03.png",
+		"data\\TEXTURE\\UI\\blockIcon.png",
 	};
 
 	// 制限値の一覧
@@ -525,31 +525,31 @@ void CStateTutorialParry::Uninit(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialParry::Update(CTutorial *pTutorial)
 {
-	CInputManager *pInputManager = CInputManager::GetInstance();
-	CPlayer *pPlayer = CPlayer::GetInstance();
+	//CInputManager *pInputManager = CInputManager::GetInstance();
+	//CPlayer *pPlayer = CPlayer::GetInstance();
 
-	if (pInputManager == nullptr || pPlayer == nullptr)
-		return;
+	//if (pInputManager == nullptr || pPlayer == nullptr)
+	//	return;
 
-	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
-	float fDeltaTime = CManager::GetDeltaTime();
+	//std::map<int, float> mapCounter = pTutorial->GetMapCounter();
+	//float fDeltaTime = CManager::GetDeltaTime();
 
-	// パリィの判定
-	int nMotion = pPlayer->GetMotion();
+	//// パリィの判定
+	//int nMotion = pPlayer->GetMotion();
 
-	if (pInputManager->GetTrigger(CInputManager::BUTTON_KATANA) && (nMotion != CPlayer::MOTION_NINJA::MOTION_NINJA_SLASHDOWN || nMotion != CPlayer::MOTION_NINJA::MOTION_NINJA_SLASHUP))
-	{// パリィのカウンターを加算
-		mapCounter[MENU_PARRY] += 1.0f;
-	}
+	//if (pInputManager->GetTrigger(CInputManager::BUTTON_KATANA) && (nMotion != CPlayer::MOTION_NINJA::MOTION_NINJA_SLASHDOWN || nMotion != CPlayer::MOTION_NINJA::MOTION_NINJA_SLASHUP))
+	//{// パリィのカウンターを加算
+	//	mapCounter[MENU_PARRY] += 1.0f;
+	//}
 
-	pTutorial->SetMapCounter(mapCounter);
+	//pTutorial->SetMapCounter(mapCounter);
 
-	CDebugProc::GetInstance()->Print("\nパリィカウンター[%f]", mapCounter[MENU_PARRY]);
+	//CDebugProc::GetInstance()->Print("\nパリィカウンター[%f]", mapCounter[MENU_PARRY]);
 
-	if (IsEndInput(MENU_MAX, pTutorial))
-	{// パリィチュートリアルを終了
-		pTutorial->ChangeState(new CStateTutorialEnd);
-	}
+	//if (IsEndInput(MENU_MAX, pTutorial))
+	//{// パリィチュートリアルを終了
+	//	pTutorial->ChangeState(new CStateTutorialEnd);
+	//}
 }
 
 //********************************************************************************

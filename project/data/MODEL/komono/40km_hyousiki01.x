@@ -478,7 +478,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\ÉNÉçÅ[Éì\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\40km.png";
+    "data\\TEXTURE\\MATERIAL\\40km.png";
    }
   }
   Material {

@@ -189,7 +189,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Downloads\\23958662_s.jpg";
+    "data\\TEXTURE\\MATERIAL\\23958662_s.jpg";
    }
   }
  }

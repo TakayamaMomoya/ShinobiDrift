@@ -1481,7 +1481,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Documents\\âÊëúï“èW\\US_Marine_Corps_030224-M-XT622-034_USMC_M923_(6X6)_5-ton_cargo_truck_heads_a_convoy_departing_Camp_Matilda,_Kuwait_crop.jpg";
+    "data\\TEXTURE\\MATERIAL\\US_Marine_Corps_030224-M-XT622-034_USMC_M923_(6X6)_5-ton_cargo_truck_heads_a_convoy_departing_Camp_Matilda,_Kuwait_crop.jpg";
    }
   }
   Material {

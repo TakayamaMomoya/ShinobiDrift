@@ -773,7 +773,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\bck0004-009.jpg";
+    "data\\TEXTURE\\MATERIAL\\bck0004-009.jpg";
    }
   }
   Material {
@@ -782,7 +782,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\publicdomainq-0009046dzj.png";
+    "data\\TEXTURE\\MATERIAL\\publicdomainq-0009046dzj.png";
    }
   }
  }
