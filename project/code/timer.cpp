@@ -25,9 +25,11 @@ const int MILLI_LIMIT = 99;			// ミリ秒の上限
 const int MINUTES_DIGIT = 1;		// 分表示の桁数
 const int TIME_DIGIT = 2;			// それぞれの桁数
 const float MAGNIFICATION = 100.0f;	// 掛ける倍率
-const float MINUTES_WIDTH = SCREEN_WIDTH * 0.44f;	// 分のX座標
-const float SECOND_WIDTH = SCREEN_WIDTH * 0.5f;		// 秒のX座標
-const float MILLI_WIDTH = SCREEN_WIDTH * 0.6f;		// ミリ秒のX座標
+const float MINUTES_WIDTH = 0.44f;	// 分のX座標
+const float SECOND_WIDTH = 0.5f;		// 秒のX座標
+const float MILLI_WIDTH = 0.6f;		// ミリ秒のX座標
+D3DXVECTOR2 SIZE_NORMAL_NUM = { 0.02f, 0.04f };	// 通常数字のサイズ
+D3DXVECTOR2 SIZE_MINI_NUM = { 0.014f, 0.028f };	// ミニ数字のサイズ
 }
 
 //*****************************************************
@@ -53,6 +55,7 @@ CTimer::CTimer(int nPriority) : CObject(nPriority)
 //=====================================================
 CTimer::~CTimer()
 {
+
 }
 
 //=====================================================
@@ -68,30 +71,6 @@ CTimer* CTimer::Create(void)
 	if (s_pTimer != nullptr)
 	{// 初期化
 		s_pTimer->Init();
-
-		if (s_pTimer->m_pMinutes == nullptr)
-		{// 分表示
-			// 生成・位置、サイズ設定
-			s_pTimer->m_pMinutes = CNumber::Create(MINUTES_DIGIT, MINUTES_LIMIT);
-			s_pTimer->m_pMinutes->SetPosition(D3DXVECTOR3(MINUTES_WIDTH, 75.0f, 0.0f));
-			s_pTimer->m_pMinutes->SetSizeAll(35.0f, 35.0f);
-		}
-
-		if (s_pTimer->m_pSecond == nullptr)
-		{// 秒表示
-			// 生成・位置、サイズ設定
-			s_pTimer->m_pSecond = CNumber::Create(TIME_DIGIT, SECOND_LIMIT);
-			s_pTimer->m_pSecond->SetPosition(D3DXVECTOR3(SECOND_WIDTH, 75.0f, 0.0f));
-			s_pTimer->m_pSecond->SetSizeAll(35.0f, 35.0f);
-		}
-
-		if (s_pTimer->m_pMilli == nullptr)
-		{// ミリ秒表示
-			// 生成・位置、サイズ設定
-			s_pTimer->m_pMilli = CNumber::Create(TIME_DIGIT, MILLI_LIMIT);
-			s_pTimer->m_pMilli->SetPosition(D3DXVECTOR3(MILLI_WIDTH, 85.0f, 0.0f));
-			s_pTimer->m_pMilli->SetSizeAll(25.0f,15.0f);
-		}
 	}
 
 	return s_pTimer;
@@ -107,6 +86,30 @@ HRESULT CTimer::Init(void)
 	m_fMilli = 0.0f;
 
 	m_IsStop = false;	// タイマー停止のフラグ
+
+	if (s_pTimer->m_pMinutes == nullptr)
+	{// 分表示
+		// 生成・位置、サイズ設定
+		s_pTimer->m_pMinutes = CNumber::Create(MINUTES_DIGIT, MINUTES_LIMIT);
+		s_pTimer->m_pMinutes->SetPosition(D3DXVECTOR3(MINUTES_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f, 0.0f));
+		s_pTimer->m_pMinutes->SetSizeAll(SIZE_NORMAL_NUM.x, SIZE_NORMAL_NUM.y);
+	}
+
+	if (s_pTimer->m_pSecond == nullptr)
+	{// 秒表示
+		// 生成・位置、サイズ設定
+		s_pTimer->m_pSecond = CNumber::Create(TIME_DIGIT, SECOND_LIMIT);
+		s_pTimer->m_pSecond->SetPosition(D3DXVECTOR3(SECOND_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f , 0.0f));
+		s_pTimer->m_pSecond->SetSizeAll(SIZE_NORMAL_NUM.x, SIZE_NORMAL_NUM.y);
+	}
+
+	if (s_pTimer->m_pMilli == nullptr)
+	{// ミリ秒表示
+		// 生成・位置、サイズ設定
+		s_pTimer->m_pMilli = CNumber::Create(TIME_DIGIT, MILLI_LIMIT);
+		s_pTimer->m_pMilli->SetPosition(D3DXVECTOR3(MILLI_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f, 0.0f));
+		s_pTimer->m_pMilli->SetSizeAll(SIZE_MINI_NUM.x, SIZE_MINI_NUM.y);
+	}
 
 	return S_OK;
 }
