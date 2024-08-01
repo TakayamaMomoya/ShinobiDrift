@@ -22,6 +22,7 @@
 #include "fade.h"
 #include "blurEvent.h"
 #include "MyEffekseer.h"
+#include "gauge.h"
 
 //*****************************************************
 // 定数定義
@@ -103,7 +104,7 @@ HRESULT CTutorial::Init(void)
 	}
 
 	// 初期ステイトに設定
-	ChangeState(new CStateTutorialEnd);
+	ChangeState(new CStateTutorialMove);
 
 	return S_OK;
 }
@@ -300,6 +301,9 @@ void CStateTutorialMove::Init(CTutorial *pTutorial)
 	}
 
 	*pMapUI = mapUI;
+
+	// ゲージの生成
+	m_pGauge = CGauge::Create(TIME_ACCELE);
 }
 
 //=====================================================
@@ -307,6 +311,12 @@ void CStateTutorialMove::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialMove::Uninit(CTutorial *pTutorial)
 {
+	if (m_pGauge != nullptr)
+	{
+		m_pGauge->Uninit();
+		m_pGauge = nullptr;
+	}
+
 	CStateResult::Uninit(pTutorial);
 }
 
@@ -330,6 +340,8 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 	if (fAccele > LINE_INPUT)
 	{// アクセルのカウンターを加算
 		mapCounter[MENU_ACCELE] += fDeltaTime;
+
+		m_pGauge->AddParam(fDeltaTime);
 	}
 
 	// ブレーキの判定

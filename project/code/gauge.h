@@ -31,9 +31,10 @@ public:
 	void Uninit(void);	// 終了
 	void Update(void);	// 更新
 	void Draw(void);	// 描画
+	void AddParam(float fValue);	// パラメーター加算処理
 
 	// 静的メンバ関数
-	static CGauge *Create(void);	// 生成処理
+	static CGauge *Create(float fParamMax);	// 生成処理
 
 private:
 	// 列挙型定義
@@ -44,8 +45,17 @@ private:
 		POLYGON_MAX
 	};
 
+	// メンバ関数
+	void CreatePolygon(void);	// ポリゴンの生成
+
 	// メンバ変数
 	vector<CUI*> m_aPolygon;	// 2Dポリゴンの配列
+	float m_fParam;	// パラメーターの現在の値
+	float m_fParamMax;	// パラメーターの最大値
+	float m_fTimerTransGauge;	// ゲージ変動のタイマー
+	float m_fTimeLimitTransGauge;	// ゲージ変動のタイムリミット
+	float m_fWidthOld;	// 前回の幅
+	D3DXVECTOR2 m_sizeGauge;	// ゲージのサイズ
 };
 
 #endif

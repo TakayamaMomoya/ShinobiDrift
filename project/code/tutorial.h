@@ -19,6 +19,7 @@ class CUI;
 class CStateResult;
 class CPolygon3D;
 class CEffekseerEffect;
+class CGauge;
 
 //*****************************************************
 // クラスの定義
@@ -89,6 +90,8 @@ private:
 		MENU_BRAKE,	// ブレーキ
 		MENU_MAX
 	};
+
+	CGauge *m_pGauge;	// ゲージのポインタ
 };
 
 class CStateTutorialDrift : public CStateResult
