@@ -33,6 +33,10 @@ public:
 	void Draw(void);	// 描画
 	void AddParam(float fValue);	// パラメーター加算処理
 
+	// 変数取得・設定関数
+	void SetParam(float fParam) { m_fParam = fParam; }	// パラメーター
+	float GetParam(void) { return m_fParam; }
+
 	// 静的メンバ関数
 	static CGauge *Create(float fParamMax);	// 生成処理
 
@@ -47,6 +51,7 @@ private:
 
 	// メンバ関数
 	void CreatePolygon(void);	// ポリゴンの生成
+	void ManageGaugePolygon(void);	// ゲージポリゴンの管理
 
 	// メンバ変数
 	vector<CUI*> m_aPolygon;	// 2Dポリゴンの配列

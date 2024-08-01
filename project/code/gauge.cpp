@@ -18,7 +18,7 @@
 //*****************************************************
 namespace
 {
-const D3DXVECTOR2 SIZE_GAUGE_INITIAL = { 0.1f, 0.05f };	// ゲージの初期サイズ
+const D3DXVECTOR2 SIZE_GAUGE_INITIAL = { 0.07f, 0.035f };	// ゲージの初期サイズ
 const D3DXVECTOR2 SIZE_FRAME_INITIAL = { SIZE_GAUGE_INITIAL.x * 1.0f, SIZE_GAUGE_INITIAL.y * 1.0f };	// フレームの初期サイズ
 const D3DXVECTOR3 POS_INITIAL = { SIZE_FRAME_INITIAL.x,SIZE_FRAME_INITIAL.y,0.0f };	// 初期位置
 const float TIMELIMIT_TRANSGAUGE_INITIAL = 2.0f;	// ゲージの変動にかかる時間の初期値
@@ -131,6 +131,18 @@ void CGauge::Uninit(void)
 //=====================================================
 void CGauge::Update(void)
 {
+	// ゲージポリゴンの管理
+	ManageGaugePolygon();
+}
+
+//=====================================================
+// ゲージポリゴンの管理
+//=====================================================
+void CGauge::ManageGaugePolygon(void)
+{
+	if (m_aPolygon.empty())
+		return;
+
 	if (m_aPolygon[E_Polygon::POLYGON_GAUGE] == nullptr)
 		return;
 
