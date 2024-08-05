@@ -164,8 +164,13 @@ HRESULT CPlayer::Init(void)
 	pCamera->SkipToDest();	// 目標位置までカメラを飛ばす
 
 	// テールランプ用軌跡の生成
-	m_info.orbitColor = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-	m_info.pOrbitLamp = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), m_info.orbitColor, 60);
+	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
+	m_info.pOrbitLamp = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), m_info.orbitColorLamp, 60);
+
+	// 縄用軌跡の生成
+	D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
+	m_info.orbitColorRope = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
+	m_info.pOrbitRope = COrbit::Create(mtxNinja, D3DXVECTOR3(40.0f, 0.0f, 0.0f), D3DXVECTOR3(-40.0f, 0.0f, 0.0f), m_info.orbitColorRope, 4);
 
 	// サウンドインスタンスの取得
 	CSound* pSound = CSound::GetInstance();
@@ -639,34 +644,14 @@ void CPlayer::JudgeRemoveWire(float fLength)
 //=====================================================
 void CPlayer::ControlRoap(void)
 {
-	if (m_info.pRoap != nullptr && m_info.pBlockGrab != nullptr)
+	if (m_info.pOrbitRope != nullptr && m_info.pBlockGrab != nullptr)
 	{
-		D3DXVECTOR3 posPlayer = GetPosition();
-		D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
-		D3DXVECTOR3 vecDiff = posBlock - posPlayer;
+		D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
+		m_info.orbitColorRope = D3DXCOLOR(0.8f, 0.4f, 0.0f, 1.0f);
+		m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
 
-		LPDIRECT3DVERTEXBUFFER9 pVtxBuff = m_info.pRoap->GetVtxBuff();
-
-		//頂点情報のポインタ
-		VERTEX_3D *pVtx;
-
-		//頂点バッファをロックし、頂点情報へのポインタを取得
-		pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-		//頂点座標の設定
-		float fHeight = 100.0f;
-
-		D3DXVECTOR3 vec = { vecDiff.z, 0.0f, -vecDiff.x };
-
-		D3DXVec3Normalize(&vec, &vec);
-
-		pVtx[0].pos = D3DXVECTOR3(posBlock.x - vec.x * 20.0f, fHeight, posBlock.z);
-		pVtx[1].pos = D3DXVECTOR3(posBlock.x + vec.x * 20.0f, fHeight, posBlock.z);
-		pVtx[2].pos = D3DXVECTOR3(posPlayer.x - vec.x * 20.0f, fHeight, posPlayer.z);
-		pVtx[3].pos = D3DXVECTOR3(posPlayer.x + vec.x * 20.0f, fHeight, posPlayer.z);
-
-		//頂点バッファをアンロック
-		pVtxBuff->Unlock();
+		D3DXMATRIX mtxBlock = m_info.pBlockGrab->GetMatrix();
+		m_info.pOrbitRope->SetOffset(mtxBlock, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
 	}
 }
 
@@ -769,6 +754,10 @@ void CPlayer::RemoveWire(void)
 	m_info.rotDriftStart.x -= D3DX_PI * 0.5f;
 	universal::LimitRot(&m_info.rotDriftStart.x);
 
+	D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
+	m_info.orbitColorRope = D3DXCOLOR(0.5f, 0.5f, 0.0f, 0.0f);
+	m_info.pOrbitLamp->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitLamp->GetID());
+
 	// ブラーを戻す
 	Blur::ResetBlur();
 }
@@ -865,8 +854,8 @@ void CPlayer::Collision(void)
 
 	// プレイヤー側の当たり判定サイズから判定用OBBを設定
 	D3DXVECTOR3 paramSize = m_param.sizeCollider;
-	D3DXVECTOR3 sizeX = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, rot.y, 0.0f), paramSize);
-	D3DXVECTOR3 sizeZ = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, -rot.y, 0.0f), D3DXVECTOR3(paramSize.x, 0.0f, paramSize.z));
+	D3DXVECTOR3 sizeX = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, m_info.rotDriftStart.y, 0.0f), paramSize);
+	D3DXVECTOR3 sizeZ = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, -m_info.rotDriftStart.y, 0.0f), D3DXVECTOR3(paramSize.x, 0.0f, paramSize.z));
 
 	// タイヤの位置保存
 	posParts[0] = universal::GetMtxPos(GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
@@ -1066,7 +1055,7 @@ void CPlayer::ManageSpeed(void)
 		SetPosition(pos);
 	}
 
-	m_info.orbitColor = D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.0f);
+	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.0f);
 
 	if (m_info.pBlockGrab != nullptr)
 	{
@@ -1094,7 +1083,7 @@ void CPlayer::ManageSpeed(void)
 		rot.y += rotDef;
 		universal::LimitRot(&rot.y);
 
-		m_info.orbitColor = D3DXCOLOR(1.0f, 0.15f, 0.0f, 1.0f);
+		m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.15f, 0.0f, 1.0f);
 	}
 	else if (m_info.fSpeed >= NOTROTATE)
 	{// ハンドルの回転を追加
@@ -1149,7 +1138,7 @@ void CPlayer::ManageSpeed(void)
 	SetMove(move);
 
 	if (m_info.pOrbitLamp != nullptr)
-		m_info.pOrbitLamp->SetOffset(GetMatrix(), m_info.orbitColor, m_info.pOrbitLamp->GetID());
+		m_info.pOrbitLamp->SetOffset(GetMatrix(), m_info.orbitColorLamp, m_info.pOrbitLamp->GetID());
 }
 
 //=====================================================

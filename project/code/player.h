@@ -115,7 +115,8 @@ private:
 		float fDesityBlurDrift;	// ドリフト時のブラーの濃さ
 		COrbit* pOrbitLamp;	// テールランプの軌跡
 		COrbit* pOrbitRope;	// テールランプの軌跡
-		D3DXCOLOR orbitColor;	// テールランプの軌跡
+		D3DXCOLOR orbitColorLamp;	// テールランプの軌跡
+		D3DXCOLOR orbitColorRope;	// テールランプの軌跡
 		D3DXVECTOR3 rotDriftStart;	// ドリフトスタート時の角度
 		float rotDriftDest;	// ドリフト終了時の角度補正値
 	};
