@@ -22,6 +22,7 @@
 #include "fade.h"
 #include "blurEvent.h"
 #include "MyEffekseer.h"
+#include "gauge.h"
 
 //*****************************************************
 // 定数定義
@@ -29,8 +30,8 @@
 namespace
 {
 const char* PATH_ROAD = "data\\MAP\\road01.bin";	// チュートリアルメッシュロードのパス
-const D3DXVECTOR3 POS_DEFAULT_UI = { SCREEN_WIDTH * 0.7f, SCREEN_HEIGHT * 0.5f, 0.0f };	// UIのデフォルト位置
-const D3DXVECTOR2 SIZE_DEFAULT_UI = { SCREEN_WIDTH * 0.1f, SCREEN_HEIGHT * 0.1f};	// UIのデフォルトサイズ
+const D3DXVECTOR3 POS_DEFAULT_UI = { 0.7f, 0.5f, 0.0f };	// UIのデフォルト位置
+const D3DXVECTOR2 SIZE_DEFAULT_UI = { 0.1f, 0.1f};	// UIのデフォルトサイズ
 const float LINE_INPUT = 0.3f;	// 入力と判定するスピード
 const float TIME_ACCELE = 5.0f;	// アクセルに必要な時間
 const float TIME_BRAKE = 3.0f;	// ブレーキに必要な時間
@@ -103,7 +104,7 @@ HRESULT CTutorial::Init(void)
 	}
 
 	// 初期ステイトに設定
-	ChangeState(new CStateTutorialParry);
+	ChangeState(new CStateTutorialMove);
 
 	return S_OK;
 }
@@ -172,7 +173,7 @@ void CTutorial::StartGame(void)
 //=====================================================
 // ステイトの変更
 //=====================================================
-void CTutorial::ChangeState(CStateResult *pState)
+void CTutorial::ChangeState(CStateTutorial *pState)
 {
 	if (m_pState != nullptr)
 	{
@@ -200,7 +201,7 @@ void CTutorial::AddLimit(int nIdx, float fValue)
 //=====================================================
 // ステイトの終了
 //=====================================================
-void CStateResult::Uninit(CTutorial *pTutorial)
+void CStateTutorial::Uninit(CTutorial *pTutorial)
 {
 	// UIのマップコンテナクリア
 	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
@@ -221,7 +222,7 @@ void CStateResult::Uninit(CTutorial *pTutorial)
 //=====================================================
 // 終了判定
 //=====================================================
-bool CStateResult::IsEndInput(int nNum, CTutorial *pTutorial)
+bool CStateTutorial::IsEndInput(int nNum, CTutorial *pTutorial)
 {
 	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
 	std::map<int, float> mapLimit = pTutorial->GetMapLimit();
@@ -291,13 +292,16 @@ void CStateTutorialMove::Init(CTutorial *pTutorial)
 		mapUI[i] = pUI;
 		
 		D3DXVECTOR3 posUI = pUI->GetPosition();
-		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
+		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i;
 		pUI->SetPosition(posUI);
 		pUI->SetVtx();
 
 		// 制限値の設定
 		pTutorial->AddLimit(i, aTime[i]);
 	}
+
+	// ゲージの生成
+	m_pGauge = CGauge::Create(TIME_ACCELE);
 
 	*pMapUI = mapUI;
 }
@@ -307,7 +311,13 @@ void CStateTutorialMove::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialMove::Uninit(CTutorial *pTutorial)
 {
-	CStateResult::Uninit(pTutorial);
+	if (m_pGauge != nullptr)
+	{
+		m_pGauge->Uninit();
+		m_pGauge = nullptr;
+	}
+
+	CStateTutorial::Uninit(pTutorial);
 }
 
 //=====================================================
@@ -322,6 +332,8 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 		return;
 
 	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
+	std::map<int, float> mapLimit = pTutorial->GetMapLimit();
+
 	float fDeltaTime = CManager::GetDeltaTime();
 
 	// アクセルの判定
@@ -330,6 +342,10 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 	if (fAccele > LINE_INPUT)
 	{// アクセルのカウンターを加算
 		mapCounter[MENU_ACCELE] += fDeltaTime;
+
+		universal::LimitValuefloat(&mapCounter[MENU_ACCELE], mapLimit[MENU_ACCELE], 0.0f);
+
+		m_pGauge->SetParam(mapCounter[MENU_ACCELE]);
 	}
 
 	// ブレーキの判定
@@ -338,6 +354,8 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 	if (fBrake > LINE_INPUT)
 	{// ブレーキのカウンターを加算
 		mapCounter[MENU_BRAKE] += fDeltaTime;
+
+		universal::LimitValuefloat(&mapCounter[MENU_BRAKE], mapLimit[MENU_BRAKE], 0.0f);
 	}
 
 	pTutorial->SetMapCounter(mapCounter);
@@ -418,7 +436,7 @@ void CStateTutorialDrift::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialDrift::Uninit(CTutorial *pTutorial)
 {
-	CStateResult::Uninit(pTutorial);
+	CStateTutorial::Uninit(pTutorial);
 }
 
 //=====================================================
@@ -481,7 +499,7 @@ void CStateTutorialParry::Init(CTutorial *pTutorial)
 	// パスの一覧
 	const char* apPath[MENU_MAX] =
 	{
-		"data\\TEXTURE\\UI\\blockIcon.png",
+		"data\\TEXTURE\\UI\\tutorial03.png",
 	};
 
 	// 制限値の一覧
@@ -517,7 +535,7 @@ void CStateTutorialParry::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialParry::Uninit(CTutorial *pTutorial)
 {
-	CStateResult::Uninit(pTutorial);
+	CStateTutorial::Uninit(pTutorial);
 }
 
 //=====================================================
@@ -525,31 +543,31 @@ void CStateTutorialParry::Uninit(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialParry::Update(CTutorial *pTutorial)
 {
-	//CInputManager *pInputManager = CInputManager::GetInstance();
-	//CPlayer *pPlayer = CPlayer::GetInstance();
+	CInputManager *pInputManager = CInputManager::GetInstance();
+	CPlayer *pPlayer = CPlayer::GetInstance();
 
-	//if (pInputManager == nullptr || pPlayer == nullptr)
-	//	return;
+	if (pInputManager == nullptr || pPlayer == nullptr)
+		return;
 
-	//std::map<int, float> mapCounter = pTutorial->GetMapCounter();
-	//float fDeltaTime = CManager::GetDeltaTime();
+	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
+	float fDeltaTime = CManager::GetDeltaTime();
 
-	//// パリィの判定
-	//int nMotion = pPlayer->GetMotion();
+	// パリィの判定
+	int nMotion = pPlayer->GetMotion();
 
-	//if (pInputManager->GetTrigger(CInputManager::BUTTON_KATANA) && (nMotion != CPlayer::MOTION_NINJA::MOTION_NINJA_SLASHDOWN || nMotion != CPlayer::MOTION_NINJA::MOTION_NINJA_SLASHUP))
-	//{// パリィのカウンターを加算
-	//	mapCounter[MENU_PARRY] += 1.0f;
-	//}
+	if (pInputManager->GetTrigger(CInputManager::BUTTON_KATANA) && (nMotion != CPlayer::MOTION_NINJA::MOTION_NINJA_SLASHDOWN || nMotion != CPlayer::MOTION_NINJA::MOTION_NINJA_SLASHUP))
+	{// パリィのカウンターを加算
+		mapCounter[MENU_PARRY] += 1.0f;
+	}
 
-	//pTutorial->SetMapCounter(mapCounter);
+	pTutorial->SetMapCounter(mapCounter);
 
-	//CDebugProc::GetInstance()->Print("\nパリィカウンター[%f]", mapCounter[MENU_PARRY]);
+	CDebugProc::GetInstance()->Print("\nパリィカウンター[%f]", mapCounter[MENU_PARRY]);
 
-	//if (IsEndInput(MENU_MAX, pTutorial))
-	//{// パリィチュートリアルを終了
-	//	pTutorial->ChangeState(new CStateTutorialEnd);
-	//}
+	if (IsEndInput(MENU_MAX, pTutorial))
+	{// パリィチュートリアルを終了
+		pTutorial->ChangeState(new CStateTutorialEnd);
+	}
 }
 
 //********************************************************************************
@@ -604,7 +622,7 @@ void CStateTutorialEnd::Uninit(CTutorial *pTutorial)
 		m_pEffect = nullptr;
 	}
 
-	CStateResult::Uninit(pTutorial);
+	CStateTutorial::Uninit(pTutorial);
 }
 
 //=====================================================

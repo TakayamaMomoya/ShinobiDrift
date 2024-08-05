@@ -315,6 +315,9 @@
     <ClCompile Include="code\editMeshfield.cpp">
       <Filter>ソース ファイル\edit</Filter>
     </ClCompile>
+    <ClCompile Include="code\gauge.cpp">
+      <Filter>ソース ファイル\UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\block.h">
@@ -592,6 +595,9 @@
     </ClInclude>
     <ClInclude Include="code\editMeshfield.h">
       <Filter>ソース ファイル\edit</Filter>
+    </ClInclude>
+    <ClInclude Include="code\gauge.h">
+      <Filter>ソース ファイル\UI</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

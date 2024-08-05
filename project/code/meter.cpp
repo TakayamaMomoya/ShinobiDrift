@@ -23,9 +23,9 @@ namespace
 const char* PATH_TEX_BACKMETER = "data\\TEXTURE\\UI\\meter00.png";	// メーター背景のテクスチャパス
 const char* PATH_TEX_NEEDLE = "data\\TEXTURE\\UI\\Needle.png";	// 針のテクスチャパス
 const int PLACE = 3;		// 桁数
-const D3DXVECTOR2 SIZE_METER = { SCREEN_WIDTH * 0.13f, SCREEN_WIDTH * 0.13f };	// メーター背景のサイズ
-const D3DXVECTOR3 POS_METER = { SCREEN_WIDTH - SIZE_METER.x - 10.0f, SCREEN_HEIGHT - SIZE_METER.y - 10.0f, 0.0f };	// メーターの位置
-const D3DXVECTOR2 SIZE_NUMBER = { SCREEN_WIDTH * 0.015f, SCREEN_WIDTH * 0.02f };	// メーターの数字のサイズ
+const D3DXVECTOR2 SIZE_METER = { 0.13f, 0.13f };	// メーター背景のサイズ
+const D3DXVECTOR3 POS_METER = { 1.0f - SIZE_METER.x - 0.001f, 1.0f - SIZE_METER.y * 2 - 0.0005f, 0.0f };	// メーターの位置
+const D3DXVECTOR2 SIZE_NUMBER = { 0.015f, 0.02f };	// メーターの数字のサイズ
 const D3DXVECTOR2 SIZE_NEEDLE = { SIZE_METER.x * 0.2f, SIZE_METER.y * 0.9f };	// 針のサイズ
 const float MIN_ANGLE_NEEDLE = D3DX_PI * 0.7f;	// 針の最低速度時の角度
 const float MAX_ANGLE_NEEDLE = -D3DX_PI * 0.7f;	// 針の最高速度時の角度
@@ -112,7 +112,7 @@ HRESULT CMeter::Init()
 		m_pNumber = CNumber::Create(PLACE, 0);
 
 		// トランスフォーム設定
-		m_pNumber->SetPosition(D3DXVECTOR3(POS_METER.x - SIZE_NUMBER.x * 2, POS_METER.y - SIZE_NUMBER.y * 1.8f, 0.0f));
+		m_pNumber->SetPosition(D3DXVECTOR3(POS_METER.x - SIZE_NUMBER.x * 2, POS_METER.y - SIZE_NUMBER.y * 4.0f, 0.0f));
 		m_pNumber->SetSizeAll(SIZE_NUMBER.x, SIZE_NUMBER.y);
 	}
 
