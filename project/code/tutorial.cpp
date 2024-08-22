@@ -217,6 +217,14 @@ void CStateTutorial::Uninit(CTutorial *pTutorial)
 	std::map<int, float> mapFloat;
 	mapFloat.clear();
 	pTutorial->SetMapCounter(mapFloat);
+
+	// ゲージの破棄
+	for (auto it : m_aGauge)
+	{
+		it->Uninit();
+	}
+
+	m_aGauge.clear();
 }
 
 //=====================================================
@@ -279,6 +287,10 @@ void CStateTutorialMove::Init(CTutorial *pTutorial)
 		TIME_BRAKE
 	};
 
+	// ゲージ配列の取得
+	vector<CGauge*> aGauge = GetArrayGauge();
+	aGauge.resize(MENU_MAX);
+
 	for (int i = 0; i < MENU_MAX; i++)
 	{
 		// 各UIの設定
@@ -292,16 +304,21 @@ void CStateTutorialMove::Init(CTutorial *pTutorial)
 		mapUI[i] = pUI;
 		
 		D3DXVECTOR3 posUI = pUI->GetPosition();
-		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i;
+		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
 		pUI->SetPosition(posUI);
 		pUI->SetVtx();
+
+		// ゲージの生成
+		aGauge[i] = CGauge::Create(aTime[i]);
+		D3DXVECTOR3 posGauge = { posUI.x, posUI.y + SIZE_DEFAULT_UI.y,0.0f }; // 位置の設定
+		aGauge[i]->SetPosition(posGauge);
 
 		// 制限値の設定
 		pTutorial->AddLimit(i, aTime[i]);
 	}
 
-	// ゲージの生成
-	m_pGauge = CGauge::Create(TIME_ACCELE);
+	// ゲージ配列の設定
+	SetArrayGauge(aGauge);
 
 	*pMapUI = mapUI;
 }
@@ -311,12 +328,6 @@ void CStateTutorialMove::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialMove::Uninit(CTutorial *pTutorial)
 {
-	if (m_pGauge != nullptr)
-	{
-		m_pGauge->Uninit();
-		m_pGauge = nullptr;
-	}
-
 	CStateTutorial::Uninit(pTutorial);
 }
 
@@ -333,6 +344,10 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 
 	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
 	std::map<int, float> mapLimit = pTutorial->GetMapLimit();
+	vector<CGauge*> aGauge = GetArrayGauge();
+
+	if (aGauge.empty())
+		return;
 
 	float fDeltaTime = CManager::GetDeltaTime();
 
@@ -345,7 +360,7 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 
 		universal::LimitValuefloat(&mapCounter[MENU_ACCELE], mapLimit[MENU_ACCELE], 0.0f);
 
-		m_pGauge->SetParam(mapCounter[MENU_ACCELE]);
+		aGauge[MENU_ACCELE]->SetParam(mapCounter[MENU_ACCELE]);
 	}
 
 	// ブレーキの判定
@@ -356,7 +371,12 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 		mapCounter[MENU_BRAKE] += fDeltaTime;
 
 		universal::LimitValuefloat(&mapCounter[MENU_BRAKE], mapLimit[MENU_BRAKE], 0.0f);
+
+		aGauge[MENU_BRAKE]->SetParam(mapCounter[MENU_BRAKE]);
 	}
+
+	// ゲージ配列の設定
+	SetArrayGauge(aGauge);
 
 	pTutorial->SetMapCounter(mapCounter);
 

@@ -69,7 +69,13 @@ public:
 	virtual void Uninit(CTutorial *pTutorial);	// 終了処理
 	virtual void Update(CTutorial *pTutorial) = 0;	// 更新処理
 	virtual bool IsEndInput(int nNum, CTutorial *pTutorial);	// 終了しているかどうか
+
+	// 変数取得・設定関数
+	vector<CGauge*> GetArrayGauge(void) { return m_aGauge; };	// ゲージ配列
+	void SetArrayGauge(vector<CGauge*> array) { m_aGauge = array; }
+
 private:
+	vector<CGauge*> m_aGauge;	// ゲージの配列
 };
 
 class CStateTutorialMove : public CStateTutorial
@@ -90,8 +96,6 @@ private:
 		MENU_BRAKE,	// ブレーキ
 		MENU_MAX
 	};
-
-	CGauge *m_pGauge;	// ゲージのポインタ
 };
 
 class CStateTutorialDrift : public CStateTutorial
