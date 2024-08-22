@@ -24,6 +24,7 @@
 #include "MyEffekseer.h"
 #include "gauge.h"
 #include "frame.h"
+#include "game.h"
 
 //*****************************************************
 // 定数定義
@@ -150,8 +151,13 @@ void CTutorial::Draw(void)
 //=====================================================
 void CTutorial::StartGame(void)
 {
-	// タイマーの生成
-	CTimer::Create();
+	// ゲームタイマーの生成
+	CGame *pGame = CGame::GetInstance();
+
+	if (pGame != nullptr)
+	{
+		pGame->CreateGameTimer();
+	}
 
 	// プレイヤーのトランスフォームを設定
 	CPlayer *pPlayer = CPlayer::GetInstance();
