@@ -112,13 +112,18 @@ void CResult::SetCamera(void)
 //=====================================================
 void CResult::SaveTime(void)
 {
-	CTimer *pTimer = CTimer::GetInstance();
+	CGame *pGame = CGame::GetInstance();
+
+	if (pGame == nullptr)
+		return;
+
+	CTimer *pTimer = pGame->GetGameTimer();
 
 	if (pTimer == nullptr)
 		return;
 
 	// タイムの取得
-	float fMilli = pTimer->GetMilli();
+	float fSecond = pTimer->GetSecond();
 
 	// ファイルに保存
 	std::ofstream outputFile(PATH_SAVE, std::ios::binary);
@@ -126,8 +131,7 @@ void CResult::SaveTime(void)
 	if (!outputFile.is_open())
 		assert(("タイムのファイルを開けませんでした", false));
 
-	// 情報数保存
-	outputFile.write(reinterpret_cast<const char*>(&fMilli), sizeof(float));
+	outputFile.write(reinterpret_cast<const char*>(&fSecond), sizeof(float));
 }
 
 //=====================================================
@@ -231,7 +235,7 @@ void CStateResultDispTime::Init(CResult *pResult)
 //=====================================================
 void CStateResultDispTime::SetNumber(void)
 {
-	CTimer *pTime = CTimer::GetInstance();
+	/*CTimer *pTime = CTimer::GetInstance();
 
 	if (pTime == nullptr)
 		return;
@@ -248,7 +252,7 @@ void CStateResultDispTime::SetNumber(void)
 		m_apTime[i] = CNumber::Create(2, aTime[i]);
 
 
-	}
+	}*/
 }
 
 //=====================================================

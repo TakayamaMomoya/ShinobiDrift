@@ -35,16 +35,14 @@ D3DXVECTOR2 SIZE_MINI_NUM = { 0.014f, 0.028f };	// ミニ数字のサイズ
 //*****************************************************
 // 静的メンバ変数宣言
 //*****************************************************
-CTimer* CTimer::s_pTimer = nullptr;
 
 //=====================================================
 // 優先順位を決めるコンストラクタ
 //=====================================================
-CTimer::CTimer(int nPriority) : CObject(nPriority)
+CTimer::CTimer()
 {
 	m_fSecond = 0.0f;			// 現在の時間(秒)
-	m_fMilli = 0.0f;			// 現在の時間(ミリ秒)
-	m_IsStop = false;
+	m_bStop = false;
 	m_pMinutes = nullptr;		// 分表示のポインタ
 	m_pSecond = nullptr;		// 秒表示用のポインタ
 	m_pMilli = nullptr;			// ミリセカンド表示用のポインタ
@@ -63,17 +61,16 @@ CTimer::~CTimer()
 //=====================================================
 CTimer* CTimer::Create(void)
 {
-	if (s_pTimer == nullptr)
-	{// インスタンス生成
-		s_pTimer = new CTimer;
-	}
+	CTimer *pTimer = nullptr;
 
-	if (s_pTimer != nullptr)
+	pTimer = new CTimer;
+
+	if (pTimer != nullptr)
 	{// 初期化
-		s_pTimer->Init();
+		pTimer->Init();
 	}
 
-	return s_pTimer;
+	return pTimer;
 }
 
 //=====================================================
@@ -83,32 +80,31 @@ HRESULT CTimer::Init(void)
 {
 	// 分・秒・ミリ秒の初期化
 	m_fSecond = 0.0f;
-	m_fMilli = 0.0f;
 
-	m_IsStop = false;	// タイマー停止のフラグ
+	m_bStop = false;	// タイマー停止のフラグ
 
-	if (s_pTimer->m_pMinutes == nullptr)
+	if (m_pMinutes == nullptr)
 	{// 分表示
 		// 生成・位置、サイズ設定
-		s_pTimer->m_pMinutes = CNumber::Create(MINUTES_DIGIT, MINUTES_LIMIT);
-		s_pTimer->m_pMinutes->SetPosition(D3DXVECTOR3(MINUTES_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f, 0.0f));
-		s_pTimer->m_pMinutes->SetSizeAll(SIZE_NORMAL_NUM.x, SIZE_NORMAL_NUM.y);
+		m_pMinutes = CNumber::Create(MINUTES_DIGIT, MINUTES_LIMIT);
+		m_pMinutes->SetPosition(D3DXVECTOR3(MINUTES_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f, 0.0f));
+		m_pMinutes->SetSizeAll(SIZE_NORMAL_NUM.x, SIZE_NORMAL_NUM.y);
 	}
 
-	if (s_pTimer->m_pSecond == nullptr)
+	if (m_pSecond == nullptr)
 	{// 秒表示
 		// 生成・位置、サイズ設定
-		s_pTimer->m_pSecond = CNumber::Create(TIME_DIGIT, SECOND_LIMIT);
-		s_pTimer->m_pSecond->SetPosition(D3DXVECTOR3(SECOND_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f , 0.0f));
-		s_pTimer->m_pSecond->SetSizeAll(SIZE_NORMAL_NUM.x, SIZE_NORMAL_NUM.y);
+		m_pSecond = CNumber::Create(TIME_DIGIT, SECOND_LIMIT);
+		m_pSecond->SetPosition(D3DXVECTOR3(SECOND_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f , 0.0f));
+		m_pSecond->SetSizeAll(SIZE_NORMAL_NUM.x, SIZE_NORMAL_NUM.y);
 	}
 
-	if (s_pTimer->m_pMilli == nullptr)
+	if (m_pMilli == nullptr)
 	{// ミリ秒表示
 		// 生成・位置、サイズ設定
-		s_pTimer->m_pMilli = CNumber::Create(TIME_DIGIT, MILLI_LIMIT);
-		s_pTimer->m_pMilli->SetPosition(D3DXVECTOR3(MILLI_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f, 0.0f));
-		s_pTimer->m_pMilli->SetSizeAll(SIZE_MINI_NUM.x, SIZE_MINI_NUM.y);
+		m_pMilli = CNumber::Create(TIME_DIGIT, MILLI_LIMIT);
+		m_pMilli->SetPosition(D3DXVECTOR3(MILLI_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f, 0.0f));
+		m_pMilli->SetSizeAll(SIZE_MINI_NUM.x, SIZE_MINI_NUM.y);
 	}
 
 	return S_OK;
@@ -119,10 +115,6 @@ HRESULT CTimer::Init(void)
 //=====================================================
 void CTimer::Uninit(void)
 {
-	// 静的メンバ変数の終了
-	if (s_pTimer != nullptr)
-		s_pTimer = nullptr;
-
 	if (m_pMinutes != nullptr)
 	{// 分の終了
 		m_pMinutes->Uninit();
@@ -151,7 +143,7 @@ void CTimer::Uninit(void)
 void CTimer::Update(void)
 {
 	// 分の更新
-	if (!m_IsStop)
+	if (!m_bStop)
 	{
 		Minutes();
 	}
@@ -185,12 +177,6 @@ void CTimer::Second()
 	// ミリ秒の更新
 	MilliSecond();
 
-	// デルタタイム取得
-	float fDeltaTime = CManager::GetDeltaTime();
-
-	// デルタタイム(リアル時間)加算
-	m_fSecond += fDeltaTime;
-
 	// 秒の計算
 	int nSecond = (int)m_fSecond % SECOND_LIMIT;
 
@@ -204,19 +190,13 @@ void CTimer::Second()
 //=====================================================
 void CTimer::MilliSecond()
 {
-	// デルタタイム取得
-	float fDeltaTime = CManager::GetDeltaTime();
-
-	// デルタタイム(リアル時間)加算
-	m_fMilli += fDeltaTime;
-
 	// 秒を100倍
-	m_fMilli = m_fSecond * MAGNIFICATION;
+	int nMilli = (int)(m_fSecond * MAGNIFICATION);
 
 	// ミリ秒の計算
-	int nMsecond = (int)m_fMilli % MILLI_LIMIT;
+	nMilli = nMilli % (int)MAGNIFICATION;
 
 	// ミリ秒表示
 	if (m_pMilli != nullptr)
-		m_pMilli->SetValue(nMsecond, TIME_DIGIT);
+		m_pMilli->SetValue(nMilli, TIME_DIGIT);
 }

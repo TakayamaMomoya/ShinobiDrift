@@ -147,9 +147,6 @@ void CGoal::Update()
 	// 移動量取得
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
 
-	// タイマーの取得
-	CTimer* pTimer = CTimer::GetInstance();
-
 	// 交点の割合
 	float fCross = 0.0f;
 

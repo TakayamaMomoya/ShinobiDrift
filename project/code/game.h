@@ -19,6 +19,7 @@
 class CGame;
 class CPlayer;
 class CEdit;
+class CTimer;
 
 //*****************************************************
 // クラスの定義
@@ -48,9 +49,15 @@ public:
 	bool GetStop(void) { return m_bStop; }
 	CEdit *GetEdit(void) { return m_pEdit; }
 
+	// ゲームタイマー
+	CTimer *GetGameTimer(void) { return m_pGameTimer; }	// ゲームタイマー
+	void CreateGameTimer(void);	// 生成
+	void ReleaseGameTimer(void);	// ゲームタイマーの解放
+
 private:
 	void UpdateCamera(void);
 	void ManageState(void);
+	void UpdateGameTimer(void);	// タイマーの更新
 	void ToggleStop(void);
 	void Debug(void);
 	void ChangeEdit(CEdit *pEdit);
@@ -61,6 +68,7 @@ private:
 	int m_nCntState;	// 状態遷移カウンター
 	bool m_bStop;	// 停止状態
 	CEdit *m_pEdit;	// エディットのポインタ
+	CTimer *m_pGameTimer;	// ゲームのタイマー
 };
 
 #endif
