@@ -31,7 +31,7 @@ namespace
 {
 const char* PATH_ROAD = "data\\MAP\\road01.bin";	// チュートリアルメッシュロードのパス
 const D3DXVECTOR3 POS_DEFAULT_UI = { 0.7f, 0.5f, 0.0f };	// UIのデフォルト位置
-const D3DXVECTOR2 SIZE_DEFAULT_UI = { 0.1f, 0.1f};	// UIのデフォルトサイズ
+const D3DXVECTOR2 SIZE_DEFAULT_UI = { 0.05f, 0.05f};	// UIのデフォルトサイズ
 const float LINE_INPUT = 0.3f;	// 入力と判定するスピード
 const float TIME_ACCELE = 5.0f;	// アクセルに必要な時間
 const float TIME_BRAKE = 3.0f;	// ブレーキに必要な時間
@@ -272,13 +272,13 @@ void CStateTutorial::CreateUI(vector<string> aPathTexture, vector<float> aLimit,
 		mapUI[i] = pUI;
 
 		D3DXVECTOR3 posUI = pUI->GetPosition();
-		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
+		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 4;
 		pUI->SetPosition(posUI);
 		pUI->SetVtx();
 
 		// ゲージの生成
 		aGauge[i] = CGauge::Create(aLimit[i]);
-		D3DXVECTOR3 posGauge = { posUI.x, posUI.y + SIZE_DEFAULT_UI.y,0.0f }; // 位置の設定
+		D3DXVECTOR3 posGauge = { posUI.x, posUI.y + SIZE_DEFAULT_UI.y * 2,0.0f }; // 位置の設定
 		aGauge[i]->SetPosition(posGauge);
 
 		// 制限値の設定
@@ -480,6 +480,9 @@ void CStateTutorialDrift::Update(CTutorial *pTutorial)
 		mapCounter[MENU_DRIFT] += fDeltaTime;
 	}
 
+	// ゲージパラメーターの設定
+	SetParamGauge(MENU_MAX, pTutorial);
+
 	pTutorial->SetMapCounter(mapCounter);
 
 	CDebugProc::GetInstance()->Print("\nドリフトカウンター[%f]", mapCounter[MENU_DRIFT]);
@@ -560,6 +563,9 @@ void CStateTutorialParry::Update(CTutorial *pTutorial)
 	{// パリィのカウンターを加算
 		mapCounter[MENU_PARRY] += 1.0f;
 	}
+
+	// ゲージパラメーターの設定
+	SetParamGauge(MENU_MAX, pTutorial);
 
 	pTutorial->SetMapCounter(mapCounter);
 
