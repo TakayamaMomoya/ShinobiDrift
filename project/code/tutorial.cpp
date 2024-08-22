@@ -23,6 +23,7 @@
 #include "blurEvent.h"
 #include "MyEffekseer.h"
 #include "gauge.h"
+#include "frame.h"
 
 //*****************************************************
 // 定数定義
@@ -104,7 +105,7 @@ HRESULT CTutorial::Init(void)
 	}
 
 	// 初期ステイトに設定
-	ChangeState(new CStateTutorialMove);
+	ChangeState(new CStateTutorialEnd);
 
 	return S_OK;
 }
@@ -583,7 +584,7 @@ void CStateTutorialParry::Update(CTutorial *pTutorial)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateTutorialEnd::CStateTutorialEnd() : m_pEffect(nullptr)
+CStateTutorialEnd::CStateTutorialEnd() : m_pGate(nullptr)
 {
 
 }
@@ -612,10 +613,23 @@ void CStateTutorialEnd::Init(CTutorial *pTutorial)
 
 	float fAngle = atan2f(pPlayer->GetForward().x, pPlayer->GetForward().z);	// プレイヤーの方を向かせる
 
-	m_pEffect = MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_GATE00, posGate, D3DXVECTOR3(0.0f, fAngle, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	// ゲートの生成
+	m_pGate = CPolygon3D::Create(D3DXVECTOR3());
+	
+	if (m_pGate != nullptr)
+	{
+		m_pGate->SetRotation(D3DXVECTOR3(-D3DX_PI * 0.5f, fAngle, 0.0f));
+		posGate.y += HEIGTH_GATE;
+		m_pGate->SetPosition(posGate);
+		m_pGate->SetSize(0.0f, 0.0f);
+		m_pGate->EnableZtest(true);
+	}
 
 	// プレイヤーを操作不可にする
 	pPlayer->SetEnableInput(false);
+
+	// フレーム演出生成
+	CFrame::Create(20, 120, 10);
 }
 
 //=====================================================
@@ -623,10 +637,10 @@ void CStateTutorialEnd::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialEnd::Uninit(CTutorial *pTutorial)
 {
-	if (m_pEffect != nullptr)
+	if (m_pGate != nullptr)
 	{
-		m_pEffect->Uninit();
-		m_pEffect = nullptr;
+		m_pGate->Uninit();
+		m_pGate = nullptr;
 	}
 
 	CStateTutorial::Uninit(pTutorial);
@@ -657,17 +671,21 @@ void CStateTutorialEnd::Update(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialEnd::ScalingGate(void)
 {
-	if (m_pEffect == nullptr)
+	if (m_pGate == nullptr)
 		return;
 
 	// ゲートエフェクトの補正
-	Effekseer::Vector3D scale = m_pEffect->GetScale();
+	D3DXVECTOR3 size =
+	{
+		m_pGate->GetWidth(),
+		m_pGate->GetHeight(),
+		0.0f,
+	};
 
-	scale.X += (SIZE_GATE_EFFECT - scale.X) * SPEED_EXPAND_GATE;
-	scale.Y += (SIZE_GATE_EFFECT - scale.X) * SPEED_EXPAND_GATE;
-	scale.Z += (SIZE_GATE_EFFECT - scale.X) * SPEED_EXPAND_GATE;
+	size.x += (SIZE_GATE_EFFECT - size.x) * SPEED_EXPAND_GATE;
+	size.y += (SIZE_GATE_EFFECT - size.y) * SPEED_EXPAND_GATE;
 
-	m_pEffect->SetScale(scale);
+	m_pGate->SetSize(size.x, size.y);
 }
 
 //=====================================================
@@ -682,8 +700,8 @@ void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
 
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
-	D3DXVECTOR3 pos = m_pEffect->GetPositionD3D();
-	D3DXVECTOR3 rot = m_pEffect->GetRotationD3D();
+	D3DXVECTOR3 pos = m_pGate->GetPosition();
+	D3DXVECTOR3 rot = m_pGate->GetRotation();
 	float fWidth = SIZE_GATE_EFFECT;
 
 	D3DXVECTOR3 posStart = { pos.x + sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z + cosf(rot.y + D3DX_PI * 0.5f) * fWidth };

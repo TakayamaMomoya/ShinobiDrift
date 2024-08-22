@@ -188,6 +188,7 @@
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
     <ClCompile Include="code\enemySpawner.cpp" />
+    <ClCompile Include="code\frame.cpp" />
     <ClCompile Include="code\gameObject.cpp" />
     <ClCompile Include="code\gauge.cpp" />
     <ClCompile Include="code\meshCube.cpp" />
@@ -283,6 +284,7 @@
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
     <ClInclude Include="code\enemySpawner.h" />
+    <ClInclude Include="code\frame.h" />
     <ClInclude Include="code\gameObject.h" />
     <ClInclude Include="code\gauge.h" />
     <ClInclude Include="code\meshCube.h" />

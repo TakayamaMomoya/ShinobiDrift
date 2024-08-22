@@ -154,9 +154,9 @@ private:
 	void ScalingGate(void);	// ゲートのスケーリング補正
 	void CollidePlayer(CTutorial *pTutorial);	// プレイヤーとゲートの判定
 	void ForwardPlayer(void);	// プレイヤーを進める処理
-
+	
 	// メンバ変数
-	CEffekseerEffect *m_pEffect;	// エフェクトのポインタ
+	CPolygon3D *m_pGate;	// ゲートのポリゴン
 };
 
 namespace Tutorial
