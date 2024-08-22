@@ -755,8 +755,12 @@ void CPlayer::RemoveWire(void)
 	universal::LimitRot(&m_info.rotDriftStart.x);
 
 	D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
-	m_info.orbitColorRope = D3DXCOLOR(0.5f, 0.5f, 0.0f, 0.0f);
+	m_info.orbitColorLamp = D3DXCOLOR(0.5f, 0.5f, 0.0f, 0.0f);
 	m_info.pOrbitLamp->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitLamp->GetID());
+
+	m_info.orbitColorRope = D3DXCOLOR(0.8f, 0.4f, 0.0f, 0.0f);
+	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
+	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
 
 	// ƒuƒ‰[‚ğ–ß‚·
 	Blur::ResetBlur();
