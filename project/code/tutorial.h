@@ -69,6 +69,8 @@ public:
 	virtual void Uninit(CTutorial *pTutorial);	// 終了処理
 	virtual void Update(CTutorial *pTutorial) = 0;	// 更新処理
 	virtual bool IsEndInput(int nNum, CTutorial *pTutorial);	// 終了しているかどうか
+	void CreateUI(vector<string> aPathTexture, vector<float> aLimit, int nNumMenu, CTutorial *pTutorial);
+	void SetParamGauge(int nNumMenu, CTutorial *pTutorial);	// ゲージのパラメーター設定
 
 	// 変数取得・設定関数
 	vector<CGauge*> GetArrayGauge(void) { return m_aGauge; };	// ゲージ配列

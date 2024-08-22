@@ -246,6 +246,70 @@ bool CStateTutorial::IsEndInput(int nNum, CTutorial *pTutorial)
 	return true;
 }
 
+//=====================================================
+// UIの生成
+//=====================================================
+void CStateTutorial::CreateUI(vector<string> aPathTexture, vector<float> aLimit, int nNumMenu, CTutorial *pTutorial)
+{
+	if (nNumMenu <= 0)
+		assert(("チュートリアルのUI生成で不正な数を生成しようとしています", false));
+
+	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
+	std::map<int, CUI*> mapUI = *pMapUI;
+	vector<CGauge*> aGauge = GetArrayGauge();
+	aGauge.resize(nNumMenu);
+
+	for (int i = 0; i < nNumMenu; i++)
+	{
+		// 各UIの設定
+		CUI *pUI = Tutorial::CreateUIDefault();
+
+		if (pUI == nullptr)
+			continue;
+
+		int nIdx = Texture::GetIdx(&aPathTexture[i][0]);
+		pUI->SetIdxTexture(nIdx);
+		mapUI[i] = pUI;
+
+		D3DXVECTOR3 posUI = pUI->GetPosition();
+		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
+		pUI->SetPosition(posUI);
+		pUI->SetVtx();
+
+		// ゲージの生成
+		aGauge[i] = CGauge::Create(aLimit[i]);
+		D3DXVECTOR3 posGauge = { posUI.x, posUI.y + SIZE_DEFAULT_UI.y,0.0f }; // 位置の設定
+		aGauge[i]->SetPosition(posGauge);
+
+		// 制限値の設定
+		pTutorial->AddLimit(i, aLimit[i]);
+	}
+
+	// ゲージ配列の設定
+	SetArrayGauge(aGauge);
+
+	*pMapUI = mapUI;
+}
+
+//=====================================================
+// ゲージのパラメーター設定
+//=====================================================
+void CStateTutorial::SetParamGauge(int nNumMenu, CTutorial *pTutorial)
+{
+	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
+	vector<CGauge*> aGauge = GetArrayGauge();
+
+	if (aGauge.empty())
+		return;
+
+	for (int i = 0; i < nNumMenu;i++)
+	{
+		aGauge[i]->SetParam(mapCounter[i]);
+	}
+
+	SetArrayGauge(aGauge);
+}
+
 //********************************************************************************
 // 移動チュートリアル
 //********************************************************************************
@@ -270,57 +334,23 @@ CStateTutorialMove::~CStateTutorialMove()
 //=====================================================
 void CStateTutorialMove::Init(CTutorial *pTutorial)
 {
-	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
-	std::map<int, CUI*> mapUI = *pMapUI;
-
 	// パスの一覧
-	const char* apPath[MENU_MAX] =
+	vector<string> aPath(MENU_MAX);
+	aPath =
 	{
 		"data\\TEXTURE\\UI\\tutorial00.png",
 		"data\\TEXTURE\\UI\\tutorial01.png"
 	};
 
 	// 制限値の一覧
-	float aTime[MENU_MAX] =
+	vector<float> aLimit(MENU_MAX);
+	aLimit =
 	{
 		TIME_ACCELE,
 		TIME_BRAKE
 	};
 
-	// ゲージ配列の取得
-	vector<CGauge*> aGauge = GetArrayGauge();
-	aGauge.resize(MENU_MAX);
-
-	for (int i = 0; i < MENU_MAX; i++)
-	{
-		// 各UIの設定
-		CUI *pUI = Tutorial::CreateUIDefault();
-
-		if (pUI == nullptr)
-			continue;
-
-		int nIdx = Texture::GetIdx(apPath[i]);
-		pUI->SetIdxTexture(nIdx);
-		mapUI[i] = pUI;
-		
-		D3DXVECTOR3 posUI = pUI->GetPosition();
-		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
-		pUI->SetPosition(posUI);
-		pUI->SetVtx();
-
-		// ゲージの生成
-		aGauge[i] = CGauge::Create(aTime[i]);
-		D3DXVECTOR3 posGauge = { posUI.x, posUI.y + SIZE_DEFAULT_UI.y,0.0f }; // 位置の設定
-		aGauge[i]->SetPosition(posGauge);
-
-		// 制限値の設定
-		pTutorial->AddLimit(i, aTime[i]);
-	}
-
-	// ゲージ配列の設定
-	SetArrayGauge(aGauge);
-
-	*pMapUI = mapUI;
+	CreateUI(aPath, aLimit, MENU_MAX, pTutorial);
 }
 
 //=====================================================
@@ -344,10 +374,6 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 
 	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
 	std::map<int, float> mapLimit = pTutorial->GetMapLimit();
-	vector<CGauge*> aGauge = GetArrayGauge();
-
-	if (aGauge.empty())
-		return;
 
 	float fDeltaTime = CManager::GetDeltaTime();
 
@@ -359,8 +385,6 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 		mapCounter[MENU_ACCELE] += fDeltaTime;
 
 		universal::LimitValuefloat(&mapCounter[MENU_ACCELE], mapLimit[MENU_ACCELE], 0.0f);
-
-		aGauge[MENU_ACCELE]->SetParam(mapCounter[MENU_ACCELE]);
 	}
 
 	// ブレーキの判定
@@ -371,12 +395,10 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 		mapCounter[MENU_BRAKE] += fDeltaTime;
 
 		universal::LimitValuefloat(&mapCounter[MENU_BRAKE], mapLimit[MENU_BRAKE], 0.0f);
-
-		aGauge[MENU_BRAKE]->SetParam(mapCounter[MENU_BRAKE]);
 	}
 
-	// ゲージ配列の設定
-	SetArrayGauge(aGauge);
+	// ゲージパラメーターの設定
+	SetParamGauge(MENU_MAX, pTutorial);
 
 	pTutorial->SetMapCounter(mapCounter);
 
@@ -412,43 +434,21 @@ CStateTutorialDrift::~CStateTutorialDrift()
 //=====================================================
 void CStateTutorialDrift::Init(CTutorial *pTutorial)
 {
-	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
-	std::map<int, CUI*> mapUI = *pMapUI;
-
 	// パスの一覧
-	const char* apPath[MENU_MAX] =
+	vector<string> aPath(MENU_MAX);
+	aPath =
 	{
 		"data\\TEXTURE\\UI\\tutorial02.png",
 	};
 
 	// 制限値の一覧
-	float aTime[MENU_MAX] =
+	vector<float> aLimit(MENU_MAX);
+	aLimit =
 	{
 		TIME_ACCELE,
 	};
 
-	for (int i = 0; i < MENU_MAX; i++)
-	{
-		// 各UIの設定
-		CUI *pUI = Tutorial::CreateUIDefault();
-
-		if (pUI == nullptr)
-			continue;
-
-		int nIdx = Texture::GetIdx(apPath[i]);
-		pUI->SetIdxTexture(nIdx);
-		mapUI[i] = pUI;
-
-		D3DXVECTOR3 posUI = pUI->GetPosition();
-		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
-		pUI->SetPosition(posUI);
-		pUI->SetVtx();
-
-		// 制限値の設定
-		pTutorial->AddLimit(i, aTime[i]);
-	}
-
-	*pMapUI = mapUI;
+	CreateUI(aPath, aLimit, MENU_MAX, pTutorial);
 }
 
 //=====================================================
@@ -514,40 +514,21 @@ CStateTutorialParry::~CStateTutorialParry()
 //=====================================================
 void CStateTutorialParry::Init(CTutorial *pTutorial)
 {
-	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
-
 	// パスの一覧
-	const char* apPath[MENU_MAX] =
+	vector<string> aPath(MENU_MAX);
+	aPath =
 	{
 		"data\\TEXTURE\\UI\\tutorial03.png",
 	};
 
 	// 制限値の一覧
-	float aTime[MENU_MAX] =
+	vector<float> aLimit(MENU_MAX);
+	aLimit =
 	{
 		TIME_ACCELE,
 	};
 
-	for (int i = 0; i < MENU_MAX; i++)
-	{
-		// 各UIの設定
-		CUI *pUI = Tutorial::CreateUIDefault();
-
-		if (pUI == nullptr)
-			continue;
-
-		int nIdx = Texture::GetIdx(apPath[i]);
-		pUI->SetIdxTexture(nIdx);
-		(*pMapUI)[i] = pUI;
-
-		D3DXVECTOR3 posUI = pUI->GetPosition();
-		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
-		pUI->SetPosition(posUI);
-		pUI->SetVtx();
-
-		// 制限値の設定
-		pTutorial->AddLimit(i, aTime[i]);
-	}
+	CreateUI(aPath, aLimit, MENU_MAX, pTutorial);
 }
 
 //=====================================================
