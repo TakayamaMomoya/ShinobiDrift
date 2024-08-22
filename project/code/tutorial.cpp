@@ -23,6 +23,7 @@
 #include "blurEvent.h"
 #include "MyEffekseer.h"
 #include "gauge.h"
+#include "frame.h"
 
 //*****************************************************
 // 定数定義
@@ -31,7 +32,7 @@ namespace
 {
 const char* PATH_ROAD = "data\\MAP\\road01.bin";	// チュートリアルメッシュロードのパス
 const D3DXVECTOR3 POS_DEFAULT_UI = { 0.7f, 0.5f, 0.0f };	// UIのデフォルト位置
-const D3DXVECTOR2 SIZE_DEFAULT_UI = { 0.1f, 0.1f};	// UIのデフォルトサイズ
+const D3DXVECTOR2 SIZE_DEFAULT_UI = { 0.05f, 0.05f};	// UIのデフォルトサイズ
 const float LINE_INPUT = 0.3f;	// 入力と判定するスピード
 const float TIME_ACCELE = 5.0f;	// アクセルに必要な時間
 const float TIME_BRAKE = 3.0f;	// ブレーキに必要な時間
@@ -104,7 +105,7 @@ HRESULT CTutorial::Init(void)
 	}
 
 	// 初期ステイトに設定
-	ChangeState(new CStateTutorialMove);
+	ChangeState(new CStateTutorialEnd);
 
 	return S_OK;
 }
@@ -246,6 +247,70 @@ bool CStateTutorial::IsEndInput(int nNum, CTutorial *pTutorial)
 	return true;
 }
 
+//=====================================================
+// UIの生成
+//=====================================================
+void CStateTutorial::CreateUI(vector<string> aPathTexture, vector<float> aLimit, int nNumMenu, CTutorial *pTutorial)
+{
+	if (nNumMenu <= 0)
+		assert(("チュートリアルのUI生成で不正な数を生成しようとしています", false));
+
+	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
+	std::map<int, CUI*> mapUI = *pMapUI;
+	vector<CGauge*> aGauge = GetArrayGauge();
+	aGauge.resize(nNumMenu);
+
+	for (int i = 0; i < nNumMenu; i++)
+	{
+		// 各UIの設定
+		CUI *pUI = Tutorial::CreateUIDefault();
+
+		if (pUI == nullptr)
+			continue;
+
+		int nIdx = Texture::GetIdx(&aPathTexture[i][0]);
+		pUI->SetIdxTexture(nIdx);
+		mapUI[i] = pUI;
+
+		D3DXVECTOR3 posUI = pUI->GetPosition();
+		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 4;
+		pUI->SetPosition(posUI);
+		pUI->SetVtx();
+
+		// ゲージの生成
+		aGauge[i] = CGauge::Create(aLimit[i]);
+		D3DXVECTOR3 posGauge = { posUI.x, posUI.y + SIZE_DEFAULT_UI.y * 2,0.0f }; // 位置の設定
+		aGauge[i]->SetPosition(posGauge);
+
+		// 制限値の設定
+		pTutorial->AddLimit(i, aLimit[i]);
+	}
+
+	// ゲージ配列の設定
+	SetArrayGauge(aGauge);
+
+	*pMapUI = mapUI;
+}
+
+//=====================================================
+// ゲージのパラメーター設定
+//=====================================================
+void CStateTutorial::SetParamGauge(int nNumMenu, CTutorial *pTutorial)
+{
+	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
+	vector<CGauge*> aGauge = GetArrayGauge();
+
+	if (aGauge.empty())
+		return;
+
+	for (int i = 0; i < nNumMenu;i++)
+	{
+		aGauge[i]->SetParam(mapCounter[i]);
+	}
+
+	SetArrayGauge(aGauge);
+}
+
 //********************************************************************************
 // 移動チュートリアル
 //********************************************************************************
@@ -270,57 +335,23 @@ CStateTutorialMove::~CStateTutorialMove()
 //=====================================================
 void CStateTutorialMove::Init(CTutorial *pTutorial)
 {
-	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
-	std::map<int, CUI*> mapUI = *pMapUI;
-
 	// パスの一覧
-	const char* apPath[MENU_MAX] =
+	vector<string> aPath(MENU_MAX);
+	aPath =
 	{
 		"data\\TEXTURE\\UI\\tutorial00.png",
 		"data\\TEXTURE\\UI\\tutorial01.png"
 	};
 
 	// 制限値の一覧
-	float aTime[MENU_MAX] =
+	vector<float> aLimit(MENU_MAX);
+	aLimit =
 	{
 		TIME_ACCELE,
 		TIME_BRAKE
 	};
 
-	// ゲージ配列の取得
-	vector<CGauge*> aGauge = GetArrayGauge();
-	aGauge.resize(MENU_MAX);
-
-	for (int i = 0; i < MENU_MAX; i++)
-	{
-		// 各UIの設定
-		CUI *pUI = Tutorial::CreateUIDefault();
-
-		if (pUI == nullptr)
-			continue;
-
-		int nIdx = Texture::GetIdx(apPath[i]);
-		pUI->SetIdxTexture(nIdx);
-		mapUI[i] = pUI;
-		
-		D3DXVECTOR3 posUI = pUI->GetPosition();
-		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
-		pUI->SetPosition(posUI);
-		pUI->SetVtx();
-
-		// ゲージの生成
-		aGauge[i] = CGauge::Create(aTime[i]);
-		D3DXVECTOR3 posGauge = { posUI.x, posUI.y + SIZE_DEFAULT_UI.y,0.0f }; // 位置の設定
-		aGauge[i]->SetPosition(posGauge);
-
-		// 制限値の設定
-		pTutorial->AddLimit(i, aTime[i]);
-	}
-
-	// ゲージ配列の設定
-	SetArrayGauge(aGauge);
-
-	*pMapUI = mapUI;
+	CreateUI(aPath, aLimit, MENU_MAX, pTutorial);
 }
 
 //=====================================================
@@ -344,10 +375,6 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 
 	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
 	std::map<int, float> mapLimit = pTutorial->GetMapLimit();
-	vector<CGauge*> aGauge = GetArrayGauge();
-
-	if (aGauge.empty())
-		return;
 
 	float fDeltaTime = CManager::GetDeltaTime();
 
@@ -359,8 +386,6 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 		mapCounter[MENU_ACCELE] += fDeltaTime;
 
 		universal::LimitValuefloat(&mapCounter[MENU_ACCELE], mapLimit[MENU_ACCELE], 0.0f);
-
-		aGauge[MENU_ACCELE]->SetParam(mapCounter[MENU_ACCELE]);
 	}
 
 	// ブレーキの判定
@@ -371,12 +396,10 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 		mapCounter[MENU_BRAKE] += fDeltaTime;
 
 		universal::LimitValuefloat(&mapCounter[MENU_BRAKE], mapLimit[MENU_BRAKE], 0.0f);
-
-		aGauge[MENU_BRAKE]->SetParam(mapCounter[MENU_BRAKE]);
 	}
 
-	// ゲージ配列の設定
-	SetArrayGauge(aGauge);
+	// ゲージパラメーターの設定
+	SetParamGauge(MENU_MAX, pTutorial);
 
 	pTutorial->SetMapCounter(mapCounter);
 
@@ -412,43 +435,21 @@ CStateTutorialDrift::~CStateTutorialDrift()
 //=====================================================
 void CStateTutorialDrift::Init(CTutorial *pTutorial)
 {
-	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
-	std::map<int, CUI*> mapUI = *pMapUI;
-
 	// パスの一覧
-	const char* apPath[MENU_MAX] =
+	vector<string> aPath(MENU_MAX);
+	aPath =
 	{
 		"data\\TEXTURE\\UI\\tutorial02.png",
 	};
 
 	// 制限値の一覧
-	float aTime[MENU_MAX] =
+	vector<float> aLimit(MENU_MAX);
+	aLimit =
 	{
 		TIME_ACCELE,
 	};
 
-	for (int i = 0; i < MENU_MAX; i++)
-	{
-		// 各UIの設定
-		CUI *pUI = Tutorial::CreateUIDefault();
-
-		if (pUI == nullptr)
-			continue;
-
-		int nIdx = Texture::GetIdx(apPath[i]);
-		pUI->SetIdxTexture(nIdx);
-		mapUI[i] = pUI;
-
-		D3DXVECTOR3 posUI = pUI->GetPosition();
-		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
-		pUI->SetPosition(posUI);
-		pUI->SetVtx();
-
-		// 制限値の設定
-		pTutorial->AddLimit(i, aTime[i]);
-	}
-
-	*pMapUI = mapUI;
+	CreateUI(aPath, aLimit, MENU_MAX, pTutorial);
 }
 
 //=====================================================
@@ -479,6 +480,9 @@ void CStateTutorialDrift::Update(CTutorial *pTutorial)
 	{// ドリフトのカウンターを加算
 		mapCounter[MENU_DRIFT] += fDeltaTime;
 	}
+
+	// ゲージパラメーターの設定
+	SetParamGauge(MENU_MAX, pTutorial);
 
 	pTutorial->SetMapCounter(mapCounter);
 
@@ -514,40 +518,21 @@ CStateTutorialParry::~CStateTutorialParry()
 //=====================================================
 void CStateTutorialParry::Init(CTutorial *pTutorial)
 {
-	std::map<int, CUI*> *pMapUI = pTutorial->GetMap();
-
 	// パスの一覧
-	const char* apPath[MENU_MAX] =
+	vector<string> aPath(MENU_MAX);
+	aPath =
 	{
 		"data\\TEXTURE\\UI\\tutorial03.png",
 	};
 
 	// 制限値の一覧
-	float aTime[MENU_MAX] =
+	vector<float> aLimit(MENU_MAX);
+	aLimit =
 	{
 		TIME_ACCELE,
 	};
 
-	for (int i = 0; i < MENU_MAX; i++)
-	{
-		// 各UIの設定
-		CUI *pUI = Tutorial::CreateUIDefault();
-
-		if (pUI == nullptr)
-			continue;
-
-		int nIdx = Texture::GetIdx(apPath[i]);
-		pUI->SetIdxTexture(nIdx);
-		(*pMapUI)[i] = pUI;
-
-		D3DXVECTOR3 posUI = pUI->GetPosition();
-		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
-		pUI->SetPosition(posUI);
-		pUI->SetVtx();
-
-		// 制限値の設定
-		pTutorial->AddLimit(i, aTime[i]);
-	}
+	CreateUI(aPath, aLimit, MENU_MAX, pTutorial);
 }
 
 //=====================================================
@@ -580,6 +565,9 @@ void CStateTutorialParry::Update(CTutorial *pTutorial)
 		mapCounter[MENU_PARRY] += 1.0f;
 	}
 
+	// ゲージパラメーターの設定
+	SetParamGauge(MENU_MAX, pTutorial);
+
 	pTutorial->SetMapCounter(mapCounter);
 
 	CDebugProc::GetInstance()->Print("\nパリィカウンター[%f]", mapCounter[MENU_PARRY]);
@@ -596,7 +584,7 @@ void CStateTutorialParry::Update(CTutorial *pTutorial)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateTutorialEnd::CStateTutorialEnd() : m_pEffect(nullptr)
+CStateTutorialEnd::CStateTutorialEnd() : m_pGate(nullptr)
 {
 
 }
@@ -625,10 +613,23 @@ void CStateTutorialEnd::Init(CTutorial *pTutorial)
 
 	float fAngle = atan2f(pPlayer->GetForward().x, pPlayer->GetForward().z);	// プレイヤーの方を向かせる
 
-	m_pEffect = MyEffekseer::CreateEffect(CEffekseer::TYPE::TYPE_GATE00, posGate, D3DXVECTOR3(0.0f, fAngle, 0.0f), D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+	// ゲートの生成
+	m_pGate = CPolygon3D::Create(D3DXVECTOR3());
+	
+	if (m_pGate != nullptr)
+	{
+		m_pGate->SetRotation(D3DXVECTOR3(-D3DX_PI * 0.5f, fAngle, 0.0f));
+		posGate.y += HEIGTH_GATE;
+		m_pGate->SetPosition(posGate);
+		m_pGate->SetSize(0.0f, 0.0f);
+		m_pGate->EnableZtest(true);
+	}
 
 	// プレイヤーを操作不可にする
 	pPlayer->SetEnableInput(false);
+
+	// フレーム演出生成
+	CFrame::Create(20, 120, 10);
 }
 
 //=====================================================
@@ -636,10 +637,10 @@ void CStateTutorialEnd::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialEnd::Uninit(CTutorial *pTutorial)
 {
-	if (m_pEffect != nullptr)
+	if (m_pGate != nullptr)
 	{
-		m_pEffect->Uninit();
-		m_pEffect = nullptr;
+		m_pGate->Uninit();
+		m_pGate = nullptr;
 	}
 
 	CStateTutorial::Uninit(pTutorial);
@@ -670,17 +671,21 @@ void CStateTutorialEnd::Update(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialEnd::ScalingGate(void)
 {
-	if (m_pEffect == nullptr)
+	if (m_pGate == nullptr)
 		return;
 
 	// ゲートエフェクトの補正
-	Effekseer::Vector3D scale = m_pEffect->GetScale();
+	D3DXVECTOR3 size =
+	{
+		m_pGate->GetWidth(),
+		m_pGate->GetHeight(),
+		0.0f,
+	};
 
-	scale.X += (SIZE_GATE_EFFECT - scale.X) * SPEED_EXPAND_GATE;
-	scale.Y += (SIZE_GATE_EFFECT - scale.X) * SPEED_EXPAND_GATE;
-	scale.Z += (SIZE_GATE_EFFECT - scale.X) * SPEED_EXPAND_GATE;
+	size.x += (SIZE_GATE_EFFECT - size.x) * SPEED_EXPAND_GATE;
+	size.y += (SIZE_GATE_EFFECT - size.y) * SPEED_EXPAND_GATE;
 
-	m_pEffect->SetScale(scale);
+	m_pGate->SetSize(size.x, size.y);
 }
 
 //=====================================================
@@ -695,8 +700,8 @@ void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
 
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
-	D3DXVECTOR3 pos = m_pEffect->GetPositionD3D();
-	D3DXVECTOR3 rot = m_pEffect->GetRotationD3D();
+	D3DXVECTOR3 pos = m_pGate->GetPosition();
+	D3DXVECTOR3 rot = m_pGate->GetRotation();
 	float fWidth = SIZE_GATE_EFFECT;
 
 	D3DXVECTOR3 posStart = { pos.x + sinf(rot.y + D3DX_PI * 0.5f) * fWidth, pos.y, pos.z + cosf(rot.y + D3DX_PI * 0.5f) * fWidth };
