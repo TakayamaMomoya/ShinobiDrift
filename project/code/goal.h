@@ -41,7 +41,7 @@ public:
 	static CGoal *GetInstance(void) { return m_pGoal; }
 
 private:
-	//メンバ変数
+	// メンバ変数
 	int m_nTransitionTime;		// 遷移時間
 	D3DXVECTOR3 m_pos;		// 位置
 	D3DXVECTOR3 m_posStart;	// ゴールの始点

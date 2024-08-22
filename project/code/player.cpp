@@ -30,6 +30,7 @@
 #include "guardRail.h"
 #include "playerNinja.h"
 #include "orbit.h"
+#include "texture.h"
 
 //*****************************************************
 // 定数定義
@@ -52,6 +53,9 @@ const float HEIGH_REAR_WHEEL = 65.0f;  // 後輪の高さ
 const float ROT_BIKE_FRONT_LIMIT = 1.5f;  // 前回りの角度限界
 const float ROT_BIKE_REAR_LIMIT = -1.35f;  // 後ろ回りの角度限界
 const float ROT_AIRBIKE_MAG = 0.015f;  // 空中での回転倍率
+const float SIZE_LAMP_BRAKE = 50.0f;	// ブレーキランプポリゴンのサイズ
+const D3DXVECTOR3 OFFSET_LAMP_BRAKE = { 0.0f, 50.0f, -100.0f };	// ブレーキランプのオフセット
+const string PATH_TEX_BRAKELAMP = "data\\TEXTURE\\EFFECT\\brakeLamp.png";	// ブレーキランプのテクスチャパス
 
 // ハンドリング関係
 const float HANDLE_INERTIA = 0.04f;  // カーブ時の角度変更慣性
@@ -62,7 +66,6 @@ const float HANDLE_CURVE_MAG = -0.04f;  // 体勢からカーブへの倍率
 const float ROT_CURVE_LIMIT = 0.025f;  // ハンドル操作がきく用になる角度の限界
 const float ROT_Y_DRIFT = 0.5f;  // ドリフト中のZ軸の角度
 const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
-
 }
 
 //*****************************************************
@@ -259,6 +262,8 @@ void CPlayer::Uninit(void)
 	m_pPlayer = nullptr;
 	m_info.pOrbitLamp->Uninit();
 
+	DisableBrakeLamp();
+
 	// 継承クラスの終了
 	CMotion::Uninit();
 
@@ -389,6 +394,19 @@ void CPlayer::InputMove(void)
 
 	m_info.fSpeed += (0.0f - m_info.fSpeed) * m_param.fFactBrake * fBrake;
 
+	// ブレーキランプの管理
+	if (fBrake > 0)
+	{
+		EnableBrakeLamp();
+
+		FollowBrakeLamp();
+	}
+	else
+	{
+		DisableBrakeLamp();
+	}
+
+	// エンジン音管理
 	if (m_info.fSpeed < SE_CHANGE_SPEED && m_bMove)
 	{
 		// アクセルSEからエンジンSEへ変更
@@ -1284,7 +1302,55 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 	universal::SetOffSet(&mtxParent, mtxPart, offset);
 
 	D3DXVECTOR3 pos = { mtxParent._41,mtxParent._42 ,mtxParent._43 };
+}
 
+//=====================================================
+// ブレーキランプをつける
+//=====================================================
+void CPlayer::EnableBrakeLamp(void)
+{
+	if (m_info.pLampBreak != nullptr)
+		return;
+
+	// ポリゴンの生成
+	m_info.pLampBreak = CPolygon3D::Create(D3DXVECTOR3());
+
+	if (m_info.pLampBreak == nullptr)
+		return;
+
+	m_info.pLampBreak->SetSize(SIZE_LAMP_BRAKE, SIZE_LAMP_BRAKE);
+	m_info.pLampBreak->SetMode(CPolygon3D::MODE::MODE_BILLBOARD);
+	m_info.pLampBreak->SetPosition(OFFSET_LAMP_BRAKE);
+	m_info.pLampBreak->SetVtx();
+	m_info.pLampBreak->EnableBlur(false);
+	m_info.pLampBreak->EnableZtest(true);
+
+	int nIdxTexture = Texture::GetIdx(&PATH_TEX_BRAKELAMP[0]);
+	m_info.pLampBreak->SetIdxTexture(nIdxTexture);
+}
+
+//=====================================================
+// ブレーキランプを消す
+//=====================================================
+void CPlayer::DisableBrakeLamp(void)
+{
+	if (m_info.pLampBreak != nullptr)
+	{
+		m_info.pLampBreak->Uninit();
+		m_info.pLampBreak = nullptr;
+	}
+}
+
+//=====================================================
+// ブレーキランプの追従
+//=====================================================
+void CPlayer::FollowBrakeLamp(void)
+{
+	if (m_info.pLampBreak == nullptr)
+		return;
+
+	D3DXMATRIX mtx = GetParts(0)->pParts->GetMatrix();
+	m_info.pLampBreak->SetMatrixParent(mtx);
 }
 
 //=====================================================
