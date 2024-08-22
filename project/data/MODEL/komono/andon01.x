@@ -805,7 +805,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "af18.jpg";
+    "data\\TEXTURE\\MATERIAL\\af18.jpg";
    }
   }
   Material {
@@ -820,7 +820,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "af18.jpg";
+    "data\\TEXTURE\\MATERIAL\\af18.jpg";
    }
   }
   Material {

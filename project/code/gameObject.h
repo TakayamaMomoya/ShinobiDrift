@@ -18,7 +18,7 @@
 class CGameObject : public CObject
 {
 public:
-	CGameObject(int nPriority) : CObject(nPriority), m_pos(), m_rot() {};	// コンストラクタ
+	CGameObject(int nPriority = 4) : CObject(nPriority), m_pos(), m_rot() {};	// コンストラクタ
 	~CGameObject() {};	// デストラクタ
 
 	// メンバ関数

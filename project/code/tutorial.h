@@ -16,9 +16,10 @@
 // 前方宣言
 //*****************************************************
 class CUI;
-class CStateResult;
+class CStateTutorial;
 class CPolygon3D;
 class CEffekseerEffect;
+class CGauge;
 
 //*****************************************************
 // クラスの定義
@@ -34,7 +35,7 @@ public:
 	virtual void Uninit(void);	// 終了
 	virtual void Update();	// 更新
 	virtual void Draw();	// 描画
-	void ChangeState(CStateResult *pState);	// ステイトの変更
+	void ChangeState(CStateTutorial *pState);	// ステイトの変更
 	void AddLimit(int nIdx, float fValue);	// 制限値の追加
 
 	// 変数取得・設定関数
@@ -53,15 +54,15 @@ private:
 	std::map<int, CUI*> m_mapUI;	// UIのマップコンテナ
 	std::map<int, float> m_mapCounter;	// カウンターのマップコンテナ
 	std::map<int, float> m_mapLimit;	// リミットのマップコンテナ
-	CStateResult *m_pState;	// ステイトのポインタ
+	CStateTutorial *m_pState;	// ステイトのポインタ
 	bool m_bEnd;	// 終了フラグ
 };
 
-class CStateResult
+class CStateTutorial
 {// ステイトの基底クラス
 public:
-	CStateResult() {};	// コンストラクタ
-	virtual ~CStateResult() {};	 // デストラクタ
+	CStateTutorial() {};	// コンストラクタ
+	virtual ~CStateTutorial() {};	 // デストラクタ
 
 	// メンバ関数
 	virtual void Init(CTutorial *pTutorial) = 0;	// 初期化処理
@@ -71,7 +72,7 @@ public:
 private:
 };
 
-class CStateTutorialMove : public CStateResult
+class CStateTutorialMove : public CStateTutorial
 {// 移動のチュートリアル
 public:
 	CStateTutorialMove();	// コンストラクタ
@@ -89,9 +90,11 @@ private:
 		MENU_BRAKE,	// ブレーキ
 		MENU_MAX
 	};
+
+	CGauge *m_pGauge;	// ゲージのポインタ
 };
 
-class CStateTutorialDrift : public CStateResult
+class CStateTutorialDrift : public CStateTutorial
 {// ドリフトのチュートリアル
 public:
 	CStateTutorialDrift();	// コンストラクタ
@@ -110,7 +113,7 @@ private:
 	};
 };
 
-class CStateTutorialParry : public CStateResult
+class CStateTutorialParry : public CStateTutorial
 {// パリィのチュートリアル
 public:
 	CStateTutorialParry();	// コンストラクタ
@@ -129,7 +132,7 @@ private:
 	};
 };
 
-class CStateTutorialEnd : public CStateResult
+class CStateTutorialEnd : public CStateTutorial
 {// チュートリアルの終了
 public:
 	CStateTutorialEnd();	// コンストラクタ

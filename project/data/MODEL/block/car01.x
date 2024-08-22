@@ -2073,7 +2073,7 @@ Mesh {
    0.520000;0.520000;0.520000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\Ver.2.2\\data\\TEXTURE\\tex_iron.jpg";
+    "data\\TEXTURE\\MATERIAL\\tex_iron.jpg";
    }
   }
   Material {
@@ -2088,7 +2088,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.199290;0.206640;0.210000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\Ver.2.2\\data\\TEXTURE\\head_light.jpg";
+    "data\\TEXTURE\\MATERIAL\\head_light.jpg";
    }
   }
   Material {
@@ -2097,7 +2097,7 @@ Mesh {
    0.610000;0.610000;0.610000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\Ver.2.2\\data\\TEXTURE\\Glass.png";
+    "data\\TEXTURE\\MATERIAL\\Glass.png";
    }
   }
   Material {
@@ -2112,7 +2112,7 @@ Mesh {
    0.610000;0.610000;0.610000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\Ver.2.2\\data\\TEXTURE\\Glass.png";
+    "data\\TEXTURE\\MATERIAL\\Glass.png";
    }
   }
   Material {

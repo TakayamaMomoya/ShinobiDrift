@@ -1747,7 +1747,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\metal_00003.jpg";
+    "data\\TEXTURE\\MATERIAL\\metal_00003.jpg";
    }
   }
   Material {
@@ -1756,7 +1756,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\team\\yazirusi01.png";
+    "data\\TEXTURE\\MATERIAL\\yazirusi01.png";
    }
   }
   Material {
@@ -1771,7 +1771,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\クローン\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\aokanban.png";
+    "data\\TEXTURE\\MATERIAL\\aokanban.png";
    }
   }
   Material {
@@ -1780,7 +1780,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\クローン\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\aokanban01.png";
+    "data\\TEXTURE\\MATERIAL\\aokanban01.png";
    }
   }
   Material {
@@ -1789,7 +1789,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\クローン\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\aokanban02.png";
+    "data\\TEXTURE\\MATERIAL\\aokanban02.png";
    }
   }
   Material {
@@ -1798,7 +1798,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\クローン\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\aokanban03.png";
+    "data\\TEXTURE\\MATERIAL\\aokanban03.png";
    }
   }
   Material {
@@ -1807,7 +1807,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Desktop\\クローン\\ShinobiDrift\\project\\data\\TEXTURE\\MATERIAL\\aokanban05.png";
+    "data\\TEXTURE\\MATERIAL\\aokanban05.png";
    }
   }
   Material {
@@ -1816,7 +1816,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\Screenshots\\aokanban07.png";
+    "data\\TEXTURE\\MATERIAL\\aokanban07.png";
    }
   }
   Material {
@@ -1825,7 +1825,7 @@ Mesh {
    0.000000;0.000000;0.000000;;
    0.000000;0.000000;0.000000;;
    TextureFilename {
-    "C:\\Users\\student\\Pictures\\Screenshots\\aokanban06.png";
+    "data\\TEXTURE\\MATERIAL\\aokanban06.png";
    }
   }
   Material {

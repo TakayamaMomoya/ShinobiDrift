@@ -97,3 +97,54 @@ void CUI::Draw(void)
 		CPolygon2D::Draw();
 	}
 }
+
+//=====================================================
+// サイズの設定
+//=====================================================
+void CUI::SetSize(float width, float height)
+{
+	float fWidth;
+	float fHeigth;
+
+	fWidth = SCREEN_WIDTH * width;
+	fHeigth = SCREEN_WIDTH * height;
+
+	CPolygon2D::SetSize(fWidth, fHeigth);
+}
+
+//=====================================================
+// サイズの取得
+//=====================================================
+D3DXVECTOR2 CUI::GetSize(void)
+{
+	D3DXVECTOR2 size = CPolygon2D::GetSize();
+
+	size.x /= SCREEN_WIDTH;
+	size.y /= SCREEN_HEIGHT;
+
+	return size;
+}
+
+//=====================================================
+// 位置設定
+//=====================================================
+void CUI::SetPosition(D3DXVECTOR3 pos)
+{
+	pos.x *= SCREEN_WIDTH;
+	pos.y *= SCREEN_HEIGHT;
+
+	CPolygon2D::SetPosition(pos);
+}
+
+//=====================================================
+// 位置取得
+//=====================================================
+D3DXVECTOR3 CUI::GetPosition(void)
+{
+	D3DXVECTOR3 pos = CPolygon2D::GetPosition();
+
+	pos.x /= SCREEN_WIDTH;
+	pos.y /= SCREEN_HEIGHT;
+
+	return pos;
+}
