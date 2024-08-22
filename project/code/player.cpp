@@ -1350,9 +1350,6 @@ void CPlayer::FollowBrakeLamp(void)
 		return;
 
 	D3DXMATRIX mtx = GetParts(0)->pParts->GetMatrix();
-
-	
-
 	m_info.pLampBreak->SetMatrixParent(mtx);
 }
 
