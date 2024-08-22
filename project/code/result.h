@@ -44,6 +44,7 @@ private:
 	// メンバ関数
 	void SetPlayer(void);	// プレイヤー設定
 	void SetCamera(void);	// カメラ設定
+	void SaveTime(void);	// タイムの保存
 
 	// メンバ変数
 	CStateResult *m_pState;

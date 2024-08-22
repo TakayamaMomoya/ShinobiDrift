@@ -318,6 +318,9 @@
     <ClCompile Include="code\gauge.cpp">
       <Filter>ソース ファイル\UI</Filter>
     </ClCompile>
+    <ClCompile Include="code\frame.cpp">
+      <Filter>ソース ファイル\VFX</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="code\block.h">
@@ -598,6 +601,9 @@
     </ClInclude>
     <ClInclude Include="code\gauge.h">
       <Filter>ソース ファイル\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="code\frame.h">
+      <Filter>ソース ファイル\VFX</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

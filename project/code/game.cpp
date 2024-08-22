@@ -125,11 +125,6 @@ HRESULT CGame::Init(void)
 	// チュートリアルの生成
 	CTutorial::Create();
 
-#ifdef _DEBUG
-	// メッシュキューブのテスト生成
-	CMeshCube::Create();
-#endif
-
 	// メッシュフィールドの生成
 	CMeshField *pMeshField = CMeshField::Create();
 

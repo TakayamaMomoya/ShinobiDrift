@@ -49,6 +49,7 @@ CGoal::CGoal(int nPriority)
 //=====================================================
 CGoal::~CGoal()
 {
+
 }
 
 //=====================================================
@@ -183,8 +184,6 @@ void CGoal::Update()
 	CDebugProc::GetInstance()->Print("\nfCross‚Ì’l[%f]", fCross);
 	CDebugProc::GetInstance()->Print("\nbHit[%d]", bHit);
 	CDebugProc::GetInstance()->Print("\nbHitOld[%d]", bHitNext);
-	//CDebugProc::GetInstance()->Print("\nstartPos‚ÌˆÊ’u[%f, %f, %f]", m_posStart.x, m_posStart.y, m_posStart.z);
-	//CDebugProc::GetInstance()->Print("\nendPos‚ÌˆÊ’u[%f, %f, %f]", m_posEnd.x, m_posEnd.y, m_posEnd.z);
 #endif
 }
 
