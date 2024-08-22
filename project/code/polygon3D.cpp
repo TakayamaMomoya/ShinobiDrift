@@ -387,17 +387,22 @@ void CPolygon3D::SetMtxBillboard(void)
 	// ワールドマトリックス初期化
 	D3DXMatrixIdentity(&mtx);
 
-	// ポリゴンをカメラに向ける
-	D3DXMatrixInverse(&mtx, nullptr, &mtxView);
-	mtx._41 = mtxParent._41;	// 位置を親子付け
-	mtx._42 = mtxParent._42;
-	mtx._43 = mtxParent._43;
-	
+	D3DXMATRIX mtxTemp = mtx;
+
 	// 位置を反映
 	D3DXVECTOR3 pos = GetPosition();
 	D3DXMatrixTranslation(&mtxTrans,
 		pos.x, pos.y, pos.z);
-	D3DXMatrixMultiply(&mtx, &mtx, &mtxTrans);
+	D3DXMatrixMultiply(&mtxTemp, &mtxTemp, &mtxTrans);
+
+	// 親子付けする
+	D3DXMatrixMultiply(&mtxTemp, &mtxTemp, &mtxParent);
+	
+	// ポリゴンをカメラに向ける
+	D3DXMatrixInverse(&mtx, nullptr, &mtxView);
+	mtx._41 = mtxTemp._41;	// 位置を親子付け
+	mtx._42 = mtxTemp._42;
+	mtx._43 = mtxTemp._43;
 
 	// ワールドマトリックス設定
 	pDevice->SetTransform(D3DTS_WORLD, &mtx);
