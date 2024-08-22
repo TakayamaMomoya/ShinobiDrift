@@ -101,15 +101,15 @@ MOTIONSET
     END_KEYSET
 END_MOTIONSET
 #===============================
-# [1]番目のモーション
+# [1]番目のモーション：リザルト
 #===============================
 MOTIONSET
-    LOOP = 1
+    LOOP = 0
     NUM_KEY = 4
 
     KEYSET     #---<< 0 / 4 >>
-        FRAME = 2
-         KEY # -----[0]----
+        FRAME = 20
+        KEY # -----[0]----
             POS = 0.00 0.00 0.00
             ROT = 0.00 0.00 0.00
         END_KEY
@@ -127,10 +127,10 @@ MOTIONSET
         END_KEY
     END_KEYSET
     KEYSET     #---<< 1 / 4 >>
-        FRAME = 2
-         KEY # -----[0]----
-            POS = 0.00 0.00 0.00
-            ROT = 0.00 0.00 0.00
+        FRAME = 30
+        KEY # -----[0]----
+            POS = 0.00 -26.40 0.00
+            ROT = 0.00 0.00 0.71
         END_KEY
         KEY # -----[1]----
             POS = 0.00 0.00 0.00
@@ -146,10 +146,10 @@ MOTIONSET
         END_KEY
     END_KEYSET
     KEYSET     #---<< 2 / 4 >>
-        FRAME = 2
-         KEY # -----[0]----
-            POS = 0.00 0.00 0.00
-            ROT = 0.00 0.00 0.00
+        FRAME = 30
+        KEY # -----[0]----
+            POS = 0.00 -26.40 0.00
+            ROT = 0.00 0.00 0.71
         END_KEY
         KEY # -----[1]----
             POS = 0.00 0.00 0.00
@@ -166,9 +166,9 @@ MOTIONSET
     END_KEYSET
     KEYSET     #---<< 3 / 4 >>
         FRAME = 2
-     KEY # -----[0]----
-            POS = 0.00 0.00 0.00
-            ROT = 0.00 0.00 0.00
+        KEY # -----[0]----
+            POS = 0.00 -14.40 0.00
+            ROT = 0.00 0.00 0.42
         END_KEY
         KEY # -----[1]----
             POS = 0.00 0.00 0.00
