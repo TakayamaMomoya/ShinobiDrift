@@ -26,12 +26,10 @@ const int NUM_VTX_DEFAULT = 4;	// デフォルトの頂点数
 //=====================================================
 // コンストラクタ
 //=====================================================
-CPolygon3D::CPolygon3D(int nPriority) : CObject(nPriority)
+CPolygon3D::CPolygon3D(int nPriority) : CObject3D(nPriority)
 {
 	m_col = { 1.0f,1.0f,1.0f,1.0f };
-	m_pos = { 0.0f,0.0f,0.0f };
 	m_posOld = { 0.0f,0.0f,0.0f };
-	m_rot = { 0.0f,0.0f,0.0f };
 	m_width = 0.0f;
 	m_heigth = 0.0f;
 	m_fFactSB = 0.0f;
@@ -102,6 +100,8 @@ HRESULT CPolygon3D::Init(void)
 	//頂点バッファをアンロック
 	m_pVtxBuff->Unlock();
 
+	CObject3D::Init();
+
 	return S_OK;
 }
 
@@ -116,7 +116,7 @@ void CPolygon3D::Uninit(void)
 		m_pVtxBuff = nullptr;
 	}
 
-	Release();
+	CObject3D::Uninit();
 }
 
 //=====================================================
@@ -165,7 +165,7 @@ LPDIRECT3DVERTEXBUFFER9 CPolygon3D::CreateVtxBuff(int nNumVtx)
 //=====================================================
 void CPolygon3D::Update(void)
 {
-
+	CObject3D::Update();
 }
 
 //=====================================================
@@ -257,15 +257,16 @@ void CPolygon3D::SetVtxStretchBillboard(void)
 	//頂点バッファをロックし、頂点情報へのポインタを取得
 	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	D3DXVECTOR3 pos = m_pos;
+	D3DXVECTOR3 pos = GetPosition();
+	D3DXVECTOR3 rot = GetRotation();
 	D3DXVECTOR3 vecFront;
 	D3DXVECTOR3 vecRear;
 
 	vecFront =
 	{// 前方ベクトル
-		sinf(m_rot.x + D3DX_PI * 0.5f) * sinf(m_rot.y) * m_heigth,
-		cosf(m_rot.x + D3DX_PI * 0.5f) * m_heigth,
-		sinf(m_rot.x + D3DX_PI * 0.5f) * cosf(m_rot.y) * m_heigth
+		sinf(rot.x + D3DX_PI * 0.5f) * sinf(rot.y) * m_heigth,
+		cosf(rot.x + D3DX_PI * 0.5f) * m_heigth,
+		sinf(rot.x + D3DX_PI * 0.5f) * cosf(rot.y) * m_heigth
 	};
 
 	// 後方ベクトル
@@ -313,10 +314,7 @@ void CPolygon3D::SetVtxStretchBillboard(void)
 void CPolygon3D::Draw(void)
 {
 	// デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
-
-	//ワールドマトリックス初期化
-	D3DXMatrixIdentity(&m_mtxWorld);
+	LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();
 
 	if (m_mode == MODE_BILLBOARD)
 	{
@@ -326,9 +324,6 @@ void CPolygon3D::Draw(void)
 	{
 		SetMtx();
 	}
-
-	//ワールドマトリックス設定
-	pDevice->SetTransform(D3DTS_WORLD,&m_mtxWorld);
 
 	//頂点バッファをデータストリームに設定
 	pDevice->SetStreamSource(0, m_pVtxBuff, 0, sizeof(VERTEX_3D));
@@ -362,24 +357,17 @@ void CPolygon3D::Draw(void)
 void CPolygon3D::SetMtx(void)
 {
 	D3DXMATRIX mtxRot, mtxTrans;
-	D3DXVECTOR3 pos = m_pos;
-	D3DXVECTOR3 rot = m_rot;
 
 	if (m_mode == MODE_STRETCHBILLBOARD)
 	{
-		pos = { 0.0f,0.0f,0.0f };
-		rot = { 0.0f,0.0f,0.0f };
+		D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f };
+		D3DXVECTOR3 rot = { 0.0f,0.0f,0.0f };
+
+		SetPosition(pos);
+		SetRotation(rot);
 	}
 
-	//向きを反映
-	D3DXMatrixRotationYawPitchRoll(&mtxRot,
-		rot.y, rot.x, rot.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxRot);
-
-	//位置を反映
-	D3DXMatrixTranslation(&mtxTrans,
-		pos.x, pos.y, pos.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+	CObject3D::Draw();
 }
 
 //=====================================================
@@ -387,22 +375,34 @@ void CPolygon3D::SetMtx(void)
 //=====================================================
 void CPolygon3D::SetMtxBillboard(void)
 {
-	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
+	LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();
 	D3DXMATRIX mtxView, mtxTrans;
 
-	//ビューマトリックス取得
+	// ビューマトリックス取得
 	pDevice->GetTransform(D3DTS_VIEW, &mtxView);
 
-	//ポリゴンをカメラに向ける
-	D3DXMatrixInverse(&m_mtxWorld, nullptr, &mtxView);
-	m_mtxWorld._41 = 0.0f;
-	m_mtxWorld._42 = 0.0f;
-	m_mtxWorld._43 = 0.0f;
+	D3DXMATRIX mtx = GetMatrix();
+	D3DXMATRIX mtxParent = GetMatrixParent();
 
+	// ワールドマトリックス初期化
+	D3DXMatrixIdentity(&mtx);
+
+	// ポリゴンをカメラに向ける
+	D3DXMatrixInverse(&mtx, nullptr, &mtxView);
+	mtx._41 = mtxParent._41;	// 位置を親子付け
+	mtx._42 = mtxParent._42;
+	mtx._43 = mtxParent._43;
+	
 	// 位置を反映
+	D3DXVECTOR3 pos = GetPosition();
 	D3DXMatrixTranslation(&mtxTrans,
-		m_pos.x, m_pos.y, m_pos.z);
-	D3DXMatrixMultiply(&m_mtxWorld, &m_mtxWorld, &mtxTrans);
+		pos.x, pos.y, pos.z);
+	D3DXMatrixMultiply(&mtx, &mtx, &mtxTrans);
+
+	// ワールドマトリックス設定
+	pDevice->SetTransform(D3DTS_WORLD, &mtx);
+
+	SetMatrix(mtx);
 }
 
 //=====================================================

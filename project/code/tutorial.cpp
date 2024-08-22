@@ -634,7 +634,7 @@ void CStateTutorialEnd::Init(CTutorial *pTutorial)
 	pPlayer->SetEnableInput(false);
 
 	// ƒtƒŒ[ƒ€‰‰o¶¬
-	CFrame::Create(20, 120, 10);
+	CFrame::Create(20, 120, 40);
 }
 
 //=====================================================

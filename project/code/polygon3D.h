@@ -10,13 +10,12 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "main.h"
-#include "object.h"
+#include "object3D.h"
 
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CPolygon3D : public CObject
+class CPolygon3D : public CObject3D
 {
 public:
 	enum MODE
@@ -38,16 +37,11 @@ public:
 	float GetWidth(void) { return m_width; }	// サイズ取得
 	float GetHeight(void) { return m_heigth; }	// サイズ取得
 	void SetSize(float width, float height);
-	void SetPosition(D3DXVECTOR3 pos) { m_pos = pos; }	// 設定処理
-	D3DXVECTOR3 GetPosition(void) { return m_pos; }	// 取得処理
 	D3DXVECTOR3 GetPositionOld(void) { return m_posOld; }
-	D3DXVECTOR3 GetRotation(void) { return m_rot; }
-	void SetRotation(D3DXVECTOR3 rot = { D3DX_PI * 0.5f,0.0f,0.0f }) { m_rot = rot; }
 	void SetIdxTexture(int nIdx) { m_nIdxTexture = nIdx; }
 	int GetIdxTexture(void) { return m_nIdxTexture; }
 	D3DXCOLOR GetColor(void) { return m_col; }
 	void SetColor(D3DXCOLOR col);
-	D3DXMATRIX *GetMatrix(void) { return &m_mtxWorld; }
 	void SetTex(D3DXVECTOR2 rd, D3DXVECTOR2 lu);
 	void SetFactSB(float fFact) { m_fFactSB = fFact; }
 	void SetVtx(void);
@@ -63,10 +57,7 @@ private:
 	void SetMtxBillboard(void);
 
 	LPDIRECT3DVERTEXBUFFER9 m_pVtxBuff;	//頂点バッファへのポインタ
-	D3DXVECTOR3 m_pos;	// 位置
 	D3DXVECTOR3 m_posOld;	// 前回の位置
-	D3DXVECTOR3 m_rot;							//向き
-	D3DXMATRIX m_mtxWorld;						//ワールドマトリックス
 	D3DXCOLOR m_col;	// 色
 	float m_width;	// 幅
 	float m_heigth;	// 高さ

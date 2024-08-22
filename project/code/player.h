@@ -119,6 +119,7 @@ private:
 		D3DXCOLOR orbitColorRope;	// テールランプの軌跡
 		D3DXVECTOR3 rotDriftStart;	// ドリフトスタート時の角度
 		float rotDriftDest;	// ドリフト終了時の角度補正値
+		CPolygon3D *pLampBreak;	// ブレーキランプ
 	};
 
 	void Load(void);
@@ -142,6 +143,9 @@ private:
 	void ManageMotionNinja(void);	// 忍者のモーション管理
 	void ManageSlashEffect(void);	// 斬撃エフェクトの管理
 	void Event(EVENT_INFO *pEventInfo);
+	void EnableBrakeLamp(void);	// ブレーキランプをつける
+	void DisableBrakeLamp(void);	// ブレーキランプを消す
+	void FollowBrakeLamp(void);	// ブレーキランプ追従
 	void Debug(void);
 
 	// メンバ変数
