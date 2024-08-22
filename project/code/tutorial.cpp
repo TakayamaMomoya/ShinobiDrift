@@ -42,9 +42,11 @@ const D3DXVECTOR3 ROT_GATE = { D3DX_PI * 0.5f, D3DX_PI * 0.5f, 0.0f };	// ゲート
 const float SPEED_RATE_PLAYER = 0.8f;	// プレイヤーがゲートに入るときのスピードの割合
 const float SPEED_EXPAND_GATE = 0.2f;	// ゲートの拡張速度
 const float SIZE_GATE_EFFECT = 1000.0f;	// ゲートエフェクトの目標サイズ
-const float HEIGTH_GATE = 500.0f;	// ゲートの高さ
+const float HEIGTH_GATE = 300.0f;	// ゲートの高さ
 const D3DXVECTOR3 POS_PLAYER_INITIAL = { -11409.0f,0.0f,26395.0f };	// チュートリアルのプレイヤー初期位置
 const D3DXVECTOR3 ROT_PLAYER_INITIAL = { 0.0f,1.77f,0.0f };	// チュートリアルのプレイヤー初期向き
+const string PATH_TEXTURE_GATE = "data\\TEXTURE\\EFFECT\\gate00.png";	// ゲートのテクスチャパス
+const float SPEED_ROTATE_GATE = 0.05f;	// ゲートの回る速度
 }
 
 //=====================================================
@@ -584,7 +586,7 @@ void CStateTutorialParry::Update(CTutorial *pTutorial)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateTutorialEnd::CStateTutorialEnd() : m_pGate(nullptr)
+CStateTutorialEnd::CStateTutorialEnd() : m_pGate(nullptr), m_bFade(false)
 {
 
 }
@@ -623,6 +625,9 @@ void CStateTutorialEnd::Init(CTutorial *pTutorial)
 		m_pGate->SetPosition(posGate);
 		m_pGate->SetSize(0.0f, 0.0f);
 		m_pGate->EnableZtest(true);
+
+		int nIdxTexture = Texture::GetIdx(&PATH_TEXTURE_GATE[0]);
+		m_pGate->SetIdxTexture(nIdxTexture);
 	}
 
 	// プレイヤーを操作不可にする
@@ -674,7 +679,7 @@ void CStateTutorialEnd::ScalingGate(void)
 	if (m_pGate == nullptr)
 		return;
 
-	// ゲートエフェクトの補正
+	// ゲートサイズの補正
 	D3DXVECTOR3 size =
 	{
 		m_pGate->GetWidth(),
@@ -734,9 +739,11 @@ void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
 
 		// ブラーをかける
 		CBlurEvent::Create(1.0f, 0.8f, 10.0f);
+
+		m_bFade = true;
 	}
 
-	if (pFade->GetState() == CFade::FADE::FADE_OUT)
+	if (pFade->GetState() == CFade::FADE::FADE_OUT && m_bFade)
 	{// フェードが消え始める瞬間でゲームをスタートする
 		pTutorial->StartGame();
 
