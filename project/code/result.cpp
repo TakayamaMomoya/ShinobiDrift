@@ -24,6 +24,7 @@
 namespace
 {
 const D3DXVECTOR3 POS_DISP_TIME = { SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.4f, 0.0f };	// タイムの表示位置
+const string PATH_SAVE = "data\\BYNARY\\gametime.bin";	// ゲームの記録時間の保存
 }
 
 //=====================================================
@@ -70,6 +71,9 @@ HRESULT CResult::Init(void)
 	// カメラ位置の設定
 	SetCamera();
 
+	// タイムの保存
+	SaveTime();
+
 	// ステイトの変更
 	ChangeState(new CStateResultDispTime);
 
@@ -101,6 +105,33 @@ void CResult::SetCamera(void)
 		return;
 	
 	pCamera->ChangeState(new CCameraStateResult);
+}
+
+//=====================================================
+// タイムの保存
+//=====================================================
+void CResult::SaveTime(void)
+{
+	CGame *pGame = CGame::GetInstance();
+
+	if (pGame == nullptr)
+		return;
+
+	CTimer *pTimer = pGame->GetGameTimer();
+
+	if (pTimer == nullptr)
+		return;
+
+	// タイムの取得
+	float fSecond = pTimer->GetSecond();
+
+	// ファイルに保存
+	std::ofstream outputFile(PATH_SAVE, std::ios::binary);
+
+	if (!outputFile.is_open())
+		assert(("タイムのファイルを開けませんでした", false));
+
+	outputFile.write(reinterpret_cast<const char*>(&fSecond), sizeof(float));
 }
 
 //=====================================================
@@ -204,7 +235,7 @@ void CStateResultDispTime::Init(CResult *pResult)
 //=====================================================
 void CStateResultDispTime::SetNumber(void)
 {
-	CTimer *pTime = CTimer::GetInstance();
+	/*CTimer *pTime = CTimer::GetInstance();
 
 	if (pTime == nullptr)
 		return;
@@ -221,7 +252,7 @@ void CStateResultDispTime::SetNumber(void)
 		m_apTime[i] = CNumber::Create(2, aTime[i]);
 
 
-	}
+	}*/
 }
 
 //=====================================================

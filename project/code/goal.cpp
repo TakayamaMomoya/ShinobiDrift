@@ -49,6 +49,7 @@ CGoal::CGoal(int nPriority)
 //=====================================================
 CGoal::~CGoal()
 {
+
 }
 
 //=====================================================
@@ -146,9 +147,6 @@ void CGoal::Update()
 	// 移動量取得
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
 
-	// タイマーの取得
-	CTimer* pTimer = CTimer::GetInstance();
-
 	// 交点の割合
 	float fCross = 0.0f;
 
@@ -183,8 +181,6 @@ void CGoal::Update()
 	CDebugProc::GetInstance()->Print("\nfCrossの値[%f]", fCross);
 	CDebugProc::GetInstance()->Print("\nbHit[%d]", bHit);
 	CDebugProc::GetInstance()->Print("\nbHitOld[%d]", bHitNext);
-	//CDebugProc::GetInstance()->Print("\nstartPosの位置[%f, %f, %f]", m_posStart.x, m_posStart.y, m_posStart.z);
-	//CDebugProc::GetInstance()->Print("\nendPosの位置[%f, %f, %f]", m_posEnd.x, m_posEnd.y, m_posEnd.z);
 #endif
 }
 

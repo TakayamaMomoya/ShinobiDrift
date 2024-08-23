@@ -132,8 +132,8 @@ void CMeshRoad::Uninit(void)
 void CMeshRoad::Update(void)
 {
 #ifdef _DEBUG
-	for (SInfoRoadPoint info : m_aRoadPoint)
-		CEffect3D::Create(info.pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	//for (SInfoRoadPoint info : m_aRoadPoint)
+		//CEffect3D::Create(info.pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 #endif // _DEBUG
 }
 
@@ -148,10 +148,10 @@ void CMeshRoad::Draw(void)
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
 
-	D3DXMATRIX *pMtx = GetMatrix();
+	D3DXMATRIX mtx = GetMatrix();
 
 	// ワールドマトリックス初期化
-	D3DXMatrixIdentity(pMtx);
+	D3DXMatrixIdentity(&mtx);
 
 	D3DXMATRIX mtxRot, mtxTrans;
 	D3DXVECTOR3 pos = GetPosition();
@@ -160,15 +160,17 @@ void CMeshRoad::Draw(void)
 	// 向きを反映
 	D3DXMatrixRotationYawPitchRoll(&mtxRot,
 		rot.y, rot.x, rot.z);
-	D3DXMatrixMultiply(pMtx, pMtx, &mtxRot);
+	D3DXMatrixMultiply(&mtx, &mtx, &mtxRot);
 
 	// 位置を反映
 	D3DXMatrixTranslation(&mtxTrans,
 		pos.x, pos.y, pos.z);
-	D3DXMatrixMultiply(pMtx, pMtx, &mtxTrans);
+	D3DXMatrixMultiply(&mtx, &mtx, &mtxTrans);
 
 	// ワールドマトリックス設定
-	pDevice->SetTransform(D3DTS_WORLD, pMtx);
+	pDevice->SetTransform(D3DTS_WORLD, &mtx);
+
+	SetMatrix(mtx);
 
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 
@@ -836,8 +838,6 @@ void CMeshRoad::Save(const char* pPath)
 
 	// トンネル情報保存
 	size = m_aTunnel.size();	// トンネル数保存
-
-
 
 	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
 

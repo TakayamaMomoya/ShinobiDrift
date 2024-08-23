@@ -14,6 +14,7 @@
 #include "MyEffekseer.h"
 #include "camera.h"
 #include "debugproc.h"
+#include "game.h"
 
 // エフェクトの名前
 const char* CEffekseer::m_apEfkName[CEffekseer::TYPE_MAX] =
@@ -101,7 +102,7 @@ void CEffekseer::Uninit(void)
 //===========================================================
 void CEffekseer::Update(void)
 {
-	for (auto it = m_listEffect.begin();it != m_listEffect.end();)
+	for (auto it = m_listEffect.begin(); it != m_listEffect.end(); )
 	{
 		// エフェクトの移動
 		Effekseer::Handle handle = (*it)->GetHandle();
@@ -125,27 +126,37 @@ void CEffekseer::Update(void)
 		Effekseer::Manager::UpdateParameter updateParameter;
 		m_efkManager->Update(updateParameter);
 
-		// 時間を更新する
-		int32_t time = (*it)->GetTime();
-		m_efkRenderer->SetTime((float)time / 60.0f);
-		time++;
-		(*it)->SetTime(time);
+		// 停止フラグの取得
+		bool bStop = false;
+		CGame *pGame = CGame::GetInstance();
+		if (pGame != nullptr)
+			bStop = pGame->GetStop();
 
-		auto itNext = std::next(it);
+		if (bStop)
+		{
+			// 再生時間を停止する
+			m_efkManager->SetPaused(handle, true);
+		}
+		else
+		{
+			// 再生時間を進める
+			int32_t time = (*it)->GetTime();
+			time++;
+			(*it)->SetTime(time);
 
-		if (itNext == m_listEffect.end())
-			break;
+			m_efkManager->SetPaused(handle, false); // 再生を再開
+		}
 
 		// 毎フレーム、エフェクトが再生終了しているか確認する
 		if (m_efkManager->Exists(handle) == false)
 		{
 			(*it)->Uninit();
-
-			// リストから除外
-			m_listEffect.remove((*it));
+			it = m_listEffect.erase(it);  // リストから要素を削除し、イテレータを更新
 		}
-
-		it = itNext;
+		else
+		{
+			++it;  // エフェクトがまだ存在する場合は次の要素へ進む
+		}
 	}
 }
 

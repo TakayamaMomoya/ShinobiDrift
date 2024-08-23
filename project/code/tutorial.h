@@ -33,8 +33,8 @@ public:
 	// メンバ関数
 	virtual HRESULT Init(void);	// 初期化
 	virtual void Uninit(void);	// 終了
-	virtual void Update();	// 更新
-	virtual void Draw();	// 描画
+	virtual void Update(void);	// 更新
+	virtual void Draw(void);	// 描画
 	void ChangeState(CStateTutorial *pState);	// ステイトの変更
 	void AddLimit(int nIdx, float fValue);	// 制限値の追加
 
@@ -49,6 +49,7 @@ public:
 
 	// 静的メンバ関数
 	static CTutorial *Create(void);	// 生成処理
+
 private:
 	// メンバ変数
 	std::map<int, CUI*> m_mapUI;	// UIのマップコンテナ
@@ -69,7 +70,15 @@ public:
 	virtual void Uninit(CTutorial *pTutorial);	// 終了処理
 	virtual void Update(CTutorial *pTutorial) = 0;	// 更新処理
 	virtual bool IsEndInput(int nNum, CTutorial *pTutorial);	// 終了しているかどうか
+	void CreateUI(vector<string> aPathTexture, vector<float> aLimit, int nNumMenu, CTutorial *pTutorial);
+	void SetParamGauge(int nNumMenu, CTutorial *pTutorial);	// ゲージのパラメーター設定
+
+	// 変数取得・設定関数
+	vector<CGauge*> GetArrayGauge(void) { return m_aGauge; };	// ゲージ配列
+	void SetArrayGauge(vector<CGauge*> array) { m_aGauge = array; }
+
 private:
+	vector<CGauge*> m_aGauge;	// ゲージの配列
 };
 
 class CStateTutorialMove : public CStateTutorial
@@ -90,8 +99,6 @@ private:
 		MENU_BRAKE,	// ブレーキ
 		MENU_MAX
 	};
-
-	CGauge *m_pGauge;	// ゲージのポインタ
 };
 
 class CStateTutorialDrift : public CStateTutorial
@@ -148,9 +155,10 @@ private:
 	void ScalingGate(void);	// ゲートのスケーリング補正
 	void CollidePlayer(CTutorial *pTutorial);	// プレイヤーとゲートの判定
 	void ForwardPlayer(void);	// プレイヤーを進める処理
-
+	
 	// メンバ変数
-	CEffekseerEffect *m_pEffect;	// エフェクトのポインタ
+	CPolygon3D *m_pGate;	// ゲートのポリゴン
+	bool m_bFade;	// フェードフラグ
 };
 
 namespace Tutorial

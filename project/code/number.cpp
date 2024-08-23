@@ -96,13 +96,11 @@ void CNumber::Update(void)
 //=====================================================
 // ’lÝ’èˆ—
 //=====================================================
-void CNumber::SetValue(int nValue,int nNumPlace)
+void CNumber::SetValue(int nValue)
 {
 	// •Ï”éŒ¾
 	int aTexU[MAX_PLACE];
 	int aData1, aData2;
-
-	m_nNumPlace = nNumPlace;
 
 	m_nValue = nValue;
 
@@ -240,7 +238,7 @@ CNumber *CNumber::Create(int nNumPlace, int nValue)
 		// ‰Šú‰»ˆ—
 		pNumber->Init();
 
-		pNumber->SetValue(nValue, nNumPlace);
+		pNumber->SetValue(nValue);
 	}
 
 	return pNumber;

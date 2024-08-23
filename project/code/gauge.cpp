@@ -173,6 +173,24 @@ void CGauge::Draw(void)
 }
 
 //=====================================================
+// 位置の設定
+//=====================================================
+void CGauge::SetPosition(D3DXVECTOR3 pos)
+{
+	CGameObject::SetPosition(pos);
+
+	// フレームの位置合わせ
+	if (m_aPolygon.empty())
+		return;
+
+	if (m_aPolygon[E_Polygon::POLYGON_FRAME] == nullptr)
+		return;
+
+	m_aPolygon[E_Polygon::POLYGON_FRAME]->SetPosition(pos);
+	m_aPolygon[E_Polygon::POLYGON_FRAME]->SetVtx();
+}
+
+//=====================================================
 // パラメーターの加算処理	// つくりかけ
 //=====================================================
 void CGauge::AddParam(float fValue)

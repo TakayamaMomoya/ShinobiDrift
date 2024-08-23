@@ -9,45 +9,38 @@
 // インクルード
 //*****************************************************
 #include "timer.h"
-#include "manager.h"
-#include "debugproc.h"
-#include "goal.h"
-#include "player.h"
+#include "UI.h"
+#include "texture.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-const int MINUTES_LIMIT = 9;		// 分の上限値
-const int SECOND_LIMIT = 59;		// 秒の上限値
-const int MILLI_LIMIT = 99;			// ミリ秒の上限
-const int MINUTES_DIGIT = 1;		// 分表示の桁数
-const int TIME_DIGIT = 2;			// それぞれの桁数
+const int MINUTES_LIMIT = 9;	// 分の上限値
+const int SECOND_LIMIT = 59;	// 秒の上限値
+const int MILLI_LIMIT = 99;	// ミリ秒の上限
+const int MINUTES_DIGIT = 2;	// 分表示の桁数
+const int TIME_DIGIT = 2;	// それぞれの桁数
 const float MAGNIFICATION = 100.0f;	// 掛ける倍率
 const float MINUTES_WIDTH = 0.44f;	// 分のX座標
-const float SECOND_WIDTH = 0.5f;		// 秒のX座標
-const float MILLI_WIDTH = 0.6f;		// ミリ秒のX座標
+const float SECOND_WIDTH = 0.5f;	// 秒のX座標
+const float MILLI_WIDTH = 0.6f;	// ミリ秒のX座標
+const float DIST_NUMBER = 0.03f;	// 数字間の距離
 D3DXVECTOR2 SIZE_NORMAL_NUM = { 0.02f, 0.04f };	// 通常数字のサイズ
 D3DXVECTOR2 SIZE_MINI_NUM = { 0.014f, 0.028f };	// ミニ数字のサイズ
+D3DXVECTOR3 POS_INITIAL = { 0.5f,0.08f,0.0f };	// 初期位置
+const string PATH_TEX_COLON = "data\\TEXTURE\\UI\\colon.png";	// コロンのテクスチャパス
 }
 
-//*****************************************************
-// 静的メンバ変数宣言
-//*****************************************************
-CTimer* CTimer::s_pTimer = nullptr;
-
 //=====================================================
-// 優先順位を決めるコンストラクタ
+// コンストラクタ
 //=====================================================
-CTimer::CTimer(int nPriority) : CObject(nPriority)
+CTimer::CTimer()
 {
-	m_fSecond = 0.0f;			// 現在の時間(秒)
-	m_fMilli = 0.0f;			// 現在の時間(ミリ秒)
-	m_IsStop = false;
-	m_pMinutes = nullptr;		// 分表示のポインタ
-	m_pSecond = nullptr;		// 秒表示用のポインタ
-	m_pMilli = nullptr;			// ミリセカンド表示用のポインタ
+	m_fSecond = 0.0f;
+	m_fScaleNumber = 0.0f;
+	m_bStop = false;
 }
 
 //=====================================================
@@ -63,17 +56,16 @@ CTimer::~CTimer()
 //=====================================================
 CTimer* CTimer::Create(void)
 {
-	if (s_pTimer == nullptr)
-	{// インスタンス生成
-		s_pTimer = new CTimer;
-	}
+	CTimer *pTimer = nullptr;
 
-	if (s_pTimer != nullptr)
+	pTimer = new CTimer;
+
+	if (pTimer != nullptr)
 	{// 初期化
-		s_pTimer->Init();
+		pTimer->Init();
 	}
 
-	return s_pTimer;
+	return pTimer;
 }
 
 //=====================================================
@@ -81,35 +73,45 @@ CTimer* CTimer::Create(void)
 //=====================================================
 HRESULT CTimer::Init(void)
 {
-	// 分・秒・ミリ秒の初期化
-	m_fSecond = 0.0f;
-	m_fMilli = 0.0f;
+	m_fSecond = 0.0f;	// 秒の初期化
+	m_fScaleNumber = 1.0f;	// 初期スケール設定
+	m_bStop = false;	// タイマー停止のフラグ
 
-	m_IsStop = false;	// タイマー停止のフラグ
+	// 初期位置の設定
+	SetPosition(POS_INITIAL);
 
-	if (s_pTimer->m_pMinutes == nullptr)
-	{// 分表示
-		// 生成・位置、サイズ設定
-		s_pTimer->m_pMinutes = CNumber::Create(MINUTES_DIGIT, MINUTES_LIMIT);
-		s_pTimer->m_pMinutes->SetPosition(D3DXVECTOR3(MINUTES_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f, 0.0f));
-		s_pTimer->m_pMinutes->SetSizeAll(SIZE_NORMAL_NUM.x, SIZE_NORMAL_NUM.y);
+	// 数字の配列のリサイズ
+	m_aNumber.resize(E_Number::NUMBER_MAX);
+
+	int aDigit[E_Number::NUMBER_MAX] =
+	{// 桁数
+		MINUTES_DIGIT,
+		TIME_DIGIT,
+		TIME_DIGIT
+	};
+
+	// 数字の生成
+	for (int i = 0; i < E_Number::NUMBER_MAX; i++)
+	{
+		m_aNumber[i] = CNumber::Create(aDigit[i], 0);	// 数字の生成
 	}
 
-	if (s_pTimer->m_pSecond == nullptr)
-	{// 秒表示
-		// 生成・位置、サイズ設定
-		s_pTimer->m_pSecond = CNumber::Create(TIME_DIGIT, SECOND_LIMIT);
-		s_pTimer->m_pSecond->SetPosition(D3DXVECTOR3(SECOND_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f , 0.0f));
-		s_pTimer->m_pSecond->SetSizeAll(SIZE_NORMAL_NUM.x, SIZE_NORMAL_NUM.y);
+	// コロンの生成
+	m_aColon.resize(E_Number::NUMBER_MAX - 1);
+
+	for (int i = 0; i < E_Number::NUMBER_MAX - 1; i++)
+	{
+		m_aColon[i] = CUI::Create();
+
+		if (m_aColon[i] == nullptr)
+			continue;
+
+		int nIdxTexture = Texture::GetIdx(&PATH_TEX_COLON[0]);
+		m_aColon[i]->SetIdxTexture(nIdxTexture);
 	}
 
-	if (s_pTimer->m_pMilli == nullptr)
-	{// ミリ秒表示
-		// 生成・位置、サイズ設定
-		s_pTimer->m_pMilli = CNumber::Create(TIME_DIGIT, MILLI_LIMIT);
-		s_pTimer->m_pMilli->SetPosition(D3DXVECTOR3(MILLI_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f, 0.0f));
-		s_pTimer->m_pMilli->SetSizeAll(SIZE_MINI_NUM.x, SIZE_MINI_NUM.y);
-	}
+	// 数字のトランスフォームの設定
+	TransformNumber();
 
 	return S_OK;
 }
@@ -119,30 +121,14 @@ HRESULT CTimer::Init(void)
 //=====================================================
 void CTimer::Uninit(void)
 {
-	// 静的メンバ変数の終了
-	if (s_pTimer != nullptr)
-		s_pTimer = nullptr;
-
-	if (m_pMinutes != nullptr)
-	{// 分の終了
-		m_pMinutes->Uninit();
-		m_pMinutes = nullptr;
+	for (auto it : m_aNumber)
+	{
+		it->Uninit();
 	}
 
-	if (m_pSecond != nullptr)
-	{// 秒の終了
-		m_pSecond->Uninit();
-		m_pSecond = nullptr;
-	}
+	m_aNumber.clear();
 
-	if (m_pMilli != nullptr)
-	{// ミリ秒の終了
-		m_pMilli->Uninit();
-		m_pMilli = nullptr;
-	}
-
-	// 自身の破棄
-	Release();
+	CGameObject::Uninit();
 }
 
 //=====================================================
@@ -150,73 +136,119 @@ void CTimer::Uninit(void)
 //=====================================================
 void CTimer::Update(void)
 {
-	// 分の更新
-	if (!m_IsStop)
-	{
-		Minutes();
+	if (!m_bStop)
+	{// 数字の更新
+		UpdateNumber();
 	}
 }
 
 //=====================================================
-// 分の更新
+// 数字の更新
 //=====================================================
-void CTimer::Minutes()
+void CTimer::UpdateNumber()
 {
-	// 秒の更新
-	Second();
+	if (m_aNumber.empty())
+		return;
 
-	// 分の計算
-	int nMinutes = (int)m_fSecond / SECOND_LIMIT;
+	// 値の用意
+	int aValue[E_Number::NUMBER_MAX] =
+	{
+		(int)m_fSecond / SECOND_LIMIT,
+		(int)m_fSecond % SECOND_LIMIT,
+		(int)(m_fSecond * MAGNIFICATION) % (int)MAGNIFICATION
+	};
 
-	// 分の上限値超えないように
-	if (nMinutes >= MINUTES_LIMIT)
-		nMinutes = MINUTES_LIMIT;
-
-	// 分表示
-	if (m_pMinutes != nullptr)
-		m_pMinutes->SetValue(nMinutes, MINUTES_DIGIT);
+	for (int i = 0; i < E_Number::NUMBER_MAX; i++)
+	{
+		m_aNumber[i]->SetValue(aValue[i]);
+	}
 }
 
 //=====================================================
-// 秒の更新
+// 数字のトランスフォーム設定
 //=====================================================
-void CTimer::Second()
+void CTimer::TransformNumber()
 {
-	// ミリ秒の更新
-	MilliSecond();
+	if (m_aNumber.empty())
+		return;
 
-	// デルタタイム取得
-	float fDeltaTime = CManager::GetDeltaTime();
+	int aDigit[E_Number::NUMBER_MAX] =
+	{// 桁数
+		MINUTES_DIGIT,
+		TIME_DIGIT,
+		TIME_DIGIT
+	};
 
-	// デルタタイム(リアル時間)加算
-	m_fSecond += fDeltaTime;
+	D3DXVECTOR2 aSize[E_Number::NUMBER_MAX] =
+	{// 数字のサイズ
+		SIZE_NORMAL_NUM * m_fScaleNumber,
+		SIZE_NORMAL_NUM * m_fScaleNumber,
+		SIZE_NORMAL_NUM * m_fScaleNumber
+	};
 
-	// 秒の計算
-	int nSecond = (int)m_fSecond % SECOND_LIMIT;
+	D3DXVECTOR3 posBase = GetPosition();
 
-	// 秒表示
-	if (m_pSecond != nullptr)
-		m_pSecond->SetValue(nSecond, TIME_DIGIT);
+	// 数字分、生成して設定
+	for (int i = 0; i < E_Number::NUMBER_MAX; i++)
+	{
+		if (m_aNumber[i] == nullptr)
+			continue;
+
+		// 参照するサイズの番号
+		int nIdx = i;
+
+		if (nIdx > 0)
+			nIdx--;	// 0番目でなければ前回のサイズを参照する
+
+		// パラメーター設定
+		float fWidth = aSize[nIdx].x * aDigit[nIdx] * 2 + DIST_NUMBER * m_fScaleNumber;	// サイズに応じて数字間のスペースをあける
+		D3DXVECTOR3 pos = { posBase.x + fWidth * (i - 1), posBase.y, 0.0f };
+		m_aNumber[i]->SetPosition(pos);
+		m_aNumber[i]->SetSizeAll(aSize[i].x, aSize[i].y);
+
+		if (i == 0)	// 0以上のときしか入らない処理
+			continue;
+		
+		// コロンの位置を設定
+		int nIdxColon = i - 1;
+
+		if (m_aColon[nIdxColon] != nullptr)
+		{
+			float fPosXLast = m_aNumber[i - 1]->GetPosition().x + aDigit[i - 1] * aSize[i - 1].x;
+			D3DXVECTOR3 posColon = { (pos.x + fPosXLast) / 2, pos.y, 0.0f };
+			m_aColon[nIdxColon]->SetPosition(posColon);	// 位置
+			m_aColon[nIdxColon]->SetSize(aSize[i].x, aSize[i].y);	// サイズ
+			m_aColon[nIdxColon]->SetVtx();
+		}
+	}
 }
 
 //=====================================================
-// ミリ秒更新
+// 位置の設定
 //=====================================================
-void CTimer::MilliSecond()
+void CTimer::SetPosition(D3DXVECTOR3 pos)
 {
-	// デルタタイム取得
-	float fDeltaTime = CManager::GetDeltaTime();
+	CGameObject::SetPosition(pos);
 
-	// デルタタイム(リアル時間)加算
-	m_fMilli += fDeltaTime;
+	// 数字のトランスフォームの設定
+	TransformNumber();
+}
 
-	// 秒を100倍
-	m_fMilli = m_fSecond * MAGNIFICATION;
+//=====================================================
+// 数字のスケールの設定
+//=====================================================
+void CTimer::SetScaleNumber(float fScale)
+{
+	m_fScaleNumber = fScale;
 
-	// ミリ秒の計算
-	int nMsecond = (int)m_fMilli % MILLI_LIMIT;
+	// 数字のトランスフォームの設定
+	TransformNumber();
+}
 
-	// ミリ秒表示
-	if (m_pMilli != nullptr)
-		m_pMilli->SetValue(nMsecond, TIME_DIGIT);
+//=====================================================
+// 描画処理
+//=====================================================
+void CTimer::Draw()
+{
+
 }

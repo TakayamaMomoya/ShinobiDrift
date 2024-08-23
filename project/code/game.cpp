@@ -71,6 +71,7 @@ CGame::CGame()
 	m_nCntState = 0;
 	m_bStop = false;
 	m_pEdit = nullptr;
+	m_pGameTimer = nullptr;
 }
 
 //=====================================================
@@ -112,9 +113,6 @@ HRESULT CGame::Init(void)
 	// スロー管理の生成
 	CSlow::Create();
 
-	// メーター生成
-	CMeter::Create();
-
 	// ゴール生成
 	//CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), D3DX_PI);
 	CGoal::Create(D3DXVECTOR3(12726.0f, 2500.7f, -27695.0f), D3DX_PI);
@@ -124,11 +122,6 @@ HRESULT CGame::Init(void)
 
 	// チュートリアルの生成
 	CTutorial::Create();
-
-#ifdef _DEBUG
-	// メッシュキューブのテスト生成
-	CMeshCube::Create();
-#endif
 
 	// メッシュフィールドの生成
 	CMeshField *pMeshField = CMeshField::Create();
@@ -146,6 +139,8 @@ HRESULT CGame::Init(void)
 //=====================================================
 void CGame::Uninit(void)
 {
+	ReleaseGameTimer();
+
 	if (m_pEdit != nullptr)
 	{
 		m_pEdit->Uninit();
@@ -168,14 +163,20 @@ void CGame::Update(void)
 	CInputManager *pInputManager = CInputManager::GetInstance();
 	CSound* pSound = CSound::GetInstance();
 
-	// シーンの更新
-	CScene::Update();
+	if (!m_bStop)
+	{
+		// シーンの更新
+		CScene::Update();
+	}
 
 	// カメラ更新
 	UpdateCamera();
 
 	// 状態管理
 	ManageState();
+
+	// タイマーの更新
+	UpdateGameTimer();
 
 #ifdef _DEBUG
 	Debug();
@@ -223,6 +224,19 @@ void CGame::ManageState(void)
 	default:
 		break;
 	}
+}
+
+//=====================================================
+// ゲームタイマーの更新
+//=====================================================
+void CGame::UpdateGameTimer(void)
+{
+	if (m_pGameTimer == nullptr)
+		return;
+
+	float fSecond = CManager::GetDeltaTime();
+
+	m_pGameTimer->AddSecond(fSecond);
 }
 
 //=====================================================
@@ -301,6 +315,29 @@ void CGame::Debug(void)
 
 	if (m_pEdit != nullptr)
 		m_pEdit->Update();
+}
+
+//=====================================================
+// ゲームタイマー生成
+//=====================================================
+void CGame::CreateGameTimer(void)
+{
+	if (m_pGameTimer != nullptr)
+		return;
+
+	m_pGameTimer = CTimer::Create();
+}
+
+//=====================================================
+// ゲームタイマー解放
+//=====================================================
+void CGame::ReleaseGameTimer(void)
+{
+	if (m_pGameTimer != nullptr)
+	{
+		m_pGameTimer->Uninit();
+		m_pGameTimer = nullptr;
+	}
 }
 
 //=====================================================
