@@ -14,6 +14,11 @@
 #include "number.h"
 
 //*****************************************************
+// 前方宣言
+//*****************************************************
+class CUI;
+
+//*****************************************************
 // クラスの定義
 //*****************************************************
 class CTimer : public CGameObject
@@ -28,16 +33,15 @@ public:
 	void Update();
 	void Draw();
 
-	void Minutes();
-	void Second();
-	void MilliSecond();
-
 	// 変数取得・設定関数
 	float GetSecond() { return m_fSecond; }	// 秒
 	void SetSecond(float fSecond) { m_fSecond = fSecond; }
 	void AddSecond(float fSecond) { m_fSecond += fSecond; }
 	bool GetFlag() { return m_bStop; }	// 動作フラグ
 	void SetFlag(bool bStop) { m_bStop = bStop; }
+	void SetPosition(D3DXVECTOR3 pos) override;	// 位置
+	void SetScaleNumber(float fScale);	// 数字のスケール
+	float GetScaleNumber(void) { return m_fScaleNumber; }
 
 	// 静的メンバ関数
 	static CTimer *Create();	// 生成
@@ -54,11 +58,14 @@ private:
 
 	// メンバ関数
 	void UpdateNumber();	// 数字の更新
+	void TransformNumber();	// 数字のトランスフォーム設定
 
 	// メンバ変数
 	float m_fSecond;			// 現在の時間(秒)
+	float m_fScaleNumber;	// 数字のスケール
 	bool m_bStop;				// タイマー停止のフラグ
 	vector<CNumber*> m_aNumber;	// 数字の配列
+	vector<CUI*> m_aColon;	// コロンの配列
 };
 
 #endif
