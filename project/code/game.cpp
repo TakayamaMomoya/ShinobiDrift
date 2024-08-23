@@ -163,8 +163,11 @@ void CGame::Update(void)
 	CInputManager *pInputManager = CInputManager::GetInstance();
 	CSound* pSound = CSound::GetInstance();
 
-	// シーンの更新
-	CScene::Update();
+	if (!m_bStop)
+	{
+		// シーンの更新
+		CScene::Update();
+	}
 
 	// カメラ更新
 	UpdateCamera();
