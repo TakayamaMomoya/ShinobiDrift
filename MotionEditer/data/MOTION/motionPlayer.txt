@@ -9,7 +9,7 @@ SCRIPT
 #====================================================================
 # モデル数
 #====================================================================
-NUM_MODEL = 21
+NUM_MODEL = 17
 
 #====================================================================
 # モデルファイル名
@@ -31,10 +31,6 @@ MODEL_FILENAME = data/MODEL/Player/13_shin_l.x
 MODEL_FILENAME = data/MODEL/Player/14_shooes_l.x
 MODEL_FILENAME = data/MODEL/Player/sword.x
 MODEL_FILENAME = data/MODEL/Player/sword.x
-MODEL_FILENAME = data/MODEL/bike/00_body.x
-MODEL_FILENAME = data/MODEL/bike/01_Handle.x
-MODEL_FILENAME = data/MODEL/bike/02_Wheel_Front.x
-MODEL_FILENAME = data/MODEL/bike/03_Wheel_Rear.x
 
 #====================================================================
 # キャラクター情報
@@ -142,30 +138,6 @@ CHARACTERSET
         INDEX = 16
         PARENT = 5
         POS = -15.6 -8.7 -7.9
-        ROT = 0.0 0.0 0.0
-    END_PARTSSET
-        PARTSSET
-        INDEX = 17
-        PARENT = -1
-        POS = 0.0 101.8 26.4
-        ROT = 0.0 0.0 0.0
-    END_PARTSSET
-    PARTSSET
-        INDEX = 18
-        PARENT = 17
-        POS = 0.0 60.7 124.1
-        ROT = 0.0 0.0 0.0
-    END_PARTSSET
-    PARTSSET
-        INDEX = 19
-        PARENT = 18
-        POS = 0.0 -127.6 23.6
-        ROT = 0.0 0.0 0.0
-    END_PARTSSET
-    PARTSSET
-        INDEX = 20
-        PARENT = 17
-        POS = 0.0 -68.4 -109.5
         ROT = 0.0 0.0 0.0
     END_PARTSSET
 END_CHARACTERSET
@@ -1226,7 +1198,7 @@ MOTIONSET
         END_KEY
         KEY # -----[2]----
             POS = 0.00 0.00 0.00
-            ROT = -0.63 -1.46 0.20
+            ROT = -0.49 -1.42 0.20
         END_KEY
         KEY # -----[3]----
             POS = 0.00 0.00 0.00
@@ -1284,7 +1256,6 @@ MOTIONSET
             POS = 0.00 0.00 0.00
             ROT = -1.67 -0.28 -0.07
         END_KEY
-    END_KEYSET
 END_MOTIONSET
 #===============================
 # [6]番目のモーション
