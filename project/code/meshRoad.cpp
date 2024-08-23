@@ -839,8 +839,6 @@ void CMeshRoad::Save(const char* pPath)
 	// トンネル情報保存
 	size = m_aTunnel.size();	// トンネル数保存
 
-
-
 	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
 
 	// イテレーターの終始端を保存

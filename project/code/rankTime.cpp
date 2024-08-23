@@ -1,6 +1,6 @@
 //*****************************************************
 //
-// UIマネージャー[UIManager.cpp]
+// ランクタイムの処理[rankTime.cpp]
 // Author:髙山桃也
 //
 //*****************************************************
@@ -8,43 +8,33 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "main.h"
-#include "UIManager.h"
-#include "UI.h"
-#include "inputkeyboard.h"
-#include "texture.h"
-#include "player.h"
-#include "meter.h"
+#include "rankTime.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-const D3DXVECTOR3 POS_FRAME = { SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.5f,0.0f };
-const D3DXCOLOR COL_NORMAL = { 1.0f,1.0f,1.0f,1.0f };
-const D3DXCOLOR COL_DAMAGE = { 1.0f,0.0f,0.0f,1.0f };
-const float SPEED_FRAME = 0.1f;	// フレームの速度
+
 }
 
 //*****************************************************
 // 静的メンバ変数宣言
 //*****************************************************
-CUIManager *CUIManager::m_pUIManager = nullptr;	// 自身のポインタ
+CRankTime *CRankTime::s_pRankTime = nullptr;
 
 //=====================================================
-// コンストラクタ
+// 優先順位を決めるコンストラクタ
 //=====================================================
-CUIManager::CUIManager()
+CRankTime::CRankTime()
 {
-	m_fCntFrame = 0.0f;
-	m_bDisp = false;
+
 }
 
 //=====================================================
 // デストラクタ
 //=====================================================
-CUIManager::~CUIManager()
+CRankTime::~CRankTime()
 {
 
 }
@@ -52,38 +42,35 @@ CUIManager::~CUIManager()
 //=====================================================
 // 生成処理
 //=====================================================
-CUIManager *CUIManager::Create(void)
+CRankTime* CRankTime::Create(void)
 {
-	if (m_pUIManager == nullptr)
+	if (s_pRankTime == nullptr)
 	{// インスタンス生成
-		m_pUIManager = new CUIManager;
-
-		// 初期化処理
-		m_pUIManager->Init();
+		s_pRankTime = new CRankTime;
 	}
 
-	return m_pUIManager;
+	if (s_pRankTime != nullptr)
+	{// 初期化
+		s_pRankTime->Init();
+	}
+
+	return s_pRankTime;
 }
 
 //=====================================================
 // 初期化処理
 //=====================================================
-HRESULT CUIManager::Init(void)
+HRESULT CRankTime::Init(void)
 {
-	m_bDisp = true;
-
-	// メーター生成
-	CMeter::Create();
-
 	return S_OK;
 }
 
 //=====================================================
 // 終了処理
 //=====================================================
-void CUIManager::Uninit(void)
+void CRankTime::Uninit(void)
 {
-	m_pUIManager = nullptr;
+	s_pRankTime = nullptr;
 
 	Release();
 }
@@ -91,27 +78,7 @@ void CUIManager::Uninit(void)
 //=====================================================
 // 更新処理
 //=====================================================
-void CUIManager::Update(void)
+void CRankTime::Update(void)
 {
-#ifdef _DEBUG
-	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
 
-	if (pKeyboard != nullptr)
-	{
-		if (pKeyboard->GetTrigger(DIK_1))
-		{
-			m_bDisp = m_bDisp ? false : true;
-		}
-	}
-#endif
-}
-
-//=====================================================
-// 描画処理
-//=====================================================
-void CUIManager::Draw(void)
-{
-#ifdef _DEBUG
-
-#endif
 }

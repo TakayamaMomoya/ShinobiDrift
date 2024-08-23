@@ -175,7 +175,7 @@ void CMeter::Acceleration()
 
 	if (m_pNumber != nullptr)
 	{// ’l•\Ž¦‚Ì§Œä
-		m_pNumber->SetValue((int)fPlayerSpeed, PLACE);
+		m_pNumber->SetValue((int)fPlayerSpeed);
 	}
 }
 

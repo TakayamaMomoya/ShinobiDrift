@@ -28,26 +28,23 @@ const float MAGNIFICATION = 100.0f;	// 掛ける倍率
 const float MINUTES_WIDTH = 0.44f;	// 分のX座標
 const float SECOND_WIDTH = 0.5f;		// 秒のX座標
 const float MILLI_WIDTH = 0.6f;		// ミリ秒のX座標
+const float DIST_NUMBER = 0.015f;	// 数字間の距離
 D3DXVECTOR2 SIZE_NORMAL_NUM = { 0.02f, 0.04f };	// 通常数字のサイズ
 D3DXVECTOR2 SIZE_MINI_NUM = { 0.014f, 0.028f };	// ミニ数字のサイズ
+D3DXVECTOR3 POS_INITIAL = { 0.5f,0.04f,0.0f };	// 初期位置
 }
 
 //*****************************************************
 // 静的メンバ変数宣言
 //*****************************************************
-CTimer* CTimer::s_pTimer = nullptr;
 
 //=====================================================
 // 優先順位を決めるコンストラクタ
 //=====================================================
-CTimer::CTimer(int nPriority) : CObject(nPriority)
+CTimer::CTimer()
 {
 	m_fSecond = 0.0f;			// 現在の時間(秒)
-	m_fMilli = 0.0f;			// 現在の時間(ミリ秒)
-	m_IsStop = false;
-	m_pMinutes = nullptr;		// 分表示のポインタ
-	m_pSecond = nullptr;		// 秒表示用のポインタ
-	m_pMilli = nullptr;			// ミリセカンド表示用のポインタ
+	m_bStop = false;
 }
 
 //=====================================================
@@ -63,17 +60,16 @@ CTimer::~CTimer()
 //=====================================================
 CTimer* CTimer::Create(void)
 {
-	if (s_pTimer == nullptr)
-	{// インスタンス生成
-		s_pTimer = new CTimer;
-	}
+	CTimer *pTimer = nullptr;
 
-	if (s_pTimer != nullptr)
+	pTimer = new CTimer;
+
+	if (pTimer != nullptr)
 	{// 初期化
-		s_pTimer->Init();
+		pTimer->Init();
 	}
 
-	return s_pTimer;
+	return pTimer;
 }
 
 //=====================================================
@@ -83,32 +79,48 @@ HRESULT CTimer::Init(void)
 {
 	// 分・秒・ミリ秒の初期化
 	m_fSecond = 0.0f;
-	m_fMilli = 0.0f;
 
-	m_IsStop = false;	// タイマー停止のフラグ
+	m_bStop = false;	// タイマー停止のフラグ
 
-	if (s_pTimer->m_pMinutes == nullptr)
-	{// 分表示
-		// 生成・位置、サイズ設定
-		s_pTimer->m_pMinutes = CNumber::Create(MINUTES_DIGIT, MINUTES_LIMIT);
-		s_pTimer->m_pMinutes->SetPosition(D3DXVECTOR3(MINUTES_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f, 0.0f));
-		s_pTimer->m_pMinutes->SetSizeAll(SIZE_NORMAL_NUM.x, SIZE_NORMAL_NUM.y);
-	}
+	// 初期位置の設定
+	SetPosition(POS_INITIAL);
 
-	if (s_pTimer->m_pSecond == nullptr)
-	{// 秒表示
-		// 生成・位置、サイズ設定
-		s_pTimer->m_pSecond = CNumber::Create(TIME_DIGIT, SECOND_LIMIT);
-		s_pTimer->m_pSecond->SetPosition(D3DXVECTOR3(SECOND_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f , 0.0f));
-		s_pTimer->m_pSecond->SetSizeAll(SIZE_NORMAL_NUM.x, SIZE_NORMAL_NUM.y);
-	}
+	// 数字の配列のリサイズ
+	m_aNumber.resize(E_Number::NUMBER_MAX);
 
-	if (s_pTimer->m_pMilli == nullptr)
-	{// ミリ秒表示
-		// 生成・位置、サイズ設定
-		s_pTimer->m_pMilli = CNumber::Create(TIME_DIGIT, MILLI_LIMIT);
-		s_pTimer->m_pMilli->SetPosition(D3DXVECTOR3(MILLI_WIDTH, SIZE_MINI_NUM.y * 2.0f + 0.01f, 0.0f));
-		s_pTimer->m_pMilli->SetSizeAll(SIZE_MINI_NUM.x, SIZE_MINI_NUM.y);
+	int aDigit[E_Number::NUMBER_MAX] =
+	{// 桁数
+		MINUTES_DIGIT,
+		TIME_DIGIT,
+		TIME_DIGIT
+	};
+
+	D3DXVECTOR2 aSize[E_Number::NUMBER_MAX] =
+	{// 数字のサイズ
+		SIZE_NORMAL_NUM,
+		SIZE_NORMAL_NUM,
+		SIZE_MINI_NUM
+	};
+
+	// 数字分、生成して設定
+	for (int i = 0; i < E_Number::NUMBER_MAX; i++)
+	{
+		m_aNumber[i] = CNumber::Create(aDigit[i], 0);	// 数字の生成
+
+		if (m_aNumber[i] == nullptr)
+			continue;
+
+		// 参照するサイズの番号
+		int nIdx = i;
+
+		if (nIdx > 0)
+			nIdx--;	// 0番目でなければ前回のサイズを参照する
+
+		// パラメーター設定
+		float fWidth = aSize[nIdx].x * aDigit[nIdx] * 2 + DIST_NUMBER;	// サイズに応じて数字間のスペースをあける
+		D3DXVECTOR3 pos = { POS_INITIAL.x + fWidth * (i - 1), POS_INITIAL.y, 0.0f };
+		m_aNumber[i]->SetPosition(pos);
+		m_aNumber[i]->SetSizeAll(aSize[i].x, aSize[i].y);
 	}
 
 	return S_OK;
@@ -119,30 +131,15 @@ HRESULT CTimer::Init(void)
 //=====================================================
 void CTimer::Uninit(void)
 {
-	// 静的メンバ変数の終了
-	if (s_pTimer != nullptr)
-		s_pTimer = nullptr;
-
-	if (m_pMinutes != nullptr)
-	{// 分の終了
-		m_pMinutes->Uninit();
-		m_pMinutes = nullptr;
+	for (auto it : m_aNumber)
+	{
+		it->Uninit();
 	}
 
-	if (m_pSecond != nullptr)
-	{// 秒の終了
-		m_pSecond->Uninit();
-		m_pSecond = nullptr;
-	}
-
-	if (m_pMilli != nullptr)
-	{// ミリ秒の終了
-		m_pMilli->Uninit();
-		m_pMilli = nullptr;
-	}
+	m_aNumber.clear();
 
 	// 自身の破棄
-	Release();
+	CGameObject::Uninit();
 }
 
 //=====================================================
@@ -150,73 +147,38 @@ void CTimer::Uninit(void)
 //=====================================================
 void CTimer::Update(void)
 {
-	// 分の更新
-	if (!m_IsStop)
-	{
-		Minutes();
+	if (!m_bStop)
+	{// 数字の更新
+		UpdateNumber();
 	}
 }
 
 //=====================================================
-// 分の更新
+// 数字の更新
 //=====================================================
-void CTimer::Minutes()
+void CTimer::UpdateNumber()
 {
-	// 秒の更新
-	Second();
+	if (m_aNumber.empty())
+		return;
 
-	// 分の計算
-	int nMinutes = (int)m_fSecond / SECOND_LIMIT;
+	// 値の用意
+	int aValue[E_Number::NUMBER_MAX] =
+	{
+		(int)m_fSecond / SECOND_LIMIT,
+		(int)m_fSecond % SECOND_LIMIT,
+		(int)(m_fSecond * MAGNIFICATION) % (int)MAGNIFICATION
+	};
 
-	// 分の上限値超えないように
-	if (nMinutes >= MINUTES_LIMIT)
-		nMinutes = MINUTES_LIMIT;
-
-	// 分表示
-	if (m_pMinutes != nullptr)
-		m_pMinutes->SetValue(nMinutes, MINUTES_DIGIT);
+	for (int i = 0; i < E_Number::NUMBER_MAX; i++)
+	{
+		m_aNumber[i]->SetValue(aValue[i]);
+	}
 }
 
 //=====================================================
-// 秒の更新
+// 描画処理
 //=====================================================
-void CTimer::Second()
+void CTimer::Draw()
 {
-	// ミリ秒の更新
-	MilliSecond();
 
-	// デルタタイム取得
-	float fDeltaTime = CManager::GetDeltaTime();
-
-	// デルタタイム(リアル時間)加算
-	m_fSecond += fDeltaTime;
-
-	// 秒の計算
-	int nSecond = (int)m_fSecond % SECOND_LIMIT;
-
-	// 秒表示
-	if (m_pSecond != nullptr)
-		m_pSecond->SetValue(nSecond, TIME_DIGIT);
-}
-
-//=====================================================
-// ミリ秒更新
-//=====================================================
-void CTimer::MilliSecond()
-{
-	// デルタタイム取得
-	float fDeltaTime = CManager::GetDeltaTime();
-
-	// デルタタイム(リアル時間)加算
-	m_fMilli += fDeltaTime;
-
-	// 秒を100倍
-	m_fMilli = m_fSecond * MAGNIFICATION;
-
-	// ミリ秒の計算
-	int nMsecond = (int)m_fMilli % MILLI_LIMIT;
-
-	// ミリ秒表示
-	if (m_pMilli != nullptr)
-		m_pMilli->SetValue(nMsecond, TIME_DIGIT);
 }
