@@ -20,16 +20,17 @@ namespace
 const int MINUTES_LIMIT = 9;		// 分の上限値
 const int SECOND_LIMIT = 59;		// 秒の上限値
 const int MILLI_LIMIT = 99;			// ミリ秒の上限
-const int MINUTES_DIGIT = 1;		// 分表示の桁数
+const int MINUTES_DIGIT = 2;		// 分表示の桁数
 const int TIME_DIGIT = 2;			// それぞれの桁数
 const float MAGNIFICATION = 100.0f;	// 掛ける倍率
 const float MINUTES_WIDTH = 0.44f;	// 分のX座標
 const float SECOND_WIDTH = 0.5f;		// 秒のX座標
 const float MILLI_WIDTH = 0.6f;		// ミリ秒のX座標
-const float DIST_NUMBER = 0.015f;	// 数字間の距離
+const float DIST_NUMBER = 0.03f;	// 数字間の距離
 D3DXVECTOR2 SIZE_NORMAL_NUM = { 0.02f, 0.04f };	// 通常数字のサイズ
 D3DXVECTOR2 SIZE_MINI_NUM = { 0.014f, 0.028f };	// ミニ数字のサイズ
 D3DXVECTOR3 POS_INITIAL = { 0.5f,0.08f,0.0f };	// 初期位置
+const string PATH_TEX_COLON = "data\\TEXTURE\\UI\\colon.png";	// コロンのテクスチャパス
 }
 
 //=====================================================
@@ -105,7 +106,8 @@ HRESULT CTimer::Init(void)
 		if (m_aColon[i] == nullptr)
 			continue;
 
-		//int nIdxTexture = Texture::GetIdx();
+		int nIdxTexture = Texture::GetIdx(&PATH_TEX_COLON[0]);
+		m_aColon[i]->SetIdxTexture(nIdxTexture);
 	}
 
 	// 数字のトランスフォームの設定
@@ -182,7 +184,7 @@ void CTimer::TransformNumber()
 	{// 数字のサイズ
 		SIZE_NORMAL_NUM * m_fScaleNumber,
 		SIZE_NORMAL_NUM * m_fScaleNumber,
-		SIZE_MINI_NUM * m_fScaleNumber
+		SIZE_NORMAL_NUM * m_fScaleNumber
 	};
 
 	D3DXVECTOR3 posBase = GetPosition();
@@ -200,7 +202,7 @@ void CTimer::TransformNumber()
 			nIdx--;	// 0番目でなければ前回のサイズを参照する
 
 		// パラメーター設定
-		float fWidth = aSize[nIdx].x * aDigit[nIdx] * 2 + DIST_NUMBER;	// サイズに応じて数字間のスペースをあける
+		float fWidth = aSize[nIdx].x * aDigit[nIdx] * 2 + DIST_NUMBER * m_fScaleNumber;	// サイズに応じて数字間のスペースをあける
 		D3DXVECTOR3 pos = { posBase.x + fWidth * (i - 1), posBase.y, 0.0f };
 		m_aNumber[i]->SetPosition(pos);
 		m_aNumber[i]->SetSizeAll(aSize[i].x, aSize[i].y);
