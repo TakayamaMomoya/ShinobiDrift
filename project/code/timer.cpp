@@ -28,6 +28,7 @@ const float MAGNIFICATION = 100.0f;	// 掛ける倍率
 const float MINUTES_WIDTH = 0.44f;	// 分のX座標
 const float SECOND_WIDTH = 0.5f;		// 秒のX座標
 const float MILLI_WIDTH = 0.6f;		// ミリ秒のX座標
+const float DIST_NUMBER = 0.015f;	// 数字間の距離
 D3DXVECTOR2 SIZE_NORMAL_NUM = { 0.02f, 0.04f };	// 通常数字のサイズ
 D3DXVECTOR2 SIZE_MINI_NUM = { 0.014f, 0.028f };	// ミニ数字のサイズ
 D3DXVECTOR3 POS_INITIAL = { 0.5f,0.04f,0.0f };	// 初期位置
@@ -109,8 +110,16 @@ HRESULT CTimer::Init(void)
 		if (m_aNumber[i] == nullptr)
 			continue;
 
+		// 参照するサイズの番号
+		int nIdx = i;
+
+		if (nIdx > 0)
+			nIdx--;	// 0番目でなければ前回のサイズを参照する
+
 		// パラメーター設定
-		//m_aNumber[i]->SetPosition();
+		float fWidth = aSize[nIdx].x * aDigit[nIdx] * 2 + DIST_NUMBER;	// サイズに応じて数字間のスペースをあける
+		D3DXVECTOR3 pos = { POS_INITIAL.x + fWidth * (i - 1), POS_INITIAL.y, 0.0f };
+		m_aNumber[i]->SetPosition(pos);
 		m_aNumber[i]->SetSizeAll(aSize[i].x, aSize[i].y);
 	}
 
