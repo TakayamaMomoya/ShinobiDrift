@@ -43,4 +43,13 @@ private:
 	static CRankTime* s_pRankTime;	// 自身のポインタ
 };
 
+namespace RankTime
+{
+// ランキングタイム読込
+vector<float> LoadRankTime(void);
+
+// ランキングタイム保存
+void SaveRankTime(vector<float> aTime);
+}
+
 #endif

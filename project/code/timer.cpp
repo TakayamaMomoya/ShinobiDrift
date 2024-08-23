@@ -17,15 +17,15 @@
 //*****************************************************
 namespace
 {
-const int MINUTES_LIMIT = 9;		// 分の上限値
-const int SECOND_LIMIT = 59;		// 秒の上限値
-const int MILLI_LIMIT = 99;			// ミリ秒の上限
-const int MINUTES_DIGIT = 2;		// 分表示の桁数
-const int TIME_DIGIT = 2;			// それぞれの桁数
+const int MINUTES_LIMIT = 9;	// 分の上限値
+const int SECOND_LIMIT = 59;	// 秒の上限値
+const int MILLI_LIMIT = 99;	// ミリ秒の上限
+const int MINUTES_DIGIT = 2;	// 分表示の桁数
+const int TIME_DIGIT = 2;	// それぞれの桁数
 const float MAGNIFICATION = 100.0f;	// 掛ける倍率
 const float MINUTES_WIDTH = 0.44f;	// 分のX座標
-const float SECOND_WIDTH = 0.5f;		// 秒のX座標
-const float MILLI_WIDTH = 0.6f;		// ミリ秒のX座標
+const float SECOND_WIDTH = 0.5f;	// 秒のX座標
+const float MILLI_WIDTH = 0.6f;	// ミリ秒のX座標
 const float DIST_NUMBER = 0.03f;	// 数字間の距離
 D3DXVECTOR2 SIZE_NORMAL_NUM = { 0.02f, 0.04f };	// 通常数字のサイズ
 D3DXVECTOR2 SIZE_MINI_NUM = { 0.014f, 0.028f };	// ミニ数字のサイズ
@@ -128,7 +128,6 @@ void CTimer::Uninit(void)
 
 	m_aNumber.clear();
 
-	// 自身の破棄
 	CGameObject::Uninit();
 }
 
