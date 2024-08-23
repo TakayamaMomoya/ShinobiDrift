@@ -13,6 +13,11 @@
 #include "object.h"
 
 //*****************************************************
+// 前方宣言
+//*****************************************************
+class CTimer;
+
+//*****************************************************
 // クラスの定義
 //*****************************************************
 class CRankTime : public CObject
@@ -31,8 +36,20 @@ public:
 	static CRankTime* GetInstance() { return s_pRankTime; }	// インスタンス取得
 
 private:
-	//メンバ変数
+	// メンバ変数
+	vector<CTimer*> m_aTimer;	// ランカーのタイム配列
+
+	// 静的メンバ変数
 	static CRankTime* s_pRankTime;	// 自身のポインタ
 };
+
+namespace RankTime
+{
+// ランキングタイム読込
+vector<float> LoadRankTime(void);
+
+// ランキングタイム保存
+void SaveRankTime(vector<float> aTime);
+}
 
 #endif

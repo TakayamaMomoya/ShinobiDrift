@@ -25,6 +25,7 @@
 #include "gauge.h"
 #include "frame.h"
 #include "game.h"
+#include "rankTime.h"
 
 //*****************************************************
 // 定数定義
@@ -158,6 +159,9 @@ void CTutorial::StartGame(void)
 	{
 		pGame->CreateGameTimer();
 	}
+
+	// ランクタイマーの生成
+	CRankTime::Create();
 
 	// プレイヤーのトランスフォームを設定
 	CPlayer *pPlayer = CPlayer::GetInstance();

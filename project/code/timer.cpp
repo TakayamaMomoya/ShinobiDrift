@@ -9,41 +9,37 @@
 // インクルード
 //*****************************************************
 #include "timer.h"
-#include "manager.h"
-#include "debugproc.h"
-#include "goal.h"
-#include "player.h"
+#include "UI.h"
+#include "texture.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
-const int MINUTES_LIMIT = 9;		// 分の上限値
-const int SECOND_LIMIT = 59;		// 秒の上限値
-const int MILLI_LIMIT = 99;			// ミリ秒の上限
-const int MINUTES_DIGIT = 1;		// 分表示の桁数
-const int TIME_DIGIT = 2;			// それぞれの桁数
+const int MINUTES_LIMIT = 9;	// 分の上限値
+const int SECOND_LIMIT = 59;	// 秒の上限値
+const int MILLI_LIMIT = 99;	// ミリ秒の上限
+const int MINUTES_DIGIT = 2;	// 分表示の桁数
+const int TIME_DIGIT = 2;	// それぞれの桁数
 const float MAGNIFICATION = 100.0f;	// 掛ける倍率
 const float MINUTES_WIDTH = 0.44f;	// 分のX座標
-const float SECOND_WIDTH = 0.5f;		// 秒のX座標
-const float MILLI_WIDTH = 0.6f;		// ミリ秒のX座標
-const float DIST_NUMBER = 0.015f;	// 数字間の距離
+const float SECOND_WIDTH = 0.5f;	// 秒のX座標
+const float MILLI_WIDTH = 0.6f;	// ミリ秒のX座標
+const float DIST_NUMBER = 0.03f;	// 数字間の距離
 D3DXVECTOR2 SIZE_NORMAL_NUM = { 0.02f, 0.04f };	// 通常数字のサイズ
 D3DXVECTOR2 SIZE_MINI_NUM = { 0.014f, 0.028f };	// ミニ数字のサイズ
-D3DXVECTOR3 POS_INITIAL = { 0.5f,0.04f,0.0f };	// 初期位置
+D3DXVECTOR3 POS_INITIAL = { 0.5f,0.08f,0.0f };	// 初期位置
+const string PATH_TEX_COLON = "data\\TEXTURE\\UI\\colon.png";	// コロンのテクスチャパス
 }
 
-//*****************************************************
-// 静的メンバ変数宣言
-//*****************************************************
-
 //=====================================================
-// 優先順位を決めるコンストラクタ
+// コンストラクタ
 //=====================================================
 CTimer::CTimer()
 {
-	m_fSecond = 0.0f;			// 現在の時間(秒)
+	m_fSecond = 0.0f;
+	m_fScaleNumber = 0.0f;
 	m_bStop = false;
 }
 
@@ -77,9 +73,8 @@ CTimer* CTimer::Create(void)
 //=====================================================
 HRESULT CTimer::Init(void)
 {
-	// 分・秒・ミリ秒の初期化
-	m_fSecond = 0.0f;
-
+	m_fSecond = 0.0f;	// 秒の初期化
+	m_fScaleNumber = 1.0f;	// 初期スケール設定
 	m_bStop = false;	// タイマー停止のフラグ
 
 	// 初期位置の設定
@@ -95,33 +90,28 @@ HRESULT CTimer::Init(void)
 		TIME_DIGIT
 	};
 
-	D3DXVECTOR2 aSize[E_Number::NUMBER_MAX] =
-	{// 数字のサイズ
-		SIZE_NORMAL_NUM,
-		SIZE_NORMAL_NUM,
-		SIZE_MINI_NUM
-	};
-
-	// 数字分、生成して設定
+	// 数字の生成
 	for (int i = 0; i < E_Number::NUMBER_MAX; i++)
 	{
 		m_aNumber[i] = CNumber::Create(aDigit[i], 0);	// 数字の生成
+	}
 
-		if (m_aNumber[i] == nullptr)
+	// コロンの生成
+	m_aColon.resize(E_Number::NUMBER_MAX - 1);
+
+	for (int i = 0; i < E_Number::NUMBER_MAX - 1; i++)
+	{
+		m_aColon[i] = CUI::Create();
+
+		if (m_aColon[i] == nullptr)
 			continue;
 
-		// 参照するサイズの番号
-		int nIdx = i;
-
-		if (nIdx > 0)
-			nIdx--;	// 0番目でなければ前回のサイズを参照する
-
-		// パラメーター設定
-		float fWidth = aSize[nIdx].x * aDigit[nIdx] * 2 + DIST_NUMBER;	// サイズに応じて数字間のスペースをあける
-		D3DXVECTOR3 pos = { POS_INITIAL.x + fWidth * (i - 1), POS_INITIAL.y, 0.0f };
-		m_aNumber[i]->SetPosition(pos);
-		m_aNumber[i]->SetSizeAll(aSize[i].x, aSize[i].y);
+		int nIdxTexture = Texture::GetIdx(&PATH_TEX_COLON[0]);
+		m_aColon[i]->SetIdxTexture(nIdxTexture);
 	}
+
+	// 数字のトランスフォームの設定
+	TransformNumber();
 
 	return S_OK;
 }
@@ -138,7 +128,6 @@ void CTimer::Uninit(void)
 
 	m_aNumber.clear();
 
-	// 自身の破棄
 	CGameObject::Uninit();
 }
 
@@ -173,6 +162,87 @@ void CTimer::UpdateNumber()
 	{
 		m_aNumber[i]->SetValue(aValue[i]);
 	}
+}
+
+//=====================================================
+// 数字のトランスフォーム設定
+//=====================================================
+void CTimer::TransformNumber()
+{
+	if (m_aNumber.empty())
+		return;
+
+	int aDigit[E_Number::NUMBER_MAX] =
+	{// 桁数
+		MINUTES_DIGIT,
+		TIME_DIGIT,
+		TIME_DIGIT
+	};
+
+	D3DXVECTOR2 aSize[E_Number::NUMBER_MAX] =
+	{// 数字のサイズ
+		SIZE_NORMAL_NUM * m_fScaleNumber,
+		SIZE_NORMAL_NUM * m_fScaleNumber,
+		SIZE_NORMAL_NUM * m_fScaleNumber
+	};
+
+	D3DXVECTOR3 posBase = GetPosition();
+
+	// 数字分、生成して設定
+	for (int i = 0; i < E_Number::NUMBER_MAX; i++)
+	{
+		if (m_aNumber[i] == nullptr)
+			continue;
+
+		// 参照するサイズの番号
+		int nIdx = i;
+
+		if (nIdx > 0)
+			nIdx--;	// 0番目でなければ前回のサイズを参照する
+
+		// パラメーター設定
+		float fWidth = aSize[nIdx].x * aDigit[nIdx] * 2 + DIST_NUMBER * m_fScaleNumber;	// サイズに応じて数字間のスペースをあける
+		D3DXVECTOR3 pos = { posBase.x + fWidth * (i - 1), posBase.y, 0.0f };
+		m_aNumber[i]->SetPosition(pos);
+		m_aNumber[i]->SetSizeAll(aSize[i].x, aSize[i].y);
+
+		if (i == 0)	// 0以上のときしか入らない処理
+			continue;
+		
+		// コロンの位置を設定
+		int nIdxColon = i - 1;
+
+		if (m_aColon[nIdxColon] != nullptr)
+		{
+			float fPosXLast = m_aNumber[i - 1]->GetPosition().x + aDigit[i - 1] * aSize[i - 1].x;
+			D3DXVECTOR3 posColon = { (pos.x + fPosXLast) / 2, pos.y, 0.0f };
+			m_aColon[nIdxColon]->SetPosition(posColon);	// 位置
+			m_aColon[nIdxColon]->SetSize(aSize[i].x, aSize[i].y);	// サイズ
+			m_aColon[nIdxColon]->SetVtx();
+		}
+	}
+}
+
+//=====================================================
+// 位置の設定
+//=====================================================
+void CTimer::SetPosition(D3DXVECTOR3 pos)
+{
+	CGameObject::SetPosition(pos);
+
+	// 数字のトランスフォームの設定
+	TransformNumber();
+}
+
+//=====================================================
+// 数字のスケールの設定
+//=====================================================
+void CTimer::SetScaleNumber(float fScale)
+{
+	m_fScaleNumber = fScale;
+
+	// 数字のトランスフォームの設定
+	TransformNumber();
 }
 
 //=====================================================
