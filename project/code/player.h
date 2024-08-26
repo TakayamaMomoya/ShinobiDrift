@@ -75,6 +75,8 @@ public:
 	CBlockGrab *GetBlock(void) { return m_info.pBlockGrab; }
 	CMotion *GetNInjaBody(void) { return m_pPlayerNinja; }	// 上に乗っている忍者の取得
 	bool IsDrift(void) { return m_info.pBlockGrab != nullptr; }	// ドリフトしているかどうか
+	void EnableTailLamp(void);	// テールランプの有効化
+	void DisableTailLamp(void);	// テールランプの無効化
 
 	// 変数取得・設定関数
 	bool IsEnableInput(void) { return m_info.bEnableInput; }	// 入力有効フラグ
@@ -114,7 +116,9 @@ private:
 		float fSizeBlurDrift;	// ドリフト時のブラーの強さ
 		float fDesityBlurDrift;	// ドリフト時のブラーの濃さ
 		COrbit* pOrbitLamp;	// テールランプの軌跡
+		bool bTailLamp;	// テールランプつけるフラグ
 		COrbit* pOrbitRope;	// テールランプの軌跡
+		COrbit* pOrbitTire;	// タイヤの軌跡
 		D3DXCOLOR orbitColorLamp;	// テールランプの軌跡
 		D3DXCOLOR orbitColorRope;	// テールランプの軌跡
 		D3DXVECTOR3 rotDriftStart;	// ドリフトスタート時の角度
@@ -137,6 +141,7 @@ private:
 	void RemoveWire(void);	// ワイヤーを外す処理
 	void LimitDrift(float fLength);
 	void ManageSpeed(void);
+	void ManageTireOrbit(void);	// タイヤ軌跡の管理
 	void ManageSpeedBlur(void);	// スピードによるブラーの管理
 	void ManageState(void);
 	void ManageMotion(void);
@@ -146,6 +151,7 @@ private:
 	void EnableBrakeLamp(void);	// ブレーキランプをつける
 	void DisableBrakeLamp(void);	// ブレーキランプを消す
 	void FollowBrakeLamp(void);	// ブレーキランプ追従
+	void EnableTireOrbit(void);	// タイヤ軌跡を有効化する
 	void Debug(void);
 
 	// メンバ変数

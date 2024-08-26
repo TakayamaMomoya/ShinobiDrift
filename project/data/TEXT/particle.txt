@@ -6,20 +6,21 @@
 #====================================================================
 SCRIPT
 
-PARTICLESET		#1 爆発のパーティクル
+PARTICLESET		#1 疾走のパーティクル
 	TEXTURE_PATH = data//TEXTURE//EFFECT//effect000.png
-    LIFE_PARTICLE = 1
-    NUM_EFFECT = 114
-    LIFE_EFFECT = 61
-    RADIUS_EFFECT = 10.33
-    SPEED_EFFECT = 6.03
+    LIFE_PARTICLE = 7
+    NUM_EFFECT = 3
+    LIFE_EFFECT = 9
+    RADIUS_EFFECT = 13.82
+    SPEED_EFFECT = 18.65
     GRAVITY = -0.00
-    DECREASE = -1.11
-    RANGEROT = 0.07
-    IS_ADD = 1
-    IS_ROT = 0
+    DECREASE = -0.13
+    RANGEROT = 2.71
+    IS_ADD = 0
+    IS_ROT = 1
     IS_TURN = 0
-    COLOR = 0.73 0.26 0.10 1.00
+    MODE_RENDER = 1
+    COLOR = 0.86 0.86 0.86 1.00
 END_PARTICLESET
 
 PARTICLESET		#2 収束爆発
@@ -35,7 +36,6 @@ PARTICLESET		#2 収束爆発
     IS_ADD = 1
     IS_ROT = 0
     IS_TURN = 0
-    MODE_RENDER = 2
     COLOR = 0.52 0.15 0.03 1.00
 END_PARTICLESET
 

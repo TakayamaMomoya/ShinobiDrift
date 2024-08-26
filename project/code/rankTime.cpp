@@ -83,6 +83,9 @@ HRESULT CRankTime::Init(void)
 		m_aTimer[i]->SetPosition(pos);	// 位置
 		m_aTimer[i]->SetScaleNumber(SCALE_NUMBER);// スケール
 		m_aTimer[i]->SetSecond(aTime[i]);
+
+		// タイマー横のメダルアイコンの生成
+
 	}
 
 	return S_OK;
