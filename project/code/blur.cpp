@@ -146,7 +146,7 @@ void CBlur::Init(void)
         // クリアする
         pDevice->Clear(0, nullptr,
             (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
-            D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+            COLOR_CLEAR, 1.0f, 0);
     }
 
     // レンダリングターゲットとZバッファを元に戻す
@@ -489,7 +489,7 @@ void CBlur::ClearNotBlur(void)
     // 画面クリア
     pDevice->Clear(0, nullptr,
         (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
-        D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+         COLOR_CLEAR, 1.0f, 0);
 
     pDevice->SetRenderTarget(0, m_pRenderDef);
 }

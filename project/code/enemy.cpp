@@ -116,7 +116,7 @@ void CEnemy::Update(void)
 	}
 
 	if (m_info.pOrbit != nullptr)
-		m_info.pOrbit->SetOffset(GetMatrix(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), m_info.pOrbit->GetID());
+		m_info.pOrbit->SetOffset(GetMatrix(), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 
 	// ƒ‚[ƒVƒ‡ƒ“‚ÌŠÇ—
 	ManageMotion();
