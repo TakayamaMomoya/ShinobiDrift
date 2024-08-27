@@ -30,6 +30,7 @@ const int PRIORITY_FAN = 5;	// 扇ポリゴンの描画プライオリティ
 const char* DOOR_TEX_PATH = "data\\TEXTURE\\MATERIAL\\potal00.png";
 const float TEX_SCROLL_X = 0.001f;  // テクスチャ座標の移動量
 const float TEX_SCROLL_Y = 0.01f;   // テクスチャ座標の移動量
+const float RATE_SPEED_ACCELE = 4.0f;	// トンネル内の加速倍率
 }
 
 //=====================================================
@@ -469,7 +470,7 @@ void CTunnel::EnterPlayer(void)
 	{
 		CPlayer::SParam param = pPlayer->GetParam();
 
-		param.fSpeedMax = param.fSpeedMaxInitial * 4.0f;
+		param.fSpeedMax = param.fSpeedMaxInitial * RATE_SPEED_ACCELE;
 
 		pPlayer->SetParam(param);
 

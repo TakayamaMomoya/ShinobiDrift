@@ -22,6 +22,7 @@
 #include <fstream>
 #include <sstream>
 #include <string.h>
+#include <algorithm>
 #include <time.h>
 #include <string>
 #include <list>

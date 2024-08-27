@@ -29,6 +29,7 @@ const float HEIGHT_CYLINDER = 800.0f;	// シリンダーの高さ
 const std::string PATH_RANKING = "data\\TEXT\\ranking.txt";	// ランキングのパス
 const D3DXVECTOR2 SIZE_CAPTION = { SCREEN_WIDTH * 0.5f,100.0f };	// 見出しのサイズ
 const D3DXVECTOR3 POS_CAPTION = { SCRN_MID.x,SIZE_CAPTION.y,0.0f };	// 見出しの位置
+const float ANGLE_VIEW = 45.0f;	// 視野角
 }
 
 //=====================================================
@@ -94,6 +95,7 @@ HRESULT CRanking::Init(void)
 
 	pInfoCamera->posV = { 0.0f,HEIGHT_CYLINDER * 0.5f,0.0f };
 	pInfoCamera->posR = { 0.0f,HEIGHT_CYLINDER * 0.5f,1.0f };
+	pInfoCamera->fViewAngle = ANGLE_VIEW;
 
 	LoadRanking();
 
