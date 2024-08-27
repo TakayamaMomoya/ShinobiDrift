@@ -39,6 +39,8 @@ public:
 private:
 	// メンバ変数
 	vector<CTimer*> m_aTimer;	// ランカーのタイム配列
+	vector<CUI*> m_aFrame;	// フレームの表示
+	vector<CUI*> m_aMedal;	// メダルの表示
 
 	// 静的メンバ変数
 	static CRankTime* s_pRankTime;	// 自身のポインタ
