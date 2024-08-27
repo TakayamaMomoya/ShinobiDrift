@@ -586,6 +586,8 @@ void CPlayer::JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength)
 			m_info.fAngleDrift = 0.29f;
 
 			Blur::AddParameter(5.0f, 0.5f, 15.0f, 0.0f, 0.7f);
+
+		
 		}
 		else
 		{
@@ -643,12 +645,16 @@ void CPlayer::JudgeRemoveWire(float fLength)
 	// ブロックのエリア内かの判定
 	D3DXVECTOR3 posPlayer = GetPosition();
 	bool bGrab = m_info.pBlockGrab->CanGrab(posPlayer);
+	CSound* pSound = CSound::GetInstance();
 
 	if (m_info.bManual)
 	{
 		if (fLength <= 0.5f)
 		{// スティックを離したらワイヤーを外す
 			RemoveWire();
+
+			if (pSound != nullptr)
+				pSound->Play(pSound->LABEL_SE_REMOVE);
 		}
 	}
 	else
@@ -656,6 +662,9 @@ void CPlayer::JudgeRemoveWire(float fLength)
 		if (m_info.bGrabOld && !bGrab)
 		{// ブロック指定のエリアを回り切ったらワイヤーを外す
 			RemoveWire();
+
+			if (pSound != nullptr)
+				pSound->Play(pSound->LABEL_SE_REMOVE);
 		}
 	}
 
@@ -759,6 +768,11 @@ void CPlayer::SarchGrab(void)
 
 			m_info.rotDriftStart = GetRotation();
 			m_info.rotDriftStart.x += D3DX_PI * 0.5f;
+
+			CSound* pSound = CSound::GetInstance();
+
+			if (pSound != nullptr)
+				pSound->Play(pSound->LABEL_SE_THROW);
 		}
 	}
 }
