@@ -10,6 +10,8 @@
 //*****************************************************
 #include "rankTime.h"
 #include "timer.h"
+#include "UI.h"
+#include "texture.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -21,6 +23,9 @@ const D3DXVECTOR3 POS_NUMBER_DEFAULT = { 0.9f, 0.2f,0.0f };	// ”š‚ÌƒfƒtƒHƒ‹ƒgˆ
 const float SCALE_NUMBER = 0.5f;	// ƒ^ƒCƒ}[‚Ì”š‚ÌƒXƒP[ƒ‹
 const float DIST_TIMER = 0.1f;	// ƒ^ƒCƒ}[ŠÔ‚Ì‹——£
 const string PATH_SAVE = "data\\BYNARY\\ranking.bin";	// ƒ‰ƒ“ƒLƒ“ƒO‚Ìƒtƒ@ƒCƒ‹ƒpƒX
+const float SIZE_MEDAL = 0.025f;	// ƒƒ_ƒ‹‚ÌƒTƒCƒY
+const D3DXVECTOR2 SIZE_FRAME = { 0.13f,0.025f };	// ƒtƒŒ[ƒ€‚ÌƒTƒCƒY
+const D3DXCOLOR COL_FRAME = { 0.4f, 0.4f, 0.4f, 0.7f };	// ƒtƒŒ[ƒ€‚ÌF
 }
 
 //*****************************************************
@@ -68,24 +73,60 @@ CRankTime* CRankTime::Create(void)
 HRESULT CRankTime::Init(void)
 {
 	m_aTimer.resize(NUM_TIMER_RUNKER);
+	m_aFrame.resize(NUM_TIMER_RUNKER);
+	m_aMedal.resize(NUM_TIMER_RUNKER);
 
 	vector<float> aTime = RankTime::LoadRankTime();
 
-	// ƒ^ƒCƒ}[‚Ì¶¬
+	vector<string> aPathMedal(NUM_TIMER_RUNKER);
+	aPathMedal =
+	{
+		"data\\TEXTURE\\UI\\rank00.png",
+		"data\\TEXTURE\\UI\\rank01.png",
+		"data\\TEXTURE\\UI\\rank02.png"
+	};
+
 	for (int i = 0; i < NUM_TIMER_RUNKER; i++)
 	{
+		D3DXVECTOR3 pos = POS_NUMBER_DEFAULT;
+		pos.y += DIST_TIMER * i;
+
+		// ƒtƒŒ[ƒ€‚Ì¶¬
+		m_aFrame[i] = CUI::Create();
+
+		if (m_aFrame[i] == nullptr)
+			continue;
+
+		D3DXVECTOR3 posFrame = pos;
+		m_aFrame[i]->SetPosition(posFrame);
+		m_aFrame[i]->SetSize(SIZE_FRAME.x, SIZE_FRAME.y);
+		m_aFrame[i]->SetVtx();
+		m_aFrame[i]->SetCol(COL_FRAME);
+
+		// ƒ^ƒCƒ}[‚Ì¶¬
 		m_aTimer[i] = CTimer::Create();
 
 		if (m_aTimer[i] == nullptr)
 			continue;
-		D3DXVECTOR3 pos = POS_NUMBER_DEFAULT;
-		pos.y += DIST_TIMER * i;
 		m_aTimer[i]->SetPosition(pos);	// ˆÊ’u
 		m_aTimer[i]->SetScaleNumber(SCALE_NUMBER);// ƒXƒP[ƒ‹
 		m_aTimer[i]->SetSecond(aTime[i]);
 
 		// ƒ^ƒCƒ}[‰¡‚Ìƒƒ_ƒ‹ƒAƒCƒRƒ“‚Ì¶¬
+		D3DXVECTOR3 posMedal = pos;
+		posMedal.x -= SIZE_MEDAL * 4;
 
+		m_aMedal[i] = CUI::Create();
+
+		if (m_aMedal[i] == nullptr)
+			continue;
+
+		m_aMedal[i]->SetPosition(posMedal);
+		m_aMedal[i]->SetSize(SIZE_MEDAL, SIZE_MEDAL);
+		m_aMedal[i]->SetVtx();
+
+		int nIdxTexture = Texture::GetIdx(&aPathMedal[i][0]);
+		m_aMedal[i]->SetIdxTexture(nIdxTexture);
 	}
 
 	return S_OK;
@@ -97,6 +138,18 @@ HRESULT CRankTime::Init(void)
 void CRankTime::Uninit(void)
 {
 	s_pRankTime = nullptr;
+
+	auto lamda = [](CObject* pObj)
+	{
+		if (pObj == nullptr)
+			return;
+
+		pObj->Uninit();
+	};
+
+	std::for_each(m_aFrame.begin(), m_aFrame.end(), lamda);
+	std::for_each(m_aMedal.begin(), m_aMedal.end(), lamda);
+	std::for_each(m_aTimer.begin(), m_aTimer.end(), lamda);
 
 	Release();
 }
