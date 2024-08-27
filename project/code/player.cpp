@@ -769,8 +769,10 @@ void CPlayer::SarchGrab(void)
 			m_info.rotDriftStart = GetRotation();
 			m_info.rotDriftStart.x += D3DX_PI * 0.5f;
 
+			// サウンドインスタンスの取得
 			CSound* pSound = CSound::GetInstance();
 
+			// 投げるSEの開始
 			if (pSound != nullptr)
 				pSound->Play(pSound->LABEL_SE_THROW);
 		}
