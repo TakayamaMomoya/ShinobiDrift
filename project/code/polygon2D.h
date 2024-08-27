@@ -18,7 +18,7 @@
 class CPolygon2D	: public CObject
 {
 public:
-	CPolygon2D(int nPriority = 7);	// コンストラク
+	CPolygon2D(int nPriority = 6);	// コンストラク
 	~CPolygon2D();	//	デストラクタ
 
 	// メンバ関数

@@ -31,6 +31,7 @@
 #include "playerNinja.h"
 #include "orbit.h"
 #include "texture.h"
+#include "particle.h"
 
 //*****************************************************
 // 定数定義
@@ -56,6 +57,10 @@ const float ROT_AIRBIKE_MAG = 0.015f;  // 空中での回転倍率
 const float SIZE_LAMP_BRAKE = 50.0f;	// ブレーキランプポリゴンのサイズ
 const D3DXVECTOR3 OFFSET_LAMP_BRAKE = { 0.0f, 50.0f, -100.0f };	// ブレーキランプのオフセット
 const string PATH_TEX_BRAKELAMP = "data\\TEXTURE\\EFFECT\\brakeLamp.png";	// ブレーキランプのテクスチャパス
+const float WIDTH_TIREORBIT = 50.0f;	// タイヤ軌跡の幅
+const D3DXCOLOR COL_TIREORBIT = D3DXCOLOR(1.0f, 1.0f, 1.f, 1.0f);	// タイヤ軌跡の色
+const int NUMEDGE_TIREORBIT = 20;	// タイヤ軌跡の辺の数
+const float RATE_LINE_ENBALE_TIREORBIT = 0.4f;	// タイヤ軌跡を有効化するラインの割合
 
 // ハンドリング関係
 const float HANDLE_INERTIA = 0.04f;  // カーブ時の角度変更慣性
@@ -260,7 +265,8 @@ void CPlayer::Load(void)
 void CPlayer::Uninit(void)
 {
 	m_pPlayer = nullptr;
-	m_info.pOrbitLamp->Uninit();
+
+	Object::DeleteObject((CObject**)&m_info.pOrbitTire, 1);
 
 	DisableBrakeLamp();
 
@@ -666,10 +672,10 @@ void CPlayer::ControlRoap(void)
 	{
 		D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
 		m_info.orbitColorRope = D3DXCOLOR(0.8f, 0.4f, 0.0f, 1.0f);
-		m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
+		m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope);
 
 		D3DXMATRIX mtxBlock = m_info.pBlockGrab->GetMatrix();
-		m_info.pOrbitRope->SetOffset(mtxBlock, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
+		m_info.pOrbitRope->SetOffset(mtxBlock, m_info.orbitColorRope);
 	}
 }
 
@@ -774,11 +780,11 @@ void CPlayer::RemoveWire(void)
 
 	D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
 	m_info.orbitColorLamp = D3DXCOLOR(0.5f, 0.5f, 0.0f, 0.0f);
-	m_info.pOrbitLamp->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitLamp->GetID());
+	m_info.pOrbitLamp->SetOffset(mtxNinja, m_info.orbitColorRope);
 
 	m_info.orbitColorRope = D3DXCOLOR(0.8f, 0.4f, 0.0f, 0.0f);
-	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
-	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
+	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope);
+	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope);
 
 	// ブラーを戻す
 	Blur::ResetBlur();
@@ -1160,7 +1166,30 @@ void CPlayer::ManageSpeed(void)
 	SetMove(move);
 
 	if (m_info.pOrbitLamp != nullptr)
-		m_info.pOrbitLamp->SetOffset(GetMatrix(), m_info.orbitColorLamp, m_info.pOrbitLamp->GetID());
+		m_info.pOrbitLamp->SetOffset(GetMatrix(), m_info.orbitColorLamp);
+
+	// タイヤ軌跡の管理
+	ManageTireOrbit();
+
+	// テールランプの管理
+	if (m_info.bTailLamp)
+	{
+
+	}
+}
+
+//=====================================================
+// タイヤ軌跡の管理
+//=====================================================
+void CPlayer::ManageTireOrbit(void)
+{
+	MultiplyMtx(false);
+	D3DXMATRIX mtx = GetParts(3)->pParts->GetMatrix();
+
+	D3DXVECTOR3 pos = { mtx._41, mtx._42, mtx._43 };
+
+	if (m_info.fSpeed > m_param.fSpeedMax * RATE_LINE_ENBALE_TIREORBIT)
+		CParticle::Create(pos, CParticle::TYPE::TYPE_RUN);
 }
 
 //=====================================================
@@ -1351,6 +1380,50 @@ void CPlayer::FollowBrakeLamp(void)
 
 	D3DXMATRIX mtx = GetParts(0)->pParts->GetMatrix();
 	m_info.pLampBreak->SetMatrixParent(mtx);
+}
+
+//=====================================================
+// タイヤ軌跡の有効化
+//=====================================================
+void CPlayer::EnableTireOrbit(void)
+{
+	if (m_info.pOrbitTire != nullptr)
+		return;	// 既に生成されてたら通らない
+
+	// 軌跡の生成
+	D3DXMATRIX mtx = GetMatrix();
+	D3DXVECTOR3 aOffset[2] =
+	{
+		{ WIDTH_TIREORBIT, 40.0f,-50.0f },
+		{-WIDTH_TIREORBIT, 40.0f,-50.0f },
+	};
+	D3DXCOLOR col = COL_TIREORBIT;
+	int nNumEdge = NUMEDGE_TIREORBIT;
+
+	//m_info.pOrbitTire = COrbit::Create(mtx, aOffset[0], aOffset[1], col, nNumEdge);
+
+	if (m_info.pOrbitTire != nullptr)
+	{
+		m_info.pOrbitTire->EnableBlur(false);
+		m_info.pOrbitTire->EnableAdd(true);
+		m_info.pOrbitTire->SetAlphaTest(100);
+	}
+}
+
+//=====================================================
+// テールランプの有効化
+//=====================================================
+void CPlayer::EnableTailLamp(void)
+{
+	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.15f, 0.0f, 1.0f);
+}
+
+//=====================================================
+// テールランプの無効化
+//=====================================================
+void CPlayer::DisableTailLamp(void)
+{
+	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.15f, 0.0f, 0.0f);
 }
 
 //=====================================================

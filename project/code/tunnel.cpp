@@ -472,6 +472,9 @@ void CTunnel::EnterPlayer(void)
 		param.fSpeedMax = param.fSpeedMaxInitial * 4.0f;
 
 		pPlayer->SetParam(param);
+
+		// テールランプつける
+		pPlayer->EnableTailLamp();
 	}
 }
 
@@ -491,6 +494,9 @@ void CTunnel::ExitPlayer(void)
 		param.fSpeedMax = param.fSpeedMaxInitial;
 
 		pPlayer->SetParam(param);
+
+		// テールランプ消す
+		pPlayer->DisableTailLamp();
 	}
 
 	Blur::ResetBlur();

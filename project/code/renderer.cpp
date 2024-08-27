@@ -255,7 +255,7 @@ void CRenderer::Draw(void)
 	// ‰æ–ÊƒNƒŠƒA
 	m_pD3DDevice->Clear(0, nullptr,
 		(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
-		D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
+		COLOR_CLEAR, 1.0f, 0);
 
 	float fStart = 5000;
 	float fEnd = 20000;
