@@ -788,6 +788,9 @@ void CPlayer::RemoveWire(void)
 
 	// ブラーを戻す
 	Blur::ResetBlur();
+
+	// テールランプの無効化
+	m_info.bTailLamp = false;
 }
 
 //=====================================================
@@ -1083,8 +1086,6 @@ void CPlayer::ManageSpeed(void)
 		SetPosition(pos);
 	}
 
-	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.0f);
-
 	if (m_info.pBlockGrab != nullptr)
 	{
 		// 差分角度の計算
@@ -1111,7 +1112,8 @@ void CPlayer::ManageSpeed(void)
 		rot.y += rotDef;
 		universal::LimitRot(&rot.y);
 
-		m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.15f, 0.0f, 1.0f);
+		// テールランプフラグ有効化
+		m_info.bTailLamp = true;
 	}
 	else if (m_info.fSpeed >= NOTROTATE)
 	{// ハンドルの回転を追加
@@ -1174,7 +1176,11 @@ void CPlayer::ManageSpeed(void)
 	// テールランプの管理
 	if (m_info.bTailLamp)
 	{
-
+		EnableTailLamp();
+	}
+	else
+	{
+		DisableTailLamp();
 	}
 }
 
@@ -1415,6 +1421,8 @@ void CPlayer::EnableTireOrbit(void)
 //=====================================================
 void CPlayer::EnableTailLamp(void)
 {
+	m_info.bTailLamp = true;
+
 	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.15f, 0.0f, 1.0f);
 }
 
@@ -1423,6 +1431,8 @@ void CPlayer::EnableTailLamp(void)
 //=====================================================
 void CPlayer::DisableTailLamp(void)
 {
+	m_info.bTailLamp = false;
+
 	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.15f, 0.0f, 0.0f);
 }
 
