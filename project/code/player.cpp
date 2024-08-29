@@ -1255,6 +1255,13 @@ void CPlayer::ManageMotion(void)
 			SetMotion(MOTION_WALK_FRONT);
 		}
 	}
+	else if (m_fragMotion.bResult)
+	{
+		if (nMotion != MOTION_WALK_FRONT)
+		{
+			SetMotion(MOTION_WALK_FRONT);
+		}
+	}
 	else
 	{// 待機モーション
 		if (nMotion != MOTION_NEUTRAL)
@@ -1312,6 +1319,13 @@ void CPlayer::ManageMotionNinja(void)
 
 		if (bFinish)
 			m_fragNinja.bSlashDown = false;
+	}
+	else if (m_fragNinja.bGoal)
+	{// ゴール時モーション
+		if (nMotion != MOTION_NINJA::MOTION_NINJA_RESULT)
+		{
+			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_RESULT);
+		}
 	}
 	else
 	{
