@@ -208,7 +208,7 @@ void CStateResult::Uninit(CResult *pResult)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateResultDispTime::CStateResultDispTime() : m_apTime()
+CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr)
 {
 
 }
@@ -235,24 +235,27 @@ void CStateResultDispTime::Init(CResult *pResult)
 //=====================================================
 void CStateResultDispTime::SetNumber(void)
 {
-	/*CTimer *pTime = CTimer::GetInstance();
+	CGame *pGame = CGame::GetInstance();
 
-	if (pTime == nullptr)
+	if (pGame == nullptr)
 		return;
 
-	int aTime[NUMBER_MAX] =
-	{
-		pTime->GetMinutes(),
-		(int)pTime->GetSecond(),
-		(int)pTime->GetMilli()
-	};
+	CTimer *pGameTimer = pGame->GetGameTimer();
 
-	for (int i = 0; i < NUMBER_MAX; i++)
-	{
-		m_apTime[i] = CNumber::Create(2, aTime[i]);
+	if (pGameTimer == nullptr)
+		return;
 
+	pGameTimer->SetFlag(true);
 
-	}*/
+	// 自身のタイマー生成
+	m_pTimeOwn = CTimer::Create();
+
+	if (m_pTimeOwn == nullptr)
+		return;
+
+	// ゲームタイマーのタイムをコピー
+	float fTime = pGameTimer->GetSecond();
+	m_pTimeOwn->SetSecond(fTime);
 }
 
 //=====================================================

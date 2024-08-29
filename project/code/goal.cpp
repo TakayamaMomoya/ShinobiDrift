@@ -173,17 +173,6 @@ void CGoal::Update()
 			CResult::Create();
 		}
 	}
-
-#ifdef _DEBUG
-	CEffect3D::Create(m_posStart, 400.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	CEffect3D::Create(m_posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-#endif
-
-#if 0
-	CDebugProc::GetInstance()->Print("\nfCross‚Ì’l[%f]", fCross);
-	CDebugProc::GetInstance()->Print("\nbHit[%d]", bHit);
-	CDebugProc::GetInstance()->Print("\nbHitOld[%d]", bHitNext);
-#endif
 }
 
 //=====================================================

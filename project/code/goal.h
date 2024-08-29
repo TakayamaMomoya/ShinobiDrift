@@ -37,7 +37,7 @@ public:
 	float GetRotation() { return m_fRot; }	// Œü‚«æ“¾ˆ—
 
 	// Ã“Iƒƒ“ƒoŠÖ”
-	static CGoal* Create(D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f }, float fRot = 0.0f, float fLength = 1000.0f);	// ¶¬
+	static CGoal* Create(D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f }, float fRot = 0.0f, float fLength = 1500.0f);	// ¶¬
 	static CGoal *GetInstance(void) { return m_pGoal; }
 
 private:
