@@ -33,6 +33,7 @@ public:
 	{
 		MOTION_NEUTRAL = 0,	// 待機
 		MOTION_WALK_FRONT,	// 前歩
+		MOTION_WALK_RESULT,	// 前歩
 		MOTION_MAX
 	};
 	enum MOTION_NINJA
@@ -40,6 +41,9 @@ public:
 		MOTION_NINJA_NEUTRAL = 0,	// 待機
 		MOTION_NINJA_SLASHDOWN,	// 切り下ろし
 		MOTION_NINJA_SLASHUP,	// 切り上げ
+		MOTION_NINJA_THROW_LEFT,	// 鉤縄(左)
+		MOTION_NINJA_THROW_RIGHT,	// 鉤縄(右)
+		MOTION_NINJA_RESULT,	// ゴール
 		MOTION_NINJA_MAX
 	};
 	enum STATE
@@ -83,17 +87,21 @@ public:
 	void SetEnableInput(bool bEnable) { m_info.bEnableInput = bEnable; }
 	float GetSpeed(void) { return m_info.fSpeed; }	// スピード
 	void SetSpeed(float fSpeed) { m_info.fSpeed = fSpeed; }
+	void SetEnableResultFlag(bool bFlag) { m_fragNinja.bGoal = bFlag; }
+	void SEtEnableBike(bool bFlag) { m_fragMotion.bResult = bFlag; }
 
 private:
 	struct SFragMotion
 	{
 		bool bMove;	// 移動
+		bool bResult;	// ゴール時
 	};
 	struct SFragNinja
 	{
 		bool bNeutral;	// 待機モーション
 		bool bSlashDown;	// 切り下ろし
 		bool bSlashUp;	// 切り上げ
+		bool bGoal;		// ゴール時
 	};
 	struct SInfo
 	{
