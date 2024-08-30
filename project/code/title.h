@@ -22,6 +22,7 @@ class CMenu;
 class CPolygon2D;
 class CFan3D;
 class CMotion;
+class COrbit;
 class CTitleBehavior;
 
 //*****************************************************
@@ -48,12 +49,15 @@ public:
 	STATE GetState(void) { return m_state; }
 	static CMotion *GetPlayer(void) { return m_pPlayer; }
 	static CMotion *GetBike(void) { return m_pBike; }
+	void PlayerAcceleration(void);  // プレイヤーが加速する
 	
 private:
+
 	STATE m_state;				// 状態
 	CPolygon2D *m_pTitleLogo;   // タイトルロゴのポインタ
 	CPolygon2D *m_pTeamLogo;    // チームロゴのポインタ
 	CFan3D *m_pFan3D;           // トンネルの扉のポインタ
+	COrbit *m_pOrbitLamp;       // テールランプのポインタ
 	static CMotion *m_pPlayer;	// プレイヤーモデル
 	static CMotion *m_pBike;   // バイクモデル
 	CTitleBehavior *m_pBehavior;	// ビヘイビア
@@ -109,6 +113,28 @@ private:
 	bool m_bFade = false;
 };
 
+class CTitleBehindPlayer : public CTitleBehavior
+{// プレイヤーの背後に回る
+public:
+	CTitleBehindPlayer();  // コンストラクタ
+	virtual ~CTitleBehindPlayer();  // デストラクタ
+	void Update(CTitle* pTItle) override;
+
+private:
+
+};
+
+class CTitlePlayerAcceleration : public CTitleBehavior
+{// プレイヤーが加速し始める
+public:
+	CTitlePlayerAcceleration();  // コンストラクタ
+	virtual ~CTitlePlayerAcceleration();  // デストラクタ
+	void Update(CTitle* pTItle) override;
+
+private:
+
+};
+
 class CTitleMovePlayer : public CTitleBehavior
 {
 public:
@@ -117,7 +143,18 @@ public:
 	void Update(CTitle* pTItle) override;
 
 private:
-	void Fade(void);
+
+};
+
+class CTitleFadePlayer : public CTitleBehavior
+{
+public:
+	CTitleFadePlayer();  // コンストラクタ
+	virtual ~CTitleFadePlayer();  // デストラクタ
+	void Update(CTitle* pTItle) override;
+
+private:
+	void Fade(void);  // フェード処理
 
 };
 

@@ -20,6 +20,7 @@
 #include "player.h"
 #include "texture.h"
 #include "debugproc.h"
+#include "MyEffekseer.h"
 
 //*****************************************************
 // 定数定義
@@ -32,6 +33,8 @@ namespace
 	const float POLYGON_SIZE_X = 100.0f;        // 鉤縄ポイントUIのサイズ
 	const float POLYGON_SIZE_Y = 100.0f;        // 鉤縄ポイントUIのサイズ
 	const float STANDARD_LENGHT = 7000.0f;      // 鉤縄ポイントUIが出る距離
+	const float DECELERATION_MAG = 0.985f;	// 衝突時の減速倍率
+	const float MOVE_MAG = 0.15f;	// 衝突時の移動量反射倍率
 }
 
 //*****************************************************
@@ -295,7 +298,7 @@ void CBlock::Load(FILE *pFile, char* pTemp)
 }
 
 //=====================================================
-// 当たり判定処理
+// 上面の当たり判定処理
 //=====================================================
 bool CBlock::Collide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 {
@@ -315,10 +318,11 @@ bool CBlock::Collide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 
 	BlockNor = universal::NorRelativeMtx(pos, rot, BlockMax, BlockMin);
 
-	// ポリゴンの下に入っているか判定する
+	// 一定の範囲内にいる
 	if (D3DXVec3Length(&(pos - *pPos)) > 10000.0f)
 		return false;
 
+	// ポリゴンの下に入っているか判定する
 	if (!universal::IsOnSquare(BlockCorner[0], BlockCorner[1], BlockCorner[2], BlockCorner[3], BlockNor, *pPos, posOld, fHeight))
 		return false;
 
@@ -327,6 +331,146 @@ bool CBlock::Collide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 		return false;
 
 	pPos->y = fHeight;
+
+	return true;
+}
+
+//=====================================================
+// 側面の当たり判定処理
+//=====================================================
+bool CBlock::CollideSide(D3DXVECTOR3* pPos, D3DXVECTOR3* move, D3DXVECTOR3 vecAxial, float* fSpeed)
+{
+	CBlockManager::SInfoBlock *pInfoBlock = CBlockManager::GetInstance()->GetInfoBlock();
+
+	if(!pInfoBlock[GetIdx()].bSnag)
+		return false;
+
+	D3DXVECTOR3 BlockMax = GetVtxMax();
+	D3DXVECTOR3 BlockMin = GetVtxMin(); 
+	D3DXVECTOR3 pos = GetPosition() + (BlockMax + BlockMin);
+	D3DXVECTOR3 rot = GetRotation();
+	D3DXVECTOR3 BlockCorner;
+	D3DXVECTOR3 BlockNor;
+
+	BlockCorner = universal::PosRelativeMtx(pos, rot, ((BlockMax - BlockMin) * 0.5f)) - pos;
+	D3DXVec3Normalize(&BlockNor, &BlockCorner);
+
+#ifdef _DEBUG
+	CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	CEffect3D::Create(pos + BlockCorner, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(pos - BlockCorner, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+#endif // _DEBUG
+
+	// ガードレールの高さ以内で判定する
+	if (pPos->y > pos.y + BlockCorner.y || pPos->y < pos.y - BlockCorner.y)
+		return false;
+
+	D3DXVECTOR3 axisA1, axisNA1;
+	D3DXVECTOR3 axisA2, axisNA2;
+	D3DXVECTOR3 axisA3, axisNA3;
+	D3DXVECTOR3 axisB1, axisNB1;
+	D3DXVECTOR3 axisB2, axisNB2;
+	D3DXVECTOR3 axisB3, axisNB3;
+
+	axisA1 = D3DXVECTOR3(vecAxial.x, 0.0f, 0.0f);
+	axisA2 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	axisA3 = D3DXVECTOR3(0.0f, 0.0f, vecAxial.z);
+	axisB1 = D3DXVECTOR3(BlockCorner.x, 0.0f, 0.0f);
+	axisB2 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+	axisB3 = D3DXVECTOR3(0.0f, 0.0f, BlockCorner.z);
+
+	D3DXVec3Normalize(&axisNA1, &axisA1);
+	D3DXVec3Normalize(&axisNA2, &axisA2);
+	D3DXVec3Normalize(&axisNA3, &axisA3);
+	D3DXVec3Normalize(&axisNB1, &axisB1);
+	D3DXVec3Normalize(&axisNB2, &axisB2);
+	D3DXVec3Normalize(&axisNB3, &axisB3);
+
+	D3DXVECTOR3 lengthCollider = pos - *pPos;
+	float lengthColliderDef = D3DXVec3Length(&lengthCollider);
+
+	float rA, rB, length;
+	D3DXVECTOR3 Cross, vecNorDef;
+
+	// A1
+	rA = D3DXVec3Length(&axisA1);
+	rB = universal::lengthAxis(axisNA1, axisB1, axisB2, axisB3);
+	length = fabs(D3DXVec3Dot(&lengthCollider, &axisNA1));
+	if (length > rA + rB)
+		return false;
+
+	if (lengthColliderDef > (rA + rB) - length)
+	{
+		lengthColliderDef = (rA + rB) - length;
+		vecNorDef = axisNA1;
+	}
+
+	// A3
+	rA = D3DXVec3Length(&axisA3);
+	rB = universal::lengthAxis(axisNA2, axisB1, axisB2, axisB3);
+	length = fabs(D3DXVec3Dot(&lengthCollider, &axisNA3));
+	if (length > rA + rB)
+		return false;
+
+	if (lengthColliderDef > (rA + rB) - length)
+	{
+		lengthColliderDef = (rA + rB) - length;
+		vecNorDef = axisNA3;
+	}
+
+	// B1
+	rA = D3DXVec3Length(&axisB1);
+	rB = universal::lengthAxis(axisNB1, axisA1, axisA2, axisA3);
+	length = fabs(D3DXVec3Dot(&lengthCollider, &axisNB1));
+	if (length > rA + rB)
+		return false;
+
+	if (lengthColliderDef > (rA + rB) - length)
+	{
+		lengthColliderDef = (rA + rB) - length;
+		vecNorDef = axisNB1;
+	}
+
+	// B3
+	rA = D3DXVec3Length(&axisB3);
+	rB = universal::lengthAxis(axisNB3, axisA1, axisA2, axisA3);
+	length = fabs(D3DXVec3Dot(&lengthCollider, &axisNB3));
+	if (length > rA + rB)
+		return false;
+
+	if (lengthColliderDef > (rA + rB) - length)
+	{
+		lengthColliderDef = (rA + rB) - length;
+		vecNorDef = axisNB3;
+	}
+
+	// 線分とターゲットの位置関係を計算
+	float lenPos = D3DXVec3Dot(&(*pPos - pos), &vecNorDef);
+
+	// 押し戻された座標を計算する
+	D3DXVECTOR3 vecReturn;
+	vecReturn = vecNorDef * -lengthColliderDef;
+
+	if (D3DXVec3Length(&vecReturn) == 0.0f)
+		return false;
+
+	// 計算した距離分押し戻す
+	*pPos += vecReturn;
+
+	// 押し戻し距離から移動方向と距離を計算する
+	D3DXVec3Normalize(&vecReturn, &vecReturn);
+	*move -= vecReturn * D3DXVec3Dot(&vecReturn, move) * MOVE_MAG;
+	*fSpeed *= DECELERATION_MAG;
+
+	// 衝突エフェクトを出す位置を計算する
+	D3DXVECTOR3 posEffect = pos + vecReturn;
+
+	// 衝突エフェクトを出す角度を計算する
+	float rotEffect;
+	rotEffect = atan2f(vecNorDef.x, vecNorDef.z);
+
+	// エフェクトの再生
+	MyEffekseer::CreateEffect(CEffekseer::TYPE_SPARK, D3DXVECTOR3(posEffect.x, posEffect.y + 100.0f, posEffect.z), D3DXVECTOR3(0.0f, rotEffect, 0.0f));
 
 	return true;
 }
