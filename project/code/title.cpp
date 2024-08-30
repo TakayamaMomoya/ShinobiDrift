@@ -26,6 +26,8 @@
 #include "meshcylinder.h"
 #include "fan3D.h"
 #include "meshfield.h"
+#include "particle.h"
+#include "orbit.h"
 #include "debugproc.h"
 
 //*****************************************************
@@ -59,8 +61,8 @@ namespace
 	const D3DXVECTOR3 POS_PLAYER = { -154.31f, 130.62f, 570.51f };	// プレイヤーモデルの位置
 	const D3DXVECTOR3 POS_BIKE = { -154.31f, 82.62f, 600.51f };	    // バイクモデルの位置
 
-	const float FADE_POS = 20000.0f;  // フェードする位置
-	const float MAX_SPEED = 120.0f;   // タイトルでのバイクのスピード上限
+	const float REBOOST_POS_Z = 20000.0f;  // プレイヤーが再び加速するZ座標
+	const float MAX_SPEED = 120.0f;        // タイトルでのバイクのスピード上限
 }
 
 //*****************************************************
@@ -79,6 +81,7 @@ CTitle::CTitle()
 	m_pTeamLogo = nullptr;
 	m_pPlayer = nullptr;
 	m_pBehavior = nullptr;
+	m_pOrbitLamp = nullptr;
 	m_fTImerSmoke = 0.0f;
 }
 
@@ -179,7 +182,7 @@ HRESULT CTitle::Init(void)
 
 	if (m_pFan3D != nullptr)
 	{
-		m_pFan3D->SetPosition(D3DXVECTOR3(0.0f, 0.0f, 3000.0f));
+		m_pFan3D->SetPosition(D3DXVECTOR3(0.0f, -200.0f, 3000.0f));
 		m_pFan3D->SetRotation(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 		m_pFan3D->SetRadius(2000.0f);
 		m_pFan3D->SetVtx();
@@ -190,7 +193,7 @@ HRESULT CTitle::Init(void)
 
 	if (pField != nullptr)
 	{
-		pField->SetPosition(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
+		pField->SetPosition(D3DXVECTOR3(0.0f, -800.0f, 0.0f));
 	}
 
 	// バイクモデルの設置
@@ -212,6 +215,9 @@ HRESULT CTitle::Init(void)
 		m_pPlayer->InitPose(CPlayer::MOTION::MOTION_NEUTRAL);
 		m_pPlayer->SetMatrix(m_pBike->GetMatrix());
 	}
+
+	// テールランプ生成
+	m_pOrbitLamp = COrbit::Create(m_pPlayer->GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60);
 
 	return S_OK;
 }
@@ -242,14 +248,27 @@ void CTitle::Update(void)
 	// シーンの更新
 	CScene::Update();
 
-	/*if(m_pFan3D != nullptr)
-	   m_pFan3D->SetTex(0.001f, 0.01f);*/
-
 	if (m_pBehavior != nullptr)
 	{
 		m_pBehavior->Update(this);
 	}
 
+	m_pBike->MultiplyMtx(false);
+	D3DXMATRIX mtx = m_pBike->GetParts(3)->pParts->GetMatrix();
+
+	D3DXVECTOR3 pos = { mtx._41, mtx._42, mtx._43 };
+
+	float fSpeed = m_pBike->GetMove().z;
+
+	if (fSpeed > MAX_SPEED * 0.4f)
+		CParticle::Create(pos, CParticle::TYPE::TYPE_RUN);
+
+	D3DXMATRIX mtxNinja = m_pBike->GetParts(3)->pParts->GetMatrix();
+	mtxNinja._42 = mtxNinja._42 - 100.0f;
+	mtxNinja._43 = mtxNinja._43 + 100.0f;
+	
+	m_pOrbitLamp->SetOffset(mtxNinja, D3DXCOLOR(1.0f, 0.15f, 0.0f, 1.0f));
+		
 	CCamera* pCamera = CManager::GetCamera();
 
 	if (pCamera == nullptr)
@@ -257,12 +276,6 @@ void CTitle::Update(void)
 
 	// カメラの更新
 	pCamera->Update();
-
-	D3DXVECTOR3 NinjaPos = m_pPlayer->GetPosition();
-	D3DXVECTOR3 BikePos = m_pBike->GetPosition();
-
-	CDebugProc::GetInstance()->Print("\n忍者の位置 [%f, %f, %f]", NinjaPos.x, NinjaPos.y, NinjaPos.z);
-	CDebugProc::GetInstance()->Print("\nバイクの位置 [%f, %f, %f]", BikePos.x, BikePos.y, BikePos.z);
 }
 
 //=====================================================
@@ -704,7 +717,7 @@ void CTitleMovePlayer::Update(CTitle* pTItle)
 
 	float BikePosZ = pBike->GetPosition().z;
 
-	if (BikePosZ >= FADE_POS)
+	if (BikePosZ >= REBOOST_POS_Z)
 		pTItle->ChangeBehavior(new CTitleFadePlayer);
 
 	CDebugProc::GetInstance()->Print("\nプレイヤーの位置 [%f, %f, %f]", pos.x, pos.y, pos.z);
@@ -715,6 +728,7 @@ void CTitleMovePlayer::Update(CTitle* pTItle)
 CTitleFadePlayer::CTitleFadePlayer()
 {// コンストラクタ
 	
+	Camera::ChangeState(nullptr);
 }
 
 CTitleFadePlayer::~CTitleFadePlayer()

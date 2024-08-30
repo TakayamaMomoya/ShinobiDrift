@@ -22,6 +22,7 @@ class CMenu;
 class CPolygon2D;
 class CFan3D;
 class CMotion;
+class COrbit;
 class CTitleBehavior;
 
 //*****************************************************
@@ -48,7 +49,6 @@ public:
 	STATE GetState(void) { return m_state; }
 	static CMotion *GetPlayer(void) { return m_pPlayer; }
 	static CMotion *GetBike(void) { return m_pBike; }
-
 	void PlayerAcceleration(void);  // プレイヤーが加速する
 	
 private:
@@ -57,6 +57,7 @@ private:
 	CPolygon2D *m_pTitleLogo;   // タイトルロゴのポインタ
 	CPolygon2D *m_pTeamLogo;    // チームロゴのポインタ
 	CFan3D *m_pFan3D;           // トンネルの扉のポインタ
+	COrbit *m_pOrbitLamp;       // テールランプのポインタ
 	static CMotion *m_pPlayer;	// プレイヤーモデル
 	static CMotion *m_pBike;   // バイクモデル
 	CTitleBehavior *m_pBehavior;	// ビヘイビア
