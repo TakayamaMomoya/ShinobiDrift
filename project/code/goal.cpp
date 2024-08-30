@@ -169,21 +169,13 @@ void CGoal::Update()
 	{
 		if (fCross >= 0.0f && fCross <= 1.0f)
 		{// 始点と終点の間を通った時
+			pPlayer->SetEnableResultFlag(true);
+			pPlayer->SEtEnableBike(true);
+
 			// リザルトの生成
 			CResult::Create();
 		}
 	}
-
-#ifdef _DEBUG
-	CEffect3D::Create(m_posStart, 400.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	CEffect3D::Create(m_posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-#endif
-
-#if 0
-	CDebugProc::GetInstance()->Print("\nfCrossの値[%f]", fCross);
-	CDebugProc::GetInstance()->Print("\nbHit[%d]", bHit);
-	CDebugProc::GetInstance()->Print("\nbHitOld[%d]", bHitNext);
-#endif
 }
 
 //=====================================================
