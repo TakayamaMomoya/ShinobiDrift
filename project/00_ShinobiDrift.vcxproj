@@ -188,6 +188,7 @@
     <ClCompile Include="code\effect2D.cpp" />
     <ClCompile Include="code\effect3D.cpp" />
     <ClCompile Include="code\enemySpawner.cpp" />
+    <ClCompile Include="code\frame.cpp" />
     <ClCompile Include="code\gameObject.cpp" />
     <ClCompile Include="code\gauge.cpp" />
     <ClCompile Include="code\meshCube.cpp" />
@@ -239,6 +240,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="code\rankTime.cpp" />
     <ClCompile Include="code\renderer.cpp" />
     <ClCompile Include="code\ranking.cpp" />
     <ClCompile Include="code\result.cpp" />
@@ -283,6 +285,7 @@
     <ClInclude Include="code\effect2D.h" />
     <ClInclude Include="code\effect3D.h" />
     <ClInclude Include="code\enemySpawner.h" />
+    <ClInclude Include="code\frame.h" />
     <ClInclude Include="code\gameObject.h" />
     <ClInclude Include="code\gauge.h" />
     <ClInclude Include="code\meshCube.h" />
@@ -333,6 +336,7 @@
     <ClInclude Include="code\player.h" />
     <ClInclude Include="code\playerNinja.h" />
     <ClInclude Include="code\precompile.h" />
+    <ClInclude Include="code\rankTime.h" />
     <ClInclude Include="code\renderer.h" />
     <ClInclude Include="code\ranking.h" />
     <ClInclude Include="code\result.h" />

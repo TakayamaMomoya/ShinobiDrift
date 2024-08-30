@@ -71,7 +71,7 @@ private:
 	void SetNormal(VERTEX_3D *pVtx);	// 法線の設定
 	void CreateSpline(void);	// スプラインの生成
 	void CreateSideSpline(void);	// 側面のスプライン生成
-	void CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3D *pVtx, SInfoRoadPoint *infoRoadPointOld = nullptr, int nIdx = 0);	// ロードポイント間の頂点の設定
+	void CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3D *pVtx, SInfoRoadPoint *infoRoadPointOld = nullptr, int nIdx = 0,float *pTex = nullptr);	// ロードポイント間の頂点の設定
 	void SetEdgeAngle(VERTEX_3D *pVtx, D3DXVECTOR3 posEdge, D3DXVECTOR3 posEdgeOld);	// 辺の角度の設定
 	D3DXVECTOR3 GetPosEdge(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2);
 
@@ -83,6 +83,7 @@ private:
 	CCutMullSpline *m_pSplineR;	// 右側のスプライン
 	std::vector<CTunnel*> m_aTunnel;	// トンネルのポインタの配列
 	std::vector<CGuardRail*> m_aGR;	// ガードレールのポインタの配列
+	int m_nCurrentVtx = 50;	// 選択頂点の番号
 
 	static CMeshRoad *m_pMeshRoad;
 	static std::list<CMeshRoad*> s_aRoad;	// メッシュロードのコンテナ

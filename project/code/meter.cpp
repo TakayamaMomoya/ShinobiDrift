@@ -29,6 +29,9 @@ const D3DXVECTOR2 SIZE_NUMBER = { 0.015f, 0.02f };	// メーターの数字のサイズ
 const D3DXVECTOR2 SIZE_NEEDLE = { SIZE_METER.x * 0.2f, SIZE_METER.y * 0.9f };	// 針のサイズ
 const float MIN_ANGLE_NEEDLE = D3DX_PI * 0.7f;	// 針の最低速度時の角度
 const float MAX_ANGLE_NEEDLE = -D3DX_PI * 0.7f;	// 針の最高速度時の角度
+const float SPEED_ROTATE_NEEDLE = 0.1f;	// 針の動く速度
+const float LINE_VIB_NEEDLE = 0.95f;	// メーターが震えるまでの閾値
+const int WIDTH_RANDOM_NEEDLEVIB = 10;	// メーターの震える幅
 }
 
 //=====================================================
@@ -175,7 +178,7 @@ void CMeter::Acceleration()
 
 	if (m_pNumber != nullptr)
 	{// 値表示の制御
-		m_pNumber->SetValue((int)fPlayerSpeed, PLACE);
+		m_pNumber->SetValue((int)fPlayerSpeed);
 	}
 }
 
@@ -189,15 +192,28 @@ void CMeter::Needle()
 	if (m_pNeedle == nullptr || pPlayer == nullptr)
 		return;
 
+	// 速度の割合を計算
 	float fSpeed = pPlayer->GetSpeed();
 	float fSpeedMax = pPlayer->GetParam().fSpeedMaxInitial;
 
 	float fRate = fSpeed / fSpeedMax;
+	float fRateOrg = fRate;
 	universal::LimitValuefloat(&fRate, 1.0f, 0.0f);
 
 	float fDiffAngle = MAX_ANGLE_NEEDLE - MIN_ANGLE_NEEDLE;
 
-	float fRot = MIN_ANGLE_NEEDLE + fDiffAngle * fRate;
+	// 割合による針の角度を設定
+	float fRot = m_pNeedle->GetRotation();
+	float fRotDest = MIN_ANGLE_NEEDLE + fDiffAngle * fRate;
+
+	if (LINE_VIB_NEEDLE < fRate)
+	{// 目標角度にランダムな値が追加される
+		float fAdd = fRateOrg - LINE_VIB_NEEDLE;
+
+		fRotDest += (float)universal::RandRange(WIDTH_RANDOM_NEEDLEVIB, -WIDTH_RANDOM_NEEDLEVIB) * 0.05f;
+	}
+
+	universal::FactingRot(&fRot, fRotDest, SPEED_ROTATE_NEEDLE);
 
 	m_pNeedle->SetRotation(fRot);
 	m_pNeedle->SetVtx();

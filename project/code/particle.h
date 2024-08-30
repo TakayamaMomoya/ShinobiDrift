@@ -22,7 +22,7 @@ public:
 	typedef enum
 	{
 		TYPE_NONE = 0,	// 何でもない
-		TYPE_EXPLOSION,	// 爆発
+		TYPE_RUN,	// 疾走
 		TYPE_TURN_EXPLOSION,	// 収束爆発
 		TYPE_BEAM_BLADE,	// ビームブレード
 		TYPE_SMOKE_DEATH,	// 煙

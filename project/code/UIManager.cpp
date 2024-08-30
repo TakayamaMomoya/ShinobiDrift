@@ -14,6 +14,7 @@
 #include "inputkeyboard.h"
 #include "texture.h"
 #include "player.h"
+#include "meter.h"
 
 //*****************************************************
 // 定数定義
@@ -70,6 +71,9 @@ CUIManager *CUIManager::Create(void)
 HRESULT CUIManager::Init(void)
 {
 	m_bDisp = true;
+
+	// メーター生成
+	CMeter::Create();
 
 	return S_OK;
 }

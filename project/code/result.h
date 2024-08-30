@@ -18,6 +18,7 @@
 class CUI;
 class CStateResult;
 class CNumber;
+class CTimer;
 
 //*****************************************************
 // クラスの定義
@@ -44,6 +45,7 @@ private:
 	// メンバ関数
 	void SetPlayer(void);	// プレイヤー設定
 	void SetCamera(void);	// カメラ設定
+	void SaveTime(void);	// タイムの保存
 
 	// メンバ変数
 	CStateResult *m_pState;
@@ -87,7 +89,7 @@ private:
 	void SetNumber(void);	// 数字の設定
 
 	// メンバ変数
-	CNumber *m_apTime[NUMBER_MAX];	// 数字のポインタ配列
+	CTimer *m_pTimeOwn;	// 自身のタイム
 };
 
 namespace Tutorial

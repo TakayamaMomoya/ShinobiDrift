@@ -42,6 +42,10 @@ public:
 		LABEL_SE_ACCELERATOR,			// アクセル音
 		LABEL_SE_DRIFT,                 // ドリフト音
 
+		LABEL_SE_THROW,					// 鉤縄を投げる音
+		LABEL_SE_GRAB,					// 鉤縄をひっかける音
+		LABEL_SE_REMOVE,                // 鉤縄を外す音
+
 		LABEL_SE_PAUSE_MENU,			// ポーズ
 		LABEL_SE_PAUSE_ARROW,			// ポーズ移動
 		LABEL_SE_PAUSE_ENTER,			// ポーズ選択
@@ -121,6 +125,10 @@ private:
 		{ "data/SOUND/SE/SE_Engin.wav",-1 },			// エンジン音
 		{ "data/SOUND/SE/SE_Accelerator.wav",-1 },		// アクセル音
 		{ "data/SOUND/SE/SE_Drift.wav",-1 },		    // ドリフト音
+
+		{ "data/SOUND/SE/SE_Throw.wav",0 },				// 鉤縄を投げる音
+		{ "data/SOUND/SE/SE_Grab.wav",0 },				// 鉤縄をひっかける音
+		{ "data/SOUND/SE/SE_Remove.wav",0 },		    // 鉤縄を外す音
 
 		{ "data/SOUND/SE/pause.wav",0 },				// ポーズ
 		{ "data/SOUND/SE/pause_arrow.wav",0 },			// 選択

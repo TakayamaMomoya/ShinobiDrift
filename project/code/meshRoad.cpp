@@ -31,6 +31,9 @@ const char* PATH_TEXTURE = "data\\TEXTURE\\MATERIAL\\road.jpg";	// ÉeÉNÉXÉ`ÉÉÉpÉ
 const float DIST_DEFAULT = 200.0f;	// ÉfÉtÉHÉãÉgÇÃï”ä‘ÇÃãóó£
 const float WIDTH_ROAD = 600.0f;	// ìπÇÃïù
 const float HEIGHT_LIMIT = 200.0f;	// îªíËÇ∑ÇÈçÇÇ≥ÇÃå¿äE
+const float DEFAULT_LENGTH_TEX = 2000.0f;	// ÉeÉNÉXÉ`ÉÉÇì\ÇÈç€ÇÃäÓèÄÇÃí∑Ç≥
+const float DEFAULT_CORDINATE_TEX = 1.0f;	// ÉeÉNÉXÉ`ÉÉÇì\ÇÈç€ÇÃÉfÉtÉHÉãÉgç¿ïW
+const int ACCURACY_LENGTH = 30;	// í∑Ç≥ÇÃê∏ìx
 }
 
 //*****************************************************
@@ -132,8 +135,35 @@ void CMeshRoad::Uninit(void)
 void CMeshRoad::Update(void)
 {
 #ifdef _DEBUG
-	for (SInfoRoadPoint info : m_aRoadPoint)
-		CEffect3D::Create(info.pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
+	VERTEX_3D* pVtx;
+
+	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+	
+	D3DXVECTOR3 pos = pVtx[m_nCurrentVtx].pos;
+
+	CEffect3D::Create(pos, 500.0f,5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
+	CDebugProc::GetInstance()->Print("\nTex[%f,%f]", pVtx[m_nCurrentVtx].tex.x, pVtx[m_nCurrentVtx].tex.y);
+	CDebugProc::GetInstance()->Print("\nCurrent[%d]", m_nCurrentVtx);
+
+	pVtxBuff->Unlock();
+
+	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+
+	if (pKeyboard->GetTrigger(DIK_UP))
+		m_nCurrentVtx += 2;
+	else if(pKeyboard->GetTrigger(DIK_DOWN))
+		m_nCurrentVtx -= 2;
+
+	if (m_nNumVtx <= m_nCurrentVtx)
+	{
+		m_nCurrentVtx = m_nNumVtx - 1;
+	}
+
+	for(auto it : m_aRoadPoint)
+		CEffect3D::Create(it.pos, 250.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+
 #endif // _DEBUG
 }
 
@@ -148,10 +178,10 @@ void CMeshRoad::Draw(void)
 	// ÉfÉoÉCÉXÇÃéÊìæ
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
 
-	D3DXMATRIX *pMtx = GetMatrix();
+	D3DXMATRIX mtx = GetMatrix();
 
 	// ÉèÅ[ÉãÉhÉ}ÉgÉäÉbÉNÉXèâä˙âª
-	D3DXMatrixIdentity(pMtx);
+	D3DXMatrixIdentity(&mtx);
 
 	D3DXMATRIX mtxRot, mtxTrans;
 	D3DXVECTOR3 pos = GetPosition();
@@ -160,15 +190,17 @@ void CMeshRoad::Draw(void)
 	// å¸Ç´ÇîΩâf
 	D3DXMatrixRotationYawPitchRoll(&mtxRot,
 		rot.y, rot.x, rot.z);
-	D3DXMatrixMultiply(pMtx, pMtx, &mtxRot);
+	D3DXMatrixMultiply(&mtx, &mtx, &mtxRot);
 
 	// à íuÇîΩâf
 	D3DXMatrixTranslation(&mtxTrans,
 		pos.x, pos.y, pos.z);
-	D3DXMatrixMultiply(pMtx, pMtx, &mtxTrans);
+	D3DXMatrixMultiply(&mtx, &mtx, &mtxTrans);
 
 	// ÉèÅ[ÉãÉhÉ}ÉgÉäÉbÉNÉXê›íË
-	pDevice->SetTransform(D3DTS_WORLD, pMtx);
+	pDevice->SetTransform(D3DTS_WORLD, &mtx);
+
+	SetMatrix(mtx);
 
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
 
@@ -401,6 +433,8 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 	std::vector<SInfoRoadPoint>::iterator itRoadPoint;
 	int nIdx = 0;
 
+	float fTex = 0;
+
 	for (itRoadPoint = m_aRoadPoint.begin(); itRoadPoint != m_aRoadPoint.end(); itRoadPoint++)
 	{
 		if (itRoadPoint != m_aRoadPoint.begin())
@@ -408,7 +442,7 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 			SInfoRoadPoint *pInfoRoadPointOld = &*std::prev(itRoadPoint);
 
 			// ÉçÅ[ÉhÉ|ÉCÉìÉgä‘ÇÃí∏ì_ê›íË
-			CreateVtxBetweenRoadPoint(*itRoadPoint, pVtx, pInfoRoadPointOld, nIdx);
+			CreateVtxBetweenRoadPoint(*itRoadPoint, pVtx, pInfoRoadPointOld, nIdx, &fTex);
 		}
 
 		pVtx += MeshRoad::NUM_EDGE_IN_ROADPOINT * MeshRoad::NUM_VTX_IN_EDGE;
@@ -423,7 +457,7 @@ void CMeshRoad::CreateVtxBuffEdge(void)
 //=====================================================
 // ÉçÅ[ÉhÉ|ÉCÉìÉgä‘ÇÃí∏ì_ê›íË
 //=====================================================
-void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3D *pVtx, SInfoRoadPoint *pInfoRoadPointOld, int nIdx)
+void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3D *pVtx, SInfoRoadPoint *pInfoRoadPointOld, int nIdx,float *pTex)
 {
 	if (pVtx == nullptr)
 		assert(("CreateVtxBetweenRoadPointÇ≈í∏ì_èÓïÒÇ™nullÇ≈Ç∑", false));
@@ -437,6 +471,11 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 	{
 		posEdgeOld = pInfoRoadPointOld->pos;
 	}
+
+	// ÉçÅ[ÉhÉ|ÉCÉìÉgä‘ÇÃãóó£Ç∆äÓèÄÇÃãóó£ÇÃäÑçá
+	float fRateLengthRoad = m_pSpline->GetLength(nIdx, ACCURACY_LENGTH) / DEFAULT_LENGTH_TEX;
+	float fCordTexMax = DEFAULT_CORDINATE_TEX * fRateLengthRoad;
+	float fAddTex = fCordTexMax / MeshRoad::NUM_EDGE_IN_ROADPOINT;
 
 	// ÉçÅ[ÉhÉ|ÉCÉìÉgä‘Ç≈ïKóvÇ»ï”
 	for (int i = 0; i < MeshRoad::NUM_EDGE_IN_ROADPOINT; i++)
@@ -473,16 +512,22 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 		// ñ@ê¸ÇÃê›íË
 		SetNormal(pVtx);
 
-		// ÉeÉNÉXÉ`ÉÉç¿ïWÇÃê›íË
-		if (i % 2 == 0)
-		{
-			pVtx[0].tex = { 0.0f,0.0f };
-			pVtx[1].tex = { 1.0f,0.0f };
+		//if (nIdx % 2 != 0)
+		{// ãÙêîî‘ñ⁄ÇÃÇ‡ÇÃÇ»ÇÁîΩëŒÇ…Ç∑ÇÈ
+			//*pTex -= fAddTex;
 		}
-		else
+		//else
 		{
-			pVtx[0].tex = { 0.0f,1.0f };
-			pVtx[1].tex = { 1.0f,1.0f };
+			*pTex += fAddTex;
+		}
+
+		pVtx[0].tex = { 0.0f,*pTex };
+		pVtx[1].tex = { 1.0f,*pTex };
+
+		if (i == 9)
+		{
+			CEffect3D::Create(pVtx[0].pos, 100.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+			CEffect3D::Create(pVtx[1].pos, 100.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 		}
 
 		pVtx += MeshRoad::NUM_VTX_IN_EDGE;	// ï”Ç…Ç†ÇÈí∏ì_êîï™É|ÉCÉìÉ^ÇêiÇﬂÇÈ
@@ -836,8 +881,6 @@ void CMeshRoad::Save(const char* pPath)
 
 	// ÉgÉìÉlÉãèÓïÒï€ë∂
 	size = m_aTunnel.size();	// ÉgÉìÉlÉãêîï€ë∂
-
-
 
 	outputFile.write(reinterpret_cast<const char*>(&size), sizeof(size));
 

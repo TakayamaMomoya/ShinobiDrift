@@ -31,6 +31,7 @@
 #include "playerNinja.h"
 #include "orbit.h"
 #include "texture.h"
+#include "particle.h"
 
 //*****************************************************
 // 定数定義
@@ -53,6 +54,13 @@ const float HEIGH_REAR_WHEEL = 65.0f;  // 後輪の高さ
 const float ROT_BIKE_FRONT_LIMIT = 1.5f;  // 前回りの角度限界
 const float ROT_BIKE_REAR_LIMIT = -1.35f;  // 後ろ回りの角度限界
 const float ROT_AIRBIKE_MAG = 0.015f;  // 空中での回転倍率
+const float SIZE_LAMP_BRAKE = 50.0f;	// ブレーキランプポリゴンのサイズ
+const D3DXVECTOR3 OFFSET_LAMP_BRAKE = { 0.0f, 50.0f, -100.0f };	// ブレーキランプのオフセット
+const string PATH_TEX_BRAKELAMP = "data\\TEXTURE\\EFFECT\\brakeLamp.png";	// ブレーキランプのテクスチャパス
+const float WIDTH_TIREORBIT = 50.0f;	// タイヤ軌跡の幅
+const D3DXCOLOR COL_TIREORBIT = D3DXCOLOR(1.0f, 1.0f, 1.f, 1.0f);	// タイヤ軌跡の色
+const int NUMEDGE_TIREORBIT = 20;	// タイヤ軌跡の辺の数
+const float RATE_LINE_ENBALE_TIREORBIT = 0.4f;	// タイヤ軌跡を有効化するラインの割合
 
 // ハンドリング関係
 const float HANDLE_INERTIA = 0.04f;  // カーブ時の角度変更慣性
@@ -64,7 +72,6 @@ const float HANDLE_SPEED_MAG = -0.005f;  // 体勢から速度への倍率
 const float ROT_CURVE_LIMIT = 0.025f;  // ハンドル操作がきく用になる角度の限界
 const float ROT_Y_DRIFT = 0.5f;  // ドリフト中のZ軸の角度
 const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
-
 }
 
 //*****************************************************
@@ -260,7 +267,10 @@ void CPlayer::Load(void)
 void CPlayer::Uninit(void)
 {
 	m_pPlayer = nullptr;
-	m_info.pOrbitLamp->Uninit();
+
+	Object::DeleteObject((CObject**)&m_info.pOrbitTire, 1);
+
+	DisableBrakeLamp();
 
 	// 継承クラスの終了
 	CMotion::Uninit();
@@ -392,6 +402,19 @@ void CPlayer::InputMove(void)
 
 	m_info.fSpeed += (0.0f - m_info.fSpeed) * m_param.fFactBrake * fBrake;
 
+	// ブレーキランプの管理
+	if (fBrake > 0)
+	{
+		EnableBrakeLamp();
+
+		FollowBrakeLamp();
+	}
+	else
+	{
+		DisableBrakeLamp();
+	}
+
+	// エンジン音管理
 	if (m_info.fSpeed < SE_CHANGE_SPEED && m_bMove)
 	{
 		// アクセルSEからエンジンSEへ変更
@@ -565,6 +588,8 @@ void CPlayer::JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength)
 			m_info.fAngleDrift = 0.29f;
 
 			Blur::AddParameter(5.0f, 0.5f, 15.0f, 0.0f, 0.7f);
+
+		
 		}
 		else
 		{
@@ -622,12 +647,16 @@ void CPlayer::JudgeRemoveWire(float fLength)
 	// ブロックのエリア内かの判定
 	D3DXVECTOR3 posPlayer = GetPosition();
 	bool bGrab = m_info.pBlockGrab->CanGrab(posPlayer);
+	CSound* pSound = CSound::GetInstance();
 
 	if (m_info.bManual)
 	{
 		if (fLength <= 0.4f)
 		{// スティックを離したらワイヤーを外す
 			RemoveWire();
+
+			if (pSound != nullptr)
+				pSound->Play(pSound->LABEL_SE_REMOVE);
 		}
 	}
 	else
@@ -635,6 +664,9 @@ void CPlayer::JudgeRemoveWire(float fLength)
 		if (m_info.bGrabOld && !bGrab)
 		{// ブロック指定のエリアを回り切ったらワイヤーを外す
 			RemoveWire();
+
+			if (pSound != nullptr)
+				pSound->Play(pSound->LABEL_SE_REMOVE);
 		}
 	}
 
@@ -651,10 +683,10 @@ void CPlayer::ControlRoap(void)
 	{
 		D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
 		m_info.orbitColorRope = D3DXCOLOR(0.8f, 0.4f, 0.0f, 1.0f);
-		m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
+		m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope);
 
 		D3DXMATRIX mtxBlock = m_info.pBlockGrab->GetMatrix();
-		m_info.pOrbitRope->SetOffset(mtxBlock, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
+		m_info.pOrbitRope->SetOffset(mtxBlock, m_info.orbitColorRope);
 	}
 }
 
@@ -738,6 +770,13 @@ void CPlayer::SarchGrab(void)
 
 			m_info.rotDriftStart = GetRotation();
 			m_info.rotDriftStart.x += D3DX_PI * 0.5f;
+
+			// サウンドインスタンスの取得
+			CSound* pSound = CSound::GetInstance();
+
+			// 投げるSEの開始
+			if (pSound != nullptr)
+				pSound->Play(pSound->LABEL_SE_THROW);
 		}
 	}
 }
@@ -759,14 +798,17 @@ void CPlayer::RemoveWire(void)
 
 	D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
 	m_info.orbitColorLamp = D3DXCOLOR(0.5f, 0.5f, 0.0f, 0.0f);
-	m_info.pOrbitLamp->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitLamp->GetID());
+	m_info.pOrbitLamp->SetOffset(mtxNinja, m_info.orbitColorRope);
 
 	m_info.orbitColorRope = D3DXCOLOR(0.8f, 0.4f, 0.0f, 0.0f);
-	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
-	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope, m_info.pOrbitRope->GetID());
+	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope);
+	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope);
 
 	// ブラーを戻す
 	Blur::ResetBlur();
+
+	// テールランプの無効化
+	m_info.bTailLamp = false;
 }
 
 //=====================================================
@@ -1074,8 +1116,6 @@ void CPlayer::ManageSpeed(void)
 		SetPosition(pos);
 	}
 
-	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.0f, 0.0f, 0.0f);
-
 	if (m_info.pBlockGrab != nullptr)
 	{
 		// 差分角度の計算
@@ -1102,7 +1142,8 @@ void CPlayer::ManageSpeed(void)
 		rot.y += rotDef;
 		universal::LimitRot(&rot.y);
 
-		m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.15f, 0.0f, 1.0f);
+		// テールランプフラグ有効化
+		m_info.bTailLamp = true;
 	}
 	else if (m_info.fSpeed >= NOTROTATE)
 	{// ハンドルの回転を追加
@@ -1159,7 +1200,34 @@ void CPlayer::ManageSpeed(void)
 	SetMove(move);
 
 	if (m_info.pOrbitLamp != nullptr)
-		m_info.pOrbitLamp->SetOffset(GetMatrix(), m_info.orbitColorLamp, m_info.pOrbitLamp->GetID());
+		m_info.pOrbitLamp->SetOffset(GetMatrix(), m_info.orbitColorLamp);
+
+	// タイヤ軌跡の管理
+	ManageTireOrbit();
+
+	// テールランプの管理
+	if (m_info.bTailLamp)
+	{
+		EnableTailLamp();
+	}
+	else
+	{
+		DisableTailLamp();
+	}
+}
+
+//=====================================================
+// タイヤ軌跡の管理
+//=====================================================
+void CPlayer::ManageTireOrbit(void)
+{
+	MultiplyMtx(false);
+	D3DXMATRIX mtx = GetParts(3)->pParts->GetMatrix();
+
+	D3DXVECTOR3 pos = { mtx._41, mtx._42, mtx._43 };
+
+	if (m_info.fSpeed > m_param.fSpeedMax * RATE_LINE_ENBALE_TIREORBIT)
+		CParticle::Create(pos, CParticle::TYPE::TYPE_RUN);
 }
 
 //=====================================================
@@ -1198,6 +1266,13 @@ void CPlayer::ManageMotion(void)
 
 	if (m_fragMotion.bMove)
 	{// 歩きモーション
+		if (nMotion != MOTION_WALK_FRONT)
+		{
+			SetMotion(MOTION_WALK_FRONT);
+		}
+	}
+	else if (m_fragMotion.bResult)
+	{
 		if (nMotion != MOTION_WALK_FRONT)
 		{
 			SetMotion(MOTION_WALK_FRONT);
@@ -1261,6 +1336,13 @@ void CPlayer::ManageMotionNinja(void)
 		if (bFinish)
 			m_fragNinja.bSlashDown = false;
 	}
+	else if (m_fragNinja.bGoal)
+	{// ゴール時モーション
+		if (nMotion != MOTION_NINJA::MOTION_NINJA_RESULT)
+		{
+			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_RESULT);
+		}
+	}
 	else
 	{
 		if (nMotion != MOTION_NINJA::MOTION_NINJA_NEUTRAL)
@@ -1301,7 +1383,103 @@ void CPlayer::Event(EVENT_INFO *pEventInfo)
 	universal::SetOffSet(&mtxParent, mtxPart, offset);
 
 	D3DXVECTOR3 pos = { mtxParent._41,mtxParent._42 ,mtxParent._43 };
+}
 
+//=====================================================
+// ブレーキランプをつける
+//=====================================================
+void CPlayer::EnableBrakeLamp(void)
+{
+	if (m_info.pLampBreak != nullptr)
+		return;
+
+	// ポリゴンの生成
+	m_info.pLampBreak = CPolygon3D::Create(D3DXVECTOR3());
+
+	if (m_info.pLampBreak == nullptr)
+		return;
+
+	m_info.pLampBreak->SetSize(SIZE_LAMP_BRAKE, SIZE_LAMP_BRAKE);
+	m_info.pLampBreak->SetMode(CPolygon3D::MODE::MODE_BILLBOARD);
+	m_info.pLampBreak->SetPosition(OFFSET_LAMP_BRAKE);
+	m_info.pLampBreak->SetVtx();
+	m_info.pLampBreak->EnableBlur(false);
+	m_info.pLampBreak->EnableZtest(true);
+
+	int nIdxTexture = Texture::GetIdx(&PATH_TEX_BRAKELAMP[0]);
+	m_info.pLampBreak->SetIdxTexture(nIdxTexture);
+}
+
+//=====================================================
+// ブレーキランプを消す
+//=====================================================
+void CPlayer::DisableBrakeLamp(void)
+{
+	if (m_info.pLampBreak != nullptr)
+	{
+		m_info.pLampBreak->Uninit();
+		m_info.pLampBreak = nullptr;
+	}
+}
+
+//=====================================================
+// ブレーキランプの追従
+//=====================================================
+void CPlayer::FollowBrakeLamp(void)
+{
+	if (m_info.pLampBreak == nullptr)
+		return;
+
+	D3DXMATRIX mtx = GetParts(0)->pParts->GetMatrix();
+	m_info.pLampBreak->SetMatrixParent(mtx);
+}
+
+//=====================================================
+// タイヤ軌跡の有効化
+//=====================================================
+void CPlayer::EnableTireOrbit(void)
+{
+	if (m_info.pOrbitTire != nullptr)
+		return;	// 既に生成されてたら通らない
+
+	// 軌跡の生成
+	D3DXMATRIX mtx = GetMatrix();
+	D3DXVECTOR3 aOffset[2] =
+	{
+		{ WIDTH_TIREORBIT, 40.0f,-50.0f },
+		{-WIDTH_TIREORBIT, 40.0f,-50.0f },
+	};
+	D3DXCOLOR col = COL_TIREORBIT;
+	int nNumEdge = NUMEDGE_TIREORBIT;
+
+	//m_info.pOrbitTire = COrbit::Create(mtx, aOffset[0], aOffset[1], col, nNumEdge);
+
+	if (m_info.pOrbitTire != nullptr)
+	{
+		m_info.pOrbitTire->EnableBlur(false);
+		m_info.pOrbitTire->EnableAdd(true);
+		m_info.pOrbitTire->SetAlphaTest(100);
+	}
+}
+
+//=====================================================
+// テールランプの有効化
+//=====================================================
+void CPlayer::EnableTailLamp(void)
+{
+	m_info.bTailLamp = true;
+
+	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.15f, 0.0f, 1.0f);
+}
+
+//=====================================================
+// テールランプの無効化
+//=====================================================
+void CPlayer::DisableTailLamp(void)
+{
+	m_info.bTailLamp = false;
+
+	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.15f, 0.0f, 0.0f);
 }
 
 //=====================================================

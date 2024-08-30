@@ -36,6 +36,7 @@ public:
 	// 変数取得・設定関数
 	void SetParam(float fParam) { m_fParam = fParam; }	// パラメーター
 	float GetParam(void) { return m_fParam; }
+	void SetPosition(D3DXVECTOR3 pos) override;	// 位置
 
 	// 静的メンバ関数
 	static CGauge *Create(float fParamMax);	// 生成処理

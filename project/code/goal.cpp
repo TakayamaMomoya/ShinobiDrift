@@ -9,13 +9,13 @@
 // インクルード
 //*****************************************************
 #include "goal.h"
-#include "universal.h"
 #include "debugproc.h"
 #include "effect3D.h"
 #include "fade.h"
 #include "game.h"
 #include "timer.h"
 #include "result.h"
+#include "texture.h"
 
 //*****************************************************
 // 定数定義
@@ -24,6 +24,7 @@ namespace
 {
 const float MOVESPEED = 4.0f;	// 移動速度
 const float WIDTH_GOAL = 100.0f;	// ゴールの幅
+const string PATH_TEX = "data\\TEXTURE\\UI\\goal.jpg";	// ゴールのテクスチャ
 }
 
 //*****************************************************
@@ -49,6 +50,7 @@ CGoal::CGoal(int nPriority)
 //=====================================================
 CGoal::~CGoal()
 {
+
 }
 
 //=====================================================
@@ -94,21 +96,22 @@ HRESULT CGoal::Init()
 void CGoal::SetGoal(void)
 {
 	// 始点・終点の計算
-	D3DXVECTOR3 vec = { sinf(m_fRot) * m_fLength ,0.0f,cosf(m_fRot) * m_fLength };
+	D3DXVECTOR3 vec = { sinf(m_fRot)* m_fLength ,0.0f,cosf(m_fRot) * m_fLength };
 
 	m_posStart = m_pos + vec;
 	m_posEnd = m_pos - vec;
 
 	if (m_pObj3D != nullptr)
 	{
-		// 色設定
-		m_pObj3D->SetColor(D3DXCOLOR(1.0f, 0.5f, 0.0f, 0.5f));
-
 		// サイズ設定
-		m_pObj3D->SetSize(WIDTH_GOAL, m_fLength);
+		m_pObj3D->SetSize(m_fLength, WIDTH_GOAL);
 
-		m_pObj3D->SetRotation(D3DXVECTOR3(0.0f, m_fRot, 0.0f));
+		m_pObj3D->SetRotation(D3DXVECTOR3(0.0f, m_fRot + D3DX_PI * 0.5f, 0.0f));
 		m_pObj3D->SetPosition(m_pos);
+
+		// テクスチャ設定
+		int nIdx = Texture::GetIdx(&PATH_TEX[0]);
+		m_pObj3D->SetIdxTexture(nIdx);
 	}
 }
 
@@ -146,9 +149,6 @@ void CGoal::Update()
 	// 移動量取得
 	D3DXVECTOR3 movePlayer = pPlayer->GetMove();
 
-	// タイマーの取得
-	CTimer* pTimer = CTimer::GetInstance();
-
 	// 交点の割合
 	float fCross = 0.0f;
 
@@ -169,23 +169,13 @@ void CGoal::Update()
 	{
 		if (fCross >= 0.0f && fCross <= 1.0f)
 		{// 始点と終点の間を通った時
+			pPlayer->SetEnableResultFlag(true);
+			pPlayer->SEtEnableBike(true);
+
 			// リザルトの生成
 			CResult::Create();
 		}
 	}
-
-#ifdef _DEBUG
-	CEffect3D::Create(m_posStart, 400.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	CEffect3D::Create(m_posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-#endif
-
-#if 0
-	CDebugProc::GetInstance()->Print("\nfCrossの値[%f]", fCross);
-	CDebugProc::GetInstance()->Print("\nbHit[%d]", bHit);
-	CDebugProc::GetInstance()->Print("\nbHitOld[%d]", bHitNext);
-	//CDebugProc::GetInstance()->Print("\nstartPosの位置[%f, %f, %f]", m_posStart.x, m_posStart.y, m_posStart.z);
-	//CDebugProc::GetInstance()->Print("\nendPosの位置[%f, %f, %f]", m_posEnd.x, m_posEnd.y, m_posEnd.z);
-#endif
 }
 
 //=====================================================

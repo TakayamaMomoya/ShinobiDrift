@@ -94,6 +94,9 @@ HRESULT COrbit::Init(void)
 	//頂点バッファをアンロックする
 	m_pVtxBuff->Unlock();
 
+	// 加算合成を有効化
+	EnableAdd(true);
+
 	return S_OK;
 }
 
@@ -217,11 +220,6 @@ void COrbit::Draw()
 	// カリングを無効化
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
-	// αブレンディングを加算合成に設定
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-
 	// ワールドマトリックスの初期化
 	D3DXMatrixIdentity(&m_mtxWorld);
 
@@ -258,11 +256,6 @@ void COrbit::Draw()
 
 	// カリングを有効化
 	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-
-	// αブレンディングを元に戻す
-	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 	// ライティング有効化
 	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
@@ -353,7 +346,7 @@ COrbit *COrbit::Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 posOffset1, D3DXVECTOR3 
 //==========================================
 // 位置設定処理
 //==========================================
-void COrbit::SetOffset(D3DXMATRIX mtxWorld, D3DXCOLOR col,int nIdxOrbit)
+void COrbit::SetOffset(D3DXMATRIX mtxWorld, D3DXCOLOR col)
 {
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();

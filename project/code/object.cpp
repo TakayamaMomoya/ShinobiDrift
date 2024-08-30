@@ -317,7 +317,7 @@ void CObject::DrawAll(void)
 		// クリアする
 		pDevice->Clear(0, nullptr,
 			(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
-			D3DCOLOR_RGBA(255, 255, 0, 255), 1.0f, 0);
+			COLOR_CLEAR, 1.0f, 0);
 	}
 
 	// カメラの取得
@@ -329,9 +329,8 @@ void CObject::DrawAll(void)
 	}
 
 	// オブジェクトの描画
-	DrawObject(true);
-
-	DrawObject(false);
+	DrawObject(true);	// ブラーするオブジェクトを全て描き切ってから
+	DrawObject(false);	// ブラーしないオブジェクトを描画する
 
 	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
 	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);

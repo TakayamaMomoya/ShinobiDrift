@@ -27,7 +27,7 @@
 class COrbit : public CObject
 {
 public:
-	COrbit(int nPriority = 6);	// コンストラクタ
+	COrbit(int nPriority = 5);	// コンストラクタ
 	~COrbit();	// デストラクタ
 
 	HRESULT Init(void);
@@ -35,7 +35,7 @@ public:
 	void Update(void);
 	void Draw(void);
 
-	void SetOffset(D3DXMATRIX mtxWorld, D3DXCOLOR col, int nIdxOrbit);
+	void SetOffset(D3DXMATRIX mtxWorld, D3DXCOLOR col);
 	static COrbit *Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 posOffset1, D3DXVECTOR3 posOffset2, D3DXCOLOR col, int nNumEdge, int nIdxTexture);
 	bool IsEnd(void) { return m_bEnd; }
 	void SetEnd(bool bEnd) { m_bEnd = bEnd; }

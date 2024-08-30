@@ -96,7 +96,7 @@ HRESULT CMeshField::Init(void)
 	m_col = { 1.0f,1.0f,1.0f,1.0f };
 
 	// 読込処理
-	//Load("data\\MAP\\field00.bin");
+	Load("data\\MAP\\field00.bin");
 
 	//Reset();
 
@@ -233,100 +233,7 @@ void CMeshField::Update(void)
 //=====================================================
 void CMeshField::Edit(void)
 {
-	CPlayer *pPlayer = CPlayer::GetInstance();
 
-	if (pPlayer == nullptr)
-	{
-		return;
-	}
-
-	float fLength;
-	D3DXVECTOR3 vecDiff;
-
-	// 頂点情報のポインタ
-	VERTEX_3D *pVtx;
-
-	// 頂点バッファをロックし、頂点情報へのポインタを取得
-	m_pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-
-	// 入力情報入手
-	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
-
-	if (pKeyboard->GetPress(DIK_UP))
-	{
-		for (int nCntVtx = 0; nCntVtx < m_MeshField.nNumVtx; nCntVtx++)
-		{
-			vecDiff = pPlayer->GetPosition() - pVtx[nCntVtx].pos;
-
-			fLength = D3DXVec3Length(&vecDiff);
-
-			if (fLength < CHENGE_LENGTH)
-			{
-				pVtx[nCntVtx].pos.y += 20.0f * (1.0f - (fLength / CHENGE_LENGTH));
-			}
-		}
-	}
-
-	if (pKeyboard->GetPress(DIK_DOWN))
-	{
-		for (int nCntVtx = 0; nCntVtx < m_MeshField.nNumVtx; nCntVtx++)
-		{
-			vecDiff = pPlayer->GetPosition() - pVtx[nCntVtx].pos;
-
-			fLength = D3DXVec3Length(&vecDiff);
-
-			if (fLength < CHENGE_LENGTH)
-			{
-				pVtx[nCntVtx].pos.y -= 20.0f * (1.0f - (fLength / CHENGE_LENGTH));
-			}
-		}
-	}
-
-	/*if (pKeyboard->GetPress(DIK_F))
-	{
-		m_col.r += 0.01f;
-	}
-	if (pKeyboard->GetPress(DIK_V))
-	{
-		m_col.r -= 0.01f;
-	}
-
-	if (pKeyboard->GetPress(DIK_G))
-	{
-		m_col.g += 0.01f;
-	}
-	if (pKeyboard->GetPress(DIK_B))
-	{
-		m_col.g -= 0.01f;
-	}
-
-	if (pKeyboard->GetPress(DIK_H))
-	{
-		m_col.b += 0.01f;
-	}
-	if (pKeyboard->GetPress(DIK_N))
-	{
-		m_col.b -= 0.01f;
-	}*/
-
-	// 頂点バッファをアンロック
-	m_pVtxBuff->Unlock();
-
-	if (pKeyboard->GetTrigger(DIK_RIGHT))
-	{
-		// 法線の設定
-		SetNormal();
-	}
-
-	if (pKeyboard->GetTrigger(DIK_F8))
-	{// 保存処理
-		Save();
-	}
-
-	if (pKeyboard->GetTrigger(DIK_F7))
-	{// 読込処理
-		Reset();
-	}
 }
 
 //=====================================================
@@ -710,13 +617,18 @@ void CMeshField::Dent(D3DXVECTOR3 pos,float fRadius,float fDepth)
 	{
 		// 差分の長さを取得
 		vecDiff = pos - (pVtx[nCnt].pos + GetPosition());
-		fLength = D3DXVec3Length(&vecDiff);
-
-		float fRate = fLength / fRadius;
+		fLength = sqrtf(vecDiff.x * vecDiff.x + vecDiff.z * vecDiff.z);
 
 		if (fLength < fRadius)
 		{
+			float fRate = fLength / fRadius * D3DX_PI;
+
+			fRate = cosf(fRate);
+
 			pVtx[nCnt].pos.y += fDepth - (fDepth * (fLength / fRadius));
+
+			// 頂点位置にエフェクトを出すよ
+			CEffect3D::Create(pVtx[nCnt].pos + GetPosition(), 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 		}
 	}
 
@@ -933,13 +845,13 @@ void CMeshField::Load(std::string path)
 //=====================================================
 // 保存処理
 //=====================================================
-void CMeshField::Save(void)
+void CMeshField::Save(std::string path)
 {
 	//ポインタ宣言
 	FILE *pFile;
 
 	//ファイルを開く
-	pFile = fopen("data\\MAP\\field00.bin", "wb");
+	pFile = fopen((const char*)&path[0], "wb");
 
 	if (pFile != nullptr)
 	{

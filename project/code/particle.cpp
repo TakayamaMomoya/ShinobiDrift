@@ -165,6 +165,7 @@ void CParticle::Update(void)
 			}
 
 			pEffect3D->SetVtx();
+			pEffect3D->EnableBlur(false);
 		}
 	}
 

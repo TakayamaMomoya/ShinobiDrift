@@ -33,6 +33,7 @@ public:
 	{
 		MOTION_NEUTRAL = 0,	// 待機
 		MOTION_WALK_FRONT,	// 前歩
+		MOTION_WALK_RESULT,	// 前歩
 		MOTION_MAX
 	};
 	enum MOTION_NINJA
@@ -40,6 +41,9 @@ public:
 		MOTION_NINJA_NEUTRAL = 0,	// 待機
 		MOTION_NINJA_SLASHDOWN,	// 切り下ろし
 		MOTION_NINJA_SLASHUP,	// 切り上げ
+		MOTION_NINJA_THROW_LEFT,	// 鉤縄(左)
+		MOTION_NINJA_THROW_RIGHT,	// 鉤縄(右)
+		MOTION_NINJA_RESULT,	// ゴール
 		MOTION_NINJA_MAX
 	};
 	enum STATE
@@ -75,23 +79,29 @@ public:
 	CBlockGrab *GetBlock(void) { return m_info.pBlockGrab; }
 	CMotion *GetNInjaBody(void) { return m_pPlayerNinja; }	// 上に乗っている忍者の取得
 	bool IsDrift(void) { return m_info.pBlockGrab != nullptr; }	// ドリフトしているかどうか
+	void EnableTailLamp(void);	// テールランプの有効化
+	void DisableTailLamp(void);	// テールランプの無効化
 
 	// 変数取得・設定関数
 	bool IsEnableInput(void) { return m_info.bEnableInput; }	// 入力有効フラグ
 	void SetEnableInput(bool bEnable) { m_info.bEnableInput = bEnable; }
 	float GetSpeed(void) { return m_info.fSpeed; }	// スピード
 	void SetSpeed(float fSpeed) { m_info.fSpeed = fSpeed; }
+	void SetEnableResultFlag(bool bFlag) { m_fragNinja.bGoal = bFlag; }
+	void SEtEnableBike(bool bFlag) { m_fragMotion.bResult = bFlag; }
 
 private:
 	struct SFragMotion
 	{
 		bool bMove;	// 移動
+		bool bResult;	// ゴール時
 	};
 	struct SFragNinja
 	{
 		bool bNeutral;	// 待機モーション
 		bool bSlashDown;	// 切り下ろし
 		bool bSlashUp;	// 切り上げ
+		bool bGoal;		// ゴール時
 	};
 	struct SInfo
 	{
@@ -114,11 +124,14 @@ private:
 		float fSizeBlurDrift;	// ドリフト時のブラーの強さ
 		float fDesityBlurDrift;	// ドリフト時のブラーの濃さ
 		COrbit* pOrbitLamp;	// テールランプの軌跡
+		bool bTailLamp;	// テールランプつけるフラグ
 		COrbit* pOrbitRope;	// テールランプの軌跡
+		COrbit* pOrbitTire;	// タイヤの軌跡
 		D3DXCOLOR orbitColorLamp;	// テールランプの軌跡
 		D3DXCOLOR orbitColorRope;	// テールランプの軌跡
 		D3DXVECTOR3 rotDriftStart;	// ドリフトスタート時の角度
 		float rotDriftDest;	// ドリフト終了時の角度補正値
+		CPolygon3D *pLampBreak;	// ブレーキランプ
 	};
 
 	void Load(void);
@@ -136,12 +149,17 @@ private:
 	void RemoveWire(void);	// ワイヤーを外す処理
 	void LimitDrift(float fLength);
 	void ManageSpeed(void);
+	void ManageTireOrbit(void);	// タイヤ軌跡の管理
 	void ManageSpeedBlur(void);	// スピードによるブラーの管理
 	void ManageState(void);
 	void ManageMotion(void);
 	void ManageMotionNinja(void);	// 忍者のモーション管理
 	void ManageSlashEffect(void);	// 斬撃エフェクトの管理
 	void Event(EVENT_INFO *pEventInfo);
+	void EnableBrakeLamp(void);	// ブレーキランプをつける
+	void DisableBrakeLamp(void);	// ブレーキランプを消す
+	void FollowBrakeLamp(void);	// ブレーキランプ追従
+	void EnableTireOrbit(void);	// タイヤ軌跡を有効化する
 	void Debug(void);
 
 	// メンバ変数

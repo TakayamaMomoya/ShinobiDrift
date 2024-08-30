@@ -37,11 +37,11 @@ public:
 	float GetRotation() { return m_fRot; }	// 向き取得処理
 
 	// 静的メンバ関数
-	static CGoal* Create(D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f }, float fRot = 0.0f, float fLength = 1000.0f);	// 生成
+	static CGoal* Create(D3DXVECTOR3 pos = { 0.0f,0.0f,0.0f }, float fRot = 0.0f, float fLength = 1500.0f);	// 生成
 	static CGoal *GetInstance(void) { return m_pGoal; }
 
 private:
-	//メンバ変数
+	// メンバ変数
 	int m_nTransitionTime;		// 遷移時間
 	D3DXVECTOR3 m_pos;		// 位置
 	D3DXVECTOR3 m_posStart;	// ゴールの始点
