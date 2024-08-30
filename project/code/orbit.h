@@ -36,7 +36,7 @@ public:
 	void Draw(void);
 
 	void SetOffset(D3DXMATRIX mtxWorld, D3DXCOLOR col, int nIdxOrbit);
-	static COrbit *Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 posOffset1, D3DXVECTOR3 posOffset2, D3DXCOLOR col, int nNumEdge);
+	static COrbit *Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 posOffset1, D3DXVECTOR3 posOffset2, D3DXCOLOR col, int nNumEdge, int nIdxTexture);
 	bool IsEnd(void) { return m_bEnd; }
 	void SetEnd(bool bEnd) { m_bEnd = bEnd; }
 	int GetID(void) { return m_nID; }

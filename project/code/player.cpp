@@ -30,6 +30,7 @@
 #include "guardRail.h"
 #include "playerNinja.h"
 #include "orbit.h"
+#include "texture.h"
 
 //*****************************************************
 // 定数定義
@@ -59,6 +60,7 @@ const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性倍
 const float HANDLE_INERTIA_DRIFT = 0.08f;  // ドリフト時の角度変更慣性倍率
 const float HANDLE_INERTIA_DEFAULT = 0.1f;  // ドリフト姿勢から通常姿勢に戻る時の角度変更慣性倍率
 const float HANDLE_CURVE_MAG = -0.04f;  // 体勢からカーブへの倍率
+const float HANDLE_SPEED_MAG = -0.005f;  // 体勢から速度への倍率
 const float ROT_CURVE_LIMIT = 0.025f;  // ハンドル操作がきく用になる角度の限界
 const float ROT_Y_DRIFT = 0.5f;  // ドリフト中のZ軸の角度
 const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
@@ -165,12 +167,13 @@ HRESULT CPlayer::Init(void)
 
 	// テールランプ用軌跡の生成
 	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
-	m_info.pOrbitLamp = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), m_info.orbitColorLamp, 60);
+	int nIdxTexture = CTexture::GetInstance()->Regist("data\\TEXTURE\\EFFECT\\orbit000.png");
+	m_info.pOrbitLamp = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), m_info.orbitColorLamp, 60, nIdxTexture);
 
 	// 縄用軌跡の生成
 	D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
 	m_info.orbitColorRope = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
-	m_info.pOrbitRope = COrbit::Create(mtxNinja, D3DXVECTOR3(40.0f, 0.0f, 0.0f), D3DXVECTOR3(-40.0f, 0.0f, 0.0f), m_info.orbitColorRope, 4);
+	m_info.pOrbitRope = COrbit::Create(mtxNinja, D3DXVECTOR3(40.0f, 0.0f, 0.0f), D3DXVECTOR3(-40.0f, 0.0f, 0.0f), m_info.orbitColorRope, 4, nIdxTexture);
 
 	// サウンドインスタンスの取得
 	CSound* pSound = CSound::GetInstance();
@@ -622,7 +625,7 @@ void CPlayer::JudgeRemoveWire(float fLength)
 
 	if (m_info.bManual)
 	{
-		if (fLength <= 0.5f)
+		if (fLength <= 0.4f)
 		{// スティックを離したらワイヤーを外す
 			RemoveWire();
 		}
@@ -858,8 +861,10 @@ void CPlayer::Collision(void)
 
 	// プレイヤー側の当たり判定サイズから判定用OBBを設定
 	D3DXVECTOR3 paramSize = m_param.sizeCollider;
+	universal::LimitRot(&m_info.rotDriftStart.y);
 	D3DXVECTOR3 sizeX = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, m_info.rotDriftStart.y, 0.0f), paramSize);
-	D3DXVECTOR3 sizeZ = universal::PosRelativeMtx(D3DXVECTOR3(0.0f, 0.0f, 0.0f), D3DXVECTOR3(0.0f, -m_info.rotDriftStart.y, 0.0f), D3DXVECTOR3(paramSize.x, 0.0f, paramSize.z));
+	sizeX.x = fabsf(sizeX.x);
+	sizeX.z = fabsf(sizeX.z);
 
 	// タイヤの位置保存
 	posParts[0] = universal::GetMtxPos(GetParts(2)->pParts->GetMatrix()) + (pos - posOld);
@@ -930,11 +935,21 @@ void CPlayer::Collision(void)
 
 			if (pBlock->Collide(&posParts[1], posOldParts[1]))
 				bRoad[1] = true;
-		}
 
-		// 両方が判定を通っていたら抜ける
-		if (bRoad[0] && bRoad[1])
-			break;
+			if (pBlock->CollideSide(&pos, &move, sizeX, &m_info.fSpeed))
+			{
+				// 一か所判定したら抜ける
+				rot.y = atan2f(move.x, move.z);
+
+				// ドリフト中の時ドリフト状態を解除する
+				m_info.rotDriftDest = 0.0f;
+				RemoveWire();
+
+				// 両方が判定を通っていたら抜ける
+				if (bRoad[0] && bRoad[1])
+					break;
+			}
+		}
 
 		// 次のアドレスを代入
 		pBlock = pBlockNext;
@@ -1102,6 +1117,8 @@ void CPlayer::ManageSpeed(void)
 		{
 			rot.y += rot.z * HANDLE_CURVE_MAG;
 			universal::LimitRot(&rot.y);
+
+			m_info.fSpeed *= 1.0f - fabsf(rot.z * HANDLE_SPEED_MAG);
 		}
 	}
 	else

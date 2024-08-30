@@ -15,28 +15,28 @@ NUM_BLOCK = 39
 INFOBLOCK
  TAG = wall00
  MODEL = data\\MODEL\\BLOCK\\wall00.x
- SNAG = 1
+ SNAG = 0
 END_INFOBLOCK
 
 #1番目のブロック
 INFOBLOCK
  TAG = wall01
  MODEL = data\\MODEL\\BLOCK\\wall01.x
- SNAG = 1
+ SNAG = 0
 END_INFOBLOCK
 
 #2番目のブロック
 INFOBLOCK
  TAG = bill00
  MODEL = data\\MODEL\\BLOCK\\bill00.x
- SNAG = 1
+ SNAG = 0
 END_INFOBLOCK
 
 #3番目のブロック
 INFOBLOCK
  TAG = bill01
  MODEL = data\\MODEL\\BLOCK\\bill01.x
- SNAG = 1
+ SNAG = 0
 END_INFOBLOCK
 
 #4番目のブロック
@@ -232,7 +232,7 @@ END_INFOBLOCK
 INFOBLOCK
  TAG = Pillar
  MODEL = data\MODEL\block\pillar.x
- SNAG = 0
+ SNAG = 1
 END_INFOBLOCK
 
 #32番目のブロック
