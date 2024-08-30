@@ -14,6 +14,7 @@
 #include "shuriken.h"
 #include "player.h"
 #include "orbit.h"
+#include "texture.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -78,8 +79,8 @@ HRESULT CEnemy::Init(void)
 	pBehaviour->Init(this);
 
 	m_listBehaviour.push_back(pBehaviour);
-
-	m_info.pOrbit = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60);
+	int nIdxTexture = CTexture::GetInstance()->Regist("data\\TEXTURE\\EFFECT\\orbit000.png");
+	m_info.pOrbit = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60, nIdxTexture);
 
 	return S_OK;
 }

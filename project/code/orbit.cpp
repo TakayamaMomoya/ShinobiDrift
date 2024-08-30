@@ -53,7 +53,7 @@ HRESULT COrbit::Init(void)
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
 
 	// テクスチャ読込
-	m_nIdxTexture = CTexture::GetInstance()->Regist("data\\TEXTURE\\EFFECT\\orbit000.png");
+	// m_nIdxTexture = CTexture::GetInstance()->Regist("data\\TEXTURE\\EFFECT\\orbit000.png");
 
 	if (m_pVtxBuff == nullptr)
 	{
@@ -264,7 +264,7 @@ void COrbit::Draw()
 //==========================================
 // 生成処理
 //==========================================
-COrbit *COrbit::Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 posOffset1, D3DXVECTOR3 posOffset2, D3DXCOLOR col,int nNumEdge)
+COrbit *COrbit::Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 posOffset1, D3DXVECTOR3 posOffset2, D3DXCOLOR col,int nNumEdge, int nIdxTexture)
 {
 	// デバイスの取得
 	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
@@ -295,6 +295,9 @@ COrbit *COrbit::Create(D3DXMATRIX mtxWorld, D3DXVECTOR3 posOffset1, D3DXVECTOR3 
 
 			// 辺の数の代入
 			pOrbit->m_nNumEdge = nNumEdge;
+
+			// テクスチャ番号の代入
+			pOrbit->m_nIdxTexture = nIdxTexture;
 
 			for (int nCntVtx = 0; nCntVtx < nNumEdge; nCntVtx++)
 			{
