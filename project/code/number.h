@@ -26,7 +26,7 @@ class CUI;
 class CNumber : public CObject
 {
 public:
-	CNumber(int nPriority = 7);	// コンストラクタ
+	CNumber(int nPriority = 6);	// コンストラクタ
 	~CNumber();	// デストラクタ
 
 	HRESULT Init(void);

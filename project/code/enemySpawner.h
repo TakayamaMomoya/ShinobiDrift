@@ -19,7 +19,7 @@
 class CEnemySpawner : public CObject3D
 {
 public:
-	CEnemySpawner(int nPriority = 7);	// コンストラクタ
+	CEnemySpawner(int nPriority = 0);	// コンストラクタ
 	~CEnemySpawner();	//	デストラクタ
 
 	// メンバ関数

@@ -113,15 +113,17 @@ HRESULT CGame::Init(void)
 	// スロー管理の生成
 	CSlow::Create();
 
-	// ゴール生成
-	CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), D3DX_PI);
-	//CGoal::Create(D3DXVECTOR3(12726.0f, 2500.7f, -27695.0f), D3DX_PI);
-
 	// メッシュロード生成
 	CMeshRoad::Create(PATH_GAME_ROAD);
 
+#if 0
+	CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), D3DX_PI);
 	// チュートリアルの生成
 	CTutorial::Create();
+#else
+	// ゴール生成
+	CGoal::Create(D3DXVECTOR3(12726.0f, 2500.7f, -27695.0f), D3DX_PI);
+#endif
 
 	// メッシュフィールドの生成
 	CMeshField *pMeshField = CMeshField::Create();
@@ -211,13 +213,16 @@ void CGame::ManageState(void)
 		break;
 
 		break;
+	case CGame::STATE_RESULT:
+
+		break;
 	case CGame::STATE_END:
 
 		m_nCntState++;
 
 		if (m_nCntState >= TRANS_TIME && pFade != nullptr)
 		{
-			pFade->SetFade(CScene::MODE_RANKING);
+			pFade->SetFade(CScene::MODE_TITLE);
 		}
 
 		break;
@@ -231,7 +236,7 @@ void CGame::ManageState(void)
 //=====================================================
 void CGame::UpdateGameTimer(void)
 {
-	if (m_pGameTimer == nullptr)
+	if (m_pGameTimer == nullptr || m_state != STATE::STATE_NORMAL)
 		return;
 
 	float fSecond = CManager::GetDeltaTime();

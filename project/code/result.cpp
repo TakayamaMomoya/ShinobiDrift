@@ -17,6 +17,9 @@
 #include "game.h"
 #include "number.h"
 #include "timer.h"
+#include "polygon2D.h"
+#include "blur.h"
+#include "debugproc.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -25,6 +28,8 @@ namespace
 {
 const D3DXVECTOR3 POS_DISP_TIME = { SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.4f, 0.0f };	// ƒ^ƒCƒ€‚Ì•\Ž¦ˆÊ’u
 const string PATH_SAVE = "data\\BYNARY\\gametime.bin";	// ƒQ[ƒ€‚Ì‹L˜^ŽžŠÔ‚Ì•Û‘¶
+const D3DXCOLOR COL_BACK = { 0.0f ,0.0f,0.0f,0.6f };	// ”wŒiƒ|ƒŠƒSƒ“‚ÌF
+const float SPEED_BACK_COLOR = 0.2f;	// ”wŒi‚Ìo‚Ä‚­‚éƒXƒs[ƒh
 }
 
 //=====================================================
@@ -76,6 +81,16 @@ HRESULT CResult::Init(void)
 
 	// ƒXƒeƒCƒg‚Ì•ÏX
 	ChangeState(new CStateResultDispTime);
+	
+	// ƒQ[ƒ€ƒ^ƒCƒ}[‚Ìíœ
+	CGame *pGame = CGame::GetInstance();
+
+	if (pGame == nullptr)
+		return E_FAIL;
+
+	pGame->ReleaseGameTimer();
+
+	EnableBack();
 
 	return S_OK;
 }
@@ -151,6 +166,9 @@ void CResult::Update(void)
 	{
 		m_pState->Update(this);
 	}
+
+	// ”wŒiƒ|ƒŠƒSƒ“‚ÌF‚Ì•â³
+	UpdateBack();
 }
 
 //=====================================================
@@ -159,6 +177,24 @@ void CResult::Update(void)
 void CResult::Draw(void)
 {
 
+}
+
+//=====================================================
+// ”wŒiƒ|ƒŠƒSƒ“‚ÌXV
+//=====================================================
+void CResult::UpdateBack(void)
+{
+	if (m_pBack == nullptr)
+		return;
+
+	// F‚ð–Ú•W‚ÌF‚ÉŒü‚©‚Á‚Ä•â³‚·‚é
+	D3DXCOLOR col = m_pBack->GetCol();
+
+	col += (COL_BACK - col) * SPEED_BACK_COLOR;
+
+	m_pBack->SetCol(col);
+
+	CDebugProc::GetInstance()->Print("\nF[%f,%f,%f,%f]", col.r, col.g, col.b, col.a);
 }
 
 //=====================================================
@@ -192,6 +228,30 @@ void CResult::StartFade(void)
 		return;
 
 	pGame->SetState(CGame::STATE::STATE_END);
+}
+
+//=====================================================
+// ”wŒi‚Ì—LŒø‰»
+//=====================================================
+void CResult::EnableBack(void)
+{
+	if (m_pBack != nullptr)
+		return;
+
+	// ”wŒiƒ|ƒŠƒSƒ“‚Ì¶¬
+	m_pBack = CPolygon2D::Create(7);
+
+	if (m_pBack == nullptr)
+		return;
+
+	m_pBack->SetPosition(SCRN_MID);
+	m_pBack->SetSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	m_pBack->SetVtx();
+	m_pBack->EnableBlur(false);
+	m_pBack->EnableAdd(true);
+
+	// Š®‘S‚É“§–¾‚ÉÝ’è
+	m_pBack->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
 }
 
 //=====================================================

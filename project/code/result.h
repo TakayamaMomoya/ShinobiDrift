@@ -19,6 +19,7 @@ class CUI;
 class CStateResult;
 class CNumber;
 class CTimer;
+class CPolygon2D;
 
 //*****************************************************
 // クラスの定義
@@ -34,8 +35,10 @@ public:
 	virtual void Uninit(void);	// 終了
 	virtual void Update();	// 更新
 	virtual void Draw();	// 描画
+	void UpdateBack(void);	// 背景ポリゴンの更新
 	void ChangeState(CStateResult *pState);	// ステイトの変更
 	void StartFade(void);	// フェード
+	void EnableBack(void);	// 背景の有効化
 
 	// 変数取得・設定関数
 
@@ -49,6 +52,7 @@ private:
 
 	// メンバ変数
 	CStateResult *m_pState;
+	CPolygon2D *m_pBack;	// 背景のポリゴン
 };
 
 class CStateResult
@@ -77,14 +81,6 @@ public:
 	void Update(CResult *pResult) override;	// 更新処理
 
 private:
-	enum E_NUMBER
-	{
-		NUMBER_MINUTE = 0,	// 分表示
-		NUMBER_SECOND,	// 秒表示
-		NUMBER_MILLISSEC,	// ミリ秒表示
-		NUMBER_MAX
-	};
-
 	// メンバ関数
 	void SetNumber(void);	// 数字の設定
 

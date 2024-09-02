@@ -161,11 +161,6 @@ void CEffect3D::Draw(void)
 		pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	}
 
-	// アルファテストの無効化
-	pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-	pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);
-	pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
-
 	// ライティングを無効化
 	pDevice->SetRenderState(D3DRS_LIGHTING,FALSE);
 
