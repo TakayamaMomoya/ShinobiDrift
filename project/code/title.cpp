@@ -170,6 +170,7 @@ HRESULT CTitle::Init(void)
 		int nIdx = CModel::Load("data\\MODEL\\block\\hangar.x");
 		m_pGarage->BindModel(nIdx);
 		m_pGarage->SetPosition(D3DXVECTOR3(0.0f, 1000.0f, 0.0f));
+		m_pGarage->SetRotation(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 	}
 
 	// 背景オブジェクトの生成
