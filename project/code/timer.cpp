@@ -113,6 +113,9 @@ HRESULT CTimer::Init(void)
 	// 数字のトランスフォームの設定
 	TransformNumber();
 
+	// ゲームUIの削除
+
+
 	return S_OK;
 }
 
@@ -127,6 +130,13 @@ void CTimer::Uninit(void)
 	}
 
 	m_aNumber.clear();
+
+	for (auto it : m_aColon)
+	{
+		it->Uninit();
+	}
+
+	m_aColon.clear();
 
 	CGameObject::Uninit();
 }
@@ -243,6 +253,39 @@ void CTimer::SetScaleNumber(float fScale)
 
 	// 数字のトランスフォームの設定
 	TransformNumber();
+}
+
+//=====================================================
+// 色の設定
+//=====================================================
+void CTimer::SetColor(E_Number number, D3DXCOLOR col)
+{
+	if (number < 0 || number > E_Number::NUMBER_MAX)
+		return;
+
+	if (number == E_Number::NUMBER_MAX)
+	{// 全数字の色設定
+		for (auto it : m_aNumber)	// 数字
+			it->SetColor(col);
+
+		for (auto it : m_aColon)	// コロン
+			it->SetCol(col);
+	}
+	else
+	{// 各数字の色設定
+		m_aNumber[number]->SetColor(col);
+	}
+}
+
+//=====================================================
+// 色の取得
+//=====================================================
+D3DXCOLOR CTimer::GetColor(E_Number number)
+{
+	if (number < 0 || number >= E_Number::NUMBER_MAX)
+		return D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
+
+	return m_aNumber[number]->GetColor();
 }
 
 //=====================================================

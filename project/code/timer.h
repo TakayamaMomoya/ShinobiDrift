@@ -24,6 +24,15 @@ class CUI;
 class CTimer : public CGameObject
 {
 public:
+	// 列挙型定義
+	enum E_Number
+	{// 数字の種類
+		NUMBER_MINUTE = 0,	// 分
+		NUMBER_SECOND,	// 秒
+		NUMBER_MILLI,	// ミリ秒
+		NUMBER_MAX
+	};
+
 	CTimer();	// コンストラクタ
 	~CTimer();	// デストラクタ
 
@@ -42,20 +51,13 @@ public:
 	void SetPosition(D3DXVECTOR3 pos) override;	// 位置
 	void SetScaleNumber(float fScale);	// 数字のスケール
 	float GetScaleNumber(void) { return m_fScaleNumber; }
+	void SetColor(E_Number number,D3DXCOLOR col);	// 色
+	D3DXCOLOR GetColor(E_Number number);
 
 	// 静的メンバ関数
 	static CTimer *Create();	// 生成
 
 private:
-	// 列挙型定義
-	enum E_Number
-	{// 数字の種類
-		NUMBER_MINUTE = 0,	// 分
-		NUMBER_SECOND,	// 秒
-		NUMBER_MILLI,	// ミリ秒
-		NUMBER_MAX
-	};
-
 	// メンバ関数
 	void UpdateNumber();	// 数字の更新
 	void TransformNumber();	// 数字のトランスフォーム設定
