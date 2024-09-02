@@ -24,6 +24,7 @@ class CFan3D;
 class CMotion;
 class COrbit;
 class CTitleBehavior;
+class CObjectX;
 
 //*****************************************************
 // クラスの定義
@@ -50,24 +51,29 @@ public:
 	static CMotion *GetPlayer(void) { return m_pPlayer; }
 	static CMotion *GetBike(void) { return m_pBike; }
 	void PlayerAcceleration(void);  // プレイヤーが加速する
+	void DoorOpen(void);            // 格納庫のドアが開く
 	
 private:
 
-	STATE m_state;				// 状態
-	CPolygon2D *m_pTitleLogo;   // タイトルロゴのポインタ
-	CPolygon2D *m_pTeamLogo;    // チームロゴのポインタ
-	CFan3D *m_pFan3D;           // トンネルの扉のポインタ
-	COrbit *m_pOrbitLamp;       // テールランプのポインタ
-	static CMotion *m_pPlayer;	// プレイヤーモデル
-	static CMotion *m_pBike;   // バイクモデル
+	STATE m_state;				    // 状態
+	CPolygon2D *m_pTitleLogo;       // タイトルロゴのポインタ
+	CPolygon2D *m_pTeamLogo;        // チームロゴのポインタ
+	CFan3D *m_pFan3D;               // トンネルの扉のポインタ
+	COrbit *m_pOrbitLamp;           // テールランプのポインタ
+	CObjectX *m_pDoorFrame;         // 格納庫のドアフレームのポインタ
+	CObjectX *m_pRightDoor;         // 格納庫のドアの右のポインタ
+	CObjectX *m_pLeftDoor;          // 格納庫のドアの左のポインタ
+	CObjectX *m_pGarage;            // 格納庫のポインタ
+	static CMotion *m_pPlayer;	    // プレイヤーモデル
+	static CMotion *m_pBike;        // バイクモデル
 	CTitleBehavior *m_pBehavior;	// ビヘイビア
-	float m_fTImerSmoke;	// 煙のスポーンタイマー
+	float m_fTImerSmoke;	        // 煙のスポーンタイマー
 };
 
 class CTitleBehavior
 {// 基本ビヘイビア
 public:
-	CTitleBehavior();	// コンストラクタ
+	CTitleBehavior();	        // コンストラクタ
 	virtual ~CTitleBehavior();	// デストラクタ
 
 	virtual void Update(CTitle *pTItle) = 0;
@@ -78,7 +84,7 @@ private:
 class CTitleStart : public CTitleBehavior
 {// スタート表示状態
 public:
-	CTitleStart();	// コンストラクタ
+	CTitleStart();	        // コンストラクタ
 	virtual ~CTitleStart();	// デストラクタ
 	void Update(CTitle *pTItle) override;
 
@@ -92,23 +98,22 @@ class CTitleMenu : public CTitleBehavior
 public:
 	enum MENU
 	{
-		MENU_GAME = 0,	// ゲーム
-		MENU_TRANING,	// 訓練場
+		MENU_GAME = 0,	    // ゲーム
+		MENU_TRANING,	    // 訓練場
 		MENU_MAX
 	};
 
-	CTitleMenu();	// コンストラクタ
+	CTitleMenu();	        // コンストラクタ
 	virtual ~CTitleMenu();	// デストラクタ
 	void Update(CTitle *pTItle) override;
 
 private:
 	void Input(void);
 	void ManageCursor(void);
-	//void Fade(void);
 	
 	CPolygon2D *m_apMenu[MENU_MAX];	// メニュー項目
-	CPolygon2D *m_pCursor;	// カーソル
-	MENU m_menu;	// 選択メニュー項目
+	CPolygon2D *m_pCursor;	        // カーソル
+	MENU m_menu;	                // 選択メニュー項目
 
 	bool m_bFade = false;
 };
@@ -116,7 +121,7 @@ private:
 class CTitleBehindPlayer : public CTitleBehavior
 {// プレイヤーの背後に回る
 public:
-	CTitleBehindPlayer();  // コンストラクタ
+	CTitleBehindPlayer();           // コンストラクタ
 	virtual ~CTitleBehindPlayer();  // デストラクタ
 	void Update(CTitle* pTItle) override;
 
@@ -127,7 +132,7 @@ private:
 class CTitlePlayerAcceleration : public CTitleBehavior
 {// プレイヤーが加速し始める
 public:
-	CTitlePlayerAcceleration();  // コンストラクタ
+	CTitlePlayerAcceleration();           // コンストラクタ
 	virtual ~CTitlePlayerAcceleration();  // デストラクタ
 	void Update(CTitle* pTItle) override;
 
@@ -138,7 +143,7 @@ private:
 class CTitleMovePlayer : public CTitleBehavior
 {
 public:
-	CTitleMovePlayer();  // コンストラクタ
+	CTitleMovePlayer();           // コンストラクタ
 	virtual ~CTitleMovePlayer();  // デストラクタ
 	void Update(CTitle* pTItle) override;
 
@@ -149,12 +154,12 @@ private:
 class CTitleFadePlayer : public CTitleBehavior
 {
 public:
-	CTitleFadePlayer();  // コンストラクタ
+	CTitleFadePlayer();           // コンストラクタ
 	virtual ~CTitleFadePlayer();  // デストラクタ
 	void Update(CTitle* pTItle) override;
 
 private:
-	void Fade(void);  // フェード処理
+	void Fade(void);              // フェード処理
 
 };
 

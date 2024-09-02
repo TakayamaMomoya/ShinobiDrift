@@ -82,6 +82,10 @@ CTitle::CTitle()
 	m_pPlayer = nullptr;
 	m_pBehavior = nullptr;
 	m_pOrbitLamp = nullptr;
+	m_pDoorFrame = nullptr;
+	m_pRightDoor = nullptr;
+	m_pLeftDoor = nullptr;
+	m_pGarage = nullptr;
 	m_fTImerSmoke = 0.0f;
 }
 
@@ -121,17 +125,17 @@ HRESULT CTitle::Init(void)
 		return E_FAIL;
 	}
 
-	// タイトルロゴの生成
-	m_pTitleLogo = CPolygon2D::Create(7);
+	//// タイトルロゴの生成
+	//m_pTitleLogo = CPolygon2D::Create(7);
 
-	if (m_pTitleLogo != nullptr)
-	{
-		m_pTitleLogo->SetSize(TITLE_LOGO_WIDTH, TITLE_LOGO_HEIGHT);
-		m_pTitleLogo->SetPosition(TITLE_LOGO_POS);
-		int nIdx = CTexture::GetInstance()->Regist(TITLE_LOGO_PATH);
-		m_pTitleLogo->SetIdxTexture(nIdx);
-		m_pTitleLogo->SetVtx();
-	}
+	//if (m_pTitleLogo != nullptr)
+	//{
+	//	m_pTitleLogo->SetSize(TITLE_LOGO_WIDTH, TITLE_LOGO_HEIGHT);
+	//	m_pTitleLogo->SetPosition(TITLE_LOGO_POS);
+	//	int nIdx = CTexture::GetInstance()->Regist(TITLE_LOGO_PATH);
+	//	m_pTitleLogo->SetIdxTexture(nIdx);
+	//	m_pTitleLogo->SetVtx();
+	//}
 
 	// チームロゴの生成
 	m_pTeamLogo = CPolygon2D::Create(7);
@@ -158,14 +162,45 @@ HRESULT CTitle::Init(void)
 
 	Camera::ChangeState(new CCameraStateTitle);
 
-	//// 背景オブジェクトの生成
-	//CObjectX* pArsenal = CObjectX::Create();
+	// 背景オブジェクトの生成
+	m_pGarage = CObjectX::Create();
 
-	//if (pArsenal != nullptr)
-	//{
-	//	int nIdx = CModel::Load("data\\MODEL\\other\\arsenal.x");
-	//	pArsenal->BindModel(nIdx);
-	//}
+	if (m_pGarage != nullptr)
+	{
+		int nIdx = CModel::Load("data\\MODEL\\block\\hangar.x");
+		m_pGarage->BindModel(nIdx);
+		m_pGarage->SetPosition(D3DXVECTOR3(0.0f, 1000.0f, 0.0f));
+	}
+
+	// 背景オブジェクトの生成
+	m_pDoorFrame = CObjectX::Create();
+
+	if (m_pDoorFrame != nullptr)
+	{
+		int nIdx = CModel::Load("data\\MODEL\\block\\door.x");
+		m_pDoorFrame->BindModel(nIdx);
+		m_pDoorFrame->SetPosition(D3DXVECTOR3(0.0f, 1000.0f, 2000.0f));
+	}
+
+	// 背景オブジェクトの生成
+	m_pRightDoor = CObjectX::Create();
+
+	if (m_pRightDoor != nullptr)
+	{
+		int nIdx = CModel::Load("data\\MODEL\\block\\door01.x");
+		m_pRightDoor->BindModel(nIdx);
+		m_pRightDoor->SetPosition(D3DXVECTOR3(590.0f, 1000.0f, 1900.0f));
+	}
+
+	// 背景オブジェクトの生成
+	m_pLeftDoor = CObjectX::Create();
+
+	if (m_pLeftDoor != nullptr)
+	{
+		int nIdx = CModel::Load("data\\MODEL\\block\\door02.x");
+		m_pLeftDoor->BindModel(nIdx);
+		m_pLeftDoor->SetPosition(D3DXVECTOR3(-590.0f, 1000.0f, 1900.0f));
+	}
 
 	CMeshCylinder *pCylinder = CMeshCylinder::Create(32, 1000);
 
@@ -217,7 +252,8 @@ HRESULT CTitle::Init(void)
 	}
 
 	// テールランプ生成
-	m_pOrbitLamp = COrbit::Create(m_pPlayer->GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60);
+	int nIdxTexture = CTexture::GetInstance()->Regist("data\\TEXTURE\\EFFECT\\orbit000.png");
+	m_pOrbitLamp = COrbit::Create(m_pPlayer->GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60, nIdxTexture);
 
 	return S_OK;
 }
@@ -317,6 +353,43 @@ void CTitle::PlayerAcceleration(void)
 	m_pPlayer->SetPosition(D3DXVECTOR3(0.0f, 50.0f, -10.0f));
 	m_pBike->MultiplyMtx(false);
 	m_pPlayer->SetMatrixParent(m_pBike->GetMatrix());
+}
+
+//=====================================================
+// 格納庫のドアが開く処理
+//=====================================================
+void CTitle::DoorOpen(void)
+{
+	if (m_pRightDoor == nullptr)
+		return;
+
+	if (m_pLeftDoor == nullptr)
+		return;
+
+	D3DXVECTOR3 RightDoorPos = m_pRightDoor->GetPosition();
+
+	if(RightDoorPos.x <= 1800.0f)
+	   RightDoorPos.x += 10.0f;
+
+	// バイクの位置設定
+	m_pRightDoor->SetPosition(RightDoorPos);
+
+	D3DXVECTOR3 LeftDoorPos = m_pLeftDoor->GetPosition();
+
+	if (LeftDoorPos.x >= -1800.0f)
+	    LeftDoorPos.x -= 10.0f;
+
+	// バイクの位置設定
+	m_pLeftDoor->SetPosition(LeftDoorPos);
+
+	if (RightDoorPos.x >= 1800.0f && LeftDoorPos.x <= -1800.0f)
+	{
+		if (m_pPlayer->GetMotion() != CPlayer::MOTION_NINJA_SLASHDOWN)
+			m_pPlayer->SetMotion(CPlayer::MOTION_NINJA_SLASHDOWN);
+	}
+	
+	CDebugProc::GetInstance()->Print("\nドアの右 [%f, %f, %f]", m_pRightDoor->GetPosition().x, m_pRightDoor->GetPosition().y, m_pRightDoor->GetPosition().z);
+	CDebugProc::GetInstance()->Print("\nドアの左 [%f, %f, %f]", m_pLeftDoor->GetPosition().x, m_pLeftDoor->GetPosition().y, m_pLeftDoor->GetPosition().z);
 }
 
 //=====================================================================
@@ -601,8 +674,8 @@ void CTitleBehindPlayer::Update(CTitle* pTItle)
 	if (pBike == nullptr)
 		return;
 
-	if(pNinja->GetMotion() != CPlayer::MOTION_NINJA_SLASHDOWN)
-	   pNinja->SetMotion(CPlayer::MOTION_NINJA_SLASHDOWN);
+	// 格納庫のドアが開く
+	pTItle->DoorOpen();
 
 	// カメラ位置の設定
 	CCamera* pCamera = CManager::GetCamera();
