@@ -41,6 +41,9 @@ const string PATH_TEX_CAPTION = "data\\TEXTURE\\UI\\resultCaption00.png";	// ƒLƒ
 const D3DXVECTOR3 POS_CAPTION_INITIAL = { 1.0f + SIZE_CAPTION.x,0.4f,0.0f };	// ƒLƒƒƒvƒVƒ‡ƒ“‚Ì‰ŠúˆÊ’u
 const D3DXVECTOR3 POS_CAPTION_DEST = { 0.5f,0.4f,0.0f };	// ƒLƒƒƒvƒVƒ‡ƒ“‚Ì–Ú•WˆÊ’u
 const float SPEED_CAPTION = 0.05f;	// ƒLƒƒƒvƒVƒ‡ƒ“‚ÌƒXƒs[ƒh
+const D3DXVECTOR3 POS_MENU_DEFAULT = { 0.6f,0.5f,0.0f };	// ƒƒjƒ…[‚ÌƒfƒtƒHƒ‹ƒgˆÊ’u
+const D3DXVECTOR2 SIZE_MENU_DEFAULT = { 0.3f,0.2f };	// ƒƒjƒ…[‚ÌƒfƒtƒHƒ‹ƒgƒTƒCƒY
+const D3DXVECTOR3 POS_MENU_INITIAL = { 1.0f + SIZE_MENU_DEFAULT.x,0.5f,0.0f };	// ƒƒjƒ…[‚Ì‰ŠúˆÊ’u
 }
 
 //=====================================================
@@ -321,7 +324,33 @@ void CStateResultDispTime::Init(CResult *pResult)
 	}
 
 	// ƒƒjƒ…[€–Ú‚Ì¶¬
-	
+	m_aMenuPolygon.resize(E_Menu::MENU_MAX);
+
+	string aPath[E_Menu::MENU_MAX] =
+	{// ƒƒjƒ…[€–Ú‚ÌƒeƒNƒXƒ`ƒƒƒpƒX
+		"data\\TEXTURE\\UI\\resultMenu00.png",
+		"data\\TEXTURE\\UI\\resultMenu01.png",
+	};
+
+	for (int i = 0; i < E_Menu::MENU_MAX; i++)
+	{
+		if (m_aMenuPolygon[i] != nullptr)
+			continue;
+
+		m_aMenuPolygon[i] = CUI::Create();
+
+		if (m_aMenuPolygon[i] == nullptr)
+			continue;
+
+		// ƒ|ƒŠƒSƒ“‚Ìİ’è
+		m_aMenuPolygon[i]->SetPosition(POS_MENU_INITIAL);
+		m_aMenuPolygon[i]->SetSize(SIZE_MENU_DEFAULT.x, SIZE_MENU_DEFAULT.y);
+
+		// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+		int nIdxTexture = CTexture::GetInstance()->Regist(&aPath[i][0]);
+		m_aMenuPolygon[i]->SetIdxTexture(nIdxTexture);
+		m_aMenuPolygon[i]->SetVtx();
+	}
 }
 
 //=====================================================
