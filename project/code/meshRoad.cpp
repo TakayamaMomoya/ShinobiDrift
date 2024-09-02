@@ -135,35 +135,8 @@ void CMeshRoad::Uninit(void)
 void CMeshRoad::Update(void)
 {
 #ifdef _DEBUG
-	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = GetVtxBuff();
-	VERTEX_3D* pVtx;
-
-	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
-	
-	D3DXVECTOR3 pos = pVtx[m_nCurrentVtx].pos;
-
-	CEffect3D::Create(pos, 500.0f,5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-
-	CDebugProc::GetInstance()->Print("\nTex[%f,%f]", pVtx[m_nCurrentVtx].tex.x, pVtx[m_nCurrentVtx].tex.y);
-	CDebugProc::GetInstance()->Print("\nCurrent[%d]", m_nCurrentVtx);
-
-	pVtxBuff->Unlock();
-
-	CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
-
-	if (pKeyboard->GetTrigger(DIK_UP))
-		m_nCurrentVtx += 2;
-	else if(pKeyboard->GetTrigger(DIK_DOWN))
-		m_nCurrentVtx -= 2;
-
-	if (m_nNumVtx <= m_nCurrentVtx)
-	{
-		m_nCurrentVtx = m_nNumVtx - 1;
-	}
-
 	for(auto it : m_aRoadPoint)
-		CEffect3D::Create(it.pos, 250.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-
+		CEffect3D::Create(it.pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 #endif // _DEBUG
 }
 
@@ -512,23 +485,13 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 		// 法線の設定
 		SetNormal(pVtx);
 
-		//if (nIdx % 2 != 0)
-		{// 偶数番目のものなら反対にする
-			//*pTex -= fAddTex;
-		}
-		//else
-		{
-			*pTex += fAddTex;
-		}
+		*pTex += fAddTex;
 
 		pVtx[0].tex = { 0.0f,*pTex };
 		pVtx[1].tex = { 1.0f,*pTex };
 
-		if (i == 9)
-		{
-			CEffect3D::Create(pVtx[0].pos, 100.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-			CEffect3D::Create(pVtx[1].pos, 100.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-		}
+		CEffect3D::Create(pVtx[0].pos, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+		CEffect3D::Create(pVtx[1].pos, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 		pVtx += MeshRoad::NUM_VTX_IN_EDGE;	// 辺にある頂点数分ポインタを進める
 	}

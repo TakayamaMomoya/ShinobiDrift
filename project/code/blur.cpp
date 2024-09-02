@@ -480,16 +480,12 @@ void CBlur::ClearNotBlur(void)
     // デバイスの取得
     LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();
 
-    LPDIRECT3DSURFACE9 m_pRenderDef;
-
-    pDevice->GetRenderTarget(0, &m_pRenderDef);
-
     pDevice->SetRenderTarget(0, m_apRenderMT[2]);
 
     // 画面クリア
     pDevice->Clear(0, nullptr,
-        (D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
-         COLOR_CLEAR, 1.0f, 0);
+        (D3DCLEAR_TARGET),
+         D3DCOLOR_RGBA(0, 0, 0, 0), 1.0f, 0);
 
     pDevice->SetRenderTarget(0, m_pRenderDef);
 }

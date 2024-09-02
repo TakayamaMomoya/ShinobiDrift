@@ -21,7 +21,7 @@
 class CGoal : public CObject
 {
 public:
-	CGoal(int nPriority = 7);	// コンストラクタ
+	CGoal(int nPriority = 0);	// コンストラクタ
 	~CGoal();	//	デストラクタ
 
 	// メンバ関数

@@ -290,8 +290,6 @@ void CRenderer::Draw(void)
 
 		CDebugProc::GetInstance()->Draw();
 
-		CBlur *pBlur = CBlur::GetInstance();
-
 #ifdef _DEBUG
 		// imgui•`‰æ
 		ImGui::Render();

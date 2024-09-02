@@ -31,6 +31,7 @@ public:
 	{// ó‘Ô
 		STATE_NONE,	// ‰½‚à‚µ‚Ä‚¢‚È‚¢ó‘Ô
 		STATE_NORMAL,	// ’Êíó‘Ô
+		STATE_RESULT,	// ƒŠƒUƒ‹ƒgó‘Ô
 		STATE_END,	// I—¹ó‘Ô
 		STATE_MAX
 	};

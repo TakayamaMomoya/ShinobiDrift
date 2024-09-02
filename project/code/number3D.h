@@ -26,7 +26,7 @@ class CPolygon3D;
 class CNumber3D : public CObject
 {
 public:
-	CNumber3D(int nPriority = 7);	// コンストラクタ
+	CNumber3D(int nPriority = 6);	// コンストラクタ
 	~CNumber3D();	// デストラクタ
 
 	static CNumber3D *Create(int nNumPlace, int nValue);

@@ -174,6 +174,8 @@ void CGoal::Update()
 
 			// ƒŠƒUƒ‹ƒg‚Ì¶¬
 			CResult::Create();
+
+			Uninit();
 		}
 	}
 }

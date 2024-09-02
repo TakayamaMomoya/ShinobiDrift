@@ -75,7 +75,7 @@ private:
 	void SetEdgeAngle(VERTEX_3D *pVtx, D3DXVECTOR3 posEdge, D3DXVECTOR3 posEdgeOld);	// 辺の角度の設定
 	D3DXVECTOR3 GetPosEdge(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2);
 
-	UINT m_nNumVtx;
+	int m_nNumVtx;
 	std::vector<SInfoRoadPoint> m_aRoadPoint;
 	std::vector<SInfoRoadPoint>::iterator m_it;
 	CCutMullSpline *m_pSpline;	// スプライン

@@ -19,6 +19,7 @@ class CUI;
 class CStateResult;
 class CNumber;
 class CTimer;
+class CPolygon2D;
 
 //*****************************************************
 // クラスの定義
@@ -34,8 +35,10 @@ public:
 	virtual void Uninit(void);	// 終了
 	virtual void Update();	// 更新
 	virtual void Draw();	// 描画
+	void UpdateBack(void);	// 背景ポリゴンの更新
 	void ChangeState(CStateResult *pState);	// ステイトの変更
 	void StartFade(void);	// フェード
+	void EnableBack(void);	// 背景の有効化
 
 	// 変数取得・設定関数
 
@@ -49,6 +52,7 @@ private:
 
 	// メンバ変数
 	CStateResult *m_pState;
+	CPolygon2D *m_pBack;	// 背景のポリゴン
 };
 
 class CStateResult
@@ -77,19 +81,24 @@ public:
 	void Update(CResult *pResult) override;	// 更新処理
 
 private:
-	enum E_NUMBER
-	{
-		NUMBER_MINUTE = 0,	// 分表示
-		NUMBER_SECOND,	// 秒表示
-		NUMBER_MILLISSEC,	// ミリ秒表示
-		NUMBER_MAX
+	// 列挙型定義
+	enum E_Menu
+	{// メニュー項目
+		MENU_CONTINUE = 0,	// コンティニュー
+		MENU_QUIT,	// 戻る
+		MENU_MAX
 	};
 
 	// メンバ関数
 	void SetNumber(void);	// 数字の設定
+	void UpdateNumber(void);	// 数字の更新
+	void UpdateCaption(void);	// 見出しの更新
 
 	// メンバ変数
 	CTimer *m_pTimeOwn;	// 自身のタイム
+	CUI *m_pCaption;	// 項目の見出し
+	float m_fCntAnim;	// アニメーションカウンター
+	vector<CUI*> m_aMenuPolygon;	// メニューのポリゴン
 };
 
 namespace Tutorial

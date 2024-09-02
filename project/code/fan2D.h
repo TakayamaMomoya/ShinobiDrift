@@ -19,10 +19,10 @@
 class CFan2D	: public CFan
 {
 public:
-	CFan2D(int nPriority = 7);
+	CFan2D(int nPriority = 6);
 	~CFan2D();	//	デストラクタ
 
-	static CFan2D *Create(int nPriority = 7,int nNumVtx = 16);	// 生成処理
+	static CFan2D *Create(int nPriority = 6,int nNumVtx = 16);	// 生成処理
 	HRESULT Init(void) override;	// 初期化処理
 	void Uninit(void) override;	// 終了処理
 	void Update(void) override;	// 更新処理
