@@ -79,6 +79,9 @@ HRESULT CResult::Init(void)
 	// タイムの保存
 	SaveTime();
 
+	// 背景の有効化
+	EnableBack();
+
 	// ステイトの変更
 	ChangeState(new CStateResultDispTime);
 	
@@ -89,8 +92,6 @@ HRESULT CResult::Init(void)
 		return E_FAIL;
 
 	pGame->ReleaseGameTimer();
-
-	EnableBack();
 
 	return S_OK;
 }
@@ -239,7 +240,7 @@ void CResult::EnableBack(void)
 		return;
 
 	// 背景ポリゴンの生成
-	m_pBack = CPolygon2D::Create(7);
+	m_pBack = CPolygon2D::Create(6);
 
 	if (m_pBack == nullptr)
 		return;
@@ -316,6 +317,7 @@ void CStateResultDispTime::SetNumber(void)
 	// ゲームタイマーのタイムをコピー
 	float fTime = pGameTimer->GetSecond();
 	m_pTimeOwn->SetSecond(fTime);
+	m_pTimeOwn->SetColor(CTimer::E_Number::NUMBER_MAX, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
 }
 
 //=====================================================
@@ -336,7 +338,18 @@ void CStateResultDispTime::Update(CResult *pResult)
 	if (pInputManager == nullptr)
 		return;
 
+	// 数字の更新
+	UpdateNumber();
+
 	// フェードを始める
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_ENTER))
 		pResult->StartFade();
+}
+
+//=====================================================
+// 数字の更新
+//=====================================================
+void CStateResultDispTime::UpdateNumber(void)
+{
+
 }
