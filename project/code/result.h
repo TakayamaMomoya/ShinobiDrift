@@ -62,7 +62,7 @@ public:
 	virtual ~CStateResult() {};	 // デストラクタ
 
 	// メンバ関数
-	virtual void Init(CResult *pResult) = 0;	// 初期化処理s
+	virtual void Init(CResult *pResult) = 0;	// 初期化処理
 	virtual void Uninit(CResult *pResult);	// 終了処理
 	virtual void Update(CResult *pResult) = 0;	// 更新処理
 
@@ -84,10 +84,12 @@ private:
 	// メンバ関数
 	void SetNumber(void);	// 数字の設定
 	void UpdateNumber(void);	// 数字の更新
+	void UpdateCaption(void);	// 見出しの更新
 
 	// メンバ変数
 	CTimer *m_pTimeOwn;	// 自身のタイム
 	CUI *m_pCaption;	// 項目の見出し
+	float m_fCntAnim;	// アニメーションカウンター
 };
 
 namespace Tutorial

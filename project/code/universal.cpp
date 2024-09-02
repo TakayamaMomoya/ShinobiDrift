@@ -1133,4 +1133,13 @@ D3DXVECTOR3 NorRelativeMtx(D3DXVECTOR3 posO, D3DXVECTOR3 rot, D3DXVECTOR3 offset
 
 	return vecNor;
 }
+
+
+float EaseOutBack(float fTime)
+{
+	float c1 = 1.70158f;
+	float c3 = c1 + 1;
+
+	return 1 + c3 * powf(fTime - 1, 3) + c1 * powf(fTime - 1, 2);
+}
 }	// namespace universal
