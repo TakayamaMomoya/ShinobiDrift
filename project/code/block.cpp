@@ -355,12 +355,6 @@ bool CBlock::CollideSide(D3DXVECTOR3* pPos, D3DXVECTOR3* move, D3DXVECTOR3 vecAx
 	BlockCorner = universal::PosRelativeMtx(pos, rot, ((BlockMax - BlockMin) * 0.5f)) - pos;
 	D3DXVec3Normalize(&BlockNor, &BlockCorner);
 
-#ifdef _DEBUG
-	CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-	CEffect3D::Create(pos + BlockCorner, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-	CEffect3D::Create(pos - BlockCorner, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-#endif // _DEBUG
-
 	// ƒK[ƒhƒŒ[ƒ‹‚Ì‚‚³ˆÈ“à‚Å”»’è‚·‚é
 	if (pPos->y > pos.y + BlockCorner.y || pPos->y < pos.y - BlockCorner.y)
 		return false;
@@ -385,6 +379,14 @@ bool CBlock::CollideSide(D3DXVECTOR3* pPos, D3DXVECTOR3* move, D3DXVECTOR3 vecAx
 	D3DXVec3Normalize(&axisNB1, &axisB1);
 	D3DXVec3Normalize(&axisNB2, &axisB2);
 	D3DXVec3Normalize(&axisNB3, &axisB3);
+
+#ifdef _DEBUG
+	CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	CEffect3D::Create(pos + BlockCorner, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(pos - BlockCorner, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
+	CEffect3D::Create(pos + axisB1, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f));
+	CEffect3D::Create(pos + axisB3, 50.0f, 3, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));
+#endif // _DEBUG
 
 	D3DXVECTOR3 lengthCollider = pos - *pPos;
 	float lengthColliderDef = D3DXVec3Length(&lengthCollider);
