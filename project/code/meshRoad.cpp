@@ -135,8 +135,6 @@ void CMeshRoad::Uninit(void)
 void CMeshRoad::Update(void)
 {
 #ifdef _DEBUG
-	for(auto it : m_aRoadPoint)
-		CEffect3D::Create(it.pos, 50.0f, 5, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 #endif // _DEBUG
 }
 
@@ -259,8 +257,6 @@ std::vector<CMeshRoad::SInfoRoadPoint>::iterator CMeshRoad::SelectRoadPoint(void
 		if (m_it != m_aRoadPoint.begin())
 			std::advance(m_it, -1);
 	}
-
-	CEffect3D::Create(m_it->pos, 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
 
 	return m_it;
 }
@@ -489,9 +485,6 @@ void CMeshRoad::CreateVtxBetweenRoadPoint(SInfoRoadPoint infoRoadPoint, VERTEX_3
 
 		pVtx[0].tex = { 0.0f,*pTex };
 		pVtx[1].tex = { 1.0f,*pTex };
-
-		CEffect3D::Create(pVtx[0].pos, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-		CEffect3D::Create(pVtx[1].pos, 50.0f, 50000, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 
 		pVtx += MeshRoad::NUM_VTX_IN_EDGE;	// 辺にある頂点数分ポインタを進める
 	}
