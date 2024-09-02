@@ -15,6 +15,7 @@
 #include "texture.h"
 #include "player.h"
 #include "meter.h"
+#include "rankTime.h"
 
 //*****************************************************
 // 定数定義
@@ -39,6 +40,8 @@ CUIManager::CUIManager()
 {
 	m_fCntFrame = 0.0f;
 	m_bDisp = false;
+	m_pMeter = nullptr;
+	m_pRankTime = nullptr;
 }
 
 //=====================================================
@@ -73,7 +76,7 @@ HRESULT CUIManager::Init(void)
 	m_bDisp = true;
 
 	// メーター生成
-	CMeter::Create();
+	m_pMeter = CMeter::Create();
 
 	return S_OK;
 }
@@ -83,6 +86,8 @@ HRESULT CUIManager::Init(void)
 //=====================================================
 void CUIManager::Uninit(void)
 {
+	ReleaseMeter();
+
 	m_pUIManager = nullptr;
 
 	Release();
@@ -114,4 +119,48 @@ void CUIManager::Draw(void)
 #ifdef _DEBUG
 
 #endif
+}
+
+//=====================================================
+// メーターの解放
+//=====================================================
+void CUIManager::ReleaseMeter(void)
+{
+	if (m_pMeter != nullptr)
+	{
+		m_pMeter->Uninit();
+		m_pMeter = nullptr;
+	}
+}
+
+//=====================================================
+// ランクタイマーの生成
+//=====================================================
+void CUIManager::CreateRankTImer(void)
+{
+	if (m_pRankTime != nullptr)
+		return;
+
+	m_pRankTime = CRankTime::Create();
+}
+
+//=====================================================
+// ランクタイマーの解放
+//=====================================================
+void CUIManager::ReleaseRankTimer(void)
+{
+	if (m_pRankTime != nullptr)
+	{
+		m_pRankTime->Uninit();
+		m_pRankTime = nullptr;
+	}
+}
+
+//=====================================================
+// ゲームUIの一括解放
+//=====================================================
+void CUIManager::ReleaseGameUI(void)
+{
+	ReleaseMeter();
+	ReleaseRankTimer();
 }

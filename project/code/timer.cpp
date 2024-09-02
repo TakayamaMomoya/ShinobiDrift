@@ -113,6 +113,9 @@ HRESULT CTimer::Init(void)
 	// 数字のトランスフォームの設定
 	TransformNumber();
 
+	// ゲームUIの削除
+
+
 	return S_OK;
 }
 

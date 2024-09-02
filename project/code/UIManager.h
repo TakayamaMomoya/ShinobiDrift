@@ -17,6 +17,8 @@
 // 前方宣言
 //*****************************************************
 class CUI;
+class CMeter;
+class CRankTime;
 
 //*****************************************************
 // 定数定義
@@ -32,18 +34,32 @@ public:
 	CUIManager();	// コンストラクタ
 	~CUIManager();	// デストラクタ
 
-	static CUIManager *Create(void);
+	// メンバ関数
 	HRESULT Init(void);
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
-	static CUIManager *GetInstance(void) { return m_pUIManager; }
+	void ReleaseMeter(void);	// メーター解放
+	void CreateRankTImer(void);	// ランクタイマー生成
+	void ReleaseRankTimer(void);	// ランクタイマー解放
+	void ReleaseGameUI(void);	// ゲームUIの一括解放
+
+	// 変数取得・設定関数
 	bool IsDisp(void) { return m_bDisp; }
 	void EnableDisp(bool bDisp) { m_bDisp = bDisp; }
 
+	// 静的メンバ関数
+	static CUIManager *Create(void);
+	static CUIManager *GetInstance(void) { return m_pUIManager; }
+
 private:
+	// メンバ変数
 	float m_fCntFrame;	// フレームのカウンター
 	bool m_bDisp;	// 表示するかどうか
+	CMeter *m_pMeter;	// メーター
+	CRankTime *m_pRankTime;	// ランクタイム
+
+	// 静的メンバ変数
 	static CUIManager *m_pUIManager;	// 自身のポインタ
 };
 
