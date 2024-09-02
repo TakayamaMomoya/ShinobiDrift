@@ -35,8 +35,12 @@ const D3DXCOLOR COL_BACK = { 0.0f ,0.0f,0.0f,0.6f };	// 背景ポリゴンの色
 const float SPEED_BACK_COLOR = 0.2f;	// 背景の出てくるスピード
 const D3DXCOLOR COL_DEST_NUMBER = { 1.0f ,1.0f,1.0f,1.0f };	// 数字ポリゴンの目標色
 const float SPEED_APPER_TIME = 0.1f;	// タイマーの出現スピード
-const D3DXVECTOR2 SIZE_CAPTION = { 0.3f, 0.1f };	// キャプションのサイズ
+const D3DXVECTOR3 POS_TIMER = { 0.4f,0.55f,0.0f };	// タイマーの初期位置
+const D3DXVECTOR2 SIZE_CAPTION = { 0.3f, 0.05f };	// キャプションのサイズ
 const string PATH_TEX_CAPTION = "data\\TEXTURE\\UI\\resultCaption00.png";	// キャプションのテクスチャパス
+const D3DXVECTOR3 POS_CAPTION_INITIAL = { 1.0f + SIZE_CAPTION.x,0.4f,0.0f };	// キャプションの初期位置
+const D3DXVECTOR3 POS_CAPTION_DEST = { 0.5f,0.4f,0.0f };	// キャプションの目標位置
+const float SPEED_CAPTION = 0.05f;	// キャプションのスピード
 }
 
 //=====================================================
@@ -207,8 +211,6 @@ void CResult::UpdateBack(void)
 	col += (COL_BACK - col) * SPEED_BACK_COLOR;
 
 	m_pBack->SetCol(col);
-
-	CDebugProc::GetInstance()->Print("\n色[%f,%f,%f,%f]", col.r, col.g, col.b, col.a);
 }
 
 //=====================================================
@@ -262,7 +264,6 @@ void CResult::EnableBack(void)
 	m_pBack->SetSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	m_pBack->SetVtx();
 	m_pBack->EnableBlur(false);
-	m_pBack->EnableAdd(true);
 
 	// 完全に透明に設定
 	m_pBack->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
@@ -282,7 +283,7 @@ void CStateResult::Uninit(CResult *pResult)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr), m_pCaption(nullptr)
+CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr), m_pCaption(nullptr), m_fCntAnim(0.0f)
 {
 
 }
@@ -311,9 +312,11 @@ void CStateResultDispTime::Init(CResult *pResult)
 		if (m_pCaption != nullptr)
 		{
 			m_pCaption->SetSize(SIZE_CAPTION.x, SIZE_CAPTION.y);
-			m_pCaption->SetVtx();
-			int nIdx = Texture::GetIdx(0);
+			
+			m_pCaption->SetPosition(POS_CAPTION_INITIAL);
+			int nIdx = Texture::GetIdx(&PATH_TEX_CAPTION[0]);
 			m_pCaption->SetIdxTexture(nIdx);
+			m_pCaption->SetVtx();
 		}
 	}
 }
@@ -345,6 +348,7 @@ void CStateResultDispTime::SetNumber(void)
 	float fTime = pGameTimer->GetSecond();
 	m_pTimeOwn->SetSecond(fTime);
 	m_pTimeOwn->SetColor(CTimer::E_Number::NUMBER_MAX, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
+	m_pTimeOwn->SetPosition(POS_TIMER);
 }
 
 //=====================================================
@@ -368,6 +372,9 @@ void CStateResultDispTime::Update(CResult *pResult)
 	// 数字の更新
 	UpdateNumber();
 
+	// 見出しの更新
+	UpdateCaption();
+
 	// フェードを始める
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_ENTER))
 		pResult->StartFade();
@@ -386,4 +393,28 @@ void CStateResultDispTime::UpdateNumber(void)
 	col += (COL_DEST_NUMBER - col) * SPEED_APPER_TIME;
 
 	m_pTimeOwn->SetColor(CTimer::E_Number::NUMBER_MAX, col);
+}
+
+//=====================================================
+// 見出しの更新
+//=====================================================
+void CStateResultDispTime::UpdateCaption(void)
+{
+	if (m_pCaption == nullptr)
+		return;
+
+	m_fCntAnim += SPEED_CAPTION;
+
+	universal::LimitValuefloat(&m_fCntAnim, 1.0f, 0.0f);
+
+	float fRate = universal::EaseOutBack(m_fCntAnim);
+
+	// キャプションの位置を設定
+	D3DXVECTOR3 vecDiff = POS_CAPTION_DEST - POS_CAPTION_INITIAL;
+	D3DXVECTOR3 pos = POS_CAPTION_INITIAL + vecDiff * fRate;
+
+	CDebugProc::GetInstance()->Print("\nキャプション位置[%f,%f]", m_pCaption->GetPosition().x, m_pCaption->GetPosition().y);
+
+	m_pCaption->SetPosition(pos);
+	m_pCaption->SetVtx();
 }
