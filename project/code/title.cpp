@@ -216,8 +216,8 @@ HRESULT CTitle::Init(void)
 		m_pPlayer->SetMatrix(m_pBike->GetMatrix());
 	}
 
-	// テールランプ生成
-	m_pOrbitLamp = COrbit::Create(m_pPlayer->GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60);
+	//// テールランプ生成
+	//m_pOrbitLamp = COrbit::Create(m_pPlayer->GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60);
 
 	return S_OK;
 }
