@@ -87,6 +87,7 @@ private:
 
 	// メンバ変数
 	CTimer *m_pTimeOwn;	// 自身のタイム
+	CUI *m_pCaption;	// 項目の見出し
 };
 
 namespace Tutorial

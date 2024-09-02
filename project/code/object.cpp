@@ -375,40 +375,40 @@ void CObject::DrawObject(bool bBlur)
 			// 次のアドレスを保存
 			CObject *pObjectNext = pObject->m_pNext;
 
-			//if (pObject->m_bWire)
-			//{// ワイヤーフレームの設定
-			//	pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-			//}
+			if (pObject->m_bWire)
+			{// ワイヤーフレームの設定
+				pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+			}
 
-			//if (pObject->m_bZtest)
-			//{// Zテストの設定
-			//	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
-			//	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-			//}
+			if (pObject->m_bZtest)
+			{// Zテストの設定
+				pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_ALWAYS);
+				pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+			}
 
-			//if (pObject->m_bLighting == false)
-			//{
-			//	// ライティングを無効化
-			//	pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
-			//}
+			if (pObject->m_bLighting == false)
+			{
+				// ライティングを無効化
+				pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+			}
 
-			//if (pObject->m_bAdd)
-			//{
-			//	// 加算合成かどうか
-			//	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-			//	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			//	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-			//}
+			if (pObject->m_bAdd)
+			{
+				// 加算合成かどうか
+				pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+				pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+			}
 
-			//if (pObject->m_bCull == false)
-			//{
-			//	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-			//}
+			if (pObject->m_bCull == false)
+			{
+				pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+			}
 
-			//// アルファテストの有効化
-			//pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-			//pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
-			//pDevice->SetRenderState(D3DRS_ALPHAREF, pObject->m_dAlpha);
+			// アルファテストの有効化
+			pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+			pDevice->SetRenderState(D3DRS_ALPHAREF, pObject->m_dAlpha);
 
 			//pDevice->SetRenderState(D3DRS_FOGENABLE, pObject->m_bFog && CRenderer::GetInstance()->IsFog());
 
@@ -436,40 +436,40 @@ void CObject::DrawObject(bool bBlur)
 				}
 			}
 
-			//if (pObject->m_bWire)
-			//{
-			//	pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-			//}
+			if (pObject->m_bWire)
+			{
+				pDevice->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+			}
 
-			//if (pObject->m_bZtest)
-			//{// Zテストの設定
-			//	pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-			//	pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-			//}
+			if (pObject->m_bZtest)
+			{// Zテストの設定
+				pDevice->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+				pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+			}
 
-			//if (pObject->m_bLighting == false)
-			//{
-			//	// ライティングを有効化
-			//	pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
-			//}
+			if (pObject->m_bLighting == false)
+			{
+				// ライティングを有効化
+				pDevice->SetRenderState(D3DRS_LIGHTING, TRUE);
+			}
 
-			//if (pObject->m_bAdd)
-			//{
-			//	// 加算合成を戻す
-			//	pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-			//	pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			//	pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-			//}
+			if (pObject->m_bAdd)
+			{
+				// 加算合成を戻す
+				pDevice->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+				pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+			}
 
-			//if (pObject->m_bCull == false)
-			//{
-			//	pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-			//}
+			if (pObject->m_bCull == false)
+			{
+				pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+			}
 
-			//// アルファテストの無効化
-			//pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-			//pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);
-			//pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
+			// アルファテストの無効化
+			pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_ALWAYS);
+			pDevice->SetRenderState(D3DRS_ALPHAREF, 0);
 
 			// 次のアドレスを代入
 			pObject = pObjectNext;

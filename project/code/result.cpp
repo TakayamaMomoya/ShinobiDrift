@@ -20,6 +20,9 @@
 #include "polygon2D.h"
 #include "blur.h"
 #include "debugproc.h"
+#include "UIManager.h"
+#include "UI.h"
+#include "texture.h"
 
 //*****************************************************
 // 定数定義
@@ -30,6 +33,10 @@ const D3DXVECTOR3 POS_DISP_TIME = { SCREEN_WIDTH * 0.5f,SCREEN_HEIGHT * 0.4f, 0.
 const string PATH_SAVE = "data\\BYNARY\\gametime.bin";	// ゲームの記録時間の保存
 const D3DXCOLOR COL_BACK = { 0.0f ,0.0f,0.0f,0.6f };	// 背景ポリゴンの色
 const float SPEED_BACK_COLOR = 0.2f;	// 背景の出てくるスピード
+const D3DXCOLOR COL_DEST_NUMBER = { 1.0f ,1.0f,1.0f,1.0f };	// 数字ポリゴンの目標色
+const float SPEED_APPER_TIME = 0.1f;	// タイマーの出現スピード
+const D3DXVECTOR2 SIZE_CAPTION = { 0.3f, 0.1f };	// キャプションのサイズ
+const string PATH_TEX_CAPTION = "data\\TEXTURE\\UI\\resultCaption00.png";	// キャプションのテクスチャパス
 }
 
 //=====================================================
@@ -92,6 +99,12 @@ HRESULT CResult::Init(void)
 		return E_FAIL;
 
 	pGame->ReleaseGameTimer();
+
+	// ゲームUIの削除
+	CUIManager *pUIManager = CUIManager::GetInstance();
+
+	if (pUIManager != nullptr)
+		pUIManager->ReleaseGameUI();
 
 	return S_OK;
 }
@@ -269,7 +282,7 @@ void CStateResult::Uninit(CResult *pResult)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr)
+CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr), m_pCaption(nullptr)
 {
 
 }
@@ -289,6 +302,20 @@ void CStateResultDispTime::Init(CResult *pResult)
 {
 	// 数字の設定
 	SetNumber();
+
+	// 項目の見出し生成
+	if (m_pCaption == nullptr)
+	{
+		m_pCaption = CUI::Create();
+
+		if (m_pCaption != nullptr)
+		{
+			m_pCaption->SetSize(SIZE_CAPTION.x, SIZE_CAPTION.y);
+			m_pCaption->SetVtx();
+			int nIdx = Texture::GetIdx(0);
+			m_pCaption->SetIdxTexture(nIdx);
+		}
+	}
 }
 
 //=====================================================
@@ -351,5 +378,12 @@ void CStateResultDispTime::Update(CResult *pResult)
 //=====================================================
 void CStateResultDispTime::UpdateNumber(void)
 {
+	if (m_pTimeOwn == nullptr)
+		return;
 
+	D3DXCOLOR col = m_pTimeOwn->GetColor(CTimer::E_Number::NUMBER_MILLI);
+
+	col += (COL_DEST_NUMBER - col) * SPEED_APPER_TIME;
+
+	m_pTimeOwn->SetColor(CTimer::E_Number::NUMBER_MAX, col);
 }
