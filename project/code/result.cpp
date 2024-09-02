@@ -319,6 +319,9 @@ void CStateResultDispTime::Init(CResult *pResult)
 			m_pCaption->SetVtx();
 		}
 	}
+
+	// ƒƒjƒ…[€–Ú‚Ì¶¬
+	
 }
 
 //=====================================================

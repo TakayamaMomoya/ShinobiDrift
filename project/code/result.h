@@ -81,6 +81,14 @@ public:
 	void Update(CResult *pResult) override;	// 更新処理
 
 private:
+	// 列挙型定義
+	enum E_Menu
+	{// メニュー項目
+		MENU_CONTINUE = 0,	// コンティニュー
+		MENU_QUIT,	// 戻る
+		MENU_MAX
+	};
+
 	// メンバ関数
 	void SetNumber(void);	// 数字の設定
 	void UpdateNumber(void);	// 数字の更新
@@ -90,6 +98,7 @@ private:
 	CTimer *m_pTimeOwn;	// 自身のタイム
 	CUI *m_pCaption;	// 項目の見出し
 	float m_fCntAnim;	// アニメーションカウンター
+	vector<CUI*> m_aMenuPolygon;	// メニューのポリゴン
 };
 
 namespace Tutorial
