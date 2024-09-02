@@ -63,6 +63,7 @@ public:
 	virtual void Load(FILE *pFile, char* pTemp);	// ì«çûèàóù
 
 	bool Collide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld);
+	bool CollideSide(D3DXVECTOR3* pos, D3DXVECTOR3* move, D3DXVECTOR3 vecAxial, float* fSpeed);
 
 private:
 	static int m_nNumAll;	// ëçêî

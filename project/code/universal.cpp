@@ -832,6 +832,8 @@ D3DXVECTOR3 CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVEC
 	D3DXVECTOR3 axis2 = D3DXVECTOR3(0.0f, vecAxial.y, 0.0f);
 	D3DXVECTOR3 axis3 = D3DXVECTOR3(0.0f, 0.0f, vecAxial.z);
 
+	vecNorPlane.y = 0.0f;
+
 	// éÀâeê¸ÇÃí∑Ç≥ÇåvéZ
 	float lenProjection = lengthAxis(vecNorPlane, axis1, axis2, axis3);
 
@@ -841,8 +843,6 @@ D3DXVECTOR3 CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVEC
 	// ÇﬂÇËçûÇÒÇ≈Ç¢ÇÈ
 	if (lenProjection < fabs(lenPos))
 		return D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-
-	vecNorPlane.y = 0.0f;
 
 	// ÇﬂÇËçûÇ›ãÔçáÇ≈ñﬂÇ∑ãóó£ÇïœÇ¶ÇÈ
 	if (lenPos > 0.0f)

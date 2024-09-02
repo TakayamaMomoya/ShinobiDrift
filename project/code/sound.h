@@ -46,6 +46,9 @@ public:
 		LABEL_SE_GRAB,					// 鉤縄をひっかける音
 		LABEL_SE_REMOVE,                // 鉤縄を外す音
 
+		LABEL_SE_ENTERTUNNEL,			//トンネルに入った音
+		LABEL_SE_EXITTUNNEL,			//トンネルから出た音
+
 		LABEL_SE_PAUSE_MENU,			// ポーズ
 		LABEL_SE_PAUSE_ARROW,			// ポーズ移動
 		LABEL_SE_PAUSE_ENTER,			// ポーズ選択
@@ -129,6 +132,9 @@ private:
 		{ "data/SOUND/SE/SE_Throw.wav",0 },				// 鉤縄を投げる音
 		{ "data/SOUND/SE/SE_Grab.wav",0 },				// 鉤縄をひっかける音
 		{ "data/SOUND/SE/SE_Remove.wav",0 },		    // 鉤縄を外す音
+
+		{ "data/SOUND/SE/SE_EnterTunnel.wav",0 },		//トンネルに入った音
+		{ "data/SOUND/SE/SE_ExitTunnel.wav",0 },		//トンネルから出た音
 
 		{ "data/SOUND/SE/pause.wav",0 },				// ポーズ
 		{ "data/SOUND/SE/pause_arrow.wav",0 },			// 選択
