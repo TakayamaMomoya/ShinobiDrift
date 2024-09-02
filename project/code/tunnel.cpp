@@ -466,7 +466,7 @@ void CTunnel::EnterPlayer(void)
 	m_bInPlayer = true;
 
 	CPlayer *pPlayer = CPlayer::GetInstance();
-	CSound *pSound = CSound::GetInstance();
+	
 
 	if (pPlayer != nullptr)
 	{
@@ -479,6 +479,10 @@ void CTunnel::EnterPlayer(void)
 		// テールランプつける
 		pPlayer->EnableTailLamp();
 
+		CSound* pSound = CSound::GetInstance();
+
+		//トンネルに入った時のSEの開始
+		if(pSound != nullptr)
 		pSound->Play(pSound->LABEL_SE_ENTERTUNNEL);
 	}
 }
@@ -491,7 +495,6 @@ void CTunnel::ExitPlayer(void)
 	m_bInPlayer = false;
 
 	CPlayer *pPlayer = CPlayer::GetInstance();
-	CSound* pSound = CSound::GetInstance();
 
 	if (pPlayer != nullptr)
 	{
@@ -504,6 +507,10 @@ void CTunnel::ExitPlayer(void)
 		// テールランプ消す
 		pPlayer->DisableTailLamp();
 
+		CSound* pSound = CSound::GetInstance();
+
+		//トンネルから出た時のSEの開始
+		if(pSound != nullptr)
 		pSound->Play(pSound->LABEL_SE_EXITTUNNEL);
 	}
 
