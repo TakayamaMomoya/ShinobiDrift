@@ -684,7 +684,7 @@ END_MOTIONSET
 # [2]番目のモーション:タイトル待機
 #===============================
 MOTIONSET
-    LOOP = 0
+    LOOP = 1
     NUM_KEY = 1
 
     KEYSET     #---<< 0 / 1 >>
