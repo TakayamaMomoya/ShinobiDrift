@@ -125,17 +125,17 @@ HRESULT CTitle::Init(void)
 		return E_FAIL;
 	}
 
-	//// タイトルロゴの生成
-	//m_pTitleLogo = CPolygon2D::Create(7);
+	// タイトルロゴの生成
+	m_pTitleLogo = CPolygon2D::Create(7);
 
-	//if (m_pTitleLogo != nullptr)
-	//{
-	//	m_pTitleLogo->SetSize(TITLE_LOGO_WIDTH, TITLE_LOGO_HEIGHT);
-	//	m_pTitleLogo->SetPosition(TITLE_LOGO_POS);
-	//	int nIdx = CTexture::GetInstance()->Regist(TITLE_LOGO_PATH);
-	//	m_pTitleLogo->SetIdxTexture(nIdx);
-	//	m_pTitleLogo->SetVtx();
-	//}
+	if (m_pTitleLogo != nullptr)
+	{
+		m_pTitleLogo->SetSize(TITLE_LOGO_WIDTH, TITLE_LOGO_HEIGHT);
+		m_pTitleLogo->SetPosition(TITLE_LOGO_POS);
+		int nIdx = CTexture::GetInstance()->Regist(TITLE_LOGO_PATH);
+		m_pTitleLogo->SetIdxTexture(nIdx);
+		m_pTitleLogo->SetVtx();
+	}
 
 	// チームロゴの生成
 	m_pTeamLogo = CPolygon2D::Create(7);
@@ -170,6 +170,7 @@ HRESULT CTitle::Init(void)
 		int nIdx = CModel::Load("data\\MODEL\\block\\hangar.x");
 		m_pGarage->BindModel(nIdx);
 		m_pGarage->SetPosition(D3DXVECTOR3(0.0f, 1000.0f, 0.0f));
+		m_pGarage->SetRotation(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
 	}
 
 	// 背景オブジェクトの生成
@@ -232,28 +233,18 @@ HRESULT CTitle::Init(void)
 	}
 
 	// バイクモデルの設置
-	m_pBike = CMotion::Create("data\\MOTION\\motionBike.txt");
+	m_pBike = CMotion::Create("data\\MOTION\\motionEnemy.txt");
 
 	if (m_pBike != nullptr)
 	{
 		m_pBike->SetPosition(POS_BIKE);
-		m_pBike->SetMotion(CPlayer::MOTION::MOTION_NEUTRAL);
-	}
-
-	// プレイヤーモデルの設置
-	m_pPlayer = CMotion::Create("data\\MOTION\\motionPlayer.txt");
-
-	if (m_pPlayer != nullptr)
-	{
-		m_pPlayer->SetPosition(POS_PLAYER);
-		m_pPlayer->SetMotion(CPlayer::MOTION::MOTION_NEUTRAL);
-		m_pPlayer->InitPose(CPlayer::MOTION::MOTION_NEUTRAL);
-		m_pPlayer->SetMatrix(m_pBike->GetMatrix());
+		m_pBike->SetMotion(2);
+		m_pBike->InitPose(2);
 	}
 
 	// テールランプ生成
 	int nIdxTexture = CTexture::GetInstance()->Regist("data\\TEXTURE\\EFFECT\\orbit000.png");
-	m_pOrbitLamp = COrbit::Create(m_pPlayer->GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60, nIdxTexture);
+	m_pOrbitLamp = COrbit::Create(m_pBike->GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60, nIdxTexture);
 
 	return S_OK;
 }
@@ -290,7 +281,7 @@ void CTitle::Update(void)
 	}
 
 	m_pBike->MultiplyMtx(false);
-	D3DXMATRIX mtx = m_pBike->GetParts(3)->pParts->GetMatrix();
+	D3DXMATRIX mtx = m_pBike->GetParts(19)->pParts->GetMatrix();
 
 	D3DXVECTOR3 pos = { mtx._41, mtx._42, mtx._43 };
 
@@ -299,8 +290,8 @@ void CTitle::Update(void)
 	if (fSpeed > MAX_SPEED * 0.4f)
 		CParticle::Create(pos, CParticle::TYPE::TYPE_RUN);
 
-	D3DXMATRIX mtxNinja = m_pBike->GetParts(3)->pParts->GetMatrix();
-	mtxNinja._42 = mtxNinja._42 - 100.0f;
+	D3DXMATRIX mtxNinja = m_pBike->GetParts(0)->pParts->GetMatrix();
+	mtxNinja._42 = mtxNinja._42 - 240.0f;
 	mtxNinja._43 = mtxNinja._43 + 100.0f;
 	
 	m_pOrbitLamp->SetOffset(mtxNinja, D3DXCOLOR(1.0f, 0.15f, 0.0f, 1.0f));
@@ -348,11 +339,6 @@ void CTitle::PlayerAcceleration(void)
 
 	// バイクの位置設定
 	m_pBike->SetPosition(BikePos);
-
-	// バイクに乗った忍者の追従
-	m_pPlayer->SetPosition(D3DXVECTOR3(0.0f, 50.0f, -10.0f));
-	m_pBike->MultiplyMtx(false);
-	m_pPlayer->SetMatrixParent(m_pBike->GetMatrix());
 }
 
 //=====================================================
@@ -384,8 +370,8 @@ void CTitle::DoorOpen(void)
 
 	if (RightDoorPos.x >= 1800.0f && LeftDoorPos.x <= -1800.0f)
 	{
-		if (m_pPlayer->GetMotion() != CPlayer::MOTION_NINJA_SLASHDOWN)
-			m_pPlayer->SetMotion(CPlayer::MOTION_NINJA_SLASHDOWN);
+		if (m_pBike->GetMotion() != 3)
+			m_pBike->SetMotion(3);
 	}
 	
 	CDebugProc::GetInstance()->Print("\nドアの右 [%f, %f, %f]", m_pRightDoor->GetPosition().x, m_pRightDoor->GetPosition().y, m_pRightDoor->GetPosition().z);
@@ -610,28 +596,6 @@ void CTitleMenu::Input(void)
 	}
 }
 
-//void CTitleMenu::Fade(void)
-//{// 各種フェード
-//	CFade *pFade = CFade::GetInstance();
-//
-//	if (pFade == nullptr)
-//		return;
-//
-//	if (pFade->GetState() != CFade::FADE_NONE)
-//		return;
-//
-//	switch (m_menu)
-//	{
-//	case CTitleMenu::MENU_GAME:
-//
-//		//pFade->SetFade(CScene::MODE_GAME);
-//		m_bFade = true;
-//		break;
-//	default:
-//		break;
-//	}
-//}
-
 void CTitleMenu::ManageCursor(void)
 {// カーソルの制御
 	if (m_pCursor == nullptr)
@@ -664,11 +628,6 @@ CTitleBehindPlayer::~CTitleBehindPlayer()
 void CTitleBehindPlayer::Update(CTitle* pTItle)
 {// 更新処理
 
-	CMotion* pNinja = pTItle->GetPlayer();
-
-	if (pNinja == nullptr)
-		return;
-
 	CMotion* pBike = pTItle->GetBike();
 
 	if (pBike == nullptr)
@@ -688,7 +647,7 @@ void CTitleBehindPlayer::Update(CTitle* pTItle)
 	D3DXVECTOR3 BikePos = pBike->GetPosition();
 
 	// モーションが終了していたらバイクの前進させる
-	if (pNinja->IsFinish())
+	if (pBike->IsFinish())
 		pTItle->ChangeBehavior(new CTitlePlayerAcceleration);
 }
 
@@ -705,11 +664,6 @@ CTitlePlayerAcceleration::~CTitlePlayerAcceleration()
 
 void CTitlePlayerAcceleration::Update(CTitle* pTItle)
 {// 更新処理
-
-	CMotion* pNinja = pTItle->GetPlayer();
-
-	if (pNinja == nullptr)
-		return;
 
 	CMotion* pBike = pTItle->GetBike();
 
@@ -742,11 +696,6 @@ CTitleMovePlayer::~CTitleMovePlayer()
 
 void CTitleMovePlayer::Update(CTitle* pTItle)
 {// 更新処理
-
-	CMotion* pNinja = pTItle->GetPlayer();
-
-	if (pNinja == nullptr)
-		return;
 
 	CMotion* pBike = pTItle->GetBike();
 
@@ -812,11 +761,6 @@ CTitleFadePlayer::~CTitleFadePlayer()
 void CTitleFadePlayer::Update(CTitle* pTItle)
 {// 更新処理
 	
-	CMotion* pNinja = pTItle->GetPlayer();
-
-	if (pNinja == nullptr)
-		return;
-
 	CMotion* pBike = pTItle->GetBike();
 
 	if (pBike == nullptr)

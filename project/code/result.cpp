@@ -23,6 +23,8 @@
 #include "UIManager.h"
 #include "UI.h"
 #include "texture.h"
+#include "manager.h"
+#include "fade.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -41,6 +43,13 @@ const string PATH_TEX_CAPTION = "data\\TEXTURE\\UI\\resultCaption00.png";	// ƒLƒ
 const D3DXVECTOR3 POS_CAPTION_INITIAL = { 1.0f + SIZE_CAPTION.x,0.4f,0.0f };	// ƒLƒƒƒvƒVƒ‡ƒ“‚Ì‰ŠúˆÊ’u
 const D3DXVECTOR3 POS_CAPTION_DEST = { 0.5f,0.4f,0.0f };	// ƒLƒƒƒvƒVƒ‡ƒ“‚Ì–Ú•WˆÊ’u
 const float SPEED_CAPTION = 0.05f;	// ƒLƒƒƒvƒVƒ‡ƒ“‚ÌƒXƒs[ƒh
+const D3DXVECTOR2 SIZE_MENU_DEFAULT = { 0.2f,0.04f };	// ƒƒjƒ…[‚ÌƒfƒtƒHƒ‹ƒgƒTƒCƒY
+const D3DXVECTOR3 POS_MENU_INITIAL = { -SIZE_MENU_DEFAULT.x,0.7f,0.0f };	// ƒƒjƒ…[‚Ì‰ŠúˆÊ’u
+const D3DXVECTOR3 POS_MENU_DEFAULT = { 0.6f,0.7f,0.0f };	// ƒƒjƒ…[‚ÌƒfƒtƒHƒ‹ƒgˆÊ’u
+const float RATE_DOWN_MENU = 3.0f;	// ƒƒjƒ…[€–Ú‚Ì‰º‚ª‚éŠ„‡
+const float SPEED_FRASH_MENU = 0.03f;	// ƒƒjƒ…[€–Ú‚Ì“_–Å‘¬“x
+const float DIFF_LENGTH_CURRENT = 0.1f;	// ‘I‘ğƒ|ƒŠƒSƒ“–Ú•WˆÊ’u‚Ì·•ª
+const float MOVE_FACT_MENU = 0.1f;	// ƒƒjƒ…[€–Ú‚ÌˆÚ“®ŒW”
 }
 
 //=====================================================
@@ -283,7 +292,7 @@ void CStateResult::Uninit(CResult *pResult)
 //=====================================================
 // ƒRƒ“ƒXƒgƒ‰ƒNƒ^
 //=====================================================
-CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr), m_pCaption(nullptr), m_fCntAnim(0.0f)
+CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr), m_pCaption(nullptr), m_fCntAnim(0.0f), m_state(E_State::STATE_NONE), m_nCurrent(0)
 {
 
 }
@@ -321,7 +330,40 @@ void CStateResultDispTime::Init(CResult *pResult)
 	}
 
 	// ƒƒjƒ…[€–Ú‚Ì¶¬
-	
+	m_aMenuPolygon.resize(E_Menu::MENU_MAX);
+
+	string aPath[E_Menu::MENU_MAX] =
+	{// ƒƒjƒ…[€–Ú‚ÌƒeƒNƒXƒ`ƒƒƒpƒX
+		"data\\TEXTURE\\UI\\resultMenu00.png",
+		"data\\TEXTURE\\UI\\resultMenu01.png",
+	};
+
+	for (int i = 0; i < E_Menu::MENU_MAX; i++)
+	{
+		if (m_aMenuPolygon[i] != nullptr)
+			continue;
+
+		m_aMenuPolygon[i] = CUI::Create();
+
+		if (m_aMenuPolygon[i] == nullptr)
+			continue;
+
+		// ƒ|ƒŠƒSƒ“‚Ìİ’è
+		D3DXVECTOR3 pos = POS_MENU_INITIAL;
+		pos.y += i * SIZE_MENU_DEFAULT.y * RATE_DOWN_MENU;
+		m_aMenuPolygon[i]->SetPosition(pos);
+		m_aMenuPolygon[i]->SetSize(SIZE_MENU_DEFAULT.x, SIZE_MENU_DEFAULT.y);
+
+		// ƒeƒNƒXƒ`ƒƒ‚Ìİ’è
+		int nIdxTexture = CTexture::GetInstance()->Regist(&aPath[i][0]);
+		m_aMenuPolygon[i]->SetIdxTexture(nIdxTexture);
+		m_aMenuPolygon[i]->SetVtx();
+
+		if (i != 0)
+			m_aMenuPolygon[i]->SetCol(D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f));
+	}
+
+	m_state = E_State::STATE_APPER;
 }
 
 //=====================================================
@@ -375,8 +417,14 @@ void CStateResultDispTime::Update(CResult *pResult)
 	// ”š‚ÌXV
 	UpdateNumber();
 
+	// ƒƒjƒ…[€–Ú‚ÌXV
+	UpdateMenu();
+
 	// Œ©o‚µ‚ÌXV
 	UpdateCaption();
+
+	// “ü—Íˆ—
+	Input();
 
 	// ƒtƒF[ƒh‚ğn‚ß‚é
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_ENTER))
@@ -408,6 +456,9 @@ void CStateResultDispTime::UpdateCaption(void)
 
 	m_fCntAnim += SPEED_CAPTION;
 
+	if (m_fCntAnim >= 1.0f)
+		m_state = E_State::STATE_SELECT;
+
 	universal::LimitValuefloat(&m_fCntAnim, 1.0f, 0.0f);
 
 	float fRate = universal::EaseOutBack(m_fCntAnim);
@@ -420,4 +471,130 @@ void CStateResultDispTime::UpdateCaption(void)
 
 	m_pCaption->SetPosition(pos);
 	m_pCaption->SetVtx();
+}
+
+//=====================================================
+// ƒƒjƒ…[€–Ú‚ÌXV
+//=====================================================
+void CStateResultDispTime::UpdateMenu(void)
+{
+	if (m_aMenuPolygon.empty())
+		return;
+
+	for (int i = 0; i < E_Menu::MENU_MAX; i++)
+	{
+		if (m_aMenuPolygon[i] == nullptr)
+			continue;
+
+		D3DXVECTOR3 pos = m_aMenuPolygon[i]->GetPosition();
+		D3DXVECTOR3 posInitial = { POS_MENU_INITIAL.x,pos.y,0.0f };	// YÀ•W‡‚í‚¹‚é‚½‚ß‚Éƒ[ƒJƒ‹‚Å—pˆÓ
+		D3DXVECTOR3 posDest = { POS_MENU_DEFAULT.x,pos.y,0.0f };
+
+		if (m_state == E_State::STATE_APPER)
+		{// oŒ»ƒAƒjƒ[ƒVƒ‡ƒ“
+			float fRate = universal::EaseOutBack(m_fCntAnim);
+
+			// ˆÊ’u‚ğİ’è
+			D3DXVECTOR3 vecDiff = posDest - posInitial;
+			pos = posInitial + vecDiff * fRate;
+
+			m_aMenuPolygon[i]->SetPosition(pos);
+			m_aMenuPolygon[i]->SetVtx();
+		}
+		else if (m_state == E_State::STATE_SELECT)
+		{// ‘I‚ñ‚Å‚¢‚é€–Ú‚ğ‰Ÿ‚µo‚·
+			D3DXVECTOR3 pos = m_aMenuPolygon[i]->GetPosition();
+			D3DXVECTOR3 posDest;
+
+			if (i == m_nCurrent)
+				posDest = { POS_MENU_DEFAULT.x - DIFF_LENGTH_CURRENT, pos.y, 0.0f };
+			else
+				posDest = { POS_MENU_DEFAULT.x, pos.y, 0.0f };
+
+			D3DXVECTOR3 vecDiff = posDest - pos;
+
+			vecDiff *= MOVE_FACT_MENU;
+
+			pos += vecDiff;
+
+			m_aMenuPolygon[i]->SetPosition(pos);
+			m_aMenuPolygon[i]->SetVtx();
+		}
+	}
+}
+
+//=====================================================
+// “ü—Íˆ—
+//=====================================================
+void CStateResultDispTime::Input(void)
+{
+	CInputManager *pInputManager = CInputManager::GetInstance();
+
+	if (pInputManager == nullptr)
+		return;
+
+	if (pInputManager->GetTrigger(CInputManager::BUTTON_PAUSE) ||
+		pInputManager->GetTrigger(CInputManager::BUTTON_BACK))
+	{// ƒ|[ƒY‰ğœAˆÈ~‚Ì‘€ì‚ğó‚¯•t‚¯‚È‚¢
+		return;
+	}
+
+	if (m_aMenuPolygon[m_nCurrent] != nullptr)
+	{// ˆÈ‘O‚É‘I‘ğ‚µ‚Ä‚½€–Ú‚ğ”ñ‘I‘ğF‚É‚·‚é
+		m_aMenuPolygon[m_nCurrent]->SetCol(D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f));
+	}
+
+	// €–ÚØ‚è‘Ö‚¦
+	if (pInputManager->GetTrigger(CInputManager::BUTTON_AXIS_DOWN))
+	{
+		m_nCurrent = (E_Menu)((m_nCurrent + 1) % E_Menu::MENU_MAX);
+
+		// ‰¹‚ÌÄ¶
+	}
+
+	if (pInputManager->GetTrigger(CInputManager::BUTTON_AXIS_UP))
+	{
+		m_nCurrent = (E_Menu)((m_nCurrent + E_Menu::MENU_MAX - 1) % E_Menu::MENU_MAX);
+
+		// ‰¹‚ÌÄ¶
+	}
+
+	if (m_aMenuPolygon[m_nCurrent] != nullptr)
+	{// ‘I‘ğ‚µ‚Ä‚¢‚é€–Ú‚ÌF•ÏX
+		m_aMenuPolygon[m_nCurrent]->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+
+	if (pInputManager->GetTrigger(CInputManager::BUTTON_ENTER))
+	{// ‘I‘ğ€–Ú‚ÉƒtƒF[ƒh‚·‚é
+		// ‰¹‚ÌÄ¶
+
+		// ƒtƒF[ƒh
+		Fade((E_Menu)m_nCurrent);
+	}
+}
+
+
+//====================================================
+// ƒtƒF[ƒh‚·‚éˆ—
+//====================================================
+void CStateResultDispTime::Fade(E_Menu menu)
+{
+	CFade *pFade = CFade::GetInstance();
+
+	if (pFade == nullptr)
+	{
+		return;
+	}
+
+	switch (menu)
+	{
+	case E_Menu::MENU_CONTINUE:
+		pFade->SetFade(CScene::MODE_GAME);
+		break;
+	case E_Menu::MENU_QUIT:
+		pFade->SetFade(CScene::MODE_TITLE);
+		break;
+	default:
+		break;
+	}
 }
