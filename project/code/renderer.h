@@ -31,7 +31,9 @@ public:
 	LPDIRECT3DDEVICE9 GetDevice(void) { return m_pD3DDevice; }	// デバイスの取得
 	bool IsFog(void) { return m_fogInfo.bEnable; }
 	void EnableFog(bool bFog) { m_fogInfo.bEnable = bFog; }
-
+	void SetCol(D3DXCOLOR col) { m_fogInfo.col = col; }  // フォグのカラー設定
+	void SetStart(float fStart) { m_fogInfo.fStart = fStart; }  // フォグの開始位置設定
+	void SetEnd(float fEnd) { m_fogInfo.fEnd = fEnd; }  // フォグの終了位置設定
 	static CRenderer *GetInstance(void) { return m_pRenderer; }
 
 private:
