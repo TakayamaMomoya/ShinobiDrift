@@ -18,14 +18,15 @@
 #include "fade.h"
 #include "game.h"
 #include "sound.h"
+#include "UI.h"
 
 //*****************************************************
 // マクロ定義
 //*****************************************************
-#define MENU_WIDTH	(200.0f)	// 項目の幅
-#define MENU_HEIGHT	(50.0f)	// 項目の高さ
+#define MENU_WIDTH	(0.18f)	// 項目の幅
+#define MENU_HEIGHT	(0.05f)	// 項目の高さ
 #define MOVE_FACT	(0.15f)	// 移動速度
-#define LINE_ARRIVAL	(90.0f)	// 到着したとされるしきい値
+#define LINE_ARRIVAL	(0.05f)	// 到着したとされるしきい値
 #define LINE_UNINIT	(3.0f)	// 終了するまでのしきい値
 #define SPEED_FADE	(0.03f)	// 背景のフェード速度
 #define ALPHA_BG	(0.5f)	// 背景の不透明度
@@ -94,13 +95,13 @@ HRESULT CPause::Init(void)
 	}
 
 	// 背景の生成
-	m_pBg = CPolygon2D::Create(7);
+	m_pBg = CUI::Create();
 
 	if (m_pBg != nullptr)
 	{
-		m_pBg->SetPosition(D3DXVECTOR3(SCREEN_WIDTH * 0.5, SCREEN_HEIGHT * 0.5f, 0.0f));
+		m_pBg->SetPosition(D3DXVECTOR3(0.5f, 0.5f, 0.0f));
 
-		m_pBg->SetSize(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.5f);
+		m_pBg->SetSize(0.5f, 0.5f);
 
 		m_pBg->SetCol(D3DXCOLOR(0.0f, 0.0f, 0.0f, 0.0f));
 
@@ -121,12 +122,12 @@ HRESULT CPause::Init(void)
 	{// メニュー項目のポリゴンを生成
 		if (m_apMenu[nCntMenu] == nullptr)
 		{
-			m_apMenu[nCntMenu] = CPolygon2D::Create(7);
+			m_apMenu[nCntMenu] = CUI::Create();
 
 			if (m_apMenu[nCntMenu] != nullptr)
 			{
 				// ポリゴンの設定
-				m_apMenu[nCntMenu]->SetPosition(D3DXVECTOR3(-MENU_WIDTH, SCREEN_HEIGHT * 0.1f + MENU_HEIGHT * nCntMenu * 2, 0.0f));
+				m_apMenu[nCntMenu]->SetPosition(D3DXVECTOR3(-MENU_WIDTH, 0.1f + MENU_HEIGHT * nCntMenu * 4, 0.0f));
 				m_aPosDest[nCntMenu] = m_apMenu[nCntMenu]->GetPosition();
 
 				m_apMenu[nCntMenu]->SetSize(MENU_WIDTH, MENU_HEIGHT);
@@ -266,9 +267,7 @@ void CPause::ManageState(void)
 void CPause::ManageBg(void)
 {
 	if (m_pBg == nullptr)
-	{
 		return;
-	}
 
 	D3DXCOLOR col = m_pBg->GetCol();
 
@@ -376,7 +375,6 @@ void CPause::Input(void)
 
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_ENTER))
 	{// 選択項目にフェードする
-
 		if (pSound != nullptr)
 		{
 			pSound->Play(pSound->LABEL_SE_PAUSE_ENTER);

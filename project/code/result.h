@@ -88,17 +88,28 @@ private:
 		MENU_QUIT,	// 戻る
 		MENU_MAX
 	};
+	enum E_State
+	{// 状態
+		STATE_NONE = 0,	// 何もしていない状態
+		STATE_APPER,	// 出現状態
+		STATE_SELECT,	// メニュー選択状態
+		STATE_MAX
+	};
 
 	// メンバ関数
 	void SetNumber(void);	// 数字の設定
 	void UpdateNumber(void);	// 数字の更新
 	void UpdateCaption(void);	// 見出しの更新
+	void UpdateMenu(void);	// メニュー項目の更新
+	void Input(void);	// 入力処理
 
 	// メンバ変数
 	CTimer *m_pTimeOwn;	// 自身のタイム
 	CUI *m_pCaption;	// 項目の見出し
 	float m_fCntAnim;	// アニメーションカウンター
 	vector<CUI*> m_aMenuPolygon;	// メニューのポリゴン
+	E_State m_state;	// 状態
+	int m_nCurrent;	// 選択番号
 };
 
 namespace Tutorial
