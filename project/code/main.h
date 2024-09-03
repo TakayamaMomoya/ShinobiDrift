@@ -52,7 +52,7 @@
 #define MAX_STRING (256)	// 文字数の最大
 #define CLASS_NAME				"WindowClass"					// ウィンドウクラスの名前
 #define WINDOW_NAME				"ShinobiDrift"				// ウィンドウの名前(キャプション)
-#define COLOR_CLEAR (D3DCOLOR_RGBA(255, 255, 255, 255))	// 画面クリア色
+#define COLOR_CLEAR (D3DCOLOR_RGBA(0, 0, 0, 255))	// 画面クリア色
 
 //*****************************************************
 // 定数定義
