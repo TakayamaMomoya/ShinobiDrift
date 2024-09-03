@@ -358,6 +358,9 @@ void CStateResultDispTime::Init(CResult *pResult)
 		int nIdxTexture = CTexture::GetInstance()->Regist(&aPath[i][0]);
 		m_aMenuPolygon[i]->SetIdxTexture(nIdxTexture);
 		m_aMenuPolygon[i]->SetVtx();
+
+		if (i != 0)
+			m_aMenuPolygon[i]->SetCol(D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f));
 	}
 
 	m_state = E_State::STATE_APPER;
