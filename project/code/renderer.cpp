@@ -264,7 +264,7 @@ void CRenderer::Draw(void)
 	//m_pD3DDevice->SetRenderState(D3DRS_FOGENABLE, m_fogInfo.bEnable);
 
 	// フォグの色を設定
-	m_pD3DDevice->SetRenderState(D3DRS_FOGCOLOR, D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f));
+	m_pD3DDevice->SetRenderState(D3DRS_FOGCOLOR, D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f));
 
 	// フォグの状態を設定
 	m_pD3DDevice->SetRenderState(D3DRS_FOGVERTEXMODE, D3DFOG_NONE);

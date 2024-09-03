@@ -59,7 +59,7 @@ namespace
 	const D3DXCOLOR COL_INITIAL_MENU = { 0.4f,0.4f,0.4f,1.0f };	// メニュー項目の初期色
 	const D3DXCOLOR COL_CURRENT_MENU = { 1.0f,1.0f,1.0f,1.0f };	// メニュー項目の選択色
 	const D3DXVECTOR3 POS_PLAYER = { -154.31f, 130.62f, 570.51f };	// プレイヤーモデルの位置
-	const D3DXVECTOR3 POS_BIKE = { -154.31f, 82.62f, 600.51f };	    // バイクモデルの位置
+	const D3DXVECTOR3 POS_BIKE = { -154.31f, 0.0f, 600.51f };	    // バイクモデルの位置
 
 	const float REBOOST_POS_Z = 20000.0f;  // プレイヤーが再び加速するZ座標
 	const float MAX_SPEED = 120.0f;        // タイトルでのバイクのスピード上限
@@ -109,7 +109,7 @@ HRESULT CTitle::Init(void)
 
 	if (pRenderer != nullptr)
 	{
-		pRenderer->EnableFog(false);
+		pRenderer->EnableFog(true);
 	}
 
 	// サウンドインスタンスの取得
@@ -203,34 +203,44 @@ HRESULT CTitle::Init(void)
 		m_pLeftDoor->SetPosition(D3DXVECTOR3(-590.0f, 1000.0f, 1900.0f));
 	}
 
-	CMeshCylinder *pCylinder = CMeshCylinder::Create(32, 1000);
+	/*CMeshCylinder *pCylinder = CMeshCylinder::Create(32, 1000);
 
 	if (pCylinder != nullptr)
 	{
-		pCylinder->SetPosition(D3DXVECTOR3(0.0f, -200.0f, 3000.0f));
+		pCylinder->SetPosition(D3DXVECTOR3(0.0f, 400.0f, 3000.0f));
 		pCylinder->SetRotation(D3DXVECTOR3(D3DX_PI * 0.5f, 0.0f, 0.0f));
 		pCylinder->SetRadius(2000.0f);
 		pCylinder->SetVtx();
 		pCylinder->SetIdxTexture(Texture::GetIdx("data\\TEXTURE\\MATERIAL\\concrete.jpg"));
-	}
+	}*/
 
-	m_pFan3D = CFan3D::Create();
+	//CObjectX* pTonnel = CObjectX::Create();
+	int nIdx = CModel::Load("data\\MODEL\\block\\tonnel.x");
+	float vtxz = 0.0f;
+
+	for (int i = 0; i < 5; i++)
+	{
+		CObjectX* pTonnel = CObjectX::Create();
+
+		if (pTonnel != nullptr)
+		{
+			int nIdx = CModel::Load("data\\MODEL\\block\\tonnel.x");
+			pTonnel->BindModel(nIdx);
+			pTonnel->SetPosition(D3DXVECTOR3(0.0f, 0.0f, 6000.0f + (i * 8000.0f)));
+			pTonnel->SetRotation(D3DXVECTOR3(0.0f, D3DX_PI, 0.0f));
+		}
+	}
+	
+	/*m_pFan3D = CFan3D::Create();
 
 	if (m_pFan3D != nullptr)
 	{
-		m_pFan3D->SetPosition(D3DXVECTOR3(0.0f, -200.0f, 3000.0f));
+		m_pFan3D->SetPosition(D3DXVECTOR3(0.0f, 400.0f, 3000.0f));
 		m_pFan3D->SetRotation(D3DXVECTOR3(0.0f, 0.0f, 0.0f));
 		m_pFan3D->SetRadius(2000.0f);
 		m_pFan3D->SetVtx();
 		m_pFan3D->SetIdxTexture(Texture::GetIdx("data\\TEXTURE\\MATERIAL\\potal00.png"));
-	}
-
-	CMeshField *pField = CMeshField::Create();
-
-	if (pField != nullptr)
-	{
-		pField->SetPosition(D3DXVECTOR3(0.0f, -800.0f, 0.0f));
-	}
+	}*/
 
 	// バイクモデルの設置
 	m_pBike = CMotion::Create("data\\MOTION\\motionEnemy.txt");
@@ -240,6 +250,7 @@ HRESULT CTitle::Init(void)
 		m_pBike->SetPosition(POS_BIKE);
 		m_pBike->SetMotion(2);
 		m_pBike->InitPose(2);
+		m_pBike->EnableShadow(true);
 	}
 
 	// テールランプ生成
