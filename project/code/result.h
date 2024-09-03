@@ -102,6 +102,7 @@ private:
 	void UpdateCaption(void);	// 見出しの更新
 	void UpdateMenu(void);	// メニュー項目の更新
 	void Input(void);	// 入力処理
+	void Fade(E_Menu menu);	// フェード処理
 
 	// メンバ変数
 	CTimer *m_pTimeOwn;	// 自身のタイム

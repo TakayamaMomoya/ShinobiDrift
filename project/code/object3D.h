@@ -27,6 +27,9 @@ public:
 	virtual void Update(void);	// 更新
 	virtual void Draw(void);	// 描画
 	void ResetMtxParent(void);	// 親マトリックスのリセット
+	D3DXVECTOR3 GetForward(void);	// マトリックスから前方ベクトルを取得
+	D3DXVECTOR3 GetUp(void);	// マトリックスから上方ベクトルを取得
+	D3DXVECTOR3 GetRight(void);	// マトリックスから右方ベクトルを取得
 
 	// 変数取得・設定関数
 	D3DXMATRIX GetMatrix(void) { return m_mtxWorld; }	// ワールドマトリックス

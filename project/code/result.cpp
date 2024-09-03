@@ -24,6 +24,7 @@
 #include "UI.h"
 #include "texture.h"
 #include "manager.h"
+#include "fade.h"
 
 //*****************************************************
 // 定数定義
@@ -564,8 +565,33 @@ void CStateResultDispTime::Input(void)
 	{// 選択項目にフェードする
 		// 音の再生
 
-
 		// フェード
-		//Fade(m_menu);
+		Fade((E_Menu)m_nCurrent);
+	}
+}
+
+
+//====================================================
+// フェードする処理
+//====================================================
+void CStateResultDispTime::Fade(E_Menu menu)
+{
+	CFade *pFade = CFade::GetInstance();
+
+	if (pFade == nullptr)
+	{
+		return;
+	}
+
+	switch (menu)
+	{
+	case E_Menu::MENU_CONTINUE:
+		pFade->SetFade(CScene::MODE_GAME);
+		break;
+	case E_Menu::MENU_QUIT:
+		pFade->SetFade(CScene::MODE_TITLE);
+		break;
+	default:
+		break;
 	}
 }
