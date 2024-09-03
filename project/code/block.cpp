@@ -346,7 +346,7 @@ bool CBlock::CollideSide(D3DXVECTOR3* pPos, D3DXVECTOR3* move, D3DXVECTOR3 vecAx
 		return false;
 
 	D3DXVECTOR3 BlockMax = GetVtxMax();
-	D3DXVECTOR3 BlockMin = GetVtxMin(); 
+	D3DXVECTOR3 BlockMin = GetVtxMin();
 	D3DXVECTOR3 pos = GetPosition() + (BlockMax + BlockMin);
 	D3DXVECTOR3 rot = GetRotation();
 	D3DXVECTOR3 BlockCorner;
@@ -356,7 +356,7 @@ bool CBlock::CollideSide(D3DXVECTOR3* pPos, D3DXVECTOR3* move, D3DXVECTOR3 vecAx
 	D3DXVec3Normalize(&BlockNor, &BlockCorner);
 
 	// ガードレールの高さ以内で判定する
-	if (pPos->y > pos.y + BlockCorner.y || pPos->y < pos.y - BlockCorner.y)
+	if (pPos->y > pos.y + BlockCorner.y || pPos->y + vecAxial.y < pos.y - BlockCorner.y)
 		return false;
 
 	D3DXVECTOR3 axisA1, axisNA1;
@@ -451,7 +451,10 @@ bool CBlock::CollideSide(D3DXVECTOR3* pPos, D3DXVECTOR3* move, D3DXVECTOR3 vecAx
 
 	// 押し戻された座標を計算する
 	D3DXVECTOR3 vecReturn;
-	vecReturn = vecNorDef * -lengthColliderDef;
+	if (lenPos > 0.0f)
+		vecReturn = vecNorDef * lengthColliderDef;
+	else
+		vecReturn = -vecNorDef * lengthColliderDef;
 
 	if (D3DXVec3Length(&vecReturn) == 0.0f)
 		return false;
@@ -469,7 +472,10 @@ bool CBlock::CollideSide(D3DXVECTOR3* pPos, D3DXVECTOR3* move, D3DXVECTOR3 vecAx
 
 	// 衝突エフェクトを出す角度を計算する
 	float rotEffect;
-	rotEffect = atan2f(vecNorDef.x, vecNorDef.z);
+	if (lenPos > 0.0f)
+		rotEffect = atan2f(vecNorDef.x, vecNorDef.z);
+	else
+		rotEffect = atan2f(-vecNorDef.x, -vecNorDef.z);
 
 	// エフェクトの再生
 	MyEffekseer::CreateEffect(CEffekseer::TYPE_SPARK, D3DXVECTOR3(posEffect.x, posEffect.y + 100.0f, posEffect.z), D3DXVECTOR3(0.0f, rotEffect, 0.0f));
