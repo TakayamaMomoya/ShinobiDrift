@@ -26,6 +26,7 @@
 #include "frame.h"
 #include "game.h"
 #include "UIManager.h"
+#include "cameraState.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -49,6 +50,8 @@ const D3DXVECTOR3 POS_PLAYER_INITIAL = { -11409.0f,0.0f,26395.0f };	// ƒ`ƒ…[ƒgƒ
 const D3DXVECTOR3 ROT_PLAYER_INITIAL = { 0.0f,1.77f,0.0f };	// ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ÌƒvƒŒƒCƒ„[‰ŠúŒü‚«
 const string PATH_TEXTURE_GATE = "data\\TEXTURE\\EFFECT\\gate00.png";	// ƒQ[ƒg‚ÌƒeƒNƒXƒ`ƒƒƒpƒX
 const float SPEED_ROTATE_GATE = 0.05f;	// ƒQ[ƒg‚Ì‰ñ‚é‘¬“x
+const D3DXVECTOR3 POS_PLAYER_END = { -11409.0f, -14.0f,26395.0f };	// ƒvƒŒƒCƒ„[‚Ìƒ`ƒ…[ƒgƒŠƒAƒ‹I—¹Žž‚ÌˆÊ’u
+const D3DXVECTOR3 ROT_PLAYER_END = { 0.0f, 1.77f,0.0f };	// ƒvƒŒƒCƒ„[‚Ìƒ`ƒ…[ƒgƒŠƒAƒ‹I—¹Žž‚ÌˆÊ’u
 }
 
 //=====================================================
@@ -109,7 +112,7 @@ HRESULT CTutorial::Init(void)
 	}
 
 	// ‰ŠúƒXƒeƒCƒg‚ÉÝ’è
-	ChangeState(new CStateTutorialEnd);
+	ChangeState(new CStateTutorialMove);
 
 	return S_OK;
 }
@@ -183,6 +186,7 @@ void CTutorial::StartGame(void)
 	if (pCamera == nullptr)
 		return;
 
+	pCamera->ChangeState(new CFollowPlayer);
 	pCamera->SkipToDest();	// –Ú•WˆÊ’u‚Ü‚ÅƒJƒƒ‰‚ð”ò‚Î‚·
 }
 
@@ -422,7 +426,7 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 	
 	if (IsEndInput(MENU_MAX,pTutorial))
 	{// ˆÚ“®ƒ`ƒ…[ƒgƒŠƒAƒ‹‚ðI—¹
-		pTutorial->ChangeState(new CStateTutorialDrift);
+		pTutorial->ChangeState(new CStateTutorialEnd);
 	}
 }
 
@@ -461,7 +465,7 @@ void CStateTutorialDrift::Init(CTutorial *pTutorial)
 	vector<float> aLimit(MENU_MAX);
 	aLimit =
 	{
-		TIME_ACCELE,
+		1.0f,
 	};
 
 	CreateUI(aPath, aLimit, MENU_MAX, pTutorial);
@@ -505,7 +509,7 @@ void CStateTutorialDrift::Update(CTutorial *pTutorial)
 
 	if (IsEndInput(MENU_MAX, pTutorial))
 	{// ƒhƒŠƒtƒgƒ`ƒ…[ƒgƒŠƒAƒ‹‚ðI—¹
-		pTutorial->ChangeState(new CStateTutorialParry);
+		pTutorial->ChangeState(new CStateTutorialEnd);
 	}
 }
 
@@ -622,6 +626,15 @@ void CStateTutorialEnd::Init(CTutorial *pTutorial)
 	if (pPlayer == nullptr)
 		return;
 
+	// ƒvƒŒƒCƒ„[‚Ìƒgƒ‰ƒ“ƒXƒtƒH[ƒ€‚ÌÝ’è
+	pPlayer->SetPosition(POS_PLAYER_END);
+	pPlayer->SetRotation(ROT_PLAYER_END);
+	pPlayer->MultiplyMtx(false);
+
+	// ƒJƒƒ‰‚ÌƒXƒeƒCƒg‚ðÝ’è
+	Camera::ChangeState(new CCameraStateTutorialEnd);
+
+	// ƒQ[ƒg¶¬‚Ì‚½‚ß‚É€”õ
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	D3DXVECTOR3 posGate = posPlayer + pPlayer->GetForward() * DIST_GATE;
 	posGate.y += HEIGTH_GATE;
@@ -769,8 +782,6 @@ void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
 	}
 
 #ifdef _DEBUG
-	CEffect3D::Create(posStart, 400.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	CEffect3D::Create(posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif
 }
 

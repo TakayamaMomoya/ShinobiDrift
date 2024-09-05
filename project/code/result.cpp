@@ -582,9 +582,7 @@ void CStateResultDispTime::Fade(E_Menu menu)
 	CFade *pFade = CFade::GetInstance();
 
 	if (pFade == nullptr)
-	{
 		return;
-	}
 
 	switch (menu)
 	{
