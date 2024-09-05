@@ -25,6 +25,7 @@
 #include "texture.h"
 #include "manager.h"
 #include "fade.h"
+#include "sound.h"
 
 //*****************************************************
 // 定数定義
@@ -119,6 +120,11 @@ HRESULT CResult::Init(void)
 	if (pUIManager != nullptr)
 		pUIManager->ReleaseGameUI();
 
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound != nullptr)
+		pSound->Play(pSound->LABEL_BGM_GAME05);
+
 	return S_OK;
 }
 
@@ -181,6 +187,11 @@ void CResult::SaveTime(void)
 //=====================================================
 void CResult::Uninit(void)
 {
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound != nullptr)
+		pSound->Stop();
+
 	Release();
 }
 
@@ -529,6 +540,7 @@ void CStateResultDispTime::UpdateMenu(void)
 void CStateResultDispTime::Input(void)
 {
 	CInputManager *pInputManager = CInputManager::GetInstance();
+	CSound* pSound = CSound::GetInstance();
 
 	if (pInputManager == nullptr)
 		return;
@@ -550,6 +562,8 @@ void CStateResultDispTime::Input(void)
 		m_nCurrent = (E_Menu)((m_nCurrent + 1) % E_Menu::MENU_MAX);
 
 		// 音の再生
+		if (pSound != nullptr)
+			pSound->Play(pSound->LABEL_SE_REMOVE);
 	}
 
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_AXIS_UP))
@@ -557,6 +571,8 @@ void CStateResultDispTime::Input(void)
 		m_nCurrent = (E_Menu)((m_nCurrent + E_Menu::MENU_MAX - 1) % E_Menu::MENU_MAX);
 
 		// 音の再生
+		if (pSound != nullptr)
+			pSound->Play(pSound->LABEL_SE_REMOVE);
 	}
 
 	if (m_aMenuPolygon[m_nCurrent] != nullptr)
@@ -567,6 +583,8 @@ void CStateResultDispTime::Input(void)
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_ENTER))
 	{// 選択項目にフェードする
 		// 音の再生
+		if (pSound != nullptr)
+			pSound->Play(pSound->LABEL_SE_THROW);
 
 		// フェード
 		Fade((E_Menu)m_nCurrent);

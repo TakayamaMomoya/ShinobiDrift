@@ -102,6 +102,8 @@ HRESULT CGame::Init(void)
 	if (pRenderer != nullptr)
 	{
 		pRenderer->EnableFog(true);
+		pRenderer->SetStart(15000);
+		pRenderer->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
 	}
 
 	// 
