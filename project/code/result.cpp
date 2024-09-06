@@ -25,6 +25,8 @@
 #include "texture.h"
 #include "manager.h"
 #include "fade.h"
+#include "sound.h"
+#include "rankTime.h"
 
 //*****************************************************
 // 定数定義
@@ -119,6 +121,11 @@ HRESULT CResult::Init(void)
 	if (pUIManager != nullptr)
 		pUIManager->ReleaseGameUI();
 
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound != nullptr)
+		pSound->Play(pSound->LABEL_BGM_GAME05);
+
 	return S_OK;
 }
 
@@ -181,6 +188,11 @@ void CResult::SaveTime(void)
 //=====================================================
 void CResult::Uninit(void)
 {
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound != nullptr)
+		pSound->Stop();
+
 	Release();
 }
 
@@ -457,7 +469,12 @@ void CStateResultDispTime::UpdateCaption(void)
 	m_fCntAnim += SPEED_CAPTION;
 
 	if (m_fCntAnim >= 1.0f)
+	{
 		m_state = E_State::STATE_SELECT;
+
+		// ランク表示の生成
+		CRankTime::Create();
+	}
 
 	universal::LimitValuefloat(&m_fCntAnim, 1.0f, 0.0f);
 
@@ -529,6 +546,7 @@ void CStateResultDispTime::UpdateMenu(void)
 void CStateResultDispTime::Input(void)
 {
 	CInputManager *pInputManager = CInputManager::GetInstance();
+	CSound* pSound = CSound::GetInstance();
 
 	if (pInputManager == nullptr)
 		return;
@@ -550,6 +568,8 @@ void CStateResultDispTime::Input(void)
 		m_nCurrent = (E_Menu)((m_nCurrent + 1) % E_Menu::MENU_MAX);
 
 		// 音の再生
+		if (pSound != nullptr)
+			pSound->Play(pSound->LABEL_SE_REMOVE);
 	}
 
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_AXIS_UP))
@@ -557,6 +577,8 @@ void CStateResultDispTime::Input(void)
 		m_nCurrent = (E_Menu)((m_nCurrent + E_Menu::MENU_MAX - 1) % E_Menu::MENU_MAX);
 
 		// 音の再生
+		if (pSound != nullptr)
+			pSound->Play(pSound->LABEL_SE_REMOVE);
 	}
 
 	if (m_aMenuPolygon[m_nCurrent] != nullptr)
@@ -567,12 +589,13 @@ void CStateResultDispTime::Input(void)
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_ENTER))
 	{// 選択項目にフェードする
 		// 音の再生
+		if (pSound != nullptr)
+			pSound->Play(pSound->LABEL_SE_THROW);
 
 		// フェード
 		Fade((E_Menu)m_nCurrent);
 	}
 }
-
 
 //====================================================
 // フェードする処理
@@ -582,9 +605,7 @@ void CStateResultDispTime::Fade(E_Menu menu)
 	CFade *pFade = CFade::GetInstance();
 
 	if (pFade == nullptr)
-	{
 		return;
-	}
 
 	switch (menu)
 	{

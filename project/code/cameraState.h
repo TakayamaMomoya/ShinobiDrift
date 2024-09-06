@@ -21,6 +21,7 @@ class CCameraState
 {
 public:
 	CCameraState() {};
+	virtual void Init(CCamera *pCamera) = 0;
 	virtual void Update(CCamera *pCamera) = 0;
 
 private:
@@ -31,6 +32,7 @@ class CFollowPlayer : public CCameraState
 {
 public:
 	CFollowPlayer();
+	void Init(CCamera *pCamera) {};
 	void Update(CCamera *pCamera) override;
 
 private:
@@ -40,11 +42,24 @@ private:
 	bool m_bDebug;
 };
 
+// チュートリアルの終了時のカメラ
+class CCameraStateTutorialEnd : public CCameraState
+{
+public:
+	CCameraStateTutorialEnd();
+	void Init(CCamera *pCamera);
+	void Update(CCamera* pCamera) override;
+
+private:
+
+};
+
 // 操作
 class CMoveControl : public CCameraState
 {
 public:
 	CMoveControl() {};
+	void Init(CCamera *pCamera) {};
 	void Update(CCamera *pCamera) override;
 
 private:
@@ -56,6 +71,7 @@ class CCameraStateTitle : public CCameraState
 {
 public:
 	CCameraStateTitle() {};
+	void Init(CCamera *pCamera) {};
 	void Update(CCamera* pCamera) override;
 
 private:
@@ -67,6 +83,7 @@ class CCameraStateFollowPlayerTitle : public CCameraState
 {
 public:
 	CCameraStateFollowPlayerTitle() {};
+	void Init(CCamera *pCamera) {};
 	void Update(CCamera* pCamera) override;
 
 private:
@@ -78,6 +95,7 @@ class CCameraStateResult : public CCameraState
 {
 public:
 	CCameraStateResult();
+	void Init(CCamera *pCamera) {};
 	void Update(CCamera* pCamera) override;
 
 private:
