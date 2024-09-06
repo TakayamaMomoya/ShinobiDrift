@@ -26,6 +26,7 @@
 #include "manager.h"
 #include "fade.h"
 #include "sound.h"
+#include "rankTime.h"
 
 //*****************************************************
 // 定数定義
@@ -137,7 +138,7 @@ void CResult::SetPlayer(void)
 
 	if (pPlayer == nullptr)
 		return;
-
+	
 	// プレイヤーを操作できないようにする
 	pPlayer->SetEnableInput(false);
 }
@@ -468,7 +469,12 @@ void CStateResultDispTime::UpdateCaption(void)
 	m_fCntAnim += SPEED_CAPTION;
 
 	if (m_fCntAnim >= 1.0f)
+	{
 		m_state = E_State::STATE_SELECT;
+
+		// ランク表示の生成
+		CRankTime::Create();
+	}
 
 	universal::LimitValuefloat(&m_fCntAnim, 1.0f, 0.0f);
 
@@ -563,7 +569,7 @@ void CStateResultDispTime::Input(void)
 
 		// 音の再生
 		if (pSound != nullptr)
-			pSound->Play(pSound->LABEL_SE_PAUSE_ARROW);
+			pSound->Play(pSound->LABEL_SE_REMOVE);
 	}
 
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_AXIS_UP))
@@ -572,7 +578,7 @@ void CStateResultDispTime::Input(void)
 
 		// 音の再生
 		if (pSound != nullptr)
-			pSound->Play(pSound->LABEL_SE_PAUSE_ARROW);
+			pSound->Play(pSound->LABEL_SE_REMOVE);
 	}
 
 	if (m_aMenuPolygon[m_nCurrent] != nullptr)
@@ -584,13 +590,12 @@ void CStateResultDispTime::Input(void)
 	{// 選択項目にフェードする
 		// 音の再生
 		if (pSound != nullptr)
-			pSound->Play(pSound->LABEL_SE_PAUSE_ENTER);
+			pSound->Play(pSound->LABEL_SE_THROW);
 
 		// フェード
 		Fade((E_Menu)m_nCurrent);
 	}
 }
-
 
 //====================================================
 // フェードする処理
