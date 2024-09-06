@@ -47,7 +47,7 @@ namespace
 	const D3DXVECTOR3 TEAM_LOGO_POS = D3DXVECTOR3(SCREEN_WIDTH * 0.9f, 680.0f, 0.0f);	// チームロゴの位置
 	float TEAM_LOGO_WIDTH = 100.0f;         // チームロゴの幅
 	const float TEAM_LOGO_HEIGHT = 35.0f;	// チームロゴの高さ
-	const char* TEAM_LOGO_PATH = "data\\TEXTURE\\UI\\logoTeam1.png";	// チームロゴのパス
+	const char* TEAM_LOGO_PATH = "data\\TEXTURE\\UI\\logoTeam.png";	// チームロゴのパス
 
 	const D3DXVECTOR3 STATE_POS = D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.7f, 0.0f);	// スタート表示の位置
 	const float START_WIDTH = 400.0f;	// スタート表示の幅
