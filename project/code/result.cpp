@@ -137,7 +137,7 @@ void CResult::SetPlayer(void)
 
 	if (pPlayer == nullptr)
 		return;
-	
+
 	// プレイヤーを操作できないようにする
 	pPlayer->SetEnableInput(false);
 }
@@ -563,7 +563,7 @@ void CStateResultDispTime::Input(void)
 
 		// 音の再生
 		if (pSound != nullptr)
-			pSound->Play(pSound->LABEL_SE_REMOVE);
+			pSound->Play(pSound->LABEL_SE_PAUSE_ARROW);
 	}
 
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_AXIS_UP))
@@ -572,7 +572,7 @@ void CStateResultDispTime::Input(void)
 
 		// 音の再生
 		if (pSound != nullptr)
-			pSound->Play(pSound->LABEL_SE_REMOVE);
+			pSound->Play(pSound->LABEL_SE_PAUSE_ARROW);
 	}
 
 	if (m_aMenuPolygon[m_nCurrent] != nullptr)
@@ -584,7 +584,7 @@ void CStateResultDispTime::Input(void)
 	{// 選択項目にフェードする
 		// 音の再生
 		if (pSound != nullptr)
-			pSound->Play(pSound->LABEL_SE_THROW);
+			pSound->Play(pSound->LABEL_SE_PAUSE_ENTER);
 
 		// フェード
 		Fade((E_Menu)m_nCurrent);

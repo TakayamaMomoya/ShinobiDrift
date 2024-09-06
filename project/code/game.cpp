@@ -94,7 +94,10 @@ HRESULT CGame::Init(void)
 	//CAnimEffect3D::Create();
 
 	// BGM再生
-	Sound::Play(CSound::LABEL_BGM_GAME01);
+	CSound* pSound = CSound::GetInstance();
+
+	if(pSound != nullptr)
+	pSound->Play(pSound->LABEL_BGM_GAME01);
 
 	// フォグをかける
 	CRenderer *pRenderer = CRenderer::GetInstance();
@@ -151,6 +154,11 @@ void CGame::Uninit(void)
 		delete m_pEdit;
 		m_pEdit = nullptr;
 	}
+
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound != nullptr)
+		pSound->Stop();
 
 	// オブジェクト全棄
 	CObject::ReleaseAll();
