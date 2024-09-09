@@ -26,6 +26,7 @@
 #include "manager.h"
 #include "fade.h"
 #include "sound.h"
+#include "rankTime.h"
 
 //*****************************************************
 // 定数定義
@@ -468,7 +469,12 @@ void CStateResultDispTime::UpdateCaption(void)
 	m_fCntAnim += SPEED_CAPTION;
 
 	if (m_fCntAnim >= 1.0f)
+	{
 		m_state = E_State::STATE_SELECT;
+
+		// ランク表示の生成
+		CRankTime::Create();
+	}
 
 	universal::LimitValuefloat(&m_fCntAnim, 1.0f, 0.0f);
 
@@ -590,7 +596,6 @@ void CStateResultDispTime::Input(void)
 		Fade((E_Menu)m_nCurrent);
 	}
 }
-
 
 //====================================================
 // フェードする処理

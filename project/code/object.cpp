@@ -346,7 +346,7 @@ void CObject::DrawAll(void)
 	
 	if (pBlur != nullptr)
 	{
-		//pBlur->OverlapLastTexture();	// 前回のテクスチャを重ねる
+		pBlur->OverlapLastTexture();	// 前回のテクスチャを重ねる
 		pBlur->RestoreTarget();	// レンダーターゲットの復元
 		pBlur->DrawBuckBuffer();	// バックバッファへの描画
 		pBlur->SwapBuffer();	// バッファーの入れ替え

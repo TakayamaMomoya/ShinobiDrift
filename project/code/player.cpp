@@ -1237,6 +1237,8 @@ void CPlayer::ManageSpeedBlur(void)
 {
 	float fRate = m_info.fSpeed / m_param.fSpeedMaxInitial;
 
+	universal::LimitValuefloat(&fRate,1.0f, 0.0f);
+
 	Blur::SetBlur(SIZE_SPEEDBLUR * fRate, fRate * DENSITY_SPEEDBLUR);
 }
 

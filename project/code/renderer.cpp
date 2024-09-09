@@ -23,6 +23,15 @@
 //*****************************************************
 CRenderer *CRenderer::m_pRenderer = nullptr;	// 自身のポインタ
 
+//*****************************************************
+// 定数定義
+//*****************************************************
+namespace
+{
+	float FOG_START = 5000;
+	float FOG_END = 20000;
+}
+
 //=====================================================
 // コンストラクタ
 //=====================================================
@@ -182,9 +191,8 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	// ブラーの生成
 	CBlur::Create();
 
-	m_fogInfo.fStart = 5000;
-	m_fogInfo.fEnd = 20000;
-	m_fogInfo.col = D3DXCOLOR(0.0f, 0.0f, 0.0f, 1.0f);
+	m_fogInfo.fStart = FOG_START;
+	m_fogInfo.fEnd = FOG_END;
 
 #ifdef _DEBUG
 	m_bDispimGui = true;
