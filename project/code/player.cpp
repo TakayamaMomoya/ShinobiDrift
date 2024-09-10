@@ -61,6 +61,7 @@ const float WIDTH_TIREORBIT = 50.0f;	// タイヤ軌跡の幅
 const D3DXCOLOR COL_TIREORBIT = D3DXCOLOR(1.0f, 1.0f, 1.f, 1.0f);	// タイヤ軌跡の色
 const int NUMEDGE_TIREORBIT = 20;	// タイヤ軌跡の辺の数
 const float RATE_LINE_ENBALE_TIREORBIT = 0.4f;	// タイヤ軌跡を有効化するラインの割合
+const float HEIGHT_PLAYER = -70.0f;	// プレイヤーの高さ
 
 // ハンドリング関係
 const float HANDLE_INERTIA = 0.04f;  // カーブ時の角度変更慣性
@@ -320,9 +321,10 @@ void CPlayer::Update(void)
 
 	if (m_pPlayerNinja != nullptr)
 	{// バイクに乗った忍者の追従
-		m_pPlayerNinja->SetPosition(D3DXVECTOR3(0.0f, 50.0f, 0.0f));
+		m_pPlayerNinja->SetPosition(D3DXVECTOR3(0.0f, HEIGHT_PLAYER, 0.0f));
 		CObject3D::Draw();
-		m_pPlayerNinja->SetMatrixParent(GetMatrix());
+		D3DXMATRIX mtx = GetParts(0)->pParts->GetMatrix();
+		m_pPlayerNinja->SetMatrixParent(mtx);
 	}
 
 	// スピードによるブラーの管理

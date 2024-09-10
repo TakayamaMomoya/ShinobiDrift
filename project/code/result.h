@@ -69,6 +69,23 @@ public:
 private:
 };
 
+class CStateResultApperPlayer : public CStateResult
+{// プレイヤー登場
+public:
+	CStateResultApperPlayer();	// コンストラクタ
+	virtual ~CStateResultApperPlayer();	 // デストラクタ
+
+	// メンバ関数
+	void Init(CResult *pResult) override;	// 初期化処理
+	void Uninit(CResult *pResult) override;	// 終了処理
+	void Update(CResult *pResult) override;	// 更新処理
+
+private:
+	// メンバ関数
+
+	// メンバ変数
+};
+
 class CStateResultDispTime : public CStateResult
 {// タイム表示
 public:

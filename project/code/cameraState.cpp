@@ -37,6 +37,9 @@ const float SPEED_MOVE_ABOVE = 20.0f;	// 上空視点時の移動速度
 const float SPEED_ZOOM_ABOVE = 10.0f;	// ズーム速度
 const D3DXVECTOR3 POS_RESULT = { 12726.0f, 2500.7f, -27695.0f };	// リザルト演出を行う位置
 const float LENGTH_TUTORIALEND_POSR = 500.0f;	// チュートリアルの終了時の注視点の長さ
+const float LENGTH_RESULT_POSR = 1000.0f;	// リザルトの注視点の距離
+const float ANGLE_RESULT_POSV = D3DX_PI * 0.3f;	// リザルトの視点の角度
+const float LENGTH_RESULT_POSV = 500.0f;	// リザルトの視点の距離
 }
 
 //***********************************************************************************
@@ -446,11 +449,26 @@ void CCameraStateFollowPlayerTitle::Update(CCamera* pCamera)
 //=====================================================
 CCameraStateResult::CCameraStateResult()
 {
-	CCamera::Camera* pInfoCamera;
+	CCamera::Camera* pInfoCamera = CManager::GetCamera()->GetCamera();
 
-	// ゴールのh情報
+	// ゴールの情報
 	CGoal* pGoal = CGoal::GetInstance();
 
+	if (pGoal == nullptr)
+		return;
+
+	D3DXVECTOR3 posGoal = pGoal->GetPosition();
+	float fRotGoal = pGoal->GetRotation();
+	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fRotGoal - D3DX_PI * 0.5f, 0.0f));
+
+	// 注視点位置をゴールの先に設定
+	D3DXVECTOR3 posR = posGoal + vecPole * LENGTH_RESULT_POSR;
+	pInfoCamera->posR = posR;
+
+	// 視点位置を設定
+	D3DXVECTOR3 vecPoleV = universal::PolarCoordinates(D3DXVECTOR3(ANGLE_RESULT_POSV, fRotGoal + D3DX_PI * 0.5f, 0.0f));
+	D3DXVECTOR3 posV = posGoal + vecPoleV * LENGTH_RESULT_POSV;
+	pInfoCamera->posV = posV;
 }
 
 //=====================================================
@@ -458,12 +476,5 @@ CCameraStateResult::CCameraStateResult()
 //=====================================================
 void CCameraStateResult::Update(CCamera* pCamera)
 {
-	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
 
-	if (pInfoCamera == nullptr)
-		return;
-
-	// カメラ位置の設定
-	pInfoCamera->posR = POS_RESULT;
-	pCamera->SetPosV();
 }

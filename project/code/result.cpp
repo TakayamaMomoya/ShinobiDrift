@@ -27,6 +27,7 @@
 #include "fade.h"
 #include "sound.h"
 #include "rankTime.h"
+#include "goal.h"
 
 //*****************************************************
 // 定数定義
@@ -101,11 +102,8 @@ HRESULT CResult::Init(void)
 	// タイムの保存
 	SaveTime();
 
-	// 背景の有効化
-	EnableBack();
-
 	// ステイトの変更
-	ChangeState(new CStateResultDispTime);
+	ChangeState(new CStateResultApperPlayer);
 	
 	// ゲームタイマーの削除
 	CGame *pGame = CGame::GetInstance();
@@ -296,6 +294,59 @@ void CResult::EnableBack(void)
 // ステイトの終了
 //=====================================================
 void CStateResult::Uninit(CResult *pResult)
+{
+
+}
+
+//********************************************************************************
+// プレイヤーの出現
+//********************************************************************************
+//=====================================================
+// コンストラクタ
+//=====================================================
+CStateResultApperPlayer::CStateResultApperPlayer()
+{
+
+}
+
+//=====================================================
+// デストラクタ
+//=====================================================
+CStateResultApperPlayer::~CStateResultApperPlayer()
+{
+
+}
+
+//=====================================================
+// 初期化
+//=====================================================
+void CStateResultApperPlayer::Init(CResult *pResult)
+{
+	CPlayer *pPlayer =  CPlayer::GetInstance();
+	CGoal *pGoal = CGoal::GetInstance();
+
+	if (pPlayer == nullptr || pGoal == nullptr)
+		return;
+
+	// プレイヤーの位置をゴールに合わせる
+	D3DXVECTOR3 pos = pGoal->GetPosition();
+	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, pGoal->GetRotation() + D3DX_PI, 0.0f);
+	pPlayer->SetPosition(pos);
+	pPlayer->SetRotation(rot);
+}
+
+//=====================================================
+// 終了
+//=====================================================
+void CStateResultApperPlayer::Uninit(CResult *pResult)
+{
+	CStateResult::Uninit(pResult);
+}
+
+//=====================================================
+// 更新
+//=====================================================
+void CStateResultApperPlayer::Update(CResult *pResult)
 {
 
 }
