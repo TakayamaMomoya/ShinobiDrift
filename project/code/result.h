@@ -82,8 +82,11 @@ public:
 
 private:
 	// メンバ関数
+	void MovePlayer(void);	// プレイヤーを動かす処理
+	void Particle(CResult *pResult);	// パーティクルを出す処理
 
 	// メンバ変数
+	D3DXVECTOR3 m_posDest;	// 目標の位置
 };
 
 class CStateResultDispTime : public CStateResult

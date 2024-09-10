@@ -28,6 +28,7 @@
 #include "sound.h"
 #include "rankTime.h"
 #include "goal.h"
+#include "particle.h"
 
 //*****************************************************
 // 定数定義
@@ -53,6 +54,8 @@ const float RATE_DOWN_MENU = 3.0f;	// メニュー項目の下がる割合
 const float SPEED_FRASH_MENU = 0.03f;	// メニュー項目の点滅速度
 const float DIFF_LENGTH_CURRENT = 0.1f;	// 選択ポリゴン目標位置の差分
 const float MOVE_FACT_MENU = 0.1f;	// メニュー項目の移動係数
+const float SPEED_STOP = 0.03f;	// 止まる速度
+const float LENGTH_STOP = 1000.0f;	// 制動距離
 }
 
 //=====================================================
@@ -333,6 +336,15 @@ void CStateResultApperPlayer::Init(CResult *pResult)
 	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, pGoal->GetRotation() + D3DX_PI, 0.0f);
 	pPlayer->SetPosition(pos);
 	pPlayer->SetRotation(rot);
+
+	// 止まる場所設定
+	D3DXVECTOR3 posGoal = pGoal->GetPosition();
+	float fRotGoal = pGoal->GetRotation();
+	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fRotGoal - D3DX_PI * 0.5f, 0.0f));
+
+	D3DXVECTOR3 posStop = posGoal + vecPole * LENGTH_STOP;
+
+	m_posDest = posStop;
 }
 
 //=====================================================
@@ -348,7 +360,55 @@ void CStateResultApperPlayer::Uninit(CResult *pResult)
 //=====================================================
 void CStateResultApperPlayer::Update(CResult *pResult)
 {
+	// プレイヤーを動かす処理
+	MovePlayer();
 
+	// パーティクルを出す処理
+	Particle(pResult);
+}
+
+//=====================================================
+// プレイヤーを動かす処理
+//=====================================================
+void CStateResultApperPlayer::MovePlayer(void)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer == nullptr)
+		return;
+
+	D3DXVECTOR3 pos = pPlayer->GetPosition();
+
+	pos += (m_posDest - pos) * SPEED_STOP;
+
+	pPlayer->SetPosition(pos);
+}
+
+//=====================================================
+// パーティクルを出す処理
+//=====================================================
+void CStateResultApperPlayer::Particle(CResult *pResult)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer == nullptr)
+		return;
+
+	int nMotion = pPlayer->GetMotion();
+	bool bFinish = pPlayer->IsFinish();
+
+	if (nMotion == CPlayer::MOTION::MOTION_WALK_FRONT && !bFinish)
+	{// 煙を出す
+		D3DXVECTOR3 posFront = pPlayer->GetMtxPos(2);
+		D3DXVECTOR3 posBack = pPlayer->GetMtxPos(3);
+
+		CParticle::Create(posFront, CParticle::TYPE::TYPE_RUN);
+		CParticle::Create(posBack, CParticle::TYPE::TYPE_RUN);
+	}
+	else
+	{// スコア表示に遷移
+		pResult->ChangeState(new CStateResultDispTime);
+	}
 }
 
 //********************************************************************************
@@ -375,6 +435,9 @@ CStateResultDispTime::~CStateResultDispTime()
 //=====================================================
 void CStateResultDispTime::Init(CResult *pResult)
 {
+	// 背景の有効化
+	pResult->EnableBack();
+
 	// 数字の設定
 	SetNumber();
 
@@ -678,9 +741,9 @@ void CStateResultDispTime::Input(void)
 	}
 }
 
-//====================================================
+//=====================================================
 // フェードする処理
-//====================================================
+//=====================================================
 void CStateResultDispTime::Fade(E_Menu menu)
 {
 	CFade *pFade = CFade::GetInstance();
