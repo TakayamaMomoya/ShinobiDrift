@@ -61,7 +61,7 @@ const float LENGTH_STOP = 1000.0f;	// 制動距離
 //=====================================================
 // コンストラクタ
 //=====================================================
-CResult::CResult() : CObject(1), m_pState(nullptr)
+CResult::CResult() : CObject(1), m_pState(nullptr), m_fTime(0.0f)
 {
 
 }
@@ -113,6 +113,8 @@ HRESULT CResult::Init(void)
 
 	if (pGame == nullptr)
 		return E_FAIL;
+
+	pGame->GetGameTimer();	// タイムの保存
 
 	pGame->ReleaseGameTimer();
 
@@ -173,7 +175,7 @@ void CResult::SaveTime(void)
 		return;
 
 	// タイムの取得
-	float fSecond = pTimer->GetSecond();
+	m_fTime = pTimer->GetSecond();
 
 	// ファイルに保存
 	std::ofstream outputFile(PATH_SAVE, std::ios::binary);
@@ -181,7 +183,7 @@ void CResult::SaveTime(void)
 	if (!outputFile.is_open())
 		assert(("タイムのファイルを開けませんでした", false));
 
-	outputFile.write(reinterpret_cast<const char*>(&fSecond), sizeof(float));
+	outputFile.write(reinterpret_cast<const char*>(&m_fTime), sizeof(float));
 
 	outputFile.close();
 }
@@ -402,8 +404,8 @@ void CStateResultApperPlayer::Particle(CResult *pResult)
 		D3DXVECTOR3 posFront = pPlayer->GetMtxPos(2);
 		D3DXVECTOR3 posBack = pPlayer->GetMtxPos(3);
 
-		CParticle::Create(posFront, CParticle::TYPE::TYPE_RUN);
-		CParticle::Create(posBack, CParticle::TYPE::TYPE_RUN);
+		CParticle::Create(posFront, CParticle::TYPE::TYPE_RESULTSMOKE);
+		CParticle::Create(posBack, CParticle::TYPE::TYPE_RESULTSMOKE);
 	}
 	else
 	{// スコア表示に遷移
@@ -439,7 +441,7 @@ void CStateResultDispTime::Init(CResult *pResult)
 	pResult->EnableBack();
 
 	// 数字の設定
-	SetNumber();
+	SetNumber(pResult);
 
 	// 項目の見出し生成
 	if (m_pCaption == nullptr)
@@ -500,19 +502,12 @@ void CStateResultDispTime::Init(CResult *pResult)
 //=====================================================
 // 数字の設定
 //=====================================================
-void CStateResultDispTime::SetNumber(void)
+void CStateResultDispTime::SetNumber(CResult *pResult)
 {
 	CGame *pGame = CGame::GetInstance();
 
 	if (pGame == nullptr)
 		return;
-
-	CTimer *pGameTimer = pGame->GetGameTimer();
-
-	if (pGameTimer == nullptr)
-		return;
-
-	pGameTimer->SetFlag(true);
 
 	// 自身のタイマー生成
 	m_pTimeOwn = CTimer::Create();
@@ -521,7 +516,7 @@ void CStateResultDispTime::SetNumber(void)
 		return;
 
 	// ゲームタイマーのタイムをコピー
-	float fTime = pGameTimer->GetSecond();
+	float fTime = pResult->GetTime();
 	m_pTimeOwn->SetSecond(fTime);
 	m_pTimeOwn->SetColor(CTimer::E_Number::NUMBER_MAX, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
 	m_pTimeOwn->SetPosition(POS_TIMER);

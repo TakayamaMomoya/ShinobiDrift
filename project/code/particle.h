@@ -23,16 +23,7 @@ public:
 	{
 		TYPE_NONE = 0,	// 何でもない
 		TYPE_RUN,	// 疾走
-		TYPE_TURN_EXPLOSION,	// 収束爆発
-		TYPE_BEAM_BLADE,	// ビームブレード
-		TYPE_SMOKE_DEATH,	// 煙
-		TYPE_TOMATO_JUICE,	// トマト汁
-		TYPE_SAND_SMOKE,	// 砂煙
-		TYPE_MISSILE_SMOKE,	// ミサイルの煙
-		TYPE_BLADE_PARTICLE,	// 武器の破壊
-		TYPE_EXPLOSION_SMOKE_BIG,	// 爆発の煙
-		TYPE_EXPLOSION_FIRE_BIG,	// 爆発の火
-		TYPE_APPER_SMOKE,	// 出現煙
+		TYPE_RESULTSMOKE,	// リザルトの煙
 		TYPE_MAX
 	}TYPE;
 

@@ -41,6 +41,7 @@ public:
 	void EnableBack(void);	// 背景の有効化
 
 	// 変数取得・設定関数
+	float GetTime(void) { return m_fTime; }	// タイムの取得
 
 	// 静的メンバ関数
 	static CResult *Create(void);	// 生成処理
@@ -53,6 +54,7 @@ private:
 	// メンバ変数
 	CStateResult *m_pState;
 	CPolygon2D *m_pBack;	// 背景のポリゴン
+	float m_fTime;	// タイムの保存用
 };
 
 class CStateResult
@@ -117,7 +119,7 @@ private:
 	};
 
 	// メンバ関数
-	void SetNumber(void);	// 数字の設定
+	void SetNumber(CResult *pResult);	// 数字の設定
 	void UpdateNumber(void);	// 数字の更新
 	void UpdateCaption(void);	// 見出しの更新
 	void UpdateMenu(void);	// メニュー項目の更新
