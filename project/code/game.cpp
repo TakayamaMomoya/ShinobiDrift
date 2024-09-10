@@ -94,7 +94,10 @@ HRESULT CGame::Init(void)
 	//CAnimEffect3D::Create();
 
 	// BGM再生
-	Sound::Play(CSound::LABEL_BGM_GAME01);
+	CSound* pSound = CSound::GetInstance();
+
+	//if(pSound != nullptr)
+		//pSound->Play(pSound->LABEL_BGM_GAME01);
 
 	// フォグをかける
 	CRenderer *pRenderer = CRenderer::GetInstance();
@@ -102,6 +105,9 @@ HRESULT CGame::Init(void)
 	if (pRenderer != nullptr)
 	{
 		pRenderer->EnableFog(true);
+		pRenderer->SetStart(50000);
+		pRenderer->SetEnd(70000);
+		pRenderer->SetCol(D3DXCOLOR(0.7f, 0.7f, 0.7f, 1.0f));
 	}
 
 	// 
@@ -116,13 +122,14 @@ HRESULT CGame::Init(void)
 	// メッシュロード生成
 	CMeshRoad::Create(PATH_GAME_ROAD);
 
-#if 0
+#if 1
 	CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), D3DX_PI);
 	// チュートリアルの生成
+	CTutorial::Create();
 #else
 	// ゴール生成
 	CGoal::Create(D3DXVECTOR3(12726.0f, 2500.7f, -27695.0f), D3DX_PI);
-	CTutorial::Create();
+	CreateGameTimer();
 #endif
 
 	// メッシュフィールドの生成
@@ -149,6 +156,11 @@ void CGame::Uninit(void)
 		delete m_pEdit;
 		m_pEdit = nullptr;
 	}
+
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound != nullptr)
+		pSound->Stop();
 
 	// オブジェクト全棄
 	CObject::ReleaseAll();

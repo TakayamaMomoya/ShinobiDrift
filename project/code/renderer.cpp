@@ -23,6 +23,15 @@
 //*****************************************************
 CRenderer *CRenderer::m_pRenderer = nullptr;	// 自身のポインタ
 
+//*****************************************************
+// 定数定義
+//*****************************************************
+namespace
+{
+	float FOG_START = 5000;
+	float FOG_END = 20000;
+}
+
 //=====================================================
 // コンストラクタ
 //=====================================================
@@ -182,6 +191,9 @@ HRESULT CRenderer::Init(HWND hWnd, BOOL bWindow)
 	// ブラーの生成
 	CBlur::Create();
 
+	m_fogInfo.fStart = FOG_START;
+	m_fogInfo.fEnd = FOG_END;
+
 #ifdef _DEBUG
 	m_bDispimGui = true;
 #else
@@ -257,22 +269,19 @@ void CRenderer::Draw(void)
 		(D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER),
 		COLOR_CLEAR, 1.0f, 0);
 
-	float fStart = 5000;
-	float fEnd = 20000;
-
 	// フォグを有効化
 	//m_pD3DDevice->SetRenderState(D3DRS_FOGENABLE, m_fogInfo.bEnable);
 
 	// フォグの色を設定
-	m_pD3DDevice->SetRenderState(D3DRS_FOGCOLOR, D3DXCOLOR(0.5f, 0.5f, 0.5f, 1.0f));
+	m_pD3DDevice->SetRenderState(D3DRS_FOGCOLOR, m_fogInfo.col);
 
 	// フォグの状態を設定
 	m_pD3DDevice->SetRenderState(D3DRS_FOGVERTEXMODE, D3DFOG_NONE);
 	m_pD3DDevice->SetRenderState(D3DRS_FOGTABLEMODE, D3DFOG_LINEAR);
 
 	// フォグの発生範囲を設定
-	m_pD3DDevice->SetRenderState(D3DRS_FOGSTART, *(DWORD*)(&fStart));
-	m_pD3DDevice->SetRenderState(D3DRS_FOGEND, *(DWORD*)(&fEnd));
+	m_pD3DDevice->SetRenderState(D3DRS_FOGSTART, *(DWORD*)(&m_fogInfo.fStart));
+	m_pD3DDevice->SetRenderState(D3DRS_FOGEND, *(DWORD*)(&m_fogInfo.fEnd));
 
 	// 描画開始
 	if (SUCCEEDED(m_pD3DDevice->BeginScene()))

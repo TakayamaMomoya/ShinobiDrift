@@ -468,7 +468,7 @@ HRESULT CBlockGrab::Init(void)
 	// ”»’è‰Â‹‰»—p‚Ìî¶¬
 	if (m_pFan == nullptr)
 	{
-		m_pFan = CFan3D::Create();
+		//m_pFan = CFan3D::Create();
 		
 		if (m_pFan != nullptr)
 		{

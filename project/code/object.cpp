@@ -346,7 +346,7 @@ void CObject::DrawAll(void)
 	
 	if (pBlur != nullptr)
 	{
-		//pBlur->OverlapLastTexture();	// 前回のテクスチャを重ねる
+		pBlur->OverlapLastTexture();	// 前回のテクスチャを重ねる
 		pBlur->RestoreTarget();	// レンダーターゲットの復元
 		pBlur->DrawBuckBuffer();	// バックバッファへの描画
 		pBlur->SwapBuffer();	// バッファーの入れ替え
@@ -410,7 +410,7 @@ void CObject::DrawObject(bool bBlur)
 			pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
 			pDevice->SetRenderState(D3DRS_ALPHAREF, pObject->m_dAlpha);
 
-			//pDevice->SetRenderState(D3DRS_FOGENABLE, pObject->m_bFog && CRenderer::GetInstance()->IsFog());
+			pDevice->SetRenderState(D3DRS_FOGENABLE, pObject->m_bFog && CRenderer::GetInstance()->IsFog());
 
 			CBlur *pBlur = CBlur::GetInstance();
 

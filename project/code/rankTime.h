@@ -32,6 +32,10 @@ public:
 	void Uninit();
 	void Update();
 
+	// 変数取得・設定関数
+	void SetArrayTimer(vector<CTimer*> aTimer) { m_aTimer = aTimer; }	// タイマーの配列
+	vector<CTimer*> GetArrayTimer(void) { return m_aTimer; }
+
 	// 静的メンバ関数
 	static CRankTime* Create();	// 生成
 	static CRankTime* GetInstance() { return s_pRankTime; }	// インスタンス取得

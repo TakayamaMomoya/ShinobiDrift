@@ -26,6 +26,7 @@
 #include "frame.h"
 #include "game.h"
 #include "UIManager.h"
+#include "cameraState.h"
 
 //*****************************************************
 // íËêîíËã`
@@ -33,7 +34,7 @@
 namespace
 {
 const char* PATH_ROAD = "data\\MAP\\road01.bin";	// É`ÉÖÅ[ÉgÉäÉAÉãÉÅÉbÉVÉÖÉçÅ[ÉhÇÃÉpÉX
-const D3DXVECTOR3 POS_DEFAULT_UI = { 0.7f, 0.5f, 0.0f };	// UIÇÃÉfÉtÉHÉãÉgà íu
+const D3DXVECTOR3 POS_DEFAULT_UI = { 0.8f, 0.1f, 0.0f };	// UIÇÃÉfÉtÉHÉãÉgà íu
 const D3DXVECTOR2 SIZE_DEFAULT_UI = { 0.05f, 0.05f};	// UIÇÃÉfÉtÉHÉãÉgÉTÉCÉY
 const float LINE_INPUT = 0.3f;	// ì¸óÕÇ∆îªíËÇ∑ÇÈÉXÉsÅ[Éh
 const float TIME_ACCELE = 5.0f;	// ÉAÉNÉZÉãÇ…ïKóvÇ»éûä‘
@@ -49,6 +50,9 @@ const D3DXVECTOR3 POS_PLAYER_INITIAL = { -11409.0f,0.0f,26395.0f };	// É`ÉÖÅ[ÉgÉ
 const D3DXVECTOR3 ROT_PLAYER_INITIAL = { 0.0f,1.77f,0.0f };	// É`ÉÖÅ[ÉgÉäÉAÉãÇÃÉvÉåÉCÉÑÅ[èâä˙å¸Ç´
 const string PATH_TEXTURE_GATE = "data\\TEXTURE\\EFFECT\\gate00.png";	// ÉQÅ[ÉgÇÃÉeÉNÉXÉ`ÉÉÉpÉX
 const float SPEED_ROTATE_GATE = 0.05f;	// ÉQÅ[ÉgÇÃâÒÇÈë¨ìx
+const D3DXVECTOR3 POS_PLAYER_END = { -11409.0f, -14.0f,26395.0f };	// ÉvÉåÉCÉÑÅ[ÇÃÉ`ÉÖÅ[ÉgÉäÉAÉãèIóπéûÇÃà íu
+const D3DXVECTOR3 ROT_PLAYER_END = { 0.0f, 1.77f,0.0f };	// ÉvÉåÉCÉÑÅ[ÇÃÉ`ÉÖÅ[ÉgÉäÉAÉãèIóπéûÇÃà íu
+const D3DXCOLOR COL_GAUGE_LIMIT = { 0.0f,1.0f,1.0f,1.0f };	// ÉQÅ[ÉWÇ™ñûÇøÇΩéûÇÃêF
 }
 
 //=====================================================
@@ -109,7 +113,7 @@ HRESULT CTutorial::Init(void)
 	}
 
 	// èâä˙ÉXÉeÉCÉgÇ…ê›íË
-	ChangeState(new CStateTutorialEnd);
+	ChangeState(new CStateTutorialMove);
 
 	return S_OK;
 }
@@ -183,6 +187,7 @@ void CTutorial::StartGame(void)
 	if (pCamera == nullptr)
 		return;
 
+	pCamera->ChangeState(new CFollowPlayer);
 	pCamera->SkipToDest();	// ñ⁄ïWà íuÇ‹Ç≈ÉJÉÅÉâÇîÚÇŒÇ∑
 }
 
@@ -313,6 +318,7 @@ void CStateTutorial::CreateUI(vector<string> aPathTexture, vector<float> aLimit,
 void CStateTutorial::SetParamGauge(int nNumMenu, CTutorial *pTutorial)
 {
 	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
+	std::map<int, float> mapLimit = pTutorial->GetMapLimit();
 	vector<CGauge*> aGauge = GetArrayGauge();
 
 	if (aGauge.empty())
@@ -321,6 +327,14 @@ void CStateTutorial::SetParamGauge(int nNumMenu, CTutorial *pTutorial)
 	for (int i = 0; i < nNumMenu;i++)
 	{
 		aGauge[i]->SetParam(mapCounter[i]);
+
+		float fParam = aGauge[i]->GetParam();
+
+		if (fParam >= mapLimit[i])
+		{// ÉpÉâÉÅÅ[É^Å[Ç™ñÑÇ‹Ç¡ÇΩÇÁêFÇïœÇ¶ÇÈ
+			CUI *pUI = aGauge[i]->GetGauge();
+			pUI->SetCol(COL_GAUGE_LIMIT);
+		}
 	}
 
 	SetArrayGauge(aGauge);
@@ -422,7 +436,7 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 	
 	if (IsEndInput(MENU_MAX,pTutorial))
 	{// à⁄ìÆÉ`ÉÖÅ[ÉgÉäÉAÉãÇèIóπ
-		pTutorial->ChangeState(new CStateTutorialDrift);
+		pTutorial->ChangeState(new CStateTutorialEnd);
 	}
 }
 
@@ -461,7 +475,7 @@ void CStateTutorialDrift::Init(CTutorial *pTutorial)
 	vector<float> aLimit(MENU_MAX);
 	aLimit =
 	{
-		TIME_ACCELE,
+		1.0f,
 	};
 
 	CreateUI(aPath, aLimit, MENU_MAX, pTutorial);
@@ -501,11 +515,9 @@ void CStateTutorialDrift::Update(CTutorial *pTutorial)
 
 	pTutorial->SetMapCounter(mapCounter);
 
-	CDebugProc::GetInstance()->Print("\nÉhÉäÉtÉgÉJÉEÉìÉ^Å[[%f]", mapCounter[MENU_DRIFT]);
-
 	if (IsEndInput(MENU_MAX, pTutorial))
 	{// ÉhÉäÉtÉgÉ`ÉÖÅ[ÉgÉäÉAÉãÇèIóπ
-		pTutorial->ChangeState(new CStateTutorialParry);
+		pTutorial->ChangeState(new CStateTutorialEnd);
 	}
 }
 
@@ -622,6 +634,15 @@ void CStateTutorialEnd::Init(CTutorial *pTutorial)
 	if (pPlayer == nullptr)
 		return;
 
+	// ÉvÉåÉCÉÑÅ[ÇÃÉgÉâÉìÉXÉtÉHÅ[ÉÄÇÃê›íË
+	pPlayer->SetPosition(POS_PLAYER_END);
+	pPlayer->SetRotation(ROT_PLAYER_END);
+	pPlayer->MultiplyMtx(false);
+
+	// ÉJÉÅÉâÇÃÉXÉeÉCÉgÇê›íË
+	Camera::ChangeState(new CCameraStateTutorialEnd);
+
+	// ÉQÅ[Égê∂ê¨ÇÃÇΩÇﬂÇ…èÄîı
 	D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 	D3DXVECTOR3 posGate = posPlayer + pPlayer->GetForward() * DIST_GATE;
 	posGate.y += HEIGTH_GATE;
@@ -769,8 +790,6 @@ void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
 	}
 
 #ifdef _DEBUG
-	CEffect3D::Create(posStart, 400.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	CEffect3D::Create(posEnd, 200.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
 #endif
 }
 

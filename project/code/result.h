@@ -41,6 +41,7 @@ public:
 	void EnableBack(void);	// 背景の有効化
 
 	// 変数取得・設定関数
+	float GetTime(void) { return m_fTime; }	// タイムの取得
 
 	// 静的メンバ関数
 	static CResult *Create(void);	// 生成処理
@@ -53,6 +54,7 @@ private:
 	// メンバ変数
 	CStateResult *m_pState;
 	CPolygon2D *m_pBack;	// 背景のポリゴン
+	float m_fTime;	// タイムの保存用
 };
 
 class CStateResult
@@ -67,6 +69,26 @@ public:
 	virtual void Update(CResult *pResult) = 0;	// 更新処理
 
 private:
+};
+
+class CStateResultApperPlayer : public CStateResult
+{// プレイヤー登場
+public:
+	CStateResultApperPlayer();	// コンストラクタ
+	virtual ~CStateResultApperPlayer();	 // デストラクタ
+
+	// メンバ関数
+	void Init(CResult *pResult) override;	// 初期化処理
+	void Uninit(CResult *pResult) override;	// 終了処理
+	void Update(CResult *pResult) override;	// 更新処理
+
+private:
+	// メンバ関数
+	void MovePlayer(void);	// プレイヤーを動かす処理
+	void Particle(CResult *pResult);	// パーティクルを出す処理
+
+	// メンバ変数
+	D3DXVECTOR3 m_posDest;	// 目標の位置
 };
 
 class CStateResultDispTime : public CStateResult
@@ -97,12 +119,13 @@ private:
 	};
 
 	// メンバ関数
-	void SetNumber(void);	// 数字の設定
+	void SetNumber(CResult *pResult);	// 数字の設定
 	void UpdateNumber(void);	// 数字の更新
 	void UpdateCaption(void);	// 見出しの更新
 	void UpdateMenu(void);	// メニュー項目の更新
 	void Input(void);	// 入力処理
 	void Fade(E_Menu menu);	// フェード処理
+	void Sort(void);	// ソート処理
 
 	// メンバ変数
 	CTimer *m_pTimeOwn;	// 自身のタイム

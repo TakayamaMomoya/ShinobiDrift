@@ -232,6 +232,11 @@ void CCamera::ChangeState(CCameraState *pBehavior)
 	}
 
 	m_pState = pBehavior;
+
+	if (m_pState != nullptr)
+	{
+		m_pState->Init(this);
+	}
 }
 
 namespace Camera

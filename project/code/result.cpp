@@ -25,6 +25,10 @@
 #include "texture.h"
 #include "manager.h"
 #include "fade.h"
+#include "sound.h"
+#include "rankTime.h"
+#include "goal.h"
+#include "particle.h"
 
 //*****************************************************
 // 定数定義
@@ -50,12 +54,14 @@ const float RATE_DOWN_MENU = 3.0f;	// メニュー項目の下がる割合
 const float SPEED_FRASH_MENU = 0.03f;	// メニュー項目の点滅速度
 const float DIFF_LENGTH_CURRENT = 0.1f;	// 選択ポリゴン目標位置の差分
 const float MOVE_FACT_MENU = 0.1f;	// メニュー項目の移動係数
+const float SPEED_STOP = 0.03f;	// 止まる速度
+const float LENGTH_STOP = 1000.0f;	// 制動距離
 }
 
 //=====================================================
 // コンストラクタ
 //=====================================================
-CResult::CResult() : CObject(1), m_pState(nullptr)
+CResult::CResult() : CObject(1), m_pState(nullptr), m_fTime(0.0f)
 {
 
 }
@@ -99,17 +105,16 @@ HRESULT CResult::Init(void)
 	// タイムの保存
 	SaveTime();
 
-	// 背景の有効化
-	EnableBack();
-
 	// ステイトの変更
-	ChangeState(new CStateResultDispTime);
+	ChangeState(new CStateResultApperPlayer);
 	
 	// ゲームタイマーの削除
 	CGame *pGame = CGame::GetInstance();
 
 	if (pGame == nullptr)
 		return E_FAIL;
+
+	pGame->GetGameTimer();	// タイムの保存
 
 	pGame->ReleaseGameTimer();
 
@@ -118,6 +123,11 @@ HRESULT CResult::Init(void)
 
 	if (pUIManager != nullptr)
 		pUIManager->ReleaseGameUI();
+
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound != nullptr)
+		pSound->Play(pSound->LABEL_BGM_GAME05);
 
 	return S_OK;
 }
@@ -165,7 +175,7 @@ void CResult::SaveTime(void)
 		return;
 
 	// タイムの取得
-	float fSecond = pTimer->GetSecond();
+	m_fTime = pTimer->GetSecond();
 
 	// ファイルに保存
 	std::ofstream outputFile(PATH_SAVE, std::ios::binary);
@@ -173,7 +183,9 @@ void CResult::SaveTime(void)
 	if (!outputFile.is_open())
 		assert(("タイムのファイルを開けませんでした", false));
 
-	outputFile.write(reinterpret_cast<const char*>(&fSecond), sizeof(float));
+	outputFile.write(reinterpret_cast<const char*>(&m_fTime), sizeof(float));
+
+	outputFile.close();
 }
 
 //=====================================================
@@ -181,6 +193,11 @@ void CResult::SaveTime(void)
 //=====================================================
 void CResult::Uninit(void)
 {
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound != nullptr)
+		pSound->Stop();
+
 	Release();
 }
 
@@ -287,6 +304,116 @@ void CStateResult::Uninit(CResult *pResult)
 }
 
 //********************************************************************************
+// プレイヤーの出現
+//********************************************************************************
+//=====================================================
+// コンストラクタ
+//=====================================================
+CStateResultApperPlayer::CStateResultApperPlayer()
+{
+
+}
+
+//=====================================================
+// デストラクタ
+//=====================================================
+CStateResultApperPlayer::~CStateResultApperPlayer()
+{
+
+}
+
+//=====================================================
+// 初期化
+//=====================================================
+void CStateResultApperPlayer::Init(CResult *pResult)
+{
+	CPlayer *pPlayer =  CPlayer::GetInstance();
+	CGoal *pGoal = CGoal::GetInstance();
+
+	if (pPlayer == nullptr || pGoal == nullptr)
+		return;
+
+	// プレイヤーの位置をゴールに合わせる
+	D3DXVECTOR3 pos = pGoal->GetPosition();
+	D3DXVECTOR3 rot = D3DXVECTOR3(0.0f, pGoal->GetRotation() + D3DX_PI, 0.0f);
+	pPlayer->SetPosition(pos);
+	pPlayer->SetRotation(rot);
+
+	// 止まる場所設定
+	D3DXVECTOR3 posGoal = pGoal->GetPosition();
+	float fRotGoal = pGoal->GetRotation();
+	D3DXVECTOR3 vecPole = universal::PolarCoordinates(D3DXVECTOR3(D3DX_PI * 0.5f, fRotGoal - D3DX_PI * 0.5f, 0.0f));
+
+	D3DXVECTOR3 posStop = posGoal + vecPole * LENGTH_STOP;
+
+	m_posDest = posStop;
+}
+
+//=====================================================
+// 終了
+//=====================================================
+void CStateResultApperPlayer::Uninit(CResult *pResult)
+{
+	CStateResult::Uninit(pResult);
+}
+
+//=====================================================
+// 更新
+//=====================================================
+void CStateResultApperPlayer::Update(CResult *pResult)
+{
+	// プレイヤーを動かす処理
+	MovePlayer();
+
+	// パーティクルを出す処理
+	Particle(pResult);
+}
+
+//=====================================================
+// プレイヤーを動かす処理
+//=====================================================
+void CStateResultApperPlayer::MovePlayer(void)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer == nullptr)
+		return;
+
+	D3DXVECTOR3 pos = pPlayer->GetPosition();
+
+	pos += (m_posDest - pos) * SPEED_STOP;
+
+	pPlayer->SetPosition(pos);
+}
+
+//=====================================================
+// パーティクルを出す処理
+//=====================================================
+void CStateResultApperPlayer::Particle(CResult *pResult)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer == nullptr)
+		return;
+
+	int nMotion = pPlayer->GetMotion();
+	bool bFinish = pPlayer->IsFinish();
+
+	if (nMotion == CPlayer::MOTION::MOTION_WALK_FRONT && !bFinish)
+	{// 煙を出す
+		D3DXVECTOR3 posFront = pPlayer->GetMtxPos(2);
+		D3DXVECTOR3 posBack = pPlayer->GetMtxPos(3);
+
+		CParticle::Create(posFront, CParticle::TYPE::TYPE_RESULTSMOKE);
+		CParticle::Create(posBack, CParticle::TYPE::TYPE_RESULTSMOKE);
+	}
+	else
+	{// スコア表示に遷移
+		pResult->ChangeState(new CStateResultDispTime);
+	}
+}
+
+//********************************************************************************
 // タイム表示
 //********************************************************************************
 //=====================================================
@@ -310,8 +437,11 @@ CStateResultDispTime::~CStateResultDispTime()
 //=====================================================
 void CStateResultDispTime::Init(CResult *pResult)
 {
+	// 背景の有効化
+	pResult->EnableBack();
+
 	// 数字の設定
-	SetNumber();
+	SetNumber(pResult);
 
 	// 項目の見出し生成
 	if (m_pCaption == nullptr)
@@ -364,24 +494,20 @@ void CStateResultDispTime::Init(CResult *pResult)
 	}
 
 	m_state = E_State::STATE_APPER;
+
+	// ソート
+	Sort();
 }
 
 //=====================================================
 // 数字の設定
 //=====================================================
-void CStateResultDispTime::SetNumber(void)
+void CStateResultDispTime::SetNumber(CResult *pResult)
 {
 	CGame *pGame = CGame::GetInstance();
 
 	if (pGame == nullptr)
 		return;
-
-	CTimer *pGameTimer = pGame->GetGameTimer();
-
-	if (pGameTimer == nullptr)
-		return;
-
-	pGameTimer->SetFlag(true);
 
 	// 自身のタイマー生成
 	m_pTimeOwn = CTimer::Create();
@@ -390,10 +516,35 @@ void CStateResultDispTime::SetNumber(void)
 		return;
 
 	// ゲームタイマーのタイムをコピー
-	float fTime = pGameTimer->GetSecond();
+	float fTime = pResult->GetTime();
 	m_pTimeOwn->SetSecond(fTime);
 	m_pTimeOwn->SetColor(CTimer::E_Number::NUMBER_MAX, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
 	m_pTimeOwn->SetPosition(POS_TIMER);
+}
+
+//=====================================================
+// ソート処理
+//=====================================================
+void CStateResultDispTime::Sort(void)
+{
+	CRankTime *pRankTIme = CRankTime::GetInstance();
+
+	if (pRankTIme == nullptr)
+		return;
+
+	// 現在のランキング取得
+	vector<CTimer*> aTimer = pRankTIme->GetArrayTimer();
+	vector<float> aTime(aTimer.size());
+
+	for (int i = 0; i < (int)aTime.size(); i++)
+	{
+
+	}
+
+	// ソートする
+
+	// ランキングの設定
+
 }
 
 //=====================================================
@@ -457,7 +608,12 @@ void CStateResultDispTime::UpdateCaption(void)
 	m_fCntAnim += SPEED_CAPTION;
 
 	if (m_fCntAnim >= 1.0f)
+	{
 		m_state = E_State::STATE_SELECT;
+
+		// ランク表示の生成
+		CRankTime::Create();
+	}
 
 	universal::LimitValuefloat(&m_fCntAnim, 1.0f, 0.0f);
 
@@ -529,6 +685,7 @@ void CStateResultDispTime::UpdateMenu(void)
 void CStateResultDispTime::Input(void)
 {
 	CInputManager *pInputManager = CInputManager::GetInstance();
+	CSound* pSound = CSound::GetInstance();
 
 	if (pInputManager == nullptr)
 		return;
@@ -550,6 +707,8 @@ void CStateResultDispTime::Input(void)
 		m_nCurrent = (E_Menu)((m_nCurrent + 1) % E_Menu::MENU_MAX);
 
 		// 音の再生
+		if (pSound != nullptr)
+			pSound->Play(pSound->LABEL_SE_REMOVE);
 	}
 
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_AXIS_UP))
@@ -557,6 +716,8 @@ void CStateResultDispTime::Input(void)
 		m_nCurrent = (E_Menu)((m_nCurrent + E_Menu::MENU_MAX - 1) % E_Menu::MENU_MAX);
 
 		// 音の再生
+		if (pSound != nullptr)
+			pSound->Play(pSound->LABEL_SE_REMOVE);
 	}
 
 	if (m_aMenuPolygon[m_nCurrent] != nullptr)
@@ -567,24 +728,23 @@ void CStateResultDispTime::Input(void)
 	if (pInputManager->GetTrigger(CInputManager::BUTTON_ENTER))
 	{// 選択項目にフェードする
 		// 音の再生
+		if (pSound != nullptr)
+			pSound->Play(pSound->LABEL_SE_THROW);
 
 		// フェード
 		Fade((E_Menu)m_nCurrent);
 	}
 }
 
-
-//====================================================
+//=====================================================
 // フェードする処理
-//====================================================
+//=====================================================
 void CStateResultDispTime::Fade(E_Menu menu)
 {
 	CFade *pFade = CFade::GetInstance();
 
 	if (pFade == nullptr)
-	{
 		return;
-	}
 
 	switch (menu)
 	{

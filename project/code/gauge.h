@@ -37,6 +37,8 @@ public:
 	void SetParam(float fParam) { m_fParam = fParam; }	// パラメーター
 	float GetParam(void) { return m_fParam; }
 	void SetPosition(D3DXVECTOR3 pos) override;	// 位置
+	CUI *GetGauge(void) { return m_aPolygon[E_Polygon::POLYGON_GAUGE]; }	// ゲージポリゴン
+	void SetGauge(CUI *pUI) { m_aPolygon[E_Polygon::POLYGON_GAUGE] = pUI; }
 
 	// 静的メンバ関数
 	static CGauge *Create(float fParamMax);	// 生成処理
