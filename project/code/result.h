@@ -103,6 +103,7 @@ private:
 	void UpdateMenu(void);	// メニュー項目の更新
 	void Input(void);	// 入力処理
 	void Fade(E_Menu menu);	// フェード処理
+	void Sort(void);	// ソート処理
 
 	// メンバ変数
 	CTimer *m_pTimeOwn;	// 自身のタイム

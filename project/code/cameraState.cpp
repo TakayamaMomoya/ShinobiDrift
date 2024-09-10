@@ -98,7 +98,7 @@ void CFollowPlayer::Update(CCamera *pCamera)
 		D3DXVECTOR3 vecPole = universal::PolarCoordinates(pInfoCamera->rot);
 
 #ifdef _DEBUG
-		CEffect3D::Create(pPlayer->GetMtxPos(2) + vecPole * 500.0f, 20.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
+		//CEffect3D::Create(pPlayer->GetMtxPos(2) + vecPole * 500.0f, 20.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
 #endif
 		// 追従時の視点からラープ(視点)
 		D3DXVECTOR3 vecPoleOld = universal::PolarCoordinates(m_rotROld);

@@ -181,6 +181,8 @@ void CResult::SaveTime(void)
 		assert(("タイムのファイルを開けませんでした", false));
 
 	outputFile.write(reinterpret_cast<const char*>(&fSecond), sizeof(float));
+
+	outputFile.close();
 }
 
 //=====================================================
@@ -376,6 +378,9 @@ void CStateResultDispTime::Init(CResult *pResult)
 	}
 
 	m_state = E_State::STATE_APPER;
+
+	// ソート
+	Sort();
 }
 
 //=====================================================
@@ -406,6 +411,31 @@ void CStateResultDispTime::SetNumber(void)
 	m_pTimeOwn->SetSecond(fTime);
 	m_pTimeOwn->SetColor(CTimer::E_Number::NUMBER_MAX, D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
 	m_pTimeOwn->SetPosition(POS_TIMER);
+}
+
+//=====================================================
+// ソート処理
+//=====================================================
+void CStateResultDispTime::Sort(void)
+{
+	CRankTime *pRankTIme = CRankTime::GetInstance();
+
+	if (pRankTIme == nullptr)
+		return;
+
+	// 現在のランキング取得
+	vector<CTimer*> aTimer = pRankTIme->GetArrayTimer();
+	vector<float> aTime(aTimer.size());
+
+	for (int i = 0; i < (int)aTime.size(); i++)
+	{
+
+	}
+
+	// ソートする
+
+	// ランキングの設定
+
 }
 
 //=====================================================
