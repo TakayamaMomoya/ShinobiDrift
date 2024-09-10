@@ -34,7 +34,7 @@
 namespace
 {
 const char* PATH_ROAD = "data\\MAP\\road01.bin";	// ƒ`ƒ…[ƒgƒŠƒAƒ‹ƒƒbƒVƒ…ƒ[ƒh‚ÌƒpƒX
-const D3DXVECTOR3 POS_DEFAULT_UI = { 0.7f, 0.5f, 0.0f };	// UI‚ÌƒfƒtƒHƒ‹ƒgˆÊ’u
+const D3DXVECTOR3 POS_DEFAULT_UI = { 0.8f, 0.1f, 0.0f };	// UI‚ÌƒfƒtƒHƒ‹ƒgˆÊ’u
 const D3DXVECTOR2 SIZE_DEFAULT_UI = { 0.05f, 0.05f};	// UI‚ÌƒfƒtƒHƒ‹ƒgƒTƒCƒY
 const float LINE_INPUT = 0.3f;	// “ü—Í‚Æ”»’è‚·‚éƒXƒs[ƒh
 const float TIME_ACCELE = 5.0f;	// ƒAƒNƒZƒ‹‚É•K—v‚ÈŠÔ
@@ -52,6 +52,7 @@ const string PATH_TEXTURE_GATE = "data\\TEXTURE\\EFFECT\\gate00.png";	// ƒQ[ƒg‚
 const float SPEED_ROTATE_GATE = 0.05f;	// ƒQ[ƒg‚Ì‰ñ‚é‘¬“x
 const D3DXVECTOR3 POS_PLAYER_END = { -11409.0f, -14.0f,26395.0f };	// ƒvƒŒƒCƒ„[‚Ìƒ`ƒ…[ƒgƒŠƒAƒ‹I—¹‚ÌˆÊ’u
 const D3DXVECTOR3 ROT_PLAYER_END = { 0.0f, 1.77f,0.0f };	// ƒvƒŒƒCƒ„[‚Ìƒ`ƒ…[ƒgƒŠƒAƒ‹I—¹‚ÌˆÊ’u
+const D3DXCOLOR COL_GAUGE_LIMIT = { 0.0f,1.0f,1.0f,1.0f };	// ƒQ[ƒW‚ª–‚¿‚½‚ÌF
 }
 
 //=====================================================
@@ -317,6 +318,7 @@ void CStateTutorial::CreateUI(vector<string> aPathTexture, vector<float> aLimit,
 void CStateTutorial::SetParamGauge(int nNumMenu, CTutorial *pTutorial)
 {
 	std::map<int, float> mapCounter = pTutorial->GetMapCounter();
+	std::map<int, float> mapLimit = pTutorial->GetMapLimit();
 	vector<CGauge*> aGauge = GetArrayGauge();
 
 	if (aGauge.empty())
@@ -325,6 +327,14 @@ void CStateTutorial::SetParamGauge(int nNumMenu, CTutorial *pTutorial)
 	for (int i = 0; i < nNumMenu;i++)
 	{
 		aGauge[i]->SetParam(mapCounter[i]);
+
+		float fParam = aGauge[i]->GetParam();
+
+		if (fParam >= mapLimit[i])
+		{// ƒpƒ‰ƒ[ƒ^[‚ª–„‚Ü‚Á‚½‚çF‚ğ•Ï‚¦‚é
+			CUI *pUI = aGauge[i]->GetGauge();
+			pUI->SetCol(COL_GAUGE_LIMIT);
+		}
 	}
 
 	SetArrayGauge(aGauge);
@@ -504,8 +514,6 @@ void CStateTutorialDrift::Update(CTutorial *pTutorial)
 	SetParamGauge(MENU_MAX, pTutorial);
 
 	pTutorial->SetMapCounter(mapCounter);
-
-	CDebugProc::GetInstance()->Print("\nƒhƒŠƒtƒgƒJƒEƒ“ƒ^[[%f]", mapCounter[MENU_DRIFT]);
 
 	if (IsEndInput(MENU_MAX, pTutorial))
 	{// ƒhƒŠƒtƒgƒ`ƒ…[ƒgƒŠƒAƒ‹‚ğI—¹
