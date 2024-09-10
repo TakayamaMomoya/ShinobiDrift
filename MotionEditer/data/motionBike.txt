@@ -14,10 +14,10 @@ NUM_MODEL = 4
 #====================================================================
 # モデルファイル名
 #====================================================================
+MODEL_FILENAME = data\MODEL\skybox\sky00.x
 MODEL_FILENAME = data/MODEL/bike/00_body.x
 MODEL_FILENAME = data/MODEL/bike/01_Handle.x
 MODEL_FILENAME = data/MODEL/bike/02_Wheel_Front.x
-MODEL_FILENAME = data/MODEL/bike/03_Wheel_Rear.x
 
 #====================================================================
 # キャラクター情報
