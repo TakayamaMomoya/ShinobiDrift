@@ -349,136 +349,74 @@ bool CBlock::CollideSide(D3DXVECTOR3* pPos, D3DXVECTOR3* move, D3DXVECTOR3 vecAx
 	D3DXVECTOR3 BlockMin = GetVtxMin();
 	D3DXVECTOR3 pos = GetPosition() + (BlockMax + BlockMin);
 	D3DXVECTOR3 rot = GetRotation();
-	D3DXVECTOR3 BlockCorner;
+	D3DXVECTOR3 BlockCornerOffset;
 	D3DXVECTOR3 BlockNor;
 
-	BlockCorner = universal::PosRelativeMtx(pos, rot, ((BlockMax - BlockMin) * 0.5f)) - pos;
-	D3DXVec3Normalize(&BlockNor, &BlockCorner);
+	BlockCornerOffset = universal::PosRelativeMtx(D3DXVECTOR3(0.0f,0.0f,0.0f), D3DXVECTOR3(0.0f, rot.y, 0.0f), (BlockMax - BlockMin) * 0.5f);
+	D3DXVec3Normalize(&BlockNor, &BlockCornerOffset);
+	BlockCornerOffset.x = fabsf(BlockCornerOffset.x);
+	BlockCornerOffset.z = fabsf(BlockCornerOffset.z);
 
 	// ガードレールの高さ以内で判定する
-	if (pPos->y > pos.y + BlockCorner.y || pPos->y + vecAxial.y < pos.y - BlockCorner.y)
+	if (pPos->y > pos.y + BlockCornerOffset.y || pPos->y + vecAxial.y < pos.y - BlockCornerOffset.y)
 		return false;
 
 	D3DXVECTOR3 axisA1, axisNA1;
 	D3DXVECTOR3 axisA2, axisNA2;
 	D3DXVECTOR3 axisA3, axisNA3;
-	D3DXVECTOR3 axisB1, axisNB1;
-	D3DXVECTOR3 axisB2, axisNB2;
-	D3DXVECTOR3 axisB3, axisNB3;
+	D3DXVECTOR3 axisA4, axisNA4;
 
-	axisA1 = D3DXVECTOR3(vecAxial.x, 0.0f, 0.0f);
-	axisA2 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	axisA3 = D3DXVECTOR3(0.0f, 0.0f, vecAxial.z);
-	axisB1 = D3DXVECTOR3(BlockCorner.x, 0.0f, 0.0f);
-	axisB2 = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
-	axisB3 = D3DXVECTOR3(0.0f, 0.0f, BlockCorner.z);
+	axisA1 = D3DXVECTOR3(pos.x + BlockCornerOffset.x, 0.0f, pos.z + BlockCornerOffset.z);
+	axisA2 = D3DXVECTOR3(pos.x + BlockCornerOffset.x, 0.0f, pos.z - BlockCornerOffset.z);
+	axisA3 = D3DXVECTOR3(pos.x - BlockCornerOffset.x, 0.0f, pos.z + BlockCornerOffset.z);
+	axisA4 = D3DXVECTOR3(pos.x - BlockCornerOffset.x, 0.0f, pos.z - BlockCornerOffset.z);
 
 	D3DXVec3Normalize(&axisNA1, &axisA1);
 	D3DXVec3Normalize(&axisNA2, &axisA2);
 	D3DXVec3Normalize(&axisNA3, &axisA3);
-	D3DXVec3Normalize(&axisNB1, &axisB1);
-	D3DXVec3Normalize(&axisNB2, &axisB2);
-	D3DXVec3Normalize(&axisNB3, &axisB3);
 
 #ifdef _DEBUG
 	CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-	CEffect3D::Create(pos + BlockCorner, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-	CEffect3D::Create(pos - BlockCorner, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	CEffect3D::Create(pos + axisB1, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f));
-	CEffect3D::Create(pos + axisB3, 50.0f, 3, D3DXCOLOR(0.0f, 1.0f, 1.0f, 1.0f));
+	CEffect3D::Create(pos + BlockCornerOffset, 50.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+	CEffect3D::Create(pos - BlockCornerOffset, 50.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
 #endif // _DEBUG
 
 	D3DXVECTOR3 lengthCollider = pos - *pPos;
 	float lengthColliderDef = D3DXVec3Length(&lengthCollider);
 
-	float rA, rB, length;
-	D3DXVECTOR3 Cross, vecNorDef;
+	//// 線分とターゲットの位置関係を計算
+	//float lenPos = D3DXVec3Dot(&(*pPos - pos), &vecNorDef);
 
-	// A1
-	rA = D3DXVec3Length(&axisA1);
-	rB = universal::lengthAxis(axisNA1, axisB1, axisB2, axisB3);
-	length = fabs(D3DXVec3Dot(&lengthCollider, &axisNA1));
-	if (length > rA + rB)
-		return false;
+	//// 押し戻された座標を計算する
+	//D3DXVECTOR3 vecReturn;
+	//if (lenPos > 0.0f)
+	//	vecReturn = vecNorDef * lengthColliderDef;
+	//else
+	//	vecReturn = vecNorDef * lengthColliderDef;
 
-	if (lengthColliderDef > (rA + rB) - length)
-	{
-		lengthColliderDef = (rA + rB) - length;
-		vecNorDef = axisNA1;
-	}
+	//if (D3DXVec3Length(&vecReturn) == 0.0f)
+	//	return false;
 
-	// A3
-	rA = D3DXVec3Length(&axisA3);
-	rB = universal::lengthAxis(axisNA2, axisB1, axisB2, axisB3);
-	length = fabs(D3DXVec3Dot(&lengthCollider, &axisNA3));
-	if (length > rA + rB)
-		return false;
+	//// 計算した距離分押し戻す
+	//*pPos += vecReturn;
 
-	if (lengthColliderDef > (rA + rB) - length)
-	{
-		lengthColliderDef = (rA + rB) - length;
-		vecNorDef = axisNA3;
-	}
+	//// 押し戻し距離から移動方向と距離を計算する
+	//D3DXVec3Normalize(&vecReturn, &vecReturn);
+	//*move -= vecReturn * D3DXVec3Dot(&vecReturn, move) * MOVE_MAG;
+	//*fSpeed *= DECELERATION_MAG;
 
-	// B1
-	rA = D3DXVec3Length(&axisB1);
-	rB = universal::lengthAxis(axisNB1, axisA1, axisA2, axisA3);
-	length = fabs(D3DXVec3Dot(&lengthCollider, &axisNB1));
-	if (length > rA + rB)
-		return false;
+	//// 衝突エフェクトを出す位置を計算する
+	//D3DXVECTOR3 posEffect = *pPos;
 
-	if (lengthColliderDef > (rA + rB) - length)
-	{
-		lengthColliderDef = (rA + rB) - length;
-		vecNorDef = axisNB1;
-	}
+	//// 衝突エフェクトを出す角度を計算する
+	//float rotEffect;
+	//if (lenPos > 0.0f)
+	//	rotEffect = atan2f(-vecNorDef.x, -vecNorDef.z);
+	//else
+	//	rotEffect = atan2f(vecNorDef.x, vecNorDef.z);
 
-	// B3
-	rA = D3DXVec3Length(&axisB3);
-	rB = universal::lengthAxis(axisNB3, axisA1, axisA2, axisA3);
-	length = fabs(D3DXVec3Dot(&lengthCollider, &axisNB3));
-	if (length > rA + rB)
-		return false;
-
-	if (lengthColliderDef > (rA + rB) - length)
-	{
-		lengthColliderDef = (rA + rB) - length;
-		vecNorDef = axisNB3;
-	}
-
-	// 線分とターゲットの位置関係を計算
-	float lenPos = D3DXVec3Dot(&(*pPos - pos), &vecNorDef);
-
-	// 押し戻された座標を計算する
-	D3DXVECTOR3 vecReturn;
-	if (lenPos > 0.0f)
-		vecReturn = vecNorDef * lengthColliderDef;
-	else
-		vecReturn = -vecNorDef * lengthColliderDef;
-
-	if (D3DXVec3Length(&vecReturn) == 0.0f)
-		return false;
-
-	// 計算した距離分押し戻す
-	*pPos += vecReturn;
-
-	// 押し戻し距離から移動方向と距離を計算する
-	D3DXVec3Normalize(&vecReturn, &vecReturn);
-	*move -= vecReturn * D3DXVec3Dot(&vecReturn, move) * MOVE_MAG;
-	*fSpeed *= DECELERATION_MAG;
-
-	// 衝突エフェクトを出す位置を計算する
-	D3DXVECTOR3 posEffect = pos + vecReturn;
-
-	// 衝突エフェクトを出す角度を計算する
-	float rotEffect;
-	if (lenPos > 0.0f)
-		rotEffect = atan2f(vecNorDef.x, vecNorDef.z);
-	else
-		rotEffect = atan2f(-vecNorDef.x, -vecNorDef.z);
-
-	// エフェクトの再生
-	MyEffekseer::CreateEffect(CEffekseer::TYPE_SPARK, D3DXVECTOR3(posEffect.x, posEffect.y + 100.0f, posEffect.z), D3DXVECTOR3(0.0f, rotEffect, 0.0f));
+	//// エフェクトの再生
+	//MyEffekseer::CreateEffect(CEffekseer::TYPE_SPARK, D3DXVECTOR3(posEffect.x, posEffect.y + 100.0f, posEffect.z), D3DXVECTOR3(0.0f, rotEffect, 0.0f));
 
 	return true;
 }

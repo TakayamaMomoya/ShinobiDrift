@@ -232,7 +232,7 @@ END_INFOBLOCK
 INFOBLOCK
  TAG = Pillar
  MODEL = data\MODEL\block\pillar.x
- SNAG = 1
+ SNAG = 0
 END_INFOBLOCK
 
 #32番目のブロック
@@ -302,7 +302,7 @@ END_INFOBLOCK
 INFOBLOCK
  TAG = Pillar_long
  MODEL = data\MODEL\block\pillar_long.x
- SNAG = 1
+ SNAG = 0
 END_INFOBLOCK
 
 #42番目のブロック

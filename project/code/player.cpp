@@ -1063,6 +1063,11 @@ void CPlayer::Collision(void)
 			move.y = 0.0f;
 			rot.x = 0.0f;
 		}
+
+		if (CInputKeyboard::GetInstance()->GetPress(DIK_N))
+		{// ‘€ì•û–@•ÏX
+			pos = D3DXVECTOR3(439000.0f, 1100.0f, -261000.0f);
+		}
 	}
 #endif // _DEBUG
 
