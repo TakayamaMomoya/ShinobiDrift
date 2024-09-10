@@ -115,7 +115,7 @@ private:
 	CPolygon2D *m_pCursor;	        // カーソル
 	MENU m_menu;	                // 選択メニュー項目
 
-	bool m_bFade = false;
+	bool m_IsGameStarted = false;
 };
 
 class CTitleBehindPlayer : public CTitleBehavior
@@ -151,11 +151,11 @@ private:
 
 };
 
-class CTitleFadePlayer : public CTitleBehavior
+class CTitleFade : public CTitleBehavior
 {
 public:
-	CTitleFadePlayer();           // コンストラクタ
-	virtual ~CTitleFadePlayer();  // デストラクタ
+	CTitleFade();           // コンストラクタ
+	virtual ~CTitleFade();  // デストラクタ
 	void Update(CTitle* pTItle) override;
 
 private:
