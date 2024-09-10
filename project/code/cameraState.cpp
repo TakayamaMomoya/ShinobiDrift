@@ -18,6 +18,7 @@
 #include "block.h"
 #include "manager.h"
 #include "title.h"
+#include "goal.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -445,6 +446,10 @@ void CCameraStateFollowPlayerTitle::Update(CCamera* pCamera)
 //=====================================================
 CCameraStateResult::CCameraStateResult()
 {
+	CCamera::Camera* pInfoCamera;
+
+	// ƒS[ƒ‹‚Ìhî•ñ
+	CGoal* pGoal = CGoal::GetInstance();
 
 }
 
