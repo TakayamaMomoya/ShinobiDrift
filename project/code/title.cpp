@@ -767,14 +767,6 @@ CTitleFade::CTitleFade()
 {// コンストラクタ
 	
 	Camera::ChangeState(nullptr);
-
-	//// サウンドインスタンスの取得
-	//CSound* pSound = CSound::GetInstance();
-
-	//if (pSound == nullptr)
-	//	return;
-
-	//pSound->Play(pSound->LABEL_SE_BIKE_FADE);
 }
 
 CTitleFade::~CTitleFade()

@@ -55,7 +55,6 @@ public:
 
 		LABEL_SE_ENGINE_START,          // エンジンスタート音
 		LABEL_SE_BIKE_ACCELERATION,     // バイク走行音
-		LABEL_SE_BIKE_FADE,             // バイク走行音
 		LABEL_MAX
 	} LABEL;
 	typedef enum
@@ -146,7 +145,6 @@ private:
 
 		{ "data/SOUND/SE/SE_Engine_Start.wav",0 },	    // エンジンスタート音
 		{ "data/SOUND/SE/SE_BikeAcceleration.wav",0 },	// バイク走行音
-		{ "data/SOUND/SE/SE_BikeRunning.wav",0 },	        // バイク走行音
 	};
 
 	static CSound *m_pSound;	// 自身のポインタ
