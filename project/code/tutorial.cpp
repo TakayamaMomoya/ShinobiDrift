@@ -27,12 +27,24 @@
 #include "game.h"
 #include "UIManager.h"
 #include "cameraState.h"
+#include "skybox.h"
 
 //*****************************************************
 // 定数定義
 //*****************************************************
 namespace
 {
+const int TIME_INFRAME_APPERPLAYER = 30;	// プレイヤー出現時のフレームイン時間
+const int TIME_WAITFRAME_APPERPLAYER = 150;	// プレイヤー出現時のフレームウェイト時間
+const int TIME_OUTFRAME_APPERPLAYER = 30;	// プレイヤー出現時のフレームアウト時間
+const float ANGLE_GATE_APPERPLAYER = -D3DX_PI * 0.46f;	// プレイヤー出現時のゲート向き
+const float RATE_POS_GATE = 2.0f;	// ゲート位置の視点と注視点の中間の割合
+const float HEIGHT_GATE_APPER = 100.0f;	// ゲートの高さ
+const D3DXVECTOR2 SIZE_GATE_APPER = { 500.0f,500.0f };	// プレイヤー出現時のゲートのサイズ
+const float LENGTH_BEHIND_APPER = 1.0f;	// ゲートの背後にプレイヤーを出す割合
+const float SPEED_APPER_PLAYER = 1.0f;	// プレイヤーの出現速度
+const float TIME_APPER = 1.8f;	// 出現にかける時間
+
 const char* PATH_ROAD = "data\\MAP\\road01.bin";	// チュートリアルメッシュロードのパス
 const D3DXVECTOR3 POS_DEFAULT_UI = { 0.8f, 0.1f, 0.0f };	// UIのデフォルト位置
 const D3DXVECTOR2 SIZE_DEFAULT_UI = { 0.05f, 0.05f};	// UIのデフォルトサイズ
@@ -113,7 +125,7 @@ HRESULT CTutorial::Init(void)
 	}
 
 	// 初期ステイトに設定
-	ChangeState(new CStateTutorialMove);
+	ChangeState(new CStateTutorialApperPlayer);
 
 	return S_OK;
 }
@@ -338,6 +350,197 @@ void CStateTutorial::SetParamGauge(int nNumMenu, CTutorial *pTutorial)
 	}
 
 	SetArrayGauge(aGauge);
+}
+
+//********************************************************************************
+// プレイヤーの出現
+//********************************************************************************
+//=====================================================
+// コンストラクタ
+//=====================================================
+CStateTutorialApperPlayer::CStateTutorialApperPlayer() : m_pGate(nullptr), m_fTimer(0.0f), m_bOpenGate(false)
+{
+
+}
+
+//=====================================================
+// デストラクタ
+//=====================================================
+CStateTutorialApperPlayer::~CStateTutorialApperPlayer()
+{
+
+}
+
+//=====================================================
+// 初期化
+//=====================================================
+void CStateTutorialApperPlayer::Init(CTutorial *pTutorial)
+{
+	// プレイヤー出現カメラにする
+	Camera::ChangeState(new CCameraStateApperPlayer);
+
+	// フレームの生成
+	CFrame::Create(TIME_INFRAME_APPERPLAYER, TIME_WAITFRAME_APPERPLAYER, TIME_OUTFRAME_APPERPLAYER);
+
+	// ゲートの生成
+	m_pGate = CPolygon3D::Create(D3DXVECTOR3());
+
+	if (m_pGate != nullptr)
+	{
+		// 位置をカメラ参照で決定
+		CCamera *pCamera = CManager::GetCamera();
+
+		if (pCamera == nullptr)
+			return;
+
+		CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+
+		D3DXVECTOR3 posR = pInfoCamera->posR;
+		D3DXVECTOR3 posV = pInfoCamera->posV;
+		D3DXVECTOR3 vecDiff = posR - posV;
+
+		D3DXVECTOR3 posGate = posV + vecDiff * RATE_POS_GATE;	// ゲート位置の決定
+		posGate.y += HEIGHT_GATE_APPER;
+		m_pGate->SetPosition(posGate);
+		
+		// トランスフォームの設定
+		m_pGate->SetRotation(D3DXVECTOR3(-D3DX_PI * 0.5f, ANGLE_GATE_APPERPLAYER, 0.0f));
+		m_pGate->SetSize(0.0f, 0.0f);
+
+		// テクスチャ設定
+		int nIdxTexture = Texture::GetIdx(&PATH_TEXTURE_GATE[0]);
+		m_pGate->SetIdxTexture(nIdxTexture);
+	}
+
+	// プレイヤーを操作不可にする
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer != nullptr)
+	{
+		pPlayer->SetEnableInput(false);
+	}
+}
+
+//=====================================================
+// 終了
+//=====================================================
+void CStateTutorialApperPlayer::Uninit(CTutorial *pTutorial)
+{
+	CStateTutorial::Uninit(pTutorial);
+}
+
+//=====================================================
+// 更新
+//=====================================================
+void CStateTutorialApperPlayer::Update(CTutorial *pTutorial)
+{
+	if (!m_bOpenGate)
+		ScalingGate();	// ゲートのスケーリング
+	else
+		ForwardPlayer(pTutorial);	// プレイヤーの前進
+}
+
+//=====================================================
+// ゲートのスケーリング補正
+//=====================================================
+void CStateTutorialApperPlayer::ScalingGate(void)
+{
+	if (m_pGate == nullptr || m_bOpenGate)
+		return;
+
+	m_fTimer += CManager::GetDeltaTime();
+
+	if (m_fTimer >= 1.0f)
+	{
+		m_bOpenGate = true;
+
+		float fRate = universal::EaseInCubic(m_fTimer);
+
+		m_pGate->SetSize(SIZE_GATE_APPER.x * fRate, SIZE_GATE_APPER.y * fRate);
+
+		m_fTimer = 0.0f;
+
+		// プレイヤーをゲートの後ろに用意
+		SetPlayerBehindGate();
+	}
+	else
+	{
+		float fRate = universal::EaseInCubic(m_fTimer);
+
+		m_pGate->SetSize(SIZE_GATE_APPER.x * fRate, SIZE_GATE_APPER.y * fRate);
+	}
+}
+
+//=====================================================
+// プレイヤーを進める処理
+//=====================================================
+void CStateTutorialApperPlayer::ForwardPlayer(CTutorial *pTutorial)
+{
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer == nullptr)
+		return;
+
+	D3DXVECTOR3 move = pPlayer->GetMove();
+	D3DXVECTOR3 pos = pPlayer->GetPosition();
+
+	move += pPlayer->GetForward() * SPEED_APPER_PLAYER;
+	pos += move;
+
+	pPlayer->SetMove(move);
+	pPlayer->SetPosition(pos);
+
+	// タイマーを進める
+	m_fTimer += CManager::GetDeltaTime();
+
+	if (m_fTimer >= TIME_APPER)
+	{// 時間を越えたらカメラのモードを変更
+		Camera::ChangeState(new CFollowPlayer);
+
+		pPlayer->SetEnableInput(true);
+
+		pTutorial->ChangeState(new CStateTutorialMove);
+
+		// スカイボックスのプレイヤー追従を無効化
+		CSkybox *pSkybox = CSkybox::GetInstance();
+
+		if (pSkybox == nullptr)
+			return;
+
+		pSkybox->EnableFollowPlayer(true);
+	}
+}
+
+//=====================================================
+// ゲートの後ろにプレイヤーを用意
+//=====================================================
+void CStateTutorialApperPlayer::SetPlayerBehindGate(void)
+{
+	CCamera *pCamera = CManager::GetCamera();
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pCamera == nullptr || m_pGate == nullptr || pPlayer == nullptr)
+		return;
+
+	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+
+	D3DXVECTOR3 posGate = m_pGate->GetPosition();
+	D3DXVECTOR3 posV = pInfoCamera->posV;
+	D3DXVECTOR3 vecDiff = posGate - posV;
+	vecDiff.y = 0.0f;
+
+	D3DXVECTOR3 posPlayer = posGate + vecDiff * LENGTH_BEHIND_APPER;
+
+	pPlayer->SetPosition(posPlayer);
+	pPlayer->MultiplyMtx(false);
+
+	// スカイボックスのプレイヤー追従を無効化
+	CSkybox *pSkybox = CSkybox::GetInstance();
+
+	if (pSkybox == nullptr)
+		return;
+
+	pSkybox->EnableFollowPlayer(false);
 }
 
 //********************************************************************************

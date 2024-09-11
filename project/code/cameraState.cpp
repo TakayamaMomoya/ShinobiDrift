@@ -25,21 +25,58 @@
 //*****************************************************
 namespace
 {
+const D3DXVECTOR3 POSR_APPERPLAYER = { -12027.77f, 1220.61f, 26307.49f };	// プレイヤー出現時の注視点位置
+const D3DXVECTOR3 POSV_APPERPLAYER = { -11694.56f, 980.66f, 26273.73f };	// プレイヤー出現時の視点位置
+
 const float MOVE_SPEED = 21.0f;	//移動スピード
 const float ROLL_SPEED = 0.04f;	//回転スピード
-const float FACT_CORRECT_POS = 0.2f;	// 位置補正係数
 const float FACT_CORRECT_CONTOROLLL = 0.9f;	// 操作時の位置補正係数
+
+const float FACT_CORRECT_POS = 0.2f;	// 位置補正係数
 const float LENGTH_FOLLOW = 412.0f;	// 追従時のカメラ距離
 const float ANGLE_FOLLOW = 0.73f;	// 追従時のカメラ角度
 const float LENGTHPOSR_FOLLOW = 4126.0f;	// 追従時の先を見る距離
 const float FOV_FOLLOW = 93.0f;	// 追従時の視野角
+
 const float SPEED_MOVE_ABOVE = 20.0f;	// 上空視点時の移動速度
 const float SPEED_ZOOM_ABOVE = 10.0f;	// ズーム速度
+
 const D3DXVECTOR3 POS_RESULT = { 12726.0f, 2500.7f, -27695.0f };	// リザルト演出を行う位置
 const float LENGTH_TUTORIALEND_POSR = 500.0f;	// チュートリアルの終了時の注視点の長さ
 const float LENGTH_RESULT_POSR = 1000.0f;	// リザルトの注視点の距離
 const float ANGLE_RESULT_POSV = D3DX_PI * 0.3f;	// リザルトの視点の角度
 const float LENGTH_RESULT_POSV = 500.0f;	// リザルトの視点の距離
+}
+
+//**************************************************************************
+// プレイヤー出現時のカメラ
+//**************************************************************************
+//=====================================================
+// コンストラクタ
+//=====================================================
+CCameraStateApperPlayer::CCameraStateApperPlayer()
+{
+
+}
+
+//=====================================================
+// 初期化
+//=====================================================
+void CCameraStateApperPlayer::Init(CCamera *pCamera)
+{
+	CCamera::Camera *pInfoCamera = pCamera->GetCamera();
+
+	// カメラを空中に向ける
+	pInfoCamera->posR = POSR_APPERPLAYER;
+	pInfoCamera->posV = POSV_APPERPLAYER;
+}
+
+//=====================================================
+// 更新
+//=====================================================
+void CCameraStateApperPlayer::Update(CCamera* pCamera)
+{
+
 }
 
 //***********************************************************************************

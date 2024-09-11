@@ -25,12 +25,12 @@ const float CHANGE_TEX_LINE = 100000.0f;	// テクスチャを変えるライン
 //*****************************************************
 // 静的メンバ変数宣言
 //*****************************************************
-CSkybox *CSkybox::m_pSkybox = nullptr;	// 自身のポインタ
+CSkybox *CSkybox::s_pSkybox = nullptr;	// 自身のポインタ
 
 //=====================================================
 // コンストラクタ
 //=====================================================
-CSkybox::CSkybox(int nPriority) : CObjectX(nPriority)
+CSkybox::CSkybox(int nPriority) : CObjectX(nPriority), m_bFollowPlayer(false)
 {
 
 }
@@ -58,6 +58,10 @@ HRESULT CSkybox::Init(void)
 	EnableLighting(true);
 	EnableFog(false);
 
+	m_bFollowPlayer = true;
+
+	s_pSkybox = this;
+
 	return S_OK;
 }
 
@@ -66,6 +70,8 @@ HRESULT CSkybox::Init(void)
 //=====================================================
 void CSkybox::Uninit(void)
 {
+	s_pSkybox = nullptr;
+
 	// 継承クラスの終了
 	CObjectX::Uninit();
 }
@@ -78,8 +84,8 @@ void CSkybox::Update(void)
 	// 継承クラスの更新
 	CObjectX::Update();
 
-	// プレイヤーの追従
-	FollowPlayer();
+	if(m_bFollowPlayer)
+		FollowPlayer();	// プレイヤー追従
 
 	// テクスチャ変更の検知
 	DetectionChangeTexture();

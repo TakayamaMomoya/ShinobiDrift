@@ -27,6 +27,17 @@ public:
 private:
 };
 
+// プレイヤー出現カメラ
+class CCameraStateApperPlayer : public CCameraState
+{
+public:
+	CCameraStateApperPlayer();
+	void Init(CCamera *pCamera);
+	void Update(CCamera *pCamera) override;
+
+private:
+};
+
 // プレイヤー追従
 class CFollowPlayer : public CCameraState
 {
