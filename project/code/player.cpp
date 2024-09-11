@@ -954,6 +954,7 @@ void CPlayer::Collision(void)
 		posOldParts[0] += pos - posOld;
 		posOldParts[1] += pos - posOld;
 
+		// meshRoad‚Æ‚Ì“–‚½‚è”»’è
 		// ƒ^ƒCƒ„‚»‚ê‚¼‚ê‚ÅmeshRoad‚Æ“–‚½‚è”»’è‚ð‚Æ‚é
 		bRoad[0] = it->CollideRoad(&posParts[0], posOldParts[0]);
 		bRoad[1] = it->CollideRoad(&posParts[1], posOldParts[1]);
