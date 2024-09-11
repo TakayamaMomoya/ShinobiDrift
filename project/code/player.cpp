@@ -896,7 +896,7 @@ void CPlayer::Collision(void)
 	D3DXVECTOR3 posParts[2];
 	D3DXVECTOR3 posOldParts[2];
 	D3DXVECTOR3 posDef, posDefOld;
-	bool bRoad[2];
+	bool bRoad[2], bSide = false;
 	CInputManager* pInputManager = CInputManager::GetInstance();
 
 	// 計算用マトリックスを宣言
@@ -954,6 +954,7 @@ void CPlayer::Collision(void)
 		posOldParts[0] += pos - posOld;
 		posOldParts[1] += pos - posOld;
 
+		// meshRoadとの当たり判定
 		// タイヤそれぞれでmeshRoadと当たり判定をとる
 		bRoad[0] = it->CollideRoad(&posParts[0], posOldParts[0]);
 		bRoad[1] = it->CollideRoad(&posParts[1], posOldParts[1]);
@@ -974,13 +975,19 @@ void CPlayer::Collision(void)
 		if (D3DXVec3Length(&(pBlock->GetPosition() - pos)) < 10000.0f)
 		{
 			// タイヤとblockで当たり判定をとる
+			if (!bRoad[0])
 			if (pBlock->Collide(&posParts[0], posOldParts[0]))
 				bRoad[0] = true;
 
+			if (!bRoad[1])
 			if (pBlock->Collide(&posParts[1], posOldParts[1]))
 				bRoad[1] = true;
 
+			if (!bSide)
 			if (pBlock->CollideSide(&pos, &move, sizeX, &m_info.fSpeed))
+				bSide = true;
+
+			if (bSide)
 			{
 				// 一か所判定したら抜ける
 				rot.y = atan2f(move.x, move.z);
@@ -988,11 +995,12 @@ void CPlayer::Collision(void)
 				// ドリフト中の時ドリフト状態を解除する
 				m_info.rotDriftDest = 0.0f;
 				RemoveWire();
-
-				// 両方が判定を通っていたら抜ける
-				if (bRoad[0] && bRoad[1])
-					break;
 			}
+
+
+			// 両方が判定を通っていたら抜ける
+			if (bRoad[0] && bRoad[1] && bSide)
+				break;
 		}
 
 		// 次のアドレスを代入
@@ -1057,6 +1065,11 @@ void CPlayer::Collision(void)
 			pos.y += 30.0f;
 			move.y = 0.0f;
 			rot.x = 0.0f;
+		}
+
+		if (CInputKeyboard::GetInstance()->GetPress(DIK_N))
+		{// 操作方法変更
+			pos = D3DXVECTOR3(439000.0f, 1100.0f, -261000.0f);
 		}
 	}
 #endif // _DEBUG

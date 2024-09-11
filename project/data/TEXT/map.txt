@@ -232,7 +232,7 @@ END_INFOBLOCK
 INFOBLOCK
  TAG = Pillar
  MODEL = data\MODEL\block\pillar.x
- SNAG = 1
+ SNAG = 0
 END_INFOBLOCK
 
 #32î‘ñ⁄ÇÃÉuÉçÉbÉN
@@ -330,7 +330,7 @@ END_INFOBLOCK
 INFOBLOCK
  TAG = Pillar_side
  MODEL = data\MODEL\block\Pillar_side.x
- SNAG = 0
+ SNAG = 1
 END_INFOBLOCK
 
 #====================================================================

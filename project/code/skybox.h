@@ -27,15 +27,24 @@ public:
 	void Uninit(void);
 	void Update(void);
 	void Draw(void);
+
+	// 変数取得・設定関数
+	void EnableFollowPlayer(bool bFollowPlayer) { m_bFollowPlayer = bFollowPlayer; }	// プレイヤー追従フラグ
+
+	// 静的メンバ関数
 	static CSkybox *Create();
-	static CSkybox *GetInstance();	// インスタンスの取得
+	static CSkybox *GetInstance() { return s_pSkybox; }	// インスタンスの取得
 
 private:
 	// メンバ関数
 	void FollowPlayer(void);	// プレイヤーの追従
 	void DetectionChangeTexture(void);	// テクスチャ変更の検知
 
-	static CSkybox *m_pSkybox;	// 自身のポインタ
+	// メンバ変数
+	bool m_bFollowPlayer;	// プレイヤー追従フラグ
+
+	// 静的メンバ変数
+	static CSkybox *s_pSkybox;	// 自身のポインタ
 };
 
 #endif

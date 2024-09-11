@@ -7,8 +7,6 @@
 #ifndef _UNIVERSAL_H_
 #define _UNIVERSAL_H_
 
-#include "main.h"
-
 //*****************************************
 // ƒNƒ‰ƒX‚Ì’è‹`
 //*****************************************
@@ -77,8 +75,8 @@ D3DXVECTOR3 CollideOBBToPlane(D3DXVECTOR3* posOBB, D3DXVECTOR3 vecAxial, D3DXVEC
 // •âŠ®Œn
 //======================================
 D3DXVECTOR3 Lerp(D3DXVECTOR3 start, D3DXVECTOR3 end, float fTime);
-float EaseOutCubic(float fTime) { return 1 - powf(1.0f - fTime, 3.0f); };
-float EaseInCubic(float fTime) { return powf(fTime, 3.0f); };
+inline float EaseOutCubic(float fTime) { return 1 - powf(1.0f - fTime, 3.0f); };
+inline float EaseInCubic(float fTime) { return powf(fTime, 3.0f); };
 float EaseOutBack(float fTime);
 }
 
