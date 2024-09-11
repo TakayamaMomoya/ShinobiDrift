@@ -127,7 +127,10 @@ HRESULT CResult::Init(void)
 	CSound* pSound = CSound::GetInstance();
 
 	if (pSound != nullptr)
+	{
+		pSound->Stop();
 		pSound->Play(pSound->LABEL_BGM_GAME05);
+	}
 
 	return S_OK;
 }
@@ -494,9 +497,6 @@ void CStateResultDispTime::Init(CResult *pResult)
 	}
 
 	m_state = E_State::STATE_APPER;
-
-	// ソート
-	Sort();
 }
 
 //=====================================================
@@ -527,24 +527,34 @@ void CStateResultDispTime::SetNumber(CResult *pResult)
 //=====================================================
 void CStateResultDispTime::Sort(void)
 {
-	CRankTime *pRankTIme = CRankTime::GetInstance();
+	CRankTime *pRankTime = CRankTime::GetInstance();
 
-	if (pRankTIme == nullptr)
+	if (pRankTime == nullptr)
 		return;
 
 	// 現在のランキング取得
-	vector<CTimer*> aTimer = pRankTIme->GetArrayTimer();
+	vector<CTimer*> aTimer = pRankTime->GetArrayTimer();
 	vector<float> aTime(aTimer.size());
 
 	for (int i = 0; i < (int)aTime.size(); i++)
 	{
-
+		aTime[i] = aTimer[i]->GetSecond();
 	}
 
 	// ソートする
+	std::sort(aTime.begin(), aTime.end());
 
-	// ランキングの設定
+	float fTime = m_pTimeOwn->GetSecond();
 
+	if (fTime < aTime[aTimer.size() - 1])
+	{// 一番下のスコアよりも上だったらスコアに入れる
+		aTime[aTimer.size() - 1] = fTime;
+	}
+
+	// 再ソート
+	std::sort(aTime.begin(), aTime.end());
+
+	RankTime::SaveRankTime(aTime);
 }
 
 //=====================================================
@@ -613,6 +623,9 @@ void CStateResultDispTime::UpdateCaption(void)
 
 		// ランク表示の生成
 		CRankTime::Create();
+
+		// ソート
+		Sort();
 	}
 
 	universal::LimitValuefloat(&m_fCntAnim, 1.0f, 0.0f);
