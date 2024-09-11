@@ -81,6 +81,29 @@ private:
 	vector<CGauge*> m_aGauge;	// ゲージの配列
 };
 
+class CStateTutorialApperPlayer : public CStateTutorial
+{// プレイヤーの出現
+public:
+	CStateTutorialApperPlayer();	// コンストラクタ
+	virtual ~CStateTutorialApperPlayer();	 // デストラクタ
+
+	// メンバ関数
+	void Init(CTutorial *pTutorial) override;	// 初期化処理
+	void Uninit(CTutorial *pTutorial) override;	// 終了処理
+	void Update(CTutorial *pTutorial) override;	// 更新処理
+
+private:
+	// メンバ関数
+	void ScalingGate(void);	// ゲートのスケーリング
+	void ForwardPlayer(CTutorial *pTutorial);	// プレイヤーを前進させる
+	void SetPlayerBehindGate(void);	// ゲートの後ろにプレイヤーを用意
+
+	// メンバ変数
+	CPolygon3D *m_pGate;	// ゲートのポリゴン
+	float m_fTimer;	// 共通タイマー
+	bool m_bOpenGate;	// ゲート開いたフラグ
+};
+
 class CStateTutorialMove : public CStateTutorial
 {// 移動のチュートリアル
 public:

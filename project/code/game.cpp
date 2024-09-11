@@ -90,14 +90,11 @@ HRESULT CGame::Init(void)
 	// スカイボックスの生成
 	CSkybox::Create();
 
-	// ３Dアニメーション管理の生成
-	//CAnimEffect3D::Create();
-
 	// BGM再生
 	CSound* pSound = CSound::GetInstance();
 
-	//if(pSound != nullptr)
-		//pSound->Play(pSound->LABEL_BGM_GAME01);
+	if(pSound != nullptr)
+		pSound->Play(pSound->LABEL_BGM_GAME01);
 
 	// フォグをかける
 	CRenderer *pRenderer = CRenderer::GetInstance();

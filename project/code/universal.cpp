@@ -1134,7 +1134,6 @@ D3DXVECTOR3 NorRelativeMtx(D3DXVECTOR3 posO, D3DXVECTOR3 rot, D3DXVECTOR3 offset
 	return vecNor;
 }
 
-
 float EaseOutBack(float fTime)
 {
 	float c1 = 1.70158f;

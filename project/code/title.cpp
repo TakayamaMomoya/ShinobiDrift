@@ -64,6 +64,8 @@ namespace
 	const float PLAYER_MAX_SPEED = 120.0f;   // タイトルでのバイクのスピード上限
 	const float FADE_PLAYER_SPEED = 300.0f;  // 画面遷移するプレイヤーの速度
 
+	const D3DXVECTOR3 POS_RIGHT_DOOR = { 590.0f, 1000.0f, 1900.0f };  // ドアの右側の位置
+	const D3DXVECTOR3 POS_LEFT_DOOR = { -590.0f, 1000.0f, 1900.0f };  // ドアの左側の位置
 	const float RIGHT_DOOR_LIMIT = 1800.0f;  // ドアの右側の可動上限
 	const float LEFT_DOOR_LIMIT = -1800.0f;  // ドアの左側の可動上限
 }
@@ -195,7 +197,7 @@ HRESULT CTitle::Init(void)
 	{
 		int nIdx = CModel::Load("data\\MODEL\\block\\door01.x");
 		m_pRightDoor->BindModel(nIdx);
-		m_pRightDoor->SetPosition(D3DXVECTOR3(590.0f, 1000.0f, 1900.0f));
+		m_pRightDoor->SetPosition(POS_RIGHT_DOOR);
 	}
 
 	// 格納庫のドアの左生成
@@ -205,7 +207,7 @@ HRESULT CTitle::Init(void)
 	{
 		int nIdx = CModel::Load("data\\MODEL\\block\\door02.x");
 		m_pLeftDoor->BindModel(nIdx);
-		m_pLeftDoor->SetPosition(D3DXVECTOR3(-590.0f, 1000.0f, 1900.0f));
+		m_pLeftDoor->SetPosition(POS_LEFT_DOOR);
 	}
 
 	// トンネル生成
