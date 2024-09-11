@@ -356,8 +356,8 @@ bool CBlock::CollideSide(D3DXVECTOR3* pPos, D3DXVECTOR3* move, D3DXVECTOR3 vecAx
 	BlockCornerOffset.z = fabsf(BlockCornerOffset.z);
 
 	// ƒK[ƒhƒŒ[ƒ‹‚Ì‚‚³ˆÈ“à‚Å”»’è‚·‚é
-	/*if (pPos->y > pos.y + BlockMax.y || pPos->y + vecAxial.y < pos.y + BlockMin.y)
-		return false;*/
+	if (pPos->y > pos.y + BlockMax.y || pPos->y + vecAxial.y < pos.y + BlockMin.y)
+		return false;
 
 	D3DXVECTOR3 axisA1;
 	D3DXVECTOR3 axisA2;
