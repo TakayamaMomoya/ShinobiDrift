@@ -126,10 +126,13 @@ private:
 	void Input(void);	// 入力処理
 	void Fade(E_Menu menu);	// フェード処理
 	void Sort(void);	// ソート処理
+	void CreateNewRecord(void);	// ニューレコード表示の生成
+	void UpdateNewRecord(void);	// ニューレコード表示の更新
 
 	// メンバ変数
 	CTimer *m_pTimeOwn;	// 自身のタイム
 	CUI *m_pCaption;	// 項目の見出し
+	CUI *m_pNewRecord;	// ニューレコード表示
 	float m_fCntAnim;	// アニメーションカウンター
 	vector<CUI*> m_aMenuPolygon;	// メニューのポリゴン
 	E_State m_state;	// 状態

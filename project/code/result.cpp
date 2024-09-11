@@ -56,6 +56,10 @@ const float DIFF_LENGTH_CURRENT = 0.1f;	// 選択ポリゴン目標位置の差分
 const float MOVE_FACT_MENU = 0.1f;	// メニュー項目の移動係数
 const float SPEED_STOP = 0.03f;	// 止まる速度
 const float LENGTH_STOP = 1000.0f;	// 制動距離
+
+const string PATH_TEX_NEWRECORD = "data\\TEXTURE\\UI\\NewRecord.png";	// ニューレコード表示のテクスチャパス
+const D3DXVECTOR3 POS_NEWRECORD = { 0.4f,0.5f,0.0f };	// ニューレコードの位置
+const D3DXVECTOR2 SIZE_NEWRECORD = { 0.16f,0.03f };	// ニューレコードのサイズ
 }
 
 //=====================================================
@@ -422,7 +426,7 @@ void CStateResultApperPlayer::Particle(CResult *pResult)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr), m_pCaption(nullptr), m_fCntAnim(0.0f), m_state(E_State::STATE_NONE), m_nCurrent(0)
+CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr), m_pNewRecord(nullptr), m_pCaption(nullptr), m_fCntAnim(0.0f), m_state(E_State::STATE_NONE), m_nCurrent(0)
 {
 
 }
@@ -549,12 +553,47 @@ void CStateResultDispTime::Sort(void)
 	if (fTime < aTime[aTimer.size() - 1])
 	{// 一番下のスコアよりも上だったらスコアに入れる
 		aTime[aTimer.size() - 1] = fTime;
+
+		// ニューレコード表示を生成
+		CreateNewRecord();
 	}
 
 	// 再ソート
 	std::sort(aTime.begin(), aTime.end());
 
 	RankTime::SaveRankTime(aTime);
+}
+
+//=====================================================
+// ニューレコード表示の生成
+//=====================================================
+void CStateResultDispTime::CreateNewRecord(void)
+{
+	if (m_pNewRecord != nullptr)
+		return;
+
+	m_pNewRecord = CUI::Create();
+
+	if (m_pNewRecord == nullptr)
+		return;
+
+	m_pNewRecord->SetPosition(POS_NEWRECORD);
+	m_pNewRecord->SetSize(SIZE_NEWRECORD.x, SIZE_NEWRECORD.y);
+	m_pNewRecord->SetVtx();
+	
+	int nIdx = Texture::GetIdx(&PATH_TEX_NEWRECORD[0]);
+	m_pNewRecord->SetIdxTexture(nIdx);
+}
+
+//=====================================================
+// ニューレコード表示の更新
+//=====================================================
+void CStateResultDispTime::UpdateNewRecord(void)
+{
+	if (m_pNewRecord == nullptr)
+		return;
+
+	
 }
 
 //=====================================================
@@ -583,6 +622,9 @@ void CStateResultDispTime::Update(CResult *pResult)
 
 	// 見出しの更新
 	UpdateCaption();
+
+	// ニューレコード表示の更新
+	UpdateNewRecord();
 
 	// 入力処理
 	Input();
