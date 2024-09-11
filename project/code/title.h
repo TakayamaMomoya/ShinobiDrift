@@ -161,6 +161,7 @@ public:
 private:
 	void Fade(void);              // フェード処理
 
+	float m_fVolume = 1.0f;
 };
 
 #endif
