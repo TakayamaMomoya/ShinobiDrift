@@ -102,6 +102,8 @@ HRESULT CPolygon3D::Init(void)
 
 	CObject3D::Init();
 
+	SetSize(500.0f, 500.0f);
+
 	return S_OK;
 }
 
@@ -419,14 +421,11 @@ CPolygon3D *CPolygon3D::Create(D3DXVECTOR3 pos, D3DXVECTOR3 rot)
 
 	if (pObject3D == nullptr)
 	{
-		// インスタンス生成
 		pObject3D = new CPolygon3D;
 
-		// 初期化処理
 		pObject3D->Init();
 
-		// サイズ設定
-		pObject3D->SetSize(500.0f, 500.0f);
+		pObject3D->SetPosition(pos);
 	}
 
 	return pObject3D;

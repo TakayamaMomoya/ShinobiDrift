@@ -125,7 +125,7 @@ private:
 		float fDesityBlurDrift;	// ドリフト時のブラーの濃さ
 		COrbit* pOrbitLamp;	// テールランプの軌跡
 		bool bTailLamp;	// テールランプつけるフラグ
-		COrbit* pOrbitRope;	// テールランプの軌跡
+		CPolygon3D* pPolygonRope;	// ロープのポリゴン
 		COrbit* pOrbitTire;	// タイヤの軌跡
 		D3DXCOLOR orbitColorLamp;	// テールランプの軌跡
 		D3DXCOLOR orbitColorRope;	// テールランプの軌跡
@@ -135,12 +135,14 @@ private:
 	};
 
 	void Load(void);
+
 	void Input(void);
 	void Collision(void);
 	void InputMove(void);
 	void InputWire(void);
 	void InputKatana(void);
 	void ManageKanataAtttack(void);	// 刀の攻撃管理
+
 	void JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength);	// ドリフト変化の判定
 	void ControlRoap(void);	// ロープの制御
 	void SarchGrab(void);	// 掴むブロックの探知
@@ -152,14 +154,20 @@ private:
 	void ManageTireOrbit(void);	// タイヤ軌跡の管理
 	void ManageSpeedBlur(void);	// スピードによるブラーの管理
 	void ManageState(void);
+
 	void ManageMotion(void);
 	void ManageMotionNinja(void);	// 忍者のモーション管理
 	void ManageSlashEffect(void);	// 斬撃エフェクトの管理
 	void Event(EVENT_INFO *pEventInfo);
+
 	void EnableBrakeLamp(void);	// ブレーキランプをつける
 	void DisableBrakeLamp(void);	// ブレーキランプを消す
 	void FollowBrakeLamp(void);	// ブレーキランプ追従
 	void EnableTireOrbit(void);	// タイヤ軌跡を有効化する
+	void EnableRope(void);	// ロープの有効化
+	void DisableRope(void);	// ロープの無効化
+	void FollowRope(void);	// ロープの追従
+
 	void Debug(void);
 
 	// メンバ変数

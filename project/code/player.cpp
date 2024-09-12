@@ -73,6 +73,9 @@ const float HANDLE_SPEED_MAG = -0.005f;  // 体勢から速度への倍率
 const float ROT_CURVE_LIMIT = 0.025f;  // ハンドル操作がきく用になる角度の限界
 const float ROT_Y_DRIFT = 0.5f;  // ドリフト中のZ軸の角度
 const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
+
+const string PATH_TEX_ROPE = "data\\TEXTURE\\MATERIAL\\rope.png";	// ロープのテクスチャパス
+const float WIDTH_ROAP = 50.0f;	// ロープの幅
 }
 
 //*****************************************************
@@ -177,11 +180,6 @@ HRESULT CPlayer::Init(void)
 	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f);
 	int nIdxTexture = CTexture::GetInstance()->Regist("data\\TEXTURE\\EFFECT\\orbit000.png");
 	m_info.pOrbitLamp = COrbit::Create(GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), m_info.orbitColorLamp, 60, nIdxTexture);
-
-	// 縄用軌跡の生成
-	D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
-	m_info.orbitColorRope = D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f);
-	m_info.pOrbitRope = COrbit::Create(mtxNinja, D3DXVECTOR3(40.0f, 0.0f, 0.0f), D3DXVECTOR3(-40.0f, 0.0f, 0.0f), m_info.orbitColorRope, 4, nIdxTexture);
 
 	// サウンドインスタンスの取得
 	CSound* pSound = CSound::GetInstance();
@@ -681,14 +679,13 @@ void CPlayer::JudgeRemoveWire(float fLength)
 //=====================================================
 void CPlayer::ControlRoap(void)
 {
-	if (m_info.pOrbitRope != nullptr && m_info.pBlockGrab != nullptr)
+	if (m_info.pBlockGrab != nullptr)
 	{
-		D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
-		m_info.orbitColorRope = D3DXCOLOR(0.8f, 0.4f, 0.0f, 1.0f);
-		m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope);
+		// ロープの有効化
+		EnableRope();
 
-		D3DXMATRIX mtxBlock = m_info.pBlockGrab->GetMatrix();
-		m_info.pOrbitRope->SetOffset(mtxBlock, m_info.orbitColorRope);
+		// ロープの追従
+		FollowRope();
 	}
 }
 
@@ -761,10 +758,16 @@ void CPlayer::SarchGrab(void)
 
 	if (pBlockGrab != nullptr)
 	{
+		CInputKeyboard *pKeyboard = CInputKeyboard::GetInstance();
+
+		if (pKeyboard == nullptr)
+			return;
+
 		if (pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_DOWN, 0) ||
 			pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_LEFT, 0) ||
 			pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_UP, 0) ||
-			pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_RIGHT, 0))
+			pJoypad->GetRStickTrigger(CInputJoypad::DIRECTION::DIRECTION_RIGHT, 0) ||
+			pKeyboard->GetTrigger(DIK_UP))
 		{// 弾いた瞬間
 			m_info.pBlockGrab = pBlockGrab;
 
@@ -772,13 +775,9 @@ void CPlayer::SarchGrab(void)
 
 			m_info.rotDriftStart = GetRotation();
 			m_info.rotDriftStart.x += D3DX_PI * 0.5f;
-
-			// サウンドインスタンスの取得
-			CSound* pSound = CSound::GetInstance();
-
-			// 投げるSEの開始
-			if (pSound != nullptr)
-				pSound->Play(pSound->LABEL_SE_THROW);
+			
+			// 投擲音の再生
+			Sound::Play(CSound::LABEL_SE_THROW);
 		}
 	}
 }
@@ -802,9 +801,8 @@ void CPlayer::RemoveWire(void)
 	m_info.orbitColorLamp = D3DXCOLOR(0.5f, 0.5f, 0.0f, 0.0f);
 	m_info.pOrbitLamp->SetOffset(mtxNinja, m_info.orbitColorRope);
 
-	m_info.orbitColorRope = D3DXCOLOR(0.8f, 0.4f, 0.0f, 0.0f);
-	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope);
-	m_info.pOrbitRope->SetOffset(mtxNinja, m_info.orbitColorRope);
+	// ロープの無効化
+	DisableRope();
 
 	// ブラーを戻す
 	Blur::ResetBlur();
@@ -1497,6 +1495,88 @@ void CPlayer::DisableTailLamp(void)
 	m_info.bTailLamp = false;
 
 	m_info.orbitColorLamp = D3DXCOLOR(1.0f, 0.15f, 0.0f, 0.0f);
+}
+
+//=====================================================
+// ロープの有効化
+//=====================================================
+void CPlayer::EnableRope(void)
+{
+	if (m_info.pPolygonRope != nullptr)
+		return;
+
+	m_info.pPolygonRope = CPolygon3D::Create(D3DXVECTOR3());
+
+	if (m_info.pPolygonRope == nullptr)
+		return;
+
+	int nIdx = Texture::GetIdx(&PATH_TEX_ROPE[0]);
+	m_info.pPolygonRope->SetIdxTexture(nIdx);
+	m_info.pPolygonRope->EnableLighting(false);
+	m_info.pPolygonRope->EnableZtest(true);
+}
+
+//=====================================================
+// ロープの無効化
+//=====================================================
+void CPlayer::DisableRope(void)
+{
+	if (m_info.pPolygonRope != nullptr)
+	{
+		m_info.pPolygonRope->Uninit();
+		m_info.pPolygonRope = nullptr;
+	}
+}
+
+//=====================================================
+// ロープの追従
+//=====================================================
+void CPlayer::FollowRope(void)
+{
+	if (m_info.pPolygonRope == nullptr || m_info.pBlockGrab == nullptr)
+		return;
+
+	D3DXVECTOR3 posPlayer = GetPosition();
+	D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
+	D3DXVECTOR3 vecDiff = posBlock - posPlayer;
+
+	CCamera *pCamera = CManager::GetCamera();
+
+	if (pCamera == nullptr)
+		return;
+
+	CCamera::Camera *pInfoCaemra = pCamera->GetCamera();
+	D3DXVECTOR3 vecDiffToBlock = posBlock - pInfoCaemra->posV;
+	D3DXVECTOR3 vecDiffToPlayer = posPlayer - pInfoCaemra->posV;
+
+	// 差分ベクトルとの垂直なベクトル
+	D3DXVECTOR3 vecCrossBlock = universal::Vec3Cross(vecDiffToBlock, vecDiff);
+	D3DXVECTOR3 vecCrossPlayer = universal::Vec3Cross(vecDiffToPlayer, vecDiff);
+
+	// ベクトルの正規化
+	D3DXVec3Normalize(&vecCrossBlock, &vecCrossBlock);
+	D3DXVec3Normalize(&vecCrossPlayer, &vecCrossPlayer);
+
+	// 頂点座標の設定
+	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = m_info.pPolygonRope->GetVtxBuff();
+
+	if (pVtxBuff == nullptr)
+		return;
+
+	//頂点情報のポインタ
+	VERTEX_3D *pVtx;
+
+	//頂点バッファをロックし、頂点情報へのポインタを取得
+	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
+
+	//頂点座標の設定
+	pVtx[0].pos = posBlock + vecCrossBlock * WIDTH_ROAP;
+	pVtx[1].pos = posBlock - vecCrossBlock * WIDTH_ROAP;
+	pVtx[2].pos = posPlayer + vecCrossPlayer * WIDTH_ROAP;
+	pVtx[3].pos = posPlayer - vecCrossPlayer * WIDTH_ROAP;
+
+	//頂点バッファをアンロック
+	pVtxBuff->Unlock();
 }
 
 //=====================================================
