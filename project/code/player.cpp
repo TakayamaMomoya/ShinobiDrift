@@ -557,7 +557,7 @@ void CPlayer::InputWire(void)
 	{
 		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_F4))
 		{// ‘€ì•û–@•ÏX
-			m_info.bManual = m_info.bManual ? false : true;
+			//m_info.bManual = m_info.bManual ? false : true;
 		}
 	}
 }

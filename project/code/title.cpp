@@ -348,23 +348,32 @@ void CTitle::DoorOpen(void)
 	if (m_pLeftDoor == nullptr)
 		return;
 
+	// サウンドインスタンスの取得
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound == nullptr)
+		return;
+
 	D3DXVECTOR3 RightDoorPos = m_pRightDoor->GetPosition();
 
-	if(RightDoorPos.x <= RIGHT_DOOR_LIMIT)
+	if(RightDoorPos.x < RIGHT_DOOR_LIMIT)
 	   RightDoorPos.x += 10.0f;
 
-	// バイクの位置設定
+	// ドアの位置設定
 	m_pRightDoor->SetPosition(RightDoorPos);
 
 	D3DXVECTOR3 LeftDoorPos = m_pLeftDoor->GetPosition();
 
-	if (LeftDoorPos.x >= LEFT_DOOR_LIMIT)
+	if (LeftDoorPos.x > LEFT_DOOR_LIMIT)
 	    LeftDoorPos.x -= 10.0f;
 
-	// バイクの位置設定
+	// ドアの位置設定
 	m_pLeftDoor->SetPosition(LeftDoorPos);
 
-	if (RightDoorPos.x >= 1800.0f && LeftDoorPos.x <= -1800.0f)
+	if (RightDoorPos.x == 1600 && LeftDoorPos.x == -1600)
+		pSound->Play(pSound->LABEL_SE_ENGINE_START);
+
+	if (RightDoorPos.x == RIGHT_DOOR_LIMIT && LeftDoorPos.x == LEFT_DOOR_LIMIT)
 	{// ドアの位置が一定の値に達したら
 
 		if (m_pBike->GetMotion() != 3)
@@ -644,12 +653,13 @@ void CTitleBehindPlayer::Update(CTitle* pTItle)
 	// モーションが終了していたらバイクの前進させる
 	if (pBike->IsFinish())
 		pTItle->ChangeBehavior(new CTitlePlayerAcceleration);
+		
 }
 
 CTitlePlayerAcceleration::CTitlePlayerAcceleration()
 {// コンストラクタ
 
-	Camera::ChangeState(new CCameraStateFollowPlayerTitle);
+	
 }
 
 CTitlePlayerAcceleration::~CTitlePlayerAcceleration()
@@ -683,6 +693,15 @@ CTitleMovePlayer::CTitleMovePlayer()
 {// コンストラクタ
 
 	Camera::ChangeState(nullptr);
+
+	// サウンドインスタンスの取得
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound == nullptr)
+		return;
+
+	pSound->Stop(pSound->LABEL_SE_ENGINE_START);
+	pSound->Play(pSound->LABEL_SE_BIKE_ACCELERATION);
 }
 
 CTitleMovePlayer::~CTitleMovePlayer()
@@ -737,6 +756,7 @@ void CTitleMovePlayer::Update(CTitle* pTItle)
 
 	if (BikePosZ >= REBOOST_POS_Z)
 		pTItle->ChangeBehavior(new CTitleFade);
+		
 
 	CDebugProc::GetInstance()->Print("\nプレイヤーの位置 [%f, %f, %f]", pos.x, pos.y, pos.z);
 	CDebugProc::GetInstance()->Print("\n注視点 [%f, %f, %f]", pInfoCamera->posR.x, pInfoCamera->posR.y, pInfoCamera->posR.z);
@@ -771,9 +791,25 @@ void CTitleFade::Update(CTitle* pTItle)
 	// プレイヤーが加速する
 	pTItle->PlayerAcceleration();
 
+	// サウンドインスタンスの取得
+	CSound* pSound = CSound::GetInstance();
+
+	if (pSound == nullptr)
+		return;
+
+	if (pSound != nullptr)
+	{
+		if (m_fVolume >= 0.0f)
+		    m_fVolume -= 0.04f;
+
+		pSound->SetVolume(pSound->LABEL_SE_BIKE_ACCELERATION, m_fVolume);
+	}
+
 	// プレイヤーの速度が一定値に達したら遷移する
 	if (fSpeed >= FADE_PLAYER_SPEED)
 		Fade();
+
+	CDebugProc::GetInstance()->Print("\nSEの音量:%f", m_fVolume);
 }
 
 void CTitleFade::Fade(void)

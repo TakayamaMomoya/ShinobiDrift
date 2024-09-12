@@ -56,6 +56,12 @@ const float DIFF_LENGTH_CURRENT = 0.1f;	// 選択ポリゴン目標位置の差分
 const float MOVE_FACT_MENU = 0.1f;	// メニュー項目の移動係数
 const float SPEED_STOP = 0.03f;	// 止まる速度
 const float LENGTH_STOP = 1000.0f;	// 制動距離
+
+const string PATH_TEX_NEWRECORD = "data\\TEXTURE\\UI\\NewRecord.png";	// ニューレコード表示のテクスチャパス
+const D3DXVECTOR3 POS_NEWRECORD = { 0.35f,0.47f,0.0f };	// ニューレコードの位置
+const D3DXVECTOR2 SIZE_NEWRECORD = { 0.16f,0.03f };	// ニューレコードのサイズ
+const float SPEED_FLASH_NEWRECORD = 0.03f;	// 点滅速度
+const float RATE_BOTTOM = 0.3f;	// 底の割合
 }
 
 //=====================================================
@@ -127,7 +133,10 @@ HRESULT CResult::Init(void)
 	CSound* pSound = CSound::GetInstance();
 
 	if (pSound != nullptr)
+	{
+		pSound->Stop();
 		pSound->Play(pSound->LABEL_BGM_GAME05);
+	}
 
 	return S_OK;
 }
@@ -419,7 +428,7 @@ void CStateResultApperPlayer::Particle(CResult *pResult)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr), m_pCaption(nullptr), m_fCntAnim(0.0f), m_state(E_State::STATE_NONE), m_nCurrent(0)
+CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr), m_pNewRecord(nullptr), m_pCaption(nullptr), m_fCntAnim(0.0f), m_state(E_State::STATE_NONE), m_nCurrent(0), m_fTimerFlash(0.0f)
 {
 
 }
@@ -494,9 +503,6 @@ void CStateResultDispTime::Init(CResult *pResult)
 	}
 
 	m_state = E_State::STATE_APPER;
-
-	// ソート
-	Sort();
 }
 
 //=====================================================
@@ -527,24 +533,82 @@ void CStateResultDispTime::SetNumber(CResult *pResult)
 //=====================================================
 void CStateResultDispTime::Sort(void)
 {
-	CRankTime *pRankTIme = CRankTime::GetInstance();
+	CRankTime *pRankTime = CRankTime::GetInstance();
 
-	if (pRankTIme == nullptr)
+	if (pRankTime == nullptr)
 		return;
 
 	// 現在のランキング取得
-	vector<CTimer*> aTimer = pRankTIme->GetArrayTimer();
+	vector<CTimer*> aTimer = pRankTime->GetArrayTimer();
 	vector<float> aTime(aTimer.size());
 
 	for (int i = 0; i < (int)aTime.size(); i++)
 	{
-
+		aTime[i] = aTimer[i]->GetSecond();
 	}
 
 	// ソートする
+	std::sort(aTime.begin(), aTime.end());
 
-	// ランキングの設定
+	float fTime = m_pTimeOwn->GetSecond();
 
+	if (fTime < aTime[aTimer.size() - 1])
+	{// 一番下のスコアよりも上だったらスコアに入れる
+		aTime[aTimer.size() - 1] = fTime;
+
+		// ニューレコード表示を生成
+		CreateNewRecord();
+	}
+
+	// 再ソート
+	std::sort(aTime.begin(), aTime.end());
+
+	RankTime::SaveRankTime(aTime);
+}
+
+//=====================================================
+// ニューレコード表示の生成
+//=====================================================
+void CStateResultDispTime::CreateNewRecord(void)
+{
+	if (m_pNewRecord != nullptr)
+		return;
+
+	m_pNewRecord = CUI::Create();
+
+	if (m_pNewRecord == nullptr)
+		return;
+
+	m_pNewRecord->SetPosition(POS_NEWRECORD);
+	m_pNewRecord->SetSize(SIZE_NEWRECORD.x, SIZE_NEWRECORD.y);
+	m_pNewRecord->SetVtx();
+	
+	int nIdx = Texture::GetIdx(&PATH_TEX_NEWRECORD[0]);
+	m_pNewRecord->SetIdxTexture(nIdx);
+}
+
+//=====================================================
+// ニューレコード表示の更新
+//=====================================================
+void CStateResultDispTime::UpdateNewRecord(void)
+{
+	if (m_pNewRecord == nullptr)
+		return;
+
+	// 点滅カウンター管理
+	m_fTimerFlash += SPEED_FLASH_NEWRECORD;
+
+	if (D3DX_PI < m_fTimerFlash)
+		m_fTimerFlash -= D3DX_PI;
+
+	// α値の制御
+	float fAlpha = sinf(m_fTimerFlash);
+
+	fAlpha *= RATE_BOTTOM;
+
+	fAlpha += (1.0f - RATE_BOTTOM);
+
+	m_pNewRecord->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, fAlpha));
 }
 
 //=====================================================
@@ -573,6 +637,9 @@ void CStateResultDispTime::Update(CResult *pResult)
 
 	// 見出しの更新
 	UpdateCaption();
+
+	// ニューレコード表示の更新
+	UpdateNewRecord();
 
 	// 入力処理
 	Input();
@@ -613,6 +680,9 @@ void CStateResultDispTime::UpdateCaption(void)
 
 		// ランク表示の生成
 		CRankTime::Create();
+
+		// ソート
+		Sort();
 	}
 
 	universal::LimitValuefloat(&m_fCntAnim, 1.0f, 0.0f);

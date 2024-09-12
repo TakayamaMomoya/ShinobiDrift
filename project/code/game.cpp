@@ -46,6 +46,7 @@
 #include "enemySpawner.h"
 #include "tutorial.h"
 #include "blur.h"
+#include "rankTime.h"
 
 //*****************************************************
 // マクロ定義
@@ -107,7 +108,7 @@ HRESULT CGame::Init(void)
 		pRenderer->SetCol(D3DXCOLOR(0.7f, 0.7f, 0.7f, 1.0f));
 	}
 
-	// 
+	// ブロックマネージャー生成
 	CBlockManager::Create();
 
 	// プレイヤーの生成
@@ -115,11 +116,11 @@ HRESULT CGame::Init(void)
 
 	// スロー管理の生成
 	CSlow::Create();
-
+	
 	// メッシュロード生成
 	CMeshRoad::Create(PATH_GAME_ROAD);
 
-#if 1
+#if 0
 	CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), D3DX_PI);
 	// チュートリアルの生成
 	CTutorial::Create();
@@ -311,6 +312,15 @@ void CGame::Debug(void)
 	if (pKeyboard->GetTrigger(DIK_F2))
 	{// エディット削除
 		ToggleStop();
+	}
+
+	if (pKeyboard->GetTrigger(DIK_F6))
+	{// ランキングリセットボタン
+		vector<float> aTime(3);
+
+		aTime = { 200.0f,400.0f,500.0f };
+
+		RankTime::SaveRankTime(aTime);
 	}
 
 	ImGui::Text("[EditMode]");
