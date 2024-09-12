@@ -438,6 +438,12 @@ void CTitleStart::Update(CTitle *pTitle)
 
 		if (pInput->GetTrigger(CInputManager::BUTTON_ENTER))
 		{
+			// サウンドインスタンスの取得
+			CSound* pSound = CSound::GetInstance();
+
+			if (pSound != nullptr)
+				pSound->Play(pSound->LABEL_SE_GAME_START);
+
 			// 残像の生成
 			m_pAfter = CPolygon2D::Create(6);
 
@@ -472,7 +478,7 @@ void CTitleStart::Update(CTitle *pTitle)
 		{
 			col.a = 0.0f;
 
-			pTitle->ChangeBehavior(new CTitleMenu);
+			pTitle->ChangeBehavior(new CTitleBehindPlayer);
 
 			return;
 		}
