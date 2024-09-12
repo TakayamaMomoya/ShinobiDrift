@@ -595,11 +595,13 @@ void CStateResultDispTime::UpdateNewRecord(void)
 	if (m_pNewRecord == nullptr)
 		return;
 
+	// 点滅カウンター管理
 	m_fTimerFlash += SPEED_FLASH_NEWRECORD;
 
 	if (D3DX_PI < m_fTimerFlash)
 		m_fTimerFlash -= D3DX_PI;
 
+	// α値の制御
 	float fAlpha = sinf(m_fTimerFlash);
 
 	fAlpha *= RATE_BOTTOM;
@@ -607,8 +609,6 @@ void CStateResultDispTime::UpdateNewRecord(void)
 	fAlpha += (1.0f - RATE_BOTTOM);
 
 	m_pNewRecord->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, fAlpha));
-
-	CDebugProc::GetInstance()->Print("\nfAlpha[%f]", fAlpha);
 }
 
 //=====================================================
