@@ -102,6 +102,8 @@ private:
 		bool bSlashDown;	// Ψ‚θ‰Ί‚λ‚µ
 		bool bSlashUp;	// Ψ‚θγ‚°
 		bool bGoal;		// ƒS[ƒ‹
+		bool bThrowLeft;		// ¶‚Ιηκ“κ“‚°‚ι
+		bool bThrowRight;		// ‰E‚Ιηκ“κ“‚°‚ι
 	};
 	struct SInfo
 	{
