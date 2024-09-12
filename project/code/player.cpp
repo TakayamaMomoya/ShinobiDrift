@@ -588,8 +588,6 @@ void CPlayer::JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength)
 			m_info.fAngleDrift = 0.29f;
 
 			Blur::AddParameter(5.0f, 0.5f, 15.0f, 0.0f, 0.7f);
-
-		
 		}
 		else
 		{
@@ -625,6 +623,8 @@ void CPlayer::ManageRotateGrab(float fAngleDiff)
 
 		// カメラロール
 		Camera::ControlRoll(0.3f, 0.04f);
+
+		m_fragNinja.bThrowRight = true;
 	}
 	else
 	{
@@ -632,6 +632,8 @@ void CPlayer::ManageRotateGrab(float fAngleDiff)
 
 		// カメラロール
 		Camera::ControlRoll(-0.3f, 0.04f);
+
+		m_fragNinja.bThrowLeft = true;
 	}
 
 	universal::LimitRot(&rotDest.y);
@@ -787,28 +789,34 @@ void CPlayer::SarchGrab(void)
 //=====================================================
 void CPlayer::RemoveWire(void)
 {
-	m_info.nCntFlip = 0;
-	m_info.fCntAngle = 0.0f;
+	if (m_info.pBlockGrab != nullptr)
+	{
+		m_info.nCntFlip = 0;
+		m_info.fCntAngle = 0.0f;
 
-	m_info.pBlockGrab = nullptr;
+		m_info.pBlockGrab = nullptr;
 
-	m_info.fLengthDrift = 0.0f;
+		m_info.fLengthDrift = 0.0f;
 
-	m_info.rotDriftStart.x -= D3DX_PI * 0.5f;
-	universal::LimitRot(&m_info.rotDriftStart.x);
+		m_info.rotDriftStart.x -= D3DX_PI * 0.5f;
+		universal::LimitRot(&m_info.rotDriftStart.x);
 
-	D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
-	m_info.orbitColorLamp = D3DXCOLOR(0.5f, 0.5f, 0.0f, 0.0f);
-	m_info.pOrbitLamp->SetOffset(mtxNinja, m_info.orbitColorRope);
+		D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
+		m_info.orbitColorLamp = D3DXCOLOR(0.5f, 0.5f, 0.0f, 0.0f);
+		m_info.pOrbitLamp->SetOffset(mtxNinja, m_info.orbitColorRope);
 
 	// ロープの無効化
 	DisableRope();
 
-	// ブラーを戻す
-	Blur::ResetBlur();
+		m_fragNinja.bThrowLeft = false;
+		m_fragNinja.bThrowRight = false;
 
-	// テールランプの無効化
-	m_info.bTailLamp = false;
+		// ブラーを戻す
+		Blur::ResetBlur();
+
+		// テールランプの無効化
+		m_info.bTailLamp = false;
+	}
 }
 
 //=====================================================
@@ -1356,6 +1364,20 @@ void CPlayer::ManageMotionNinja(void)
 		if (nMotion != MOTION_NINJA::MOTION_NINJA_RESULT)
 		{
 			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_RESULT);
+		}
+	}
+	else if (m_fragNinja.bThrowLeft)
+	{// 左鉤縄投げ時モーション
+		if (nMotion != MOTION_NINJA::MOTION_NINJA_THROW_LEFT)
+		{
+			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_THROW_LEFT);
+		}
+	}
+	else if (m_fragNinja.bThrowRight)
+	{// 右鉤縄投げ時モーション
+		if (nMotion != MOTION_NINJA::MOTION_NINJA_THROW_RIGHT)
+		{
+			m_pPlayerNinja->SetMotion(MOTION_NINJA::MOTION_NINJA_THROW_RIGHT);
 		}
 	}
 	else
