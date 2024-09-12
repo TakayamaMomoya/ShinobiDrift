@@ -75,7 +75,7 @@ const float ROT_Y_DRIFT = 0.5f;  // ドリフト中のZ軸の角度
 const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
 
 const string PATH_TEX_ROPE = "data\\TEXTURE\\MATERIAL\\rope.png";	// ロープのテクスチャパス
-const float WIDTH_ROAP = 50.0f;	// ロープの幅
+const float WIDTH_ROAP = 20.0f;	// ロープの幅
 }
 
 //*****************************************************
@@ -1555,10 +1555,17 @@ void CPlayer::DisableRope(void)
 //=====================================================
 void CPlayer::FollowRope(void)
 {
-	if (m_info.pPolygonRope == nullptr || m_info.pBlockGrab == nullptr)
+	if (m_info.pPolygonRope == nullptr || m_info.pBlockGrab == nullptr || m_pPlayerNinja == nullptr)
 		return;
 
 	D3DXVECTOR3 posPlayer = GetPosition();
+	int nMotion = m_pPlayerNinja->GetMotion();
+
+	if (nMotion == MOTION_NINJA::MOTION_NINJA_THROW_LEFT)
+		posPlayer = m_pPlayerNinja->GetMtxPos(8);
+	else if(nMotion == MOTION_NINJA::MOTION_NINJA_THROW_RIGHT)
+		posPlayer = m_pPlayerNinja->GetMtxPos(5);
+
 	D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
 	D3DXVECTOR3 vecDiff = posBlock - posPlayer;
 
@@ -1579,7 +1586,6 @@ void CPlayer::FollowRope(void)
 	D3DXVec3Normalize(&vecCrossBlock, &vecCrossBlock);
 	D3DXVec3Normalize(&vecCrossPlayer, &vecCrossPlayer);
 
-	// 頂点座標の設定
 	LPDIRECT3DVERTEXBUFFER9 pVtxBuff = m_info.pPolygonRope->GetVtxBuff();
 
 	if (pVtxBuff == nullptr)
