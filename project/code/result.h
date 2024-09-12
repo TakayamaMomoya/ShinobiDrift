@@ -137,6 +137,7 @@ private:
 	vector<CUI*> m_aMenuPolygon;	// メニューのポリゴン
 	E_State m_state;	// 状態
 	int m_nCurrent;	// 選択番号
+	float m_fTimerFlash; // 点滅タイマー
 };
 
 namespace Tutorial

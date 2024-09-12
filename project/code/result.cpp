@@ -58,8 +58,10 @@ const float SPEED_STOP = 0.03f;	// 止まる速度
 const float LENGTH_STOP = 1000.0f;	// 制動距離
 
 const string PATH_TEX_NEWRECORD = "data\\TEXTURE\\UI\\NewRecord.png";	// ニューレコード表示のテクスチャパス
-const D3DXVECTOR3 POS_NEWRECORD = { 0.4f,0.5f,0.0f };	// ニューレコードの位置
+const D3DXVECTOR3 POS_NEWRECORD = { 0.35f,0.47f,0.0f };	// ニューレコードの位置
 const D3DXVECTOR2 SIZE_NEWRECORD = { 0.16f,0.03f };	// ニューレコードのサイズ
+const float SPEED_FLASH_NEWRECORD = 0.03f;	// 点滅速度
+const float RATE_BOTTOM = 0.3f;	// 底の割合
 }
 
 //=====================================================
@@ -426,7 +428,7 @@ void CStateResultApperPlayer::Particle(CResult *pResult)
 //=====================================================
 // コンストラクタ
 //=====================================================
-CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr), m_pNewRecord(nullptr), m_pCaption(nullptr), m_fCntAnim(0.0f), m_state(E_State::STATE_NONE), m_nCurrent(0)
+CStateResultDispTime::CStateResultDispTime() : m_pTimeOwn(nullptr), m_pNewRecord(nullptr), m_pCaption(nullptr), m_fCntAnim(0.0f), m_state(E_State::STATE_NONE), m_nCurrent(0), m_fTimerFlash(0.0f)
 {
 
 }
@@ -593,7 +595,20 @@ void CStateResultDispTime::UpdateNewRecord(void)
 	if (m_pNewRecord == nullptr)
 		return;
 
-	
+	m_fTimerFlash += SPEED_FLASH_NEWRECORD;
+
+	if (D3DX_PI < m_fTimerFlash)
+		m_fTimerFlash -= D3DX_PI;
+
+	float fAlpha = sinf(m_fTimerFlash);
+
+	fAlpha *= RATE_BOTTOM;
+
+	fAlpha += (1.0f - RATE_BOTTOM);
+
+	m_pNewRecord->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, fAlpha));
+
+	CDebugProc::GetInstance()->Print("\nfAlpha[%f]", fAlpha);
 }
 
 //=====================================================

@@ -46,6 +46,7 @@
 #include "enemySpawner.h"
 #include "tutorial.h"
 #include "blur.h"
+#include "rankTime.h"
 
 //*****************************************************
 // マクロ定義
@@ -311,6 +312,15 @@ void CGame::Debug(void)
 	if (pKeyboard->GetTrigger(DIK_F2))
 	{// エディット削除
 		ToggleStop();
+	}
+
+	if (pKeyboard->GetTrigger(DIK_F6))
+	{// ランキングリセットボタン
+		vector<float> aTime(3);
+
+		aTime = { 200.0f,400.0f,500.0f };
+
+		RankTime::SaveRankTime(aTime);
 	}
 
 	ImGui::Text("[EditMode]");
