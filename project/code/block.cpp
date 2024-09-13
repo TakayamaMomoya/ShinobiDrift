@@ -30,8 +30,8 @@ namespace
 	const float SPEED_MOVE(1.0f);	// 移動速度
 	const char* MAP_FILE = "data\\MAP\\map01.bin";	// マップのファイルパス
 	const float RADIUS_DRIFT_DEFAULT = 1000.0f;	// ドリフト半径のデフォルト値
-	const float POLYGON_SIZE_X = 100.0f;        // 鉤縄ポイントUIのサイズ
-	const float POLYGON_SIZE_Y = 100.0f;        // 鉤縄ポイントUIのサイズ
+	const float POLYGON_SIZE_X = 200.0f;        // 鉤縄ポイントUIのサイズ
+	const float POLYGON_SIZE_Y = 200.0f;        // 鉤縄ポイントUIのサイズ
 	const float STANDARD_LENGHT = 7000.0f;      // 鉤縄ポイントUIが出る距離
 	const float DECELERATION_MAG = 0.985f;	// 衝突時の減速倍率
 	const float MOVE_MAG = 0.15f;	// 衝突時の移動量反射倍率
@@ -712,7 +712,7 @@ void CBlockGrab::GrabPointUI(void)
 				int nIdx = CTexture::GetInstance()->Regist("data\\TEXTURE\\UI\\FK.png");
 				m_pGrabPointUI->SetIdxTexture(nIdx);
 				D3DXVECTOR3 vtxmax = GetVtxMax();
-				m_pGrabPointUI->SetPosition(D3DXVECTOR3(pos.x, pos.y + vtxmax.y, pos.z));
+				m_pGrabPointUI->SetPosition(D3DXVECTOR3(pos.x, pos.y + vtxmax.y * 0.5f, pos.z));
 				m_pGrabPointUI->SetMode(CPolygon3D::MODE_BILLBOARD);
 				m_pGrabPointUI->SetSize(POLYGON_SIZE_X, POLYGON_SIZE_Y);
 				m_pGrabPointUI->SetColor(D3DXCOLOR(1.0f, 1.0f, 1.0f, m_fColA));
