@@ -42,24 +42,27 @@ const float SPEED_BACK_COLOR = 0.2f;	// 背景の出てくるスピード
 const D3DXCOLOR COL_DEST_NUMBER = { 1.0f ,1.0f,1.0f,1.0f };	// 数字ポリゴンの目標色
 const float SPEED_APPER_TIME = 0.1f;	// タイマーの出現スピード
 const D3DXVECTOR3 POS_TIMER = { 0.4f,0.55f,0.0f };	// タイマーの初期位置
-const D3DXVECTOR2 SIZE_CAPTION = { 0.3f, 0.05f };	// キャプションのサイズ
+
+const D3DXVECTOR2 SIZE_CAPTION = { 0.3f, 0.07f };	// キャプションのサイズ
 const string PATH_TEX_CAPTION = "data\\TEXTURE\\UI\\resultCaption00.png";	// キャプションのテクスチャパス
 const D3DXVECTOR3 POS_CAPTION_INITIAL = { 1.0f + SIZE_CAPTION.x,0.4f,0.0f };	// キャプションの初期位置
 const D3DXVECTOR3 POS_CAPTION_DEST = { 0.5f,0.4f,0.0f };	// キャプションの目標位置
 const float SPEED_CAPTION = 0.05f;	// キャプションのスピード
-const D3DXVECTOR2 SIZE_MENU_DEFAULT = { 0.2f,0.04f };	// メニューのデフォルトサイズ
+
+const D3DXVECTOR2 SIZE_MENU_DEFAULT = { 0.2f,0.07f };	// メニューのデフォルトサイズ
 const D3DXVECTOR3 POS_MENU_INITIAL = { -SIZE_MENU_DEFAULT.x,0.7f,0.0f };	// メニューの初期位置
 const D3DXVECTOR3 POS_MENU_DEFAULT = { 0.6f,0.7f,0.0f };	// メニューのデフォルト位置
-const float RATE_DOWN_MENU = 3.0f;	// メニュー項目の下がる割合
+const float RATE_DOWN_MENU = 1.6f;	// メニュー項目の下がる割合
 const float SPEED_FRASH_MENU = 0.03f;	// メニュー項目の点滅速度
 const float DIFF_LENGTH_CURRENT = 0.1f;	// 選択ポリゴン目標位置の差分
 const float MOVE_FACT_MENU = 0.1f;	// メニュー項目の移動係数
+
 const float SPEED_STOP = 0.03f;	// 止まる速度
 const float LENGTH_STOP = 1000.0f;	// 制動距離
 
 const string PATH_TEX_NEWRECORD = "data\\TEXTURE\\UI\\NewRecord.png";	// ニューレコード表示のテクスチャパス
 const D3DXVECTOR3 POS_NEWRECORD = { 0.35f,0.47f,0.0f };	// ニューレコードの位置
-const D3DXVECTOR2 SIZE_NEWRECORD = { 0.16f,0.03f };	// ニューレコードのサイズ
+const D3DXVECTOR2 SIZE_NEWRECORD = { 0.16f,0.06f };	// ニューレコードのサイズ
 const float SPEED_FLASH_NEWRECORD = 0.03f;	// 点滅速度
 const float RATE_BOTTOM = 0.3f;	// 底の割合
 }

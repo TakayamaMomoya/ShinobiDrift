@@ -23,11 +23,8 @@ const int MILLI_LIMIT = 99;	// ミリ秒の上限
 const int MINUTES_DIGIT = 2;	// 分表示の桁数
 const int TIME_DIGIT = 2;	// それぞれの桁数
 const float MAGNIFICATION = 100.0f;	// 掛ける倍率
-const float MINUTES_WIDTH = 0.44f;	// 分のX座標
-const float SECOND_WIDTH = 0.5f;	// 秒のX座標
-const float MILLI_WIDTH = 0.6f;	// ミリ秒のX座標
 const float DIST_NUMBER = 0.03f;	// 数字間の距離
-D3DXVECTOR2 SIZE_NORMAL_NUM = { 0.02f, 0.04f };	// 通常数字のサイズ
+D3DXVECTOR2 SIZE_NORMAL_NUM = { 0.02f, 0.06f };	// 通常数字のサイズ
 D3DXVECTOR2 SIZE_MINI_NUM = { 0.014f, 0.028f };	// ミニ数字のサイズ
 D3DXVECTOR3 POS_INITIAL = { 0.5f,0.08f,0.0f };	// 初期位置
 const string PATH_TEX_COLON = "data\\TEXTURE\\UI\\colon.png";	// コロンのテクスチャパス
@@ -112,9 +109,6 @@ HRESULT CTimer::Init(void)
 
 	// 数字のトランスフォームの設定
 	TransformNumber();
-
-	// ゲームUIの削除
-
 
 	return S_OK;
 }

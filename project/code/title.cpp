@@ -29,6 +29,7 @@
 #include "particle.h"
 #include "orbit.h"
 #include "debugproc.h"
+#include "UI.h"
 
 //*****************************************************
 // マクロ定義
@@ -39,21 +40,21 @@
 //*****************************************************
 namespace
 {
-	const D3DXVECTOR3 TITLE_LOGO_POS = D3DXVECTOR3(SCREEN_WIDTH * 0.5f, 200.0f, 0.0f);	// タイトルロゴの位置
-	const float TITLE_LOGO_WIDTH = 875.0f * 0.35f;	// タイトルロゴの幅
-	const float TITLE_LOGO_HEIGHT = 320.0f * 0.35f;	// タイトルロゴの高さ
+	const D3DXVECTOR3 TITLE_LOGO_POS = D3DXVECTOR3(0.5f, 0.3f, 0.0f);	// タイトルロゴの位置
+	const float TITLE_LOGO_WIDTH = 0.2f;	// タイトルロゴの幅
+	const float TITLE_LOGO_HEIGHT = 0.18f;	// タイトルロゴの高さ
 	const char* TITLE_LOGO_PATH = "data\\TEXTURE\\UI\\title_logo00.png";	// タイトルロゴのパス
 
-	const D3DXVECTOR3 TEAM_LOGO_POS = D3DXVECTOR3(SCREEN_WIDTH * 0.9f, 680.0f, 0.0f);	// チームロゴの位置
-	float TEAM_LOGO_WIDTH = 100.0f;         // チームロゴの幅
-	const float TEAM_LOGO_HEIGHT = 35.0f;	// チームロゴの高さ
+	const D3DXVECTOR3 TEAM_LOGO_POS = D3DXVECTOR3(0.9f, 0.9f, 0.0f);	// チームロゴの位置
+	float TEAM_LOGO_WIDTH = 0.09f;         // チームロゴの幅
+	const float TEAM_LOGO_HEIGHT = 0.1f;	// チームロゴの高さ
 	const char* TEAM_LOGO_PATH = "data\\TEXTURE\\UI\\logoTeam.png";	// チームロゴのパス
 
-	const D3DXVECTOR3 STATE_POS = D3DXVECTOR3(SCREEN_WIDTH * 0.5f, SCREEN_HEIGHT * 0.7f, 0.0f);	// スタート表示の位置
-	const float START_WIDTH = 400.0f;	// スタート表示の幅
-	const float START_HEIGHT = 100.0f;	// スタート表示の高さ
+	const D3DXVECTOR3 STATE_POS = D3DXVECTOR3(0.5f, 0.7f, 0.0f);	// スタート表示の位置
+	const float START_WIDTH = 0.3f;	// スタート表示の幅
+	const float START_HEIGHT = 0.14f;	// スタート表示の高さ
 	const char* START_PATH = "data\\TEXTURE\\UI\\gamestart.png";	// スタート表示のパス
-	const float SPEED_AFTER_EXPAND = 2.0f;	    // 残像の膨らむ速度
+	const float SPEED_AFTER_EXPAND = 0.006f;	    // 残像の膨らむ速度
 	const float SPEED_START_AVOID = 0.03f;	    // スタート表示の消える速度
 	D3DXVECTOR2 SIZE_MENU = { 200.0f,60.0f };	//　メニューのサイズ
 	const D3DXCOLOR COL_INITIAL_MENU = { 0.4f,0.4f,0.4f,1.0f };	// メニュー項目の初期色
@@ -133,7 +134,7 @@ HRESULT CTitle::Init(void)
 	}
 
 	// タイトルロゴの生成
-	m_pTitleLogo = CPolygon2D::Create(7);
+	m_pTitleLogo = CUI::Create();
 
 	if (m_pTitleLogo != nullptr)
 	{
@@ -145,7 +146,7 @@ HRESULT CTitle::Init(void)
 	}
 
 	// チームロゴの生成
-	m_pTeamLogo = CPolygon2D::Create(7);
+	m_pTeamLogo = CUI::Create();
 
 	if (m_pTeamLogo != nullptr)
 	{
@@ -409,7 +410,7 @@ CTitleStart::CTitleStart()
 	m_pAfter = nullptr;
 
 	// スタート表示の生成
-	m_pStart = CPolygon2D::Create(7);
+	m_pStart = CUI::Create();
 
 	if (m_pStart != nullptr)
 	{
@@ -445,7 +446,7 @@ void CTitleStart::Update(CTitle *pTitle)
 				pSound->Play(pSound->LABEL_SE_GAME_START);
 
 			// 残像の生成
-			m_pAfter = CPolygon2D::Create(6);
+			m_pAfter = CUI::Create();
 
 			if (m_pAfter != nullptr)
 			{
@@ -460,11 +461,13 @@ void CTitleStart::Update(CTitle *pTitle)
 	else
 	{
 		// サイズの変更
-		float fWidth = m_pAfter->GetWidth();
-		float fHeight = m_pAfter->GetHeight();
+		float fWidth = m_pAfter->GetSize().x;
+		float fHeight = m_pAfter->GetSize().y;
 
 		fWidth += SPEED_AFTER_EXPAND;
 		fHeight += SPEED_AFTER_EXPAND;
+
+		CDebugProc::GetInstance()->Print("\n幅幅幅幅幅幅幅幅幅幅幅幅幅幅[%f]", fHeight);
 
 		m_pAfter->SetSize(fWidth, fHeight);
 		m_pAfter->SetVtx();
@@ -511,7 +514,7 @@ CTitleMenu::CTitleMenu()
 	{
 		int nCnt = i - 1;
 
-		m_apMenu[i] = CPolygon2D::Create(6);
+		m_apMenu[i] = CUI::Create();
 
 		if (m_apMenu[i] != nullptr)
 		{
@@ -528,18 +531,6 @@ CTitleMenu::CTitleMenu()
 			m_apMenu[i]->SetIdxTexture(nIdx);
 		}
 	}
-
-	//// カーソルの生成
-	//m_pCursor = CPolygon2D::Create(6);
-
-	//if (m_pCursor != nullptr)
-	//{
-	//	m_pCursor->SetSize(SCREEN_WIDTH, SCREEN_HEIGHT);
-	//	m_pCursor->SetVtx();
-
-	//	int nIdx = CTexture::GetInstance()->Regist("data\\TEXTURE\\UI\\cursorMenu.png");
-	//	m_pCursor->SetIdxTexture(nIdx);
-	//}
 }
 
 CTitleMenu::~CTitleMenu()

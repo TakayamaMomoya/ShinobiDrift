@@ -107,7 +107,7 @@ void CUI::SetSize(float width, float height)
 	float fHeigth;
 
 	fWidth = SCREEN_WIDTH * width;
-	fHeigth = SCREEN_WIDTH * height;
+	fHeigth = SCREEN_HEIGHT * height;
 
 	CPolygon2D::SetSize(fWidth, fHeigth);
 }

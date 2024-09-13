@@ -49,7 +49,7 @@ HRESULT CNumber::Init(void)
 	{
 		if (m_apObject[nCount] != nullptr)
 		{
-			m_apObject[nCount]->SetSize(0.1f, 0.2f);
+			m_apObject[nCount]->SetSize(0.1f, 0.3f);
 			m_apObject[nCount]->SetPosition(D3DXVECTOR3(GetPosition().x + 80.0f * nCount, GetPosition().y, GetPosition().z));
 		}
 	}

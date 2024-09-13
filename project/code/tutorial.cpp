@@ -47,7 +47,7 @@ const float TIME_APPER = 1.8f;	// 出現にかける時間
 
 const char* PATH_ROAD = "data\\MAP\\road01.bin";	// チュートリアルメッシュロードのパス
 const D3DXVECTOR3 POS_DEFAULT_UI = { 0.8f, 0.1f, 0.0f };	// UIのデフォルト位置
-const D3DXVECTOR2 SIZE_DEFAULT_UI = { 0.05f, 0.05f};	// UIのデフォルトサイズ
+const D3DXVECTOR2 SIZE_DEFAULT_UI = { 0.05f, 0.09f};	// UIのデフォルトサイズ
 const float LINE_INPUT = 0.3f;	// 入力と判定するスピード
 const float TIME_ACCELE = 3.0f;	// アクセルに必要な時間
 const float TIME_BRAKE = 1.0f;	// ブレーキに必要な時間
@@ -305,13 +305,13 @@ void CStateTutorial::CreateUI(vector<string> aPathTexture, vector<float> aLimit,
 		mapUI[i] = pUI;
 
 		D3DXVECTOR3 posUI = pUI->GetPosition();
-		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 4;
+		posUI.y = POS_DEFAULT_UI.y + SIZE_DEFAULT_UI.y * i * 2;
 		pUI->SetPosition(posUI);
 		pUI->SetVtx();
 
 		// ゲージの生成
 		aGauge[i] = CGauge::Create(aLimit[i]);
-		D3DXVECTOR3 posGauge = { posUI.x, posUI.y + SIZE_DEFAULT_UI.y * 2,0.0f }; // 位置の設定
+		D3DXVECTOR3 posGauge = { posUI.x, posUI.y + SIZE_DEFAULT_UI.y,0.0f }; // 位置の設定
 		aGauge[i]->SetPosition(posGauge);
 
 		// 制限値の設定

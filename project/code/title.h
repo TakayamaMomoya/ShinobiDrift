@@ -12,19 +12,17 @@
 //*****************************************************
 #include "main.h"
 #include "scene.h"
-
 #include "motion.h"
 
 //*****************************************************
 // 前方宣言
 //*****************************************************
-class CMenu;
-class CPolygon2D;
-class CFan3D;
 class CMotion;
 class COrbit;
 class CTitleBehavior;
 class CObjectX;
+class CUI;
+class CFan3D;
 
 //*****************************************************
 // クラスの定義
@@ -56,8 +54,8 @@ public:
 private:
 
 	STATE m_state;				    // 状態
-	CPolygon2D *m_pTitleLogo;       // タイトルロゴのポインタ
-	CPolygon2D *m_pTeamLogo;        // チームロゴのポインタ
+	CUI *m_pTitleLogo;       // タイトルロゴのポインタ
+	CUI *m_pTeamLogo;        // チームロゴのポインタ
 	CFan3D *m_pFan3D;               // トンネルの扉のポインタ
 	COrbit *m_pOrbitLamp;           // テールランプのポインタ
 	CObjectX *m_pDoorFrame;         // 格納庫のドアフレームのポインタ
@@ -89,8 +87,8 @@ public:
 	void Update(CTitle *pTItle) override;
 
 private:
-	CPolygon2D *m_pStart;	// スタート表示のポインタ
-	CPolygon2D *m_pAfter;	// スタート表示の残像
+	CUI *m_pStart;	// スタート表示のポインタ
+	CUI *m_pAfter;	// スタート表示の残像
 };
 
 class CTitleMenu : public CTitleBehavior
@@ -111,8 +109,8 @@ private:
 	void Input(void);
 	void ManageCursor(void);
 	
-	CPolygon2D *m_apMenu[MENU_MAX];	// メニュー項目
-	CPolygon2D *m_pCursor;	        // カーソル
+	CUI *m_apMenu[MENU_MAX];	// メニュー項目
+	CUI *m_pCursor;	        // カーソル
 	MENU m_menu;	                // 選択メニュー項目
 
 	bool m_IsGameStarted = false;

@@ -56,7 +56,7 @@ HRESULT CLogo::Init(void)
 	if (m_pLogo != nullptr)
 	{
 		m_pLogo->SetPosition(D3DXVECTOR3(0.5f, 0.5f, 0.0f));
-		m_pLogo->SetSize(0.1f, 0.05f);
+		m_pLogo->SetSize(0.1f, 0.1f);
 		m_pLogo->SetCol(D3DXCOLOR(1.0f, 1.0f, 1.0f, 0.0f));
 		m_pLogo->SetVtx();
 

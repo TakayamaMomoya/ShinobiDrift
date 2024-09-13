@@ -24,7 +24,7 @@ const float SCALE_NUMBER = 0.5f;	// タイマーの数字のスケール
 const float DIST_TIMER = 0.1f;	// タイマー間の距離
 const string PATH_SAVE = "data\\BYNARY\\ranking.bin";	// ランキングのファイルパス
 const float SIZE_MEDAL = 0.025f;	// メダルのサイズ
-const D3DXVECTOR2 SIZE_FRAME = { 0.13f,0.025f };	// フレームのサイズ
+const D3DXVECTOR2 SIZE_FRAME = { 0.13f,0.035f };	// フレームのサイズ
 const D3DXCOLOR COL_FRAME = { 0.4f, 0.4f, 0.4f, 0.7f };	// フレームの色
 }
 
@@ -122,7 +122,7 @@ HRESULT CRankTime::Init(void)
 			continue;
 
 		m_aMedal[i]->SetPosition(posMedal);
-		m_aMedal[i]->SetSize(SIZE_MEDAL, SIZE_MEDAL);
+		m_aMedal[i]->SetSize(SIZE_MEDAL, SIZE_MEDAL * 1.6);
 		m_aMedal[i]->SetVtx();
 
 		int nIdxTexture = Texture::GetIdx(&aPathMedal[i][0]);
