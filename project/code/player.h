@@ -91,6 +91,13 @@ public:
 	void SEtEnableBike(bool bFlag) { m_fragMotion.bResult = bFlag; }
 
 private:
+	enum E_StateRoap
+	{// ロープの状態
+		ROAPSTATE_NONE = 0,	// 何もしていない状態
+		ROAPSTATE_EXTEND,	// 伸びている状態
+		ROAPSTATE_SHRINK,	// 縮んでいる状態
+		ROAPSTATE_MAX
+	};
 	struct SFragMotion
 	{
 		bool bMove;	// 移動
@@ -127,13 +134,18 @@ private:
 		float fDesityBlurDrift;	// ドリフト時のブラーの濃さ
 		COrbit* pOrbitLamp;	// テールランプの軌跡
 		bool bTailLamp;	// テールランプつけるフラグ
-		CPolygon3D* pPolygonRope;	// ロープのポリゴン
 		COrbit* pOrbitTire;	// タイヤの軌跡
 		D3DXCOLOR orbitColorLamp;	// テールランプの軌跡
 		D3DXCOLOR orbitColorRope;	// テールランプの軌跡
 		D3DXVECTOR3 rotDriftStart;	// ドリフトスタート時の角度
 		float rotDriftDest;	// ドリフト終了時の角度補正値
 		CPolygon3D *pLampBreak;	// ブレーキランプ
+		
+		CPolygon3D* pPolygonRope;	// ロープのポリゴン
+		E_StateRoap stateRoap;	// ロープの状態
+		float fTimerRoap;	// ロープのタイマー
+		D3DXVECTOR3 posGrabedBlock;	// 掴んでいたブロックの位置
+		float fLengthGrabedBlock;	// 掴んでいたブロックとの距離
 	};
 
 	void Load(void);
@@ -169,8 +181,9 @@ private:
 	void EnableRope(void);	// ロープの有効化
 	void DisableRope(void);	// ロープの無効化
 	void FollowRope(void);	// ロープの追従
+	bool SwitchPosBlock(D3DXVECTOR3 *pPosBlock);	// ブロックの位置切り替え
 
-	void Debug(void);
+	void Debug(void);	// デバッグ操作
 
 	// メンバ変数
 	SInfo m_info;	// 自身の情報
