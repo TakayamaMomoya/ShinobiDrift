@@ -76,6 +76,8 @@ const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
 
 const string PATH_TEX_ROPE = "data\\TEXTURE\\MATERIAL\\rope.png";	// ロープのテクスチャパス
 const float WIDTH_ROAP = 20.0f;	// ロープの幅
+const float SPEED_EXTEND_ROAP = 0.1f;	// ロープの伸びる速度
+const float SPEED_SHRINK_ROAP = 0.1f;	// ロープの縮む速度
 }
 
 //*****************************************************
@@ -151,8 +153,6 @@ HRESULT CPlayer::Init(void)
 			m_pPlayerNinja->SetMatrix(GetMatrix());
 		}
 	}
-
-	m_info.pRoap = CPolygon3D::Create(GetPosition());
 
 	// デフォルト値設定
 	m_info.fLengthDrift = 1500.0f;
@@ -270,6 +270,9 @@ void CPlayer::Uninit(void)
 	Object::DeleteObject((CObject**)&m_info.pOrbitTire, 1);
 
 	DisableBrakeLamp();
+
+	if (m_info.pPolygonRope != nullptr)
+		Object::DeleteObject((CObject**)&m_info.pPolygonRope);
 
 	// 継承クラスの終了
 	CMotion::Uninit();
@@ -478,6 +481,9 @@ void CPlayer::InputWire(void)
 
 	CBlock *pBlock = pBlockManager->GetHead();
 
+	// ロープの制御
+	ControlRoap();
+
 	if (m_info.pBlockGrab != nullptr)
 	{
 		m_info.pBlockGrab->EnableCurrent(true);
@@ -510,9 +516,6 @@ void CPlayer::InputWire(void)
 
 		// ドリフトの補正
 		LimitDrift(m_info.fLengthDrift);
-
-		// ロープの制御
-		ControlRoap();
 
 		// 後輪の位置取得
 		float PosX = GetParts(3)->pParts->GetMatrix()._41;
@@ -681,10 +684,8 @@ void CPlayer::JudgeRemoveWire(float fLength)
 //=====================================================
 void CPlayer::ControlRoap(void)
 {
-	if (m_info.pBlockGrab != nullptr)
+	//if (m_info.pBlockGrab != nullptr)
 	{
-		// ロープの有効化
-		EnableRope();
 
 		// ロープの追従
 		FollowRope();
@@ -780,6 +781,9 @@ void CPlayer::SarchGrab(void)
 			
 			// 投擲音の再生
 			Sound::Play(CSound::LABEL_SE_THROW);
+
+			// ロープの有効化
+			EnableRope();
 		}
 	}
 }
@@ -791,6 +795,9 @@ void CPlayer::RemoveWire(void)
 {
 	if (m_info.pBlockGrab != nullptr)
 	{
+		// ロープの無効化
+		DisableRope();
+
 		m_info.nCntFlip = 0;
 		m_info.fCntAngle = 0.0f;
 
@@ -804,9 +811,6 @@ void CPlayer::RemoveWire(void)
 		D3DXMATRIX mtxNinja = GetNInjaBody()->GetParts(5)->pParts->GetMatrix();
 		m_info.orbitColorLamp = D3DXCOLOR(0.5f, 0.5f, 0.0f, 0.0f);
 		m_info.pOrbitLamp->SetOffset(mtxNinja, m_info.orbitColorRope);
-
-	// ロープの無効化
-	DisableRope();
 
 		m_fragNinja.bThrowLeft = false;
 		m_fragNinja.bThrowRight = false;
@@ -1526,9 +1530,12 @@ void CPlayer::DisableTailLamp(void)
 void CPlayer::EnableRope(void)
 {
 	if (m_info.pPolygonRope != nullptr)
-		return;
+	{
+		m_info.pPolygonRope->Uninit();
+		m_info.pPolygonRope = nullptr;
+	}
 
-	m_info.pPolygonRope = CPolygon3D::Create(D3DXVECTOR3());
+	m_info.pPolygonRope = CPolygon3D::Create(D3DXVECTOR3(0.0f,0.0f,0.0f));
 
 	if (m_info.pPolygonRope == nullptr)
 		return;
@@ -1537,6 +1544,11 @@ void CPlayer::EnableRope(void)
 	m_info.pPolygonRope->SetIdxTexture(nIdx);
 	m_info.pPolygonRope->EnableLighting(false);
 	m_info.pPolygonRope->EnableZtest(true);
+	m_info.pPolygonRope->EnableCull(false);
+
+	m_info.stateRoap = E_StateRoap::ROAPSTATE_EXTEND;
+	m_info.fTimerRoap = 0.0f;
+	m_info.fLengthGrabedBlock = 0.0f;
 }
 
 //=====================================================
@@ -1544,10 +1556,11 @@ void CPlayer::EnableRope(void)
 //=====================================================
 void CPlayer::DisableRope(void)
 {
-	if (m_info.pPolygonRope != nullptr)
+	m_info.stateRoap = E_StateRoap::ROAPSTATE_SHRINK;
+
+	if (m_info.pBlockGrab != nullptr)
 	{
-		m_info.pPolygonRope->Uninit();
-		m_info.pPolygonRope = nullptr;
+		m_info.posGrabedBlock = m_info.pBlockGrab->GetPosition();
 	}
 }
 
@@ -1556,9 +1569,10 @@ void CPlayer::DisableRope(void)
 //=====================================================
 void CPlayer::FollowRope(void)
 {
-	if (m_info.pPolygonRope == nullptr || m_info.pBlockGrab == nullptr || m_pPlayerNinja == nullptr)
+	if (m_info.pPolygonRope == nullptr || m_pPlayerNinja == nullptr)
 		return;
 
+	// プレイヤー側の手の座標決定
 	D3DXVECTOR3 posPlayer = GetPosition();
 	int nMotion = m_pPlayerNinja->GetMotion();
 
@@ -1567,9 +1581,16 @@ void CPlayer::FollowRope(void)
 	else if(nMotion == MOTION_NINJA::MOTION_NINJA_THROW_RIGHT)
 		posPlayer = m_pPlayerNinja->GetMtxPos(5);
 
-	D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
+	// ブロックの位置決定
+	D3DXVECTOR3 posBlock;
+	SwitchPosBlock(&posBlock);
+
+	if (m_info.pPolygonRope == nullptr)
+		return;
+
 	D3DXVECTOR3 vecDiff = posBlock - posPlayer;
 
+	// カメラに必ず垂直に映るように設定
 	CCamera *pCamera = CManager::GetCamera();
 
 	if (pCamera == nullptr)
@@ -1592,20 +1613,64 @@ void CPlayer::FollowRope(void)
 	if (pVtxBuff == nullptr)
 		return;
 
-	//頂点情報のポインタ
+	// 頂点情報のポインタ
 	VERTEX_3D *pVtx;
 
-	//頂点バッファをロックし、頂点情報へのポインタを取得
+	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 
-	//頂点座標の設定
-	pVtx[0].pos = posBlock + vecCrossBlock * WIDTH_ROAP;
-	pVtx[1].pos = posBlock - vecCrossBlock * WIDTH_ROAP;
-	pVtx[2].pos = posPlayer + vecCrossPlayer * WIDTH_ROAP;
-	pVtx[3].pos = posPlayer - vecCrossPlayer * WIDTH_ROAP;
+	// 頂点座標の設定
+	float fRate = universal::EaseInCubic(m_info.fTimerRoap);
+	D3DXVECTOR3 posRoapFront = posPlayer + vecDiff * fRate;
 
-	//頂点バッファをアンロック
+	pVtx[0].pos = posRoapFront - vecCrossBlock * WIDTH_ROAP;
+	pVtx[1].pos = posRoapFront + vecCrossBlock * WIDTH_ROAP;
+	pVtx[2].pos = posPlayer - vecCrossPlayer * WIDTH_ROAP;
+	pVtx[3].pos = posPlayer + vecCrossPlayer * WIDTH_ROAP;
+
+	// 頂点バッファをアンロック
 	pVtxBuff->Unlock();
+}
+
+//=====================================================
+// ブロック位置の切り替え
+//=====================================================
+bool CPlayer::SwitchPosBlock(D3DXVECTOR3 *pPosBlock)
+{
+	switch (m_info.stateRoap)
+	{
+	case E_StateRoap::ROAPSTATE_EXTEND:	// 伸びてる状態
+		m_info.fTimerRoap += SPEED_EXTEND_ROAP;
+
+		if (m_info.pBlockGrab != nullptr)
+		{
+			*pPosBlock = m_info.pBlockGrab->GetPosition();
+		}
+
+		CDebugProc::GetInstance()->Print("\n伸びてる～～～～～");
+
+		break;
+	case E_StateRoap::ROAPSTATE_SHRINK:	// 縮んでいる状態
+		m_info.fTimerRoap -= SPEED_SHRINK_ROAP;
+		if (m_info.fTimerRoap <= 0.0f)
+		{
+			m_info.pPolygonRope->Uninit();
+			m_info.pPolygonRope = nullptr;
+			return true;
+		}
+
+		*pPosBlock = m_info.posGrabedBlock;
+
+		CDebugProc::GetInstance()->Print("\n縮むぅ～～～～～");
+
+		break;
+	default:
+		break;
+	}
+
+	universal::LimitValuefloat(&m_info.fTimerRoap, 1.0f, 0.0f);
+
+	return false;
 }
 
 //=====================================================
@@ -1646,7 +1711,11 @@ void CPlayer::Debug(void)
 #if 1
 	pDebugProc->Print("\nプレイヤーの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	pDebugProc->Print("\nプレイヤーの移動量[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
-	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);/*
+	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);
+	pDebugProc->Print("\n掴んでたブロックの位置[%f,%f,%f]", m_info.posGrabedBlock.x, m_info.posGrabedBlock.y, m_info.posGrabedBlock.z);
+	pDebugProc->Print("\nロープあるよっ！[%d]", m_info.pPolygonRope != nullptr);
+	pDebugProc->Print("\nロープの長さ[%f]", m_info.fTimerRoap);
+	/*
 	pDebugProc->Print("\n目標速度[%f]", m_info.fSpeedDest);
 	pDebugProc->Print("\n現在の速度[%f]", m_info.fSpeed);
 	pDebugProc->Print("\n弾きカウンター[%d]", m_info.nCntFlip);
