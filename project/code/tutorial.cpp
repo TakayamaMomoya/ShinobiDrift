@@ -49,8 +49,8 @@ const char* PATH_ROAD = "data\\MAP\\road01.bin";	// チュートリアルメッシュロード
 const D3DXVECTOR3 POS_DEFAULT_UI = { 0.8f, 0.1f, 0.0f };	// UIのデフォルト位置
 const D3DXVECTOR2 SIZE_DEFAULT_UI = { 0.05f, 0.05f};	// UIのデフォルトサイズ
 const float LINE_INPUT = 0.3f;	// 入力と判定するスピード
-const float TIME_ACCELE = 5.0f;	// アクセルに必要な時間
-const float TIME_BRAKE = 3.0f;	// ブレーキに必要な時間
+const float TIME_ACCELE = 3.0f;	// アクセルに必要な時間
+const float TIME_BRAKE = 1.0f;	// ブレーキに必要な時間
 const D3DXVECTOR2 SIZE_GATE = { 3000.0f,3000.0f };	// ゲートのサイズ
 const float DIST_GATE = 3000.0f;	// ゲートの距離
 const D3DXVECTOR3 ROT_GATE = { D3DX_PI * 0.5f, D3DX_PI * 0.5f, 0.0f };	// ゲートの向き
@@ -452,6 +452,8 @@ void CStateTutorialApperPlayer::ScalingGate(void)
 
 	if (m_fTimer >= 1.0f)
 	{
+		universal::LimitValuefloat(&m_fTimer, 1.0f, 0.0f);
+
 		m_bOpenGate = true;
 
 		float fRate = universal::EaseInCubic(m_fTimer);
@@ -639,7 +641,7 @@ void CStateTutorialMove::Update(CTutorial *pTutorial)
 	
 	if (IsEndInput(MENU_MAX,pTutorial))
 	{// 移動チュートリアルを終了
-		pTutorial->ChangeState(new CStateTutorialEnd);
+		pTutorial->ChangeState(new CStateTutorialDrift);
 	}
 }
 
