@@ -1,51 +1,40 @@
 //*****************************************************
 //
-// シーン処理[scene.h]
+// ロゴ表示処理[logo.h]
 // Author:髙山桃也
 //
 //*****************************************************
-#ifndef _SCENE_H_
-#define _SCENE_H_
+#ifndef _LOGO_H_
+#define _LOGO_H_
 
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "main.h"
+#include "scene.h"
 
 //*****************************************************
 // 前方宣言
 //*****************************************************
-class CPlayer;
-class CMeshField;
+class CUI;
 
 //*****************************************************
 // クラスの定義
 //*****************************************************
-class CScene
+class CLogo : public CScene
 {
 public:
-	enum MODE
-	{
-		MODE_LOGO = 0,
-		MODE_TITLE,
-		MODE_GAME,
-		MODE_RANKING,
-		MODE_MAX
-	};
-
-	CScene();	// コンストラクタ
-	~CScene();	// デストラクタ
+	CLogo();	// コンストラクタ
+	~CLogo();	// デストラクタ
 
 	virtual HRESULT Init(void);
 	virtual void Uninit(void);
-	virtual void Update();
-	virtual void Draw();
-	static CScene *Create(MODE mode);
-	int GetTimer(void) { return m_nTimerTrans; }
-	void SetTimer(int nTime) { m_nTimerTrans = nTime; }
+	virtual void Update(void);
+	virtual void Draw(void);
 
 private:
-	int m_nTimerTrans;	// 遷移タイマー
+	// メンバ変数
+	CUI *m_pLogo;	// ロゴ
+	float m_fTimerLogoDisp;	// ロゴの表示カウンター
 };
 
 #endif

@@ -78,6 +78,7 @@ D3DXVECTOR3 Lerp(D3DXVECTOR3 start, D3DXVECTOR3 end, float fTime);
 inline float EaseOutCubic(float fTime) { return 1 - powf(1.0f - fTime, 3.0f); };
 inline float EaseInCubic(float fTime) { return powf(fTime, 3.0f); };
 float EaseOutBack(float fTime);
+inline float EaseOutExpo(float fTime) { return fTime == 1 ? 1 : 1 - powf(2, -10 * fTime); }
 }
 
 #endif

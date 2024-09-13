@@ -10,6 +10,7 @@
 //*****************************************************
 #include "scene.h"
 #include "game.h"
+#include "logo.h"
 #include "title.h"
 #include "tutorial.h"
 #include "ranking.h"
@@ -80,6 +81,11 @@ CScene *CScene::Create(MODE mode)
 
 	switch (mode)
 	{
+	case CScene::MODE_LOGO:
+
+		pScene = new CLogo;
+
+		break;
 	case CScene::MODE_TITLE:
 
 		pScene = new CTitle;
