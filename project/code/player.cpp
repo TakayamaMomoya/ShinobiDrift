@@ -66,12 +66,12 @@ const float HEIGHT_PLAYER = -70.0f;	// プレイヤーの高さ
 // ハンドリング関係
 const float HANDLE_INERTIA = 0.04f;  // カーブ時の角度変更慣性
 const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性倍率
-const float HANDLE_INERTIA_DRIFT = 0.08f;  // ドリフト時の角度変更慣性倍率
-const float HANDLE_INERTIA_DEFAULT = 0.1f;  // ドリフト姿勢から通常姿勢に戻る時の角度変更慣性倍率
+const float HANDLE_INERTIA_DRIFT = 0.06f;  // ドリフト時の角度変更慣性倍率
+const float HANDLE_INERTIA_DEFAULT = 0.05f;  // ドリフト姿勢から通常姿勢に戻る時の角度変更慣性倍率
 const float HANDLE_CURVE_MAG = -0.04f;  // 体勢からカーブへの倍率
 const float HANDLE_SPEED_MAG = -0.005f;  // 体勢から速度への倍率
-const float ROT_CURVE_LIMIT = 0.025f;  // ハンドル操作がきく用になる角度の限界
-const float ROT_Y_DRIFT = 0.5f;  // ドリフト中のZ軸の角度
+const float ROT_CURVE_LIMIT = 0.4f;  // ハンドル操作がきく用になる角度の限界
+const float ROT_Y_DRIFT = 0.3f;  // ドリフト中のZ軸の角度
 const float ROT_Z_DRIFT = 1.0f;  // ドリフト中のZ軸の角度
 
 const string PATH_TEX_ROPE = "data\\TEXTURE\\MATERIAL\\rope.png";	// ロープのテクスチャパス
@@ -555,7 +555,7 @@ void CPlayer::InputWire(void)
 	{
 		if (CInputKeyboard::GetInstance()->GetTrigger(DIK_F4))
 		{// 操作方法変更
-			//m_info.bManual = m_info.bManual ? false : true;
+			m_info.bManual = m_info.bManual ? false : true;
 		}
 	}
 }
@@ -755,7 +755,7 @@ void CPlayer::SarchGrab(void)
 
 		m_info.fLengthDrift = fLengthMin;
 
-		m_info.fAngleDrift = 0.4f;
+		m_info.fAngleDrift = 0.41f;
 	}
 
 	if (pBlockGrab != nullptr)
@@ -1142,6 +1142,7 @@ void CPlayer::ManageSpeed(void)
 		// 差分角度の計算
 		D3DXVECTOR3 posPlayer = GetPosition();
 		D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
+		float rotDef;
 		rotBlock = atan2f((posBlock.x - posPlayer.x), (posBlock.z - posPlayer.z));
 		universal::LimitRot(&rotBlock);
 
@@ -1149,16 +1150,16 @@ void CPlayer::ManageSpeed(void)
 		{
 			rot.z += (-ROT_Z_DRIFT - rot.z) * HANDLE_INERTIA_DRIFT;
 			m_info.rotDriftDest = D3DX_PI * ROT_Y_DRIFT;
+			rotDef = rotBlock - rot.y + (D3DX_PI * -0.15f);
 		}
 		else
 		{
 			rot.z += (ROT_Z_DRIFT - rot.z) * HANDLE_INERTIA_DRIFT;
 			m_info.rotDriftDest = D3DX_PI * -ROT_Y_DRIFT;
+			rotDef = rotBlock - rot.y + (D3DX_PI * 0.15f);
 		}
 		
 		universal::LimitRot(&rot.z);
-
-		float rotDef = rotBlock - rot.y;
 		universal::LimitRot(&rotDef);
 		rot.y += rotDef;
 		universal::LimitRot(&rot.y);
