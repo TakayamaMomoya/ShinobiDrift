@@ -378,11 +378,6 @@ bool CBlock::CollideSide(D3DXVECTOR3* pPos, D3DXVECTOR3* move, D3DXVECTOR3 vecAx
 
 #ifdef _DEBUG
 	CEffect3D::Create(pos, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f));
-	//CEffect3D::Create(pos + BlockCornerOffset, 50.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
-	CEffect3D::Create(axisA1, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
-	CEffect3D::Create(axisA2, 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
-	CEffect3D::Create(axisA3, 100.0f, 3, D3DXCOLOR(0.0f, 0.0f, 1.0f, 1.0f));
-	CEffect3D::Create(axisA4, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 1.0f, 1.0f));
 #endif // _DEBUG
 
 	bool bCollision = false;
