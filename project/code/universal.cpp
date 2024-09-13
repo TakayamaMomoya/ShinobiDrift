@@ -662,6 +662,11 @@ bool IsOnTrianglePolygon(D3DXVECTOR3 vtx1, D3DXVECTOR3 vtx2, D3DXVECTOR3 vtx3, D
 	vecVtx[1] = vtx3 - vtx2;
 	vecVtx[2] = vtx1 - vtx3;
 
+	if (D3DXVec3Length(&vecVtx[0]) <= 0 ||
+		D3DXVec3Length(&vecVtx[1]) <= 0 ||
+		D3DXVec3Length(&vecVtx[2]) <= 0)
+		return false;
+
 	// ポリゴンの各点から目標へのベクトルを設定
 	D3DXVECTOR3 vecVtxTarget[3];
 	vecVtxTarget[0] = posTarget - vtx1;
