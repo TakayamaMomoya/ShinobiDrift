@@ -302,6 +302,10 @@ void CBlock::Load(FILE *pFile, char* pTemp)
 //=====================================================
 bool CBlock::Collide(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 {
+	CBlockManager::SInfoBlock* pInfoBlock = CBlockManager::GetInstance()->GetInfoBlock();
+	if (pInfoBlock[GetIdx()].bSnag)
+		return false;
+
 	float fHeight = pPos->y;
 
 	D3DXVECTOR3 pos = GetPosition();
