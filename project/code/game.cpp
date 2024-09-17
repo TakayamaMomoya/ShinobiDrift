@@ -332,6 +332,8 @@ void CGame::CreateLight(void)
 		infoLight.Direction = vecDir;
 		
 		pLight->SetLightInfo(infoLight);
+
+		m_aLight.push_back(pLight);
 	}
 }
 
