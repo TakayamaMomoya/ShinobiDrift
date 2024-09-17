@@ -1612,7 +1612,7 @@ void CPlayer::FollowRope(void)
 
 	if (pVtxBuff == nullptr)
 		return;
-
+	
 	// 頂点情報のポインタ
 	VERTEX_3D *pVtx;
 
