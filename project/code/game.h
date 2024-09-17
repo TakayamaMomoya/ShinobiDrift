@@ -20,6 +20,7 @@ class CGame;
 class CPlayer;
 class CEdit;
 class CTimer;
+class CLight;
 
 //*****************************************************
 // クラスの定義
@@ -50,26 +51,38 @@ public:
 	bool GetStop(void) { return m_bStop; }
 	CEdit *GetEdit(void) { return m_pEdit; }
 
+	// 変数取得・設定関数
+	vector<CLight*> GetLight(void) { return m_aLight; };	// ライトの配列
+	void SetDestColLight(D3DXCOLOR col) { m_colLight = col; }	// ライトの色
+	void ResetDestColLight(void);	// ライト色リセットs
+
 	// ゲームタイマー
 	CTimer *GetGameTimer(void) { return m_pGameTimer; }	// ゲームタイマー
 	void CreateGameTimer(void);	// 生成
 	void ReleaseGameTimer(void);	// ゲームタイマーの解放
 
 private:
+	// メンバ関数
 	void UpdateCamera(void);
 	void ManageState(void);
 	void UpdateGameTimer(void);	// タイマーの更新
 	void ToggleStop(void);
 	void Debug(void);
 	void ChangeEdit(CEdit *pEdit);
+	void CreateLight(void);	// ライトの生成
+	void UpdateLight(void);	// ライトの更新
 
-	static STATE m_state;	// 状態
-	static CGame *m_pGame;	// 自身のポインタ
-
+	// メンバ変数
 	int m_nCntState;	// 状態遷移カウンター
 	bool m_bStop;	// 停止状態
 	CEdit *m_pEdit;	// エディットのポインタ
 	CTimer *m_pGameTimer;	// ゲームのタイマー
+	vector<CLight*> m_aLight;	// ゲーム中のライト
+	D3DXCOLOR m_colLight;	// ライト色
+
+	// 静的メンバ変数
+	static STATE m_state;	// 状態
+	static CGame *m_pGame;	// 自身のポインタ
 };
 
 #endif

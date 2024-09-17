@@ -17,6 +17,8 @@
 #include "player.h"
 #include "fan3D.h"
 #include "sound.h"
+#include "manager.h"
+#include "game.h"
 
 //*****************************************************
 // 定数定義
@@ -32,6 +34,8 @@ const char* DOOR_TEX_PATH = "data\\TEXTURE\\MATERIAL\\potal00.png";
 const float TEX_SCROLL_X = 0.001f;  // テクスチャ座標の移動量
 const float TEX_SCROLL_Y = 0.01f;   // テクスチャ座標の移動量
 const float RATE_SPEED_ACCELE = 4.0f;	// トンネル内の加速倍率
+
+const D3DXCOLOR COL_IN_TUNNEL = { 0.6f,0.6f,0.6f,1.0f };	// トンネル内の
 }
 
 //=====================================================
@@ -380,8 +384,6 @@ void CTunnel::CollidePlayerEnter(VERTEX_3D *pVtx)
 		}
 	}
 
-	CDebugProc::GetInstance()->Print("\nInfRate1[%f]", fRate);
-
 	bool bHit2 = universal::IsCross(posPlayer, pos4, pos3, &fRate, posNext);
 	bool bHit2Next = universal::IsCross(posNext, pos4, pos3, &fRate, posNext + movePlayer);
 
@@ -393,7 +395,6 @@ void CTunnel::CollidePlayerEnter(VERTEX_3D *pVtx)
 		}
 	}
 
-	CDebugProc::GetInstance()->Print("\nInfRate2[%f]", fRate);
 }
 
 //=====================================================
@@ -485,6 +486,14 @@ void CTunnel::EnterPlayer(void)
 		if(pSound != nullptr)
 		pSound->Play(pSound->LABEL_SE_ENTERTUNNEL);
 	}
+
+	// ライティングを暗くする
+	CGame *pGame = CGame::GetInstance();
+
+	if (pGame != nullptr)
+	{
+		pGame->SetDestColLight(COL_IN_TUNNEL);
+	}
 }
 
 //=====================================================
@@ -515,6 +524,14 @@ void CTunnel::ExitPlayer(void)
 	}
 
 	Blur::ResetBlur();
+
+	// ライティングを戻す
+	CGame *pGame = CGame::GetInstance();
+
+	if (pGame != nullptr)
+	{
+		pGame->ResetDestColLight();
+	}
 }
 
 //=====================================================

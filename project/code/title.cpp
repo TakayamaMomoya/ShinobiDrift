@@ -30,6 +30,7 @@
 #include "orbit.h"
 #include "debugproc.h"
 #include "UI.h"
+#include "light.h"
 
 //*****************************************************
 // マクロ定義
@@ -69,6 +70,8 @@ namespace
 	const D3DXVECTOR3 POS_LEFT_DOOR = { -590.0f, 1000.0f, 1900.0f };  // ドアの左側の位置
 	const float RIGHT_DOOR_LIMIT = 1800.0f;  // ドアの右側の可動上限
 	const float LEFT_DOOR_LIMIT = -1800.0f;  // ドアの左側の可動上限
+
+	const int NUM_LIGHT = 3;	// ライトの数
 }
 
 //*****************************************************
@@ -243,7 +246,42 @@ HRESULT CTitle::Init(void)
 	int nIdxTexture = CTexture::GetInstance()->Regist("data\\TEXTURE\\EFFECT\\orbit000.png");
 	m_pOrbitLamp = COrbit::Create(m_pBike->GetMatrix(), D3DXVECTOR3(20.0f, 220.0f, -80.0f), D3DXVECTOR3(-20.0f, 220.0f, -80.0f), D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f), 60, nIdxTexture);
 
+	// ライトの生成
+	CreateLight();
+
 	return S_OK;
+}
+
+//=====================================================
+// ライトの生成
+//=====================================================
+void CTitle::CreateLight(void)
+{
+	D3DXVECTOR3 aDir[NUM_LIGHT] =
+	{
+		{ -1.4f, 0.24f, -2.21f, },
+		{ 1.42f, -0.8f, 0.08f },
+		{ -0.29f, -0.8f, 0.55f }
+	};
+
+	for (int i = 0; i < NUM_LIGHT; i++)
+	{
+		CLight *pLight = CLight::Create();
+
+		if (pLight == nullptr)
+			continue;
+
+		D3DLIGHT9 infoLight = pLight->GetLightInfo();
+
+		infoLight.Type = D3DLIGHT_DIRECTIONAL;
+		infoLight.Diffuse = D3DXCOLOR(0.9f, 0.9f, 0.9f, 1.0f);
+
+		D3DXVECTOR3 vecDir = aDir[i];
+		D3DXVec3Normalize(&vecDir, &vecDir);		//ベクトル正規化
+		infoLight.Direction = vecDir;
+
+		pLight->SetLightInfo(infoLight);
+	}
 }
 
 //=====================================================

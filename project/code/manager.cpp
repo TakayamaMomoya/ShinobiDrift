@@ -91,20 +91,6 @@ HRESULT CManager::Init(HINSTANCE hInstance, HWND hWnd, BOOL bWindow)
 		}
 	}
 
-	if (m_pLight == nullptr)
-	{// ライト生成
-		m_pLight = new CLight;
-
-		if (m_pLight != nullptr)
-		{
-			// 初期化
-			if (FAILED(m_pLight->Init()))
-			{// 初期化に失敗した場合
-				return E_FAIL;
-			}
-		}
-	}
-
 	if (m_pMyEffekseer == nullptr)
 	{// エフェクシア生成
 
@@ -187,14 +173,6 @@ void CManager::Uninit(void)
 	if (pDebugProc != nullptr)
 	{
 		pDebugProc->Uninit();
-	}
-
-	if (m_pLight != nullptr)
-	{// ライトの終了・破棄
-		m_pLight->Uninit();
-
-		delete m_pLight;
-		m_pLight = nullptr;
 	}
 
 	if (m_pMyEffekseer != nullptr)

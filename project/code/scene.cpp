@@ -16,6 +16,7 @@
 #include "ranking.h"
 #include "manager.h"
 #include "renderer.h"
+#include "light.h"
 
 //=====================================================
 // コンストラクタ
@@ -46,7 +47,7 @@ HRESULT CScene::Init(void)
 //=====================================================
 void CScene::Uninit(void)
 {
-
+	CLight::ReleaseAll();
 }
 
 //=====================================================

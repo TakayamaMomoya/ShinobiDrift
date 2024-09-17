@@ -8,7 +8,6 @@
 //*****************************************************
 // インクルード
 //*****************************************************
-#include "main.h"
 #include "light.h"
 #include "manager.h"
 #include "renderer.h"
@@ -29,127 +28,122 @@ const D3DXCOLOR INTIIAL_COLOR[MAX_LIGHT] =
 };
 }
 
+//*****************************************************
+// 静的メンバ変数宣言
+//*****************************************************
+int CLight::s_nNumAll = 0;	// 総数
+vector<CLight*> CLight::s_aLight;	// ライトの格納用配列
+
 //====================================================
-//初期化処理
+// コンストラク
+//====================================================
+CLight::CLight()
+{
+	m_nID = s_nNumAll;
+	s_nNumAll++;
+	s_aLight.push_back(this);
+}
+
+//====================================================
+// デストラク
+//====================================================
+CLight::~CLight()
+{
+	s_nNumAll--;
+}
+
+//====================================================
+// 生成
+//====================================================
+CLight *CLight::Create(void)
+{
+	CLight *pLight = nullptr;
+
+	pLight = new CLight;
+
+	if (pLight == nullptr)
+		return nullptr;
+
+	pLight->Init();
+
+	return pLight;
+}
+
+//====================================================
+// 初期化処理
 //====================================================
 HRESULT CLight::Init(void)
 {
 	// デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
-	D3DXVECTOR3 vecDir;
+	LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();
 
-	//ライト１の設定============================================
 	//ライトの種類設定
-	m_aLight[0].Type = D3DLIGHT_DIRECTIONAL;
+	m_light.Type = D3DLIGHT_DIRECTIONAL;
 
 	//ライトの拡散光の設定
-	m_aLight[0].Diffuse = INTIIAL_COLOR[0];
+	m_light.Diffuse = INTIIAL_COLOR[0];
 
 	//ライトの方向設定
-	vecDir = D3DXVECTOR3(-1.4f, 0.24f, -2.21f);
+	D3DXVECTOR3 vecDir = D3DXVECTOR3(-1.4f, 0.24f, -2.21f);
 	D3DXVec3Normalize(&vecDir, &vecDir);		//ベクトル正規化
-	m_aLight[0].Direction = vecDir;
+	m_light.Direction = vecDir;
 
 	//ライト設定
-	pDevice->SetLight(0, &m_aLight[0]);
+	pDevice->SetLight(m_nID, &m_light);
 
 	//ライト有効化
-	pDevice->LightEnable(0, TRUE);
-
-	//ライト２の設定============================================
-	//ライトの種類設定
-	m_aLight[1].Type = D3DLIGHT_DIRECTIONAL;
-
-	//ライトの拡散光の設定
-	m_aLight[1].Diffuse = INTIIAL_COLOR[1];
-
-	//ライトの方向設定
-	vecDir = D3DXVECTOR3(1.42f, -0.8f, 0.08f);
-	D3DXVec3Normalize(&vecDir, &vecDir);		//ベクトル正規化
-	m_aLight[1].Direction = vecDir;
-
-	//ライト設定
-	pDevice->SetLight(1, &m_aLight[1]);
-
-	//ライト有効化
-	pDevice->LightEnable(1, TRUE);
-
-	//ライト３の設定============================================
-	//ライトの種類設定
-	m_aLight[2].Type = D3DLIGHT_DIRECTIONAL;
-
-	//ライトの拡散光の設定
-	m_aLight[2].Diffuse = INTIIAL_COLOR[2];
-
-	//ライトの方向設定
-	vecDir = D3DXVECTOR3(-0.29f, -0.8f, 0.55f);
-	D3DXVec3Normalize(&vecDir, &vecDir);		//ベクトル正規化
-	m_aLight[2].Direction = vecDir;
-
-	//ライト設定
-	pDevice->SetLight(2, &m_aLight[2]);
-
-	//ライト有効化
-	pDevice->LightEnable(2, TRUE);
-
-	// 色の初期化
-	ResetColDest();
-
-	for (int i = 0; i < MAX_LIGHT; i++)
-	{
-		m_aInfo[i].col = INTIIAL_COLOR[i];
-	}
-
+	pDevice->LightEnable(m_nID, TRUE);
 	return S_OK;
 }
 
 //====================================================
-//終了処理
+// 終了処理
 //====================================================
 void CLight::Uninit(void)
 {
-
+	Release();
 }
 
 //====================================================
-//更新処理
+// 更新処理
 //====================================================
 void CLight::Update(void)
 {
-	// デバイスの取得
-	LPDIRECT3DDEVICE9 pDevice = CRenderer::GetInstance()->GetDevice();
 
-	for (int i = 0; i < MAX_LIGHT; i++)
-	{
-		// 色の補正
-		m_aInfo[i].col.r += (m_aInfo[i].colDest.r - m_aInfo[i].col.r) * SPEED_CHANGE_COL;
-		m_aInfo[i].col.g += (m_aInfo[i].colDest.g - m_aInfo[i].col.g) * SPEED_CHANGE_COL;
-		m_aInfo[i].col.b += (m_aInfo[i].colDest.b - m_aInfo[i].col.b) * SPEED_CHANGE_COL;
-		m_aInfo[i].col.a += (m_aInfo[i].colDest.a - m_aInfo[i].col.a) * SPEED_CHANGE_COL;
-
-		// ライトの拡散光の設定
-		m_aLight[i].Diffuse = m_aInfo[i].col;
-
-		// ライト設定
-		pDevice->SetLight(i, &m_aLight[i]);
-	}
 }
 
 //====================================================
-// 色の設定
+// ライト情報設定
 //====================================================
-void CLight::SetColDest(int nIdx, D3DXCOLOR col)
+void CLight::SetLightInfo(D3DLIGHT9 light)
 {
-	m_aInfo[nIdx].colDest = col;
+	LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();
+
+	m_light = light;
+
+	pDevice->SetLight(m_nID, &m_light);
 }
 
 //====================================================
-// 色のリセット
+// ライトの有効化切り替え
 //====================================================
-void CLight::ResetColDest(void)
+void CLight::EnableLight(bool bFrag)
 {
-	for (int i = 0; i < MAX_LIGHT; i++)
+	LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();
+
+	//ライト有効化
+	pDevice->LightEnable(m_nID, bFrag);
+}
+
+//====================================================
+// 全ライトの解放
+//====================================================
+void CLight::ReleaseAll(void)
+{
+	for (auto it : s_aLight)
 	{
-		m_aInfo[i].colDest = INTIIAL_COLOR[i];
+		it->Uninit();
 	}
+
+	s_aLight.clear();
 }

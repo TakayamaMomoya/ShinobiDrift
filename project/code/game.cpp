@@ -47,6 +47,7 @@
 #include "tutorial.h"
 #include "blur.h"
 #include "rankTime.h"
+#include "light.h"
 
 //*****************************************************
 // マクロ定義
@@ -56,6 +57,9 @@ namespace
 {
 const char* PATH_GAME_ROAD = "data\\MAP\\road00.bin";	// ゲームメッシュロードのパス
 const D3DXVECTOR3 POS_MESHFIELD = { 342028.0f,1000.0f, -30640.0f };	// メッシュフィールドの位置
+const int NUM_LIGHT = 3;	// ライトの数
+const D3DXCOLOR COL_LIGHT_DEFAULT = { 0.9f,0.9f,0.9f,1.0f };	// ライトのデフォルト色
+const float SPEED_CHANGE_LIGHTCOL = 0.1f;	// ライトの色が変わる速度
 }
 
 //*****************************************************
@@ -82,6 +86,7 @@ HRESULT CGame::Init(void)
 {
 	m_pGame = this;
 
+	m_colLight = COL_LIGHT_DEFAULT;
 	m_state = STATE_NORMAL;
 	m_bStop = false;
 
@@ -139,6 +144,9 @@ HRESULT CGame::Init(void)
 		pMeshField->SetPosition(POS_MESHFIELD);
 	}
 
+	// ライトの生成
+	CreateLight();
+
 	return S_OK;
 }
 
@@ -190,6 +198,9 @@ void CGame::Update(void)
 
 	// タイマーの更新
 	UpdateGameTimer();
+
+	// ライトの更新
+	UpdateLight();
 
 #ifdef _DEBUG
 	Debug();
@@ -290,6 +301,65 @@ void CGame::ChangeEdit(CEdit *pEdit)
 	{
 		m_pEdit->Init();
 	}
+}
+
+//=====================================================
+// ライトの生成
+//=====================================================
+void CGame::CreateLight(void)
+{
+	D3DXVECTOR3 aDir[NUM_LIGHT] =
+	{
+		{ -1.4f, 0.24f, -2.21f, },
+		{ 1.42f, -0.8f, 0.08f },
+		{ -0.29f, -0.8f, 0.55f }
+	};
+
+	for (int i = 0; i < NUM_LIGHT; i++)
+	{
+		CLight *pLight = CLight::Create();
+
+		if (pLight == nullptr)
+			continue;
+
+		D3DLIGHT9 infoLight = pLight->GetLightInfo();
+
+		infoLight.Type = D3DLIGHT_DIRECTIONAL;
+		infoLight.Diffuse = m_colLight;
+
+		D3DXVECTOR3 vecDir = aDir[i];
+		D3DXVec3Normalize(&vecDir, &vecDir);		//ベクトル正規化
+		infoLight.Direction = vecDir;
+		
+		pLight->SetLightInfo(infoLight);
+	}
+}
+
+//=====================================================
+// ライトの更新
+//=====================================================
+void CGame::UpdateLight(void)
+{
+	for (auto it : m_aLight)
+	{
+		D3DLIGHT9 infoLight = it->GetLightInfo();
+
+		D3DXCOLOR col = infoLight.Diffuse;
+
+		col += (m_colLight - col) * SPEED_CHANGE_LIGHTCOL;
+
+		infoLight.Diffuse = col;
+
+		it->SetLightInfo(infoLight);
+	}
+}
+
+//=====================================================
+// ライトの色リセット
+//=====================================================
+void CGame::ResetDestColLight(void)
+{
+	m_colLight = COL_LIGHT_DEFAULT;
 }
 
 //=====================================================

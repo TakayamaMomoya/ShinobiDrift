@@ -52,7 +52,10 @@ public:
 	void DoorOpen(void);            // 格納庫のドアが開く
 	
 private:
+	// メンバ関数
+	void CreateLight(void);	// ライトの生成
 
+	// メンバ変数
 	STATE m_state;				    // 状態
 	CUI *m_pTitleLogo;       // タイトルロゴのポインタ
 	CUI *m_pTeamLogo;        // チームロゴのポインタ
