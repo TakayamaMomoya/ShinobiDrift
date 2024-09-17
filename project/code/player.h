@@ -22,6 +22,7 @@ class CPlayerNinja;
 class CMeshRoad;
 class COrbit;
 class CEffekseerEffect;
+class CLight;
 
 //*****************************************************
 // クラスの定義
@@ -90,6 +91,7 @@ public:
 	void SetSpeed(float fSpeed) { m_info.fSpeed = fSpeed; }
 	void SetEnableResultFlag(bool bFlag) { m_fragNinja.bGoal = bFlag; }
 	void SetEnableBike(bool bFlag) { m_fragMotion.bResult = bFlag; }
+	CLight *GetLight(void) { return m_info.pLight; }	// プレイヤーライト
 
 private:
 	enum E_StateRoap
@@ -147,6 +149,7 @@ private:
 		float fTimerRoap;	// ロープのタイマー
 		D3DXVECTOR3 posGrabedBlock;	// 掴んでいたブロックの位置
 		float fLengthGrabedBlock;	// 掴んでいたブロックとの距離
+		CLight* pLight;	// プレイヤーライト
 	};
 
 	void Load(void);

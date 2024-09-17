@@ -12,6 +12,7 @@
 #include "player.h"
 #include "shuriken.h"
 #include "debugproc.h"
+#include "light.h"
 
 //*****************************************************
 // ’è”’è‹`
@@ -143,6 +144,20 @@ void CPlayerNinja::ManagekatanaCollision(D3DXVECTOR3 pos)
 //=====================================================
 void CPlayerNinja::Draw(void)
 {
+	CPlayer *pPlayer = CPlayer::GetInstance();
+
+	if (pPlayer == nullptr)
+		return;
+
+	CLight *pLight = pPlayer->GetLight();
+
+	if (pLight == nullptr)
+		return;
+
+	pLight->EnableLight(true);
+
 	// Œp³ƒNƒ‰ƒX‚Ì•`‰æ
 	CMotion::Draw();
+
+	pLight->EnableLight(false);
 }

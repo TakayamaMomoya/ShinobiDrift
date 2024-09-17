@@ -32,6 +32,7 @@
 #include "orbit.h"
 #include "texture.h"
 #include "particle.h"
+#include "light.h"
 
 //*****************************************************
 // 定数定義
@@ -190,6 +191,9 @@ HRESULT CPlayer::Init(void)
 
 	m_info.bEnableInput = true;
 
+	// ライトの生成
+	m_info.pLight = CLight::Create();
+
 	return S_OK;
 }
 
@@ -330,6 +334,16 @@ void CPlayer::Update(void)
 
 	// スピードによるブラーの管理
 	ManageSpeedBlur();
+
+	if (m_info.pLight != nullptr)
+	{
+		D3DLIGHT9 infoLight = m_info.pLight->GetLightInfo();
+
+		D3DXVECTOR3 vecDir = GetForward();
+		infoLight.Direction = vecDir;
+
+		m_info.pLight->SetLightInfo(infoLight);
+	}
 
 // デバッグ処理
 #if _DEBUG
@@ -1683,8 +1697,14 @@ bool CPlayer::SwitchPosBlock(D3DXVECTOR3 *pPosBlock)
 //=====================================================
 void CPlayer::Draw(void)
 {
+	if (m_info.pLight != nullptr)
+		m_info.pLight->EnableLight(true);
+
 	// 継承クラスの描画
 	CMotion::Draw();
+
+	if (m_info.pLight != nullptr)
+		m_info.pLight->EnableLight(false);
 }
 
 //=====================================================
