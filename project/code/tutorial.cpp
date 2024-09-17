@@ -980,6 +980,8 @@ void CStateTutorialEnd::CollidePlayer(CTutorial *pTutorial)
 		CBlurEvent::Create(1.0f, 0.8f, 10.0f);
 
 		m_bFade = true;
+
+		pPlayer->RemoveWire();
 	}
 
 	if (pFade->GetState() == CFade::FADE::FADE_OUT && m_bFade)

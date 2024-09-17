@@ -414,7 +414,8 @@ void CPlayer::InputMove(void)
 	}
 	else
 	{
-		DisableBrakeLamp();
+		if(m_info.pBlockGrab == nullptr)
+			DisableBrakeLamp();
 	}
 
 	// エンジン音管理
@@ -773,6 +774,7 @@ void CPlayer::SarchGrab(void)
 			pKeyboard->GetTrigger(DIK_UP))
 		{// 弾いた瞬間
 			m_info.pBlockGrab = pBlockGrab;
+			m_info.pBlockGrab = pBlockGrab;
 
 			m_info.fTimerDriftChange = 0.7f;
 
@@ -784,6 +786,9 @@ void CPlayer::SarchGrab(void)
 
 			// ロープの有効化
 			EnableRope();
+
+			// ブレーキランプの有効化
+			EnableBrakeLamp();
 		}
 	}
 }
@@ -1713,8 +1718,7 @@ void CPlayer::Debug(void)
 	pDebugProc->Print("\nプレイヤーの移動量[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
 	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);
 	pDebugProc->Print("\n掴んでたブロックの位置[%f,%f,%f]", m_info.posGrabedBlock.x, m_info.posGrabedBlock.y, m_info.posGrabedBlock.z);
-	pDebugProc->Print("\nロープあるよっ！[%d]", m_info.pPolygonRope != nullptr);
-	pDebugProc->Print("\nロープの長さ[%f]", m_info.fTimerRoap);
+	pDebugProc->Print("\nランプあるよっ！[%d]", m_info.pLampBreak != nullptr);
 	/*
 	pDebugProc->Print("\n目標速度[%f]", m_info.fSpeedDest);
 	pDebugProc->Print("\n現在の速度[%f]", m_info.fSpeed);

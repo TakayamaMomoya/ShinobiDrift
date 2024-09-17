@@ -52,6 +52,7 @@ public:
 	static CInputManager *GetInstance(void) { return m_pInputManager; }
 	bool GetTrigger(BUTTON button) { return m_info.abTrigger[button]; }
 	bool GetPress(BUTTON button) { return m_info.abPress[button]; }
+	bool GetRelease(BUTTON button) { return m_info.abRelease[button]; }
 	SAxis GetAxis(void) { return m_axis; }
 	float GetAccele(void) { return m_fAccele; }
 	float GetBrake(void) { return m_fBreake; }
@@ -61,6 +62,7 @@ private:
 	{// 情報の構造体
 		bool abTrigger[BUTTON_MAX];	// トリガー情報
 		bool abPress[BUTTON_MAX];	// プレス情報
+		bool abRelease[BUTTON_MAX];	// リリース情報
 	};
 
 	static CInputManager *m_pInputManager;	// 自身のポインタ

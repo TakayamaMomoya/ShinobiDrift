@@ -81,6 +81,7 @@ public:
 	bool IsDrift(void) { return m_info.pBlockGrab != nullptr; }	// ドリフトしているかどうか
 	void EnableTailLamp(void);	// テールランプの有効化
 	void DisableTailLamp(void);	// テールランプの無効化
+	void RemoveWire(void);	// ワイヤーを外す処理
 
 	// 変数取得・設定関数
 	bool IsEnableInput(void) { return m_info.bEnableInput; }	// 入力有効フラグ
@@ -88,7 +89,7 @@ public:
 	float GetSpeed(void) { return m_info.fSpeed; }	// スピード
 	void SetSpeed(float fSpeed) { m_info.fSpeed = fSpeed; }
 	void SetEnableResultFlag(bool bFlag) { m_fragNinja.bGoal = bFlag; }
-	void SEtEnableBike(bool bFlag) { m_fragMotion.bResult = bFlag; }
+	void SetEnableBike(bool bFlag) { m_fragMotion.bResult = bFlag; }
 
 private:
 	enum E_StateRoap
@@ -162,7 +163,6 @@ private:
 	void SarchGrab(void);	// 掴むブロックの探知
 	void ManageRotateGrab(float fAngleDiff);	// 掴んでいるときの回転制御
 	void JudgeRemoveWire(float fLength);	// ワイヤーを外すかの判定
-	void RemoveWire(void);	// ワイヤーを外す処理
 	void LimitDrift(float fLength);
 	void ManageSpeed(void);
 	void ManageTireOrbit(void);	// タイヤ軌跡の管理
@@ -201,7 +201,7 @@ private:
 
 namespace Player
 {
-const D3DXVECTOR3 DEFAULT_POS = { 8500.1f,1000.0f,-28621.6f };	// 初期位置
+const D3DXVECTOR3 DEFAULT_POS = { 8500.1f,2700.0f,-28621.6f };	// 初期位置
 const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,1.0f,0.0f };	// 初期向き
 }
 

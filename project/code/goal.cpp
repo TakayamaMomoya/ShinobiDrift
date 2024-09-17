@@ -170,7 +170,7 @@ void CGoal::Update()
 		if (fCross >= 0.0f && fCross <= 1.0f)
 		{// 始点と終点の間を通った時
 			pPlayer->SetEnableResultFlag(true);
-			pPlayer->SEtEnableBike(true);
+			pPlayer->SetEnableBike(true);
 
 			// リザルトの生成
 			CResult::Create();
