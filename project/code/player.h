@@ -201,7 +201,7 @@ private:
 
 namespace Player
 {
-const D3DXVECTOR3 DEFAULT_POS = { 8500.1f,2700.0f,-28621.6f };	// ‰ŠúˆÊ’u
+const D3DXVECTOR3 DEFAULT_POS = { 8500.1f,1500.0f,-28621.6f };	// ‰ŠúˆÊ’u
 const D3DXVECTOR3 DEFAULT_ROT = { 0.0f,1.0f,0.0f };	// ‰ŠúŒü‚«
 }
 
