@@ -1379,7 +1379,7 @@ void CMotion::SaveMotion(void)
 
 		for (int nCntModel = 0; nCntModel < m_nNumParts; nCntModel++)
 		{// ファイル名書き出し
-			fprintf(pFile, "MODEL_FILENAME = %s\n", CModel::GetModelPath(nCntModel));
+			fprintf(pFile, "MODEL_FILENAME = %s\n", CModel::GetModelPath(m_apParts[nCntModel]->pParts->GetIdxModel()));
 		}
 
 		fprintf(pFile, "\n");
