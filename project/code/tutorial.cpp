@@ -426,6 +426,12 @@ void CStateTutorialApperPlayer::Init(CTutorial *pTutorial)
 //=====================================================
 void CStateTutorialApperPlayer::Uninit(CTutorial *pTutorial)
 {
+	if (m_pGate != nullptr)
+	{
+		m_pGate->Uninit();
+		m_pGate = nullptr;
+	}
+
 	CStateTutorial::Uninit(pTutorial);
 }
 
