@@ -489,7 +489,7 @@ HRESULT CBlockGrab::Init(void)
 	// ”»’è‰ÂŽ‹‰»—p‚Ìî¶¬
 	if (m_pFan == nullptr)
 	{
-		//m_pFan = CFan3D::Create();
+		m_pFan = CFan3D::Create();
 		
 		if (m_pFan != nullptr)
 		{
@@ -625,8 +625,10 @@ void CBlockGrab::SetFan(void)
 	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
 	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
 
-	//CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
-	//CEffect3D::Create(posMtx2, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+#ifdef _DEBUG
+	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
+	CEffect3D::Create(posMtx2, 100.0f, 3, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+#endif
 
 	// î‚ÌŠp“x‚ÌÝ’è
 	if (m_pFan != nullptr)
@@ -644,6 +646,7 @@ void CBlockGrab::SetFan(void)
 			fRate = 1.0f + fRate;
 
 		m_pFan->SetRateAngle(fRate);
+		m_pFan->SetRadius(m_fRadiusOffset);
 
 		pos.y += 10.0f;
 		m_pFan->SetPosition(pos);

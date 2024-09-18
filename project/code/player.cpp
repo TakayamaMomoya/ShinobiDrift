@@ -890,26 +890,34 @@ void CPlayer::LimitDrift(float fLength)
 
 	float fLengthDiff = sqrtf(vecDiff.x * vecDiff.x + vecDiff.z * vecDiff.z);
 
-	//if (fLengthDiff < DIST_LIMIT - LINE_CORRECT_DRIFT)
-	{
-		//m_info.fAngleHandle = 0.2f;
+	float fRadiusDrift = m_info.pBlockGrab->GetRadiusOffset();
 
-		/*universal::VecConvertLength(&vecDiff, fLength);
+	CDebugProc::GetInstance()->Print("\nドリフト半径[%f]", fRadiusDrift);
+
+	if (fLengthDiff < fRadiusDrift - LINE_CORRECT_DRIFT)
+	{// ドリフト半径の内側にいるとき
+		universal::VecConvertLength(&vecDiff, fRadiusDrift);
 
 		D3DXVECTOR3 posDest = posBlock + vecDiff;
 
 		universal::MoveToDest(&posPlayer, posDest, 0.1f);
 
-		SetPosition(posPlayer);*/
+		SetPosition(posPlayer);
 	}
-	/*else if(fLengthDiff >= fLength + LINE_CORRECT_DRIFT)
-	{
-		m_info.fAngleHandle = 0.2f;
+	else if(fLengthDiff >= fRadiusDrift + LINE_CORRECT_DRIFT)
+	{// ドリフト半径の外側にいるとき
+		universal::VecConvertLength(&vecDiff, fRadiusDrift);
+
+		D3DXVECTOR3 posDest = posBlock + vecDiff;
+
+		universal::MoveToDest(&posPlayer, posDest, 0.1f);
+
+		SetPosition(posPlayer);
 	}
 	else
-	{
-		m_info.fAngleHandle = 0.0f;
-	}*/
+	{// ドリフト範囲内にいるとき
+
+	}
 }
 
 //=====================================================
@@ -1733,7 +1741,7 @@ void CPlayer::Debug(void)
 		return;
 	}
 
-#if 1
+#if 0
 	pDebugProc->Print("\nプレイヤーの位置[%f,%f,%f]", GetPosition().x, GetPosition().y, GetPosition().z);
 	pDebugProc->Print("\nプレイヤーの移動量[%f,%f,%f]", GetMove().x, GetMove().y, GetMove().z);
 	pDebugProc->Print("\nプレイヤーの向き[%f,%f,%f]", GetRotation().x, GetRotation().y, GetRotation().z);
