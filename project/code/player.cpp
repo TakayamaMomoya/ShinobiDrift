@@ -62,7 +62,7 @@ const float WIDTH_TIREORBIT = 50.0f;	// タイヤ軌跡の幅
 const D3DXCOLOR COL_TIREORBIT = D3DXCOLOR(1.0f, 1.0f, 1.f, 1.0f);	// タイヤ軌跡の色
 const int NUMEDGE_TIREORBIT = 20;	// タイヤ軌跡の辺の数
 const float RATE_LINE_ENBALE_TIREORBIT = 0.4f;	// タイヤ軌跡を有効化するラインの割合
-const float HEIGHT_PLAYER = -70.0f;	// プレイヤーの高さ
+const D3DXVECTOR3 OFFSE_PLAYERNINJA = { 0.0f,-90.0f,-20.0f };	// 忍者のオフセット位置
 
 // ハンドリング関係
 const float HANDLE_INERTIA = 0.04f;  // カーブ時の角度変更慣性
@@ -326,11 +326,13 @@ void CPlayer::Update(void)
 
 	if (m_pPlayerNinja != nullptr)
 	{// バイクに乗った忍者の追従
-		m_pPlayerNinja->SetPosition(D3DXVECTOR3(0.0f, HEIGHT_PLAYER, 0.0f));
+		m_pPlayerNinja->SetPosition(OFFSE_PLAYERNINJA);
 		CObject3D::Draw();
 		D3DXMATRIX mtx = GetParts(0)->pParts->GetMatrix();
 		m_pPlayerNinja->SetMatrixParent(mtx);
 	}
+
+	FollowRope();
 
 	// スピードによるブラーの管理
 	ManageSpeedBlur();
@@ -699,12 +701,7 @@ void CPlayer::JudgeRemoveWire(float fLength)
 //=====================================================
 void CPlayer::ControlRoap(void)
 {
-	//if (m_info.pBlockGrab != nullptr)
-	{
 
-		// ロープの追従
-		FollowRope();
-	}
 }
 
 //=====================================================
@@ -1598,6 +1595,8 @@ void CPlayer::FollowRope(void)
 {
 	if (m_info.pPolygonRope == nullptr || m_pPlayerNinja == nullptr)
 		return;
+
+	MultiplyMtx(false);
 
 	// プレイヤー側の手の座標決定
 	D3DXVECTOR3 posPlayer = GetPosition();

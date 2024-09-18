@@ -448,7 +448,7 @@ bool CBlock::CollideSide(D3DXVECTOR3* pPos, D3DXVECTOR3* move, D3DXVECTOR3 vecAx
 //=====================================================
 // コンストラクタ
 //=====================================================
-CBlockGrab::CBlockGrab() : m_bCurrent(false), m_fRadiusOffset(0.0f),m_pFan(nullptr)
+CBlockGrab::CBlockGrab() : m_bCurrent(false), m_fRadiusOffset(0.0f), m_pFan(nullptr), m_offsetGrab()
 {
 	for (int i = 0; i < NUM_OFFSET; i++)
 	{
@@ -568,8 +568,8 @@ bool CBlockGrab::CanGrab(D3DXVECTOR3 pos)
 	universal::SetOffSet(&mtxVec1, mtx, offset1);
 	universal::SetOffSet(&mtxVec2, mtx, offset2);
 
-	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
-	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
+	D3DXVECTOR3 posMtx1 = { mtxVec1._41 + m_offsetGrab.x, mtxVec1._42 + m_offsetGrab.y ,mtxVec1._43 + m_offsetGrab.z };
+	D3DXVECTOR3 posMtx2 = { mtxVec2._41 + m_offsetGrab.x, mtxVec2._42 + m_offsetGrab.y ,mtxVec2._43 + m_offsetGrab.z };
 
 	bCanGrab1 = universal::IsCross(pos, posMtx1, GetPosition(), nullptr);
 	bCanGrab2 = universal::IsCross(pos, GetPosition(), posMtx2, nullptr);
@@ -615,6 +615,8 @@ void CBlockGrab::SetFan(void)
 	D3DXMATRIX mtxVec1;
 	D3DXMATRIX mtxVec2;
 	D3DXMATRIX mtx = GetMatrix();
+	
+	
 
 	D3DXVECTOR3 offset1 = { sinf(m_afAngleOffset[0]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[0]) * m_fRadiusOffset };
 	D3DXVECTOR3 offset2 = { sinf(m_afAngleOffset[1]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[1]) * m_fRadiusOffset };
@@ -763,6 +765,7 @@ void CBlockGrab::Save(FILE *pFile)
 	fprintf(pFile, " POS = %.2f %.2f %.2f\n", pos.x, pos.y, pos.z);
 	fprintf(pFile, " ROT = %.2f %.2f %.2f\n", rot.x, rot.y, rot.z);
 
+	fprintf(pFile, " POS_OFFSET = %.2f %.2f %.2f\n", m_offsetGrab.x, m_offsetGrab.y, m_offsetGrab.z);
 	fprintf(pFile, " ANGLE_OFFSET = %.2f %.2f\n", m_afAngleOffset[0], m_afAngleOffset[1]);
 	fprintf(pFile, " RADIUS_OFFSET = %.2f\n", m_fRadiusOffset);
 }
@@ -774,6 +777,15 @@ void CBlockGrab::Load(FILE *pFile, char* pTemp)
 {
 	// 共通の読込
 	CBlock::Load(pFile, pTemp);
+
+	if (strcmp(pTemp, "POS_OFFSET") == 0)
+	{// オフセットの位置
+		(void)fscanf(pFile, "%s", pTemp);
+		
+		(void)fscanf(pFile, "%f", &m_offsetGrab.x);
+		(void)fscanf(pFile, "%f", &m_offsetGrab.y);
+		(void)fscanf(pFile, "%f", &m_offsetGrab.z);
+	}
 
 	if (strcmp(pTemp, "ANGLE_OFFSET") == 0)
 	{// オフセットの角度

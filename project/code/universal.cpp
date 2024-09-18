@@ -420,6 +420,34 @@ D3DXVECTOR3 Vec3Cross(D3DXVECTOR3 vec1, D3DXVECTOR3 vec2)
 }
 
 //========================================
+// マトリックスの親子付け
+//========================================
+void ParentMtx(D3DXMATRIX *pMtx, D3DXMATRIX mtxParent, D3DXVECTOR3 pos, D3DXVECTOR3 rot)
+{
+	LPDIRECT3DDEVICE9 pDevice = Renderer::GetDevice();
+	D3DXMATRIX mtxRot, mtxTrans;
+
+	// ワールドマトリックス初期化
+	D3DXMatrixIdentity(pMtx);
+
+	// 向きを反映
+	D3DXMatrixRotationYawPitchRoll(&mtxRot,
+		rot.y, rot.x, rot.z);
+	D3DXMatrixMultiply(pMtx, pMtx, &mtxRot);
+
+	// 位置を反映s
+	D3DXMatrixTranslation(&mtxTrans,
+		pos.x, pos.y, pos.z);
+	D3DXMatrixMultiply(pMtx, pMtx, &mtxTrans);
+
+	// 親マトリックスをかけ合わせる
+	D3DXMatrixMultiply(pMtx, pMtx, &mtxParent);
+
+	// ワールドマトリックス設定
+	pDevice->SetTransform(D3DTS_WORLD, pMtx);
+}
+
+//========================================
 // オフセット設定処理
 //========================================
 void SetOffSet(D3DXMATRIX *pMtxWorldOffset, D3DXMATRIX mtxWorldOwner, D3DXVECTOR3 posOffset, D3DXVECTOR3 rot)

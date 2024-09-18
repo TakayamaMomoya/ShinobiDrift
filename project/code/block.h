@@ -102,9 +102,9 @@ public:
 	void SetRadiusOffset(float fRadius) { m_fRadiusOffset = fRadius; }
 	float GetAngleOffset(int nIdx) { return m_afAngleOffset[nIdx]; }	// オフセット角度
 	void SetAngleOffset(float fAngle, int nIdx) { m_afAngleOffset[nIdx] = fAngle; }
+	D3DXVECTOR3 GetOffsetGrab(void) { return m_offsetGrab; }	// 掴みオフセット取得
 
 private:
-
 	// メンバ関数
 	void GrabPointUI(void);  // 鉤縄ポイントUI表示
 
@@ -118,7 +118,7 @@ private:
 	CFan3D *m_pFan;	// 判定可視化用の扇ポリゴン
 	CPolygon3D *m_pGrabPointUI;  // 鉤縄ポイントUI表示用ポリゴン
 	float m_fColA = 0.0f;  // 鉤縄ポイントUI表示用ポリゴンのα値
-
+	D3DXVECTOR3 m_offsetGrab;	// 掴むポイント
 };
 
 #endif
