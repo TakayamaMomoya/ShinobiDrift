@@ -871,6 +871,8 @@ void CStateEditGrabBlock::MoveOffsetGrab(void)
 	D3DXVECTOR3 posFar;
 	D3DXVECTOR3 vecDiff;
 
+	CEffect3D::Create(posGrab, 100.0f, 5, D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
 	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
 
 	bool bHit = universal::CalcRaySphere(posNear, vecDiff, posGrab, SIZE_ICON);
