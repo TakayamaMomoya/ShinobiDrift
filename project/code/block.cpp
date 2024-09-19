@@ -489,8 +489,10 @@ HRESULT CBlockGrab::Init(void)
 	// îªíËâ¬éãâªópÇÃêÓê∂ê¨
 	if (m_pFan == nullptr)
 	{
+#ifdef _DEBUG
 		m_pFan = CFan3D::Create();
-		
+#endif
+
 		if (m_pFan != nullptr)
 		{
 			m_pFan->SetRotation(D3DXVECTOR3(D3DX_PI * 0.5f, 0.0f, 0.0f));
@@ -571,8 +573,10 @@ bool CBlockGrab::CanGrab(D3DXVECTOR3 pos)
 	D3DXVECTOR3 posMtx1 = { mtxVec1._41 + m_offsetGrab.x, mtxVec1._42 + m_offsetGrab.y ,mtxVec1._43 + m_offsetGrab.z };
 	D3DXVECTOR3 posMtx2 = { mtxVec2._41 + m_offsetGrab.x, mtxVec2._42 + m_offsetGrab.y ,mtxVec2._43 + m_offsetGrab.z };
 
-	bCanGrab1 = universal::IsCross(pos, posMtx1, GetPosition(), nullptr);
-	bCanGrab2 = universal::IsCross(pos, GetPosition(), posMtx2, nullptr);
+	D3DXVECTOR3 posGrab = GetPosition() + m_offsetGrab;
+
+	bCanGrab1 = universal::IsCross(pos, posMtx1, posGrab, nullptr);
+	bCanGrab2 = universal::IsCross(pos, posGrab, posMtx2, nullptr);
 
 #if 0
 	CDebugProc::GetInstance()->Print("\níÕÇﬂÇÈ1[%d]", bCanGrab1);
@@ -615,8 +619,6 @@ void CBlockGrab::SetFan(void)
 	D3DXMATRIX mtxVec1;
 	D3DXMATRIX mtxVec2;
 	D3DXMATRIX mtx = GetMatrix();
-	
-	
 
 	D3DXVECTOR3 offset1 = { sinf(m_afAngleOffset[0]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[0]) * m_fRadiusOffset };
 	D3DXVECTOR3 offset2 = { sinf(m_afAngleOffset[1]) * m_fRadiusOffset,0.0f,cosf(m_afAngleOffset[1]) * m_fRadiusOffset };
@@ -624,8 +626,8 @@ void CBlockGrab::SetFan(void)
 	universal::SetOffSet(&mtxVec1, mtx, offset1);
 	universal::SetOffSet(&mtxVec2, mtx, offset2);
 
-	D3DXVECTOR3 posMtx1 = { mtxVec1._41,mtxVec1._42 ,mtxVec1._43 };
-	D3DXVECTOR3 posMtx2 = { mtxVec2._41,mtxVec2._42 ,mtxVec2._43 };
+	D3DXVECTOR3 posMtx1 = { mtxVec1._41 + m_offsetGrab.x, mtxVec1._42 + m_offsetGrab.y, mtxVec1._43 + m_offsetGrab.z };
+	D3DXVECTOR3 posMtx2 = { mtxVec2._41 + m_offsetGrab.x, mtxVec2._42 + m_offsetGrab.y, mtxVec2._43 + m_offsetGrab.z };
 
 #ifdef _DEBUG
 	CEffect3D::Create(posMtx1, 100.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
@@ -635,7 +637,7 @@ void CBlockGrab::SetFan(void)
 	// êÓÇÃäpìxÇÃê›íË
 	if (m_pFan != nullptr)
 	{
-		D3DXVECTOR3 pos = GetPosition();
+		D3DXVECTOR3 pos = GetPosition() + m_offsetGrab;
 
 		float fAngleOffset1 = atan2f(posMtx1.x - pos.x, posMtx1.z - pos.z);
 		float fAngleOffset2 = atan2f(posMtx2.x - pos.x, posMtx2.z - pos.z);

@@ -34,11 +34,11 @@ public:
 	void ChangeState(CStateEditBlock *pState);
 	void AddBlockToMap(CBlock *pBlock);
 	void SetMoveBlock(CBlock *pBlock) { m_pMoveBlock = pBlock; }
+	void RaySelectBlock(void);
 
 private:
 	void CreateBlockIconAll(void);
 	void DeleteAllIcon(void);
-	void RaySelectBlock(void);
 	void CollideBlockRay(CBlock *pBlock,D3DXVECTOR3 posFar, D3DXVECTOR3 posNear, D3DXVECTOR3 vecDiff);
 	void MoveCurrentBlock(D3DXVECTOR3 posFar, D3DXVECTOR3 posNear);
 
@@ -102,6 +102,7 @@ private:
 	// メンバ関数
 	void SelectGrabBlock(void);
 	void EditGrabBlock(void);
+	void MoveOffsetGrab();	// 掴みオフセットの移動
 
 	// メンバ変数
 	std::list<CBlockGrab*>::iterator m_it;	// イテレーター

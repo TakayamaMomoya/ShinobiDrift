@@ -102,7 +102,8 @@ public:
 	void SetRadiusOffset(float fRadius) { m_fRadiusOffset = fRadius; }
 	float GetAngleOffset(int nIdx) { return m_afAngleOffset[nIdx]; }	// オフセット角度
 	void SetAngleOffset(float fAngle, int nIdx) { m_afAngleOffset[nIdx] = fAngle; }
-	D3DXVECTOR3 GetOffsetGrab(void) { return m_offsetGrab; }	// 掴みオフセット取得
+	void SetOffsetGrab(D3DXVECTOR3 offset) { m_offsetGrab = offset; }	// 掴みオフセット
+	D3DXVECTOR3 GetOffsetGrab(void) { return m_offsetGrab; }
 
 private:
 	// メンバ関数
