@@ -149,6 +149,8 @@ private:
 		float fTimerRoap;	// ロープのタイマー
 		D3DXVECTOR3 posGrabedBlock;	// 掴んでいたブロックの位置
 		float fLengthGrabedBlock;	// 掴んでいたブロックとの距離
+		float fTimerAfterImage;	// 残像を出すタイマー
+
 		CLight* pLight;	// プレイヤーライト
 	};
 
@@ -160,6 +162,7 @@ private:
 	void InputWire(void);
 	void InputKatana(void);
 	void ManageKanataAtttack(void);	// 刀の攻撃管理
+	void ManageAfterImage(void);	// 残像の管理
 
 	void JudgeChangeDrift(float fAngle, float fAngleDiff, float fLength);	// ドリフト変化の判定
 	void ControlRoap(void);	// ロープの制御

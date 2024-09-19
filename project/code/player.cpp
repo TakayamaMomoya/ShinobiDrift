@@ -63,6 +63,7 @@ const D3DXCOLOR COL_TIREORBIT = D3DXCOLOR(1.0f, 1.0f, 1.f, 1.0f);	// ƒ^ƒCƒ„‹OÕ‚
 const int NUMEDGE_TIREORBIT = 20;	// ƒ^ƒCƒ„‹OÕ‚Ì•Ó‚Ì”
 const float RATE_LINE_ENBALE_TIREORBIT = 0.4f;	// ƒ^ƒCƒ„‹OÕ‚ð—LŒø‰»‚·‚éƒ‰ƒCƒ“‚ÌŠ„‡
 const D3DXVECTOR3 OFFSE_PLAYERNINJA = { 0.0f,-90.0f,-20.0f };	// ”EŽÒ‚ÌƒIƒtƒZƒbƒgˆÊ’u
+const float TIME_AFTERIMAGE = 0.04f;	// Žc‘œ‚ðo‚·ƒfƒBƒŒƒC
 
 // ƒnƒ“ƒhƒŠƒ“ƒOŠÖŒW
 const float HANDLE_INERTIA = 0.04f;  // ƒJ[ƒuŽž‚ÌŠp“x•ÏXŠµ«
@@ -333,6 +334,10 @@ void CPlayer::Update(void)
 		m_pPlayerNinja->SetMatrixParent(mtx);
 	}
 
+	// Žc‘œ‚ÌŠÇ—
+	ManageAfterImage();
+
+	// “ê‚Ì’Ç]
 	FollowRope();
 
 	// ƒXƒs[ƒh‚É‚æ‚éƒuƒ‰[‚ÌŠÇ—
@@ -540,8 +545,17 @@ void CPlayer::InputWire(void)
 		float PosY = GetParts(3)->pParts->GetMatrix()._42;
 		float PosZ = GetParts(3)->pParts->GetMatrix()._43;
 
+		float fAngleEffect = GetRotation().y;
+
+		if (fAngleDiff > 0)
+			fAngleEffect -= D3DX_PI * 0.5f;
+		else
+			fAngleEffect += D3DX_PI * 0.5f;
+
+		universal::LimitRot(&fAngleEffect);
+
 		// ƒGƒtƒFƒNƒg‚ÌÄ¶
-		MyEffekseer::CreateEffect(CEffekseer::TYPE_DRIFT, D3DXVECTOR3(PosX, PosY, PosZ), D3DXVECTOR3(0.0f, fAngleDiff, 0.0f));
+		MyEffekseer::CreateEffect(CEffekseer::TYPE_DRIFT, D3DXVECTOR3(PosX, PosY, PosZ), D3DXVECTOR3(0.0f, fAngleEffect, 0.0f));
 		
 		// ƒTƒEƒ“ƒhƒCƒ“ƒXƒ^ƒ“ƒX‚ÌŽæ“¾
 		CSound* pSound = CSound::GetInstance();
@@ -872,6 +886,24 @@ void CPlayer::ManageKanataAtttack(void)
 	else
 	{
 		m_fragNinja.bSlashDown = true;
+	}
+}
+
+//=====================================================
+// Žc‘œ‚ÌŠÇ—
+//=====================================================
+void CPlayer::ManageAfterImage(void)
+{
+	if (m_info.pBlockGrab != nullptr)
+	{
+		m_info.fTimerAfterImage += CManager::GetDeltaTime();
+
+		if (m_info.fTimerAfterImage > TIME_AFTERIMAGE)
+		{
+			SetAfterImage(D3DXCOLOR(1.0f, 0.0f, 0.0f, 1.0f));
+
+			m_info.fTimerAfterImage = 0.0;
+		}
 	}
 }
 

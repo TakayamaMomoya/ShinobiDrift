@@ -81,6 +81,8 @@ HRESULT CAfterImage::Init(void)
 
 	m_fDecAlpha = 1.0f / m_nLife;
 
+	EnableBlur(false);
+
 	return S_OK;
 }
 
