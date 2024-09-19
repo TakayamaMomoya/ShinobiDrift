@@ -490,7 +490,7 @@ HRESULT CBlockGrab::Init(void)
 	if (m_pFan == nullptr)
 	{
 #ifdef _DEBUG
-		m_pFan = CFan3D::Create();
+		//m_pFan = CFan3D::Create();
 #endif
 
 		if (m_pFan != nullptr)
