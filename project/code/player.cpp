@@ -158,7 +158,7 @@ HRESULT CPlayer::Init(void)
 
 	// デフォルト値設定
 	m_info.fLengthDrift = 1500.0f;
-	m_info.bGrabOld = true;
+	m_info.bGrabOld = false;
 	m_info.fDesityBlurDrift = DENSITY_BLUR;
 	m_info.fSizeBlurDrift = SIZE_BLUR;
 
@@ -801,6 +801,9 @@ void CPlayer::SarchGrab(void)
 
 			// ブレーキランプの有効化
 			EnableBrakeLamp();
+
+			// ブロックのドリフト有効範囲に入っているかのチェック
+			m_info.bGrabOld = m_info.pBlockGrab->CanGrab(GetPosition());
 		}
 	}
 }
@@ -892,30 +895,15 @@ void CPlayer::LimitDrift(float fLength)
 
 	CDebugProc::GetInstance()->Print("\nドリフト半径[%f]", fRadiusDrift);
 
-	if (fLengthDiff < fRadiusDrift - LINE_CORRECT_DRIFT)
-	{// ドリフト半径の内側にいるとき
-		universal::VecConvertLength(&vecDiff, fRadiusDrift);
+	universal::VecConvertLength(&vecDiff, fRadiusDrift);
 
-		D3DXVECTOR3 posDest = posBlock + vecDiff;
+	D3DXVECTOR3 posDest = posBlock + vecDiff;
 
-		universal::MoveToDest(&posPlayer, posDest, 0.1f);
+	posDest.y = posPlayer.y;
 
-		SetPosition(posPlayer);
-	}
-	else if(fLengthDiff >= fRadiusDrift + LINE_CORRECT_DRIFT)
-	{// ドリフト半径の外側にいるとき
-		universal::VecConvertLength(&vecDiff, fRadiusDrift);
+	universal::MoveToDest(&posPlayer, posDest, 0.1f);
 
-		D3DXVECTOR3 posDest = posBlock + vecDiff;
-
-		universal::MoveToDest(&posPlayer, posDest, 0.1f);
-
-		SetPosition(posPlayer);
-	}
-	else
-	{// ドリフト範囲内にいるとき
-
-	}
+	SetPosition(posPlayer);
 }
 
 //=====================================================
