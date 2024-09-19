@@ -761,21 +761,24 @@ bool CMeshRoad::CollideRoad(D3DXVECTOR3* pPos, D3DXVECTOR3 posOld)
 	// 頂点バッファをロックし、頂点情報へのポインタを取得
 	pVtxBuff->Lock(0, 0, (void**)&pVtx, 0);
 	int effectNum = 0;
+	int nCountRoadPoint = 0;
 
 	for (auto itRoadPoint : m_aRoadPoint)
 	{
-		// 道の区分の中にいなければ判定しない
-		if (D3DXVec3Dot(&(itRoadPoint.pos - posOldRoadPoint), &(*pPos - posOldRoadPoint)) < 0.0f)
-		{
-			// 区分判定用変数に代入
-			posOldRoadPoint = itRoadPoint.pos;
-			pVtx += MeshRoad::NUM_VTX_IN_EDGE * MeshRoad::NUM_EDGE_IN_ROADPOINT;
-			continue;
-		}
 		posOldRoadPoint = itRoadPoint.pos;
+		nCountRoadPoint++;
 
 		for (int i = 0; i < MeshRoad::NUM_EDGE_IN_ROADPOINT; i++)
 		{
+			// 道の区分の中にいなければ判定しない
+			if (nCountRoadPoint == m_aRoadPoint.size() && i == MeshRoad::NUM_EDGE_IN_ROADPOINT - 2)
+			{
+				// 区分判定用変数に代入
+				posOldRoadPoint = itRoadPoint.pos;
+				pVtx += MeshRoad::NUM_VTX_IN_EDGE;
+				continue;
+			}
+
 			pVtx += MeshRoad::NUM_VTX_IN_EDGE;
 			
 			// 判定用の位置を設定
