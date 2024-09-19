@@ -70,6 +70,7 @@ const float HANDLE_INERTIA_RESET = 0.07f;  // 体勢角度リセット時の角度変更慣性倍
 const float HANDLE_INERTIA_DRIFT = 0.06f;  // ドリフト時の角度変更慣性倍率
 const float HANDLE_INERTIA_DEFAULT = 0.05f;  // ドリフト姿勢から通常姿勢に戻る時の角度変更慣性倍率
 const float HANDLE_CURVE_MAG = -0.04f;  // 体勢からカーブへの倍率
+const float SPEED_CURVE_MAG = 0.7f;  // 速度からカーブへの倍率(大きくなるほど曲がらなくなる)
 const float HANDLE_SPEED_MAG = -0.005f;  // 体勢から速度への倍率
 const float ROT_CURVE_LIMIT = 0.4f;  // ハンドル操作がきく用になる角度の限界
 const float ROT_Y_DRIFT = 0.3f;  // ドリフト中のZ軸の角度
@@ -1206,7 +1207,14 @@ void CPlayer::ManageSpeed(void)
 
 		if (fabsf(m_info.rotDriftDest) < ROT_CURVE_LIMIT)
 		{
-			rot.y += rot.z * HANDLE_CURVE_MAG;
+			float fSpeedMag = (m_info.fSpeed / m_param.fSpeedMax) * (m_info.fSpeed / m_param.fSpeedMax);
+			if (fSpeedMag > 1.0f)
+				fSpeedMag = 1.0f;
+
+			float fCurveY = (rot.z * HANDLE_CURVE_MAG);
+			float fCurveYMag = (1 - (fSpeedMag * SPEED_CURVE_MAG));
+			
+			rot.y += fCurveY * fCurveYMag;
 			universal::LimitRot(&rot.y);
 
 			m_info.fSpeed *= 1.0f - fabsf(rot.z * HANDLE_SPEED_MAG);
