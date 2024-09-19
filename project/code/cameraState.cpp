@@ -120,13 +120,13 @@ void CFollowPlayer::Update(CCamera *pCamera)
 	D3DXVECTOR3 pos = pPlayer->GetMtxPos(0);
 
 	// 注視点の設定
-	CBlock *pBlock = pPlayer->GetBlock();
+	CBlockGrab *pBlock = pPlayer->GetBlock();
 
 	if (pBlock != nullptr)
 	{// ブロックを掴んでいる場合、中間に視点を向ける
 		D3DXVECTOR3 posPlayer = pPlayer->GetPosition();
 		D3DXVECTOR3 rotPlayer = pPlayer->GetRotation();
-		D3DXVECTOR3 posBlock = pBlock->GetPosition();
+		D3DXVECTOR3 posBlock = pBlock->GetPosition() + pBlock->GetOffsetGrab();
 		D3DXVECTOR3 vecDiff = posBlock - posPlayer;
 		
 		// 視点の設定
@@ -141,6 +141,7 @@ void CFollowPlayer::Update(CCamera *pCamera)
 #ifdef _DEBUG
 		//CEffect3D::Create(pPlayer->GetMtxPos(2) + vecPole * 500.0f, 20.0f, 3, D3DXCOLOR(1.0f, 1.0f, 0.0f, 1.0f));
 #endif
+
 		// 追従時の視点からラープ(視点)
 		D3DXVECTOR3 vecPoleOld = universal::PolarCoordinates(m_rotROld);
 		D3DXVECTOR3 posOld = pPlayer->GetMtxPos(2) + vecPoleOld * pInfoCamera->fLength;

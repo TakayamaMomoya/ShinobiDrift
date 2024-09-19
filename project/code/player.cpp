@@ -511,7 +511,7 @@ void CPlayer::InputWire(void)
 
 		// ·•ªŠp“x‚ÌŒvŽZ
 		D3DXVECTOR3 posPlayer = GetPosition();
-		D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
+		D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition() + m_info.pBlockGrab->GetOffsetGrab();
 		D3DXVECTOR3 vecDiff = posBlock - posPlayer;
 		float vecLength = D3DXVec3Length(&(posBlock - posPlayer));
 
@@ -881,7 +881,7 @@ void CPlayer::LimitDrift(float fLength)
 		return;
 
 	D3DXVECTOR3 posPlayer = GetPosition();
-	D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
+	D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition() + m_info.pBlockGrab->GetOffsetGrab();
 	D3DXVECTOR3 vecDiff = posPlayer - posBlock;
 
 	vecDiff.y = 0.0f;
@@ -1170,7 +1170,7 @@ void CPlayer::ManageSpeed(void)
 	{
 		// ·•ªŠp“x‚ÌŒvŽZ
 		D3DXVECTOR3 posPlayer = GetPosition();
-		D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition();
+		D3DXVECTOR3 posBlock = m_info.pBlockGrab->GetPosition() + m_info.pBlockGrab->GetOffsetGrab();
 		float rotDef;
 		rotBlock = atan2f((posBlock.x - posPlayer.x), (posBlock.z - posPlayer.z));
 		universal::LimitRot(&rotBlock);

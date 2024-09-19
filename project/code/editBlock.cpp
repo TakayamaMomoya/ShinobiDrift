@@ -172,9 +172,6 @@ void CEditBlock::Update(void)
 	if (ImGui::Button("EditGrabBlock", ImVec2(70, 30)))	// 掴めるブロックの編集
 		ChangeState(new CStateEditGrabBlock);
 
-	// レイでのブロック選択
-	RaySelectBlock();
-
 	CEdit::Update();
 
 	if (m_pMoveBlock != nullptr)
@@ -593,6 +590,9 @@ void CStateCreateBlockNormal::Update(CEditBlock *pEdit)
 		m_pObjectCursor->SetPosition(pos);
 		m_pObjectCursor->SetRotation(rot);
 	}
+
+	// レイでのブロック選択
+	pEdit->RaySelectBlock();
 }
 
 //=====================================================
@@ -826,7 +826,6 @@ void CStateEditGrabBlock::SelectGrabBlock(void)
 	}
 
 	CEffect3D::Create((*m_it)->GetPosition(), 100.0f, 3, D3DXCOLOR(0.0f, 1.0f, 0.0f, 1.0f));
-
 }
 
 //=====================================================
@@ -849,4 +848,52 @@ void CStateEditGrabBlock::EditGrabBlock(void)
 	(*m_it)->SetRadiusOffset(fRadius);
 
 	(*m_it)->SetFan();
+
+	// オフセットの移動
+	MoveOffsetGrab();
+}
+
+//=====================================================
+// 掴みオフセットの移動
+//=====================================================
+void CStateEditGrabBlock::MoveOffsetGrab(void)
+{
+	CInputMouse *pMouse = CInputMouse::GetInstance();
+
+	if (pMouse == nullptr)
+		return;
+
+	// オフセットの設定
+	D3DXVECTOR3 offsetGrab = (*m_it)->GetOffsetGrab();
+
+	D3DXVECTOR3 posGrab = (*m_it)->GetPosition() + (*m_it)->GetOffsetGrab();
+	D3DXVECTOR3 posNear;
+	D3DXVECTOR3 posFar;
+	D3DXVECTOR3 vecDiff;
+
+	universal::ConvertScreenPosTo3D(&posNear, &posFar, &vecDiff);
+
+	bool bHit = universal::CalcRaySphere(posNear, vecDiff, posGrab, SIZE_ICON);
+
+	CDebugProc::GetInstance()->Print("\n掴んでるよ、オフセット！！！！！[%d]", bHit);
+
+	if (pMouse->GetPress(CInputMouse::BUTTON_LMB) && bHit)
+	{// 操作している状態ならオフセット位置をずらす
+		D3DXVECTOR3 posHit;
+		universal::CalcRayFlat(posGrab, vecDiff, posNear, posFar, &posHit);	// 平面とレイの判定
+
+		posGrab = { posHit.x,posGrab.y, posHit.z };
+		offsetGrab = posGrab - (*m_it)->GetPosition();
+
+		(*m_it)->SetFan();
+	}
+	else
+	{
+		// レイでのブロック選択
+		//pEdit->RaySelectBlock();
+	}
+
+	CDebugProc::GetInstance()->Print("\nオフセットいちいち[%f,%f,%f]", offsetGrab.x, offsetGrab.y, offsetGrab.z);
+
+	(*m_it)->SetOffsetGrab(offsetGrab);
 }
