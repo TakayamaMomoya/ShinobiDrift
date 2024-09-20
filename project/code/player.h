@@ -143,6 +143,8 @@ private:
 		D3DXVECTOR3 rotDriftStart;	// ドリフトスタート時の角度
 		float rotDriftDest;	// ドリフト終了時の角度補正値
 		CPolygon3D *pLampBreak;	// ブレーキランプ
+		float fRollDist;		//ドリフト中のカメラロール値
+		float fRollFact;		//ドリフト中のカメラロール値
 		
 		CPolygon3D* pPolygonRope;	// ロープのポリゴン
 		E_StateRoap stateRoap;	// ロープの状態

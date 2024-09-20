@@ -48,7 +48,7 @@ const float DENSITY_BLUR = 0.5f;	// ブラーの濃さ
 const float SE_CHANGE_SPEED = 10.0f;  // エンジン音とアクセル音が切り替わる速度の値
 const float SIZE_SPEEDBLUR = 13.0f;	// スピードブラーのサイズ
 const float DENSITY_SPEEDBLUR = 0.3f;	// スピードブラーの濃さ
-const float GRAVITY = -0.2f;  // 重力の倍率
+const float GRAVITY = -0.4f;  // 重力の倍率
 const float GRAVITY_GROUND = -9.0f;  // 接地時の重力
 const float HEIGH_FRONT_WHEEL = 55.0f;  // 前輪の高さ
 const float HEIGH_REAR_WHEEL = 65.0f;  // 後輪の高さ
@@ -64,6 +64,9 @@ const int NUMEDGE_TIREORBIT = 20;	// タイヤ軌跡の辺の数
 const float RATE_LINE_ENBALE_TIREORBIT = 0.4f;	// タイヤ軌跡を有効化するラインの割合
 const D3DXVECTOR3 OFFSE_PLAYERNINJA = { 0.0f,-90.0f,-20.0f };	// 忍者のオフセット位置
 const float TIME_AFTERIMAGE = 0.04f;	// 残像を出すディレイ
+const float CAMERA_ROLL_MAG = 0.2f;	// カメラロール調整倍率
+const float CAMERA_ROLL_DIST = 0.27f;	// カメラロールDist値
+const float CAMERA_ROLL_FACT = 0.04f;	// カメラロールFact値
 
 // ハンドリング関係
 const float HANDLE_INERTIA = 0.04f;  // カーブ時の角度変更慣性
@@ -569,8 +572,9 @@ void CPlayer::InputWire(void)
 	}
 	else
 	{
-		// カメラのロール値をまっすぐに戻す
-		Camera::ControlRoll(0.0f, 0.1f);
+		// カメラのロール値を調整する
+		m_info.fRollDist += (0.0f - m_info.fRollDist) * CAMERA_ROLL_MAG;
+		m_info.fRollFact += (0.1f - m_info.fRollFact) * CAMERA_ROLL_MAG;
 
 		// 掴むブロックの探知
 		SarchGrab();
@@ -585,6 +589,9 @@ void CPlayer::InputWire(void)
 		// ドリフトしていない
 		m_bDrift = false;
 	}
+
+	// カメラのロール値を入れる
+	Camera::ControlRoll(m_info.fRollDist, m_info.fRollFact);
 
 	if (CInputKeyboard::GetInstance() != nullptr)
 	{
@@ -656,8 +663,9 @@ void CPlayer::ManageRotateGrab(float fAngleDiff)
 	{
 		rotDest.y = fAngleDiff + D3DX_PI * m_info.fAngleDrift;
 
-		// カメラロール
-		Camera::ControlRoll(0.3f, 0.04f);
+		// カメラのロール値を調整する
+		m_info.fRollDist += (CAMERA_ROLL_DIST - m_info.fRollDist) * CAMERA_ROLL_MAG;
+		m_info.fRollFact += (CAMERA_ROLL_FACT - m_info.fRollFact) * CAMERA_ROLL_MAG;
 
 		m_fragNinja.bThrowRight = true;
 	}
@@ -665,8 +673,9 @@ void CPlayer::ManageRotateGrab(float fAngleDiff)
 	{
 		rotDest.y = fAngleDiff - D3DX_PI * m_info.fAngleDrift;
 
-		// カメラロール
-		Camera::ControlRoll(-0.3f, 0.04f);
+		// カメラのロール値を調整する
+		m_info.fRollDist += (-CAMERA_ROLL_DIST - m_info.fRollDist) * CAMERA_ROLL_MAG;
+		m_info.fRollFact += (CAMERA_ROLL_FACT - m_info.fRollFact) * CAMERA_ROLL_MAG;
 
 		m_fragNinja.bThrowLeft = true;
 	}
