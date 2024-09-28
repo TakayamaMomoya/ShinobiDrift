@@ -195,13 +195,13 @@ void CInputManager::Update(void)
 		pJoypad->GetTrigger(CInputJoypad::PADBUTTONS_LEFT, 0)
 	);
 
-	// 刀振るボタン
-	m_info.abTrigger[BUTTON_KATANA] =
-	(
-		pJoypad->GetTrigger(CInputJoypad::PADBUTTONS_RB,0) ||
-		pJoypad->GetTrigger(CInputJoypad::PADBUTTONS_LB,0) ||
-		pKeyboard->GetTrigger(DIK_E)
-	);
+	//// 刀振るボタン
+	//m_info.abTrigger[BUTTON_KATANA] =
+	//(
+	//	pJoypad->GetTrigger(CInputJoypad::PADBUTTONS_RB,0) ||
+	//	pJoypad->GetTrigger(CInputJoypad::PADBUTTONS_LB,0) ||
+	//	pKeyboard->GetTrigger(DIK_E)
+	//);
 
 	// 方向のリセット
 	ZeroMemory(&m_axis, sizeof(SAxis));

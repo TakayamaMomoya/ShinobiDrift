@@ -23,7 +23,7 @@
 namespace
 {
 const float MOVESPEED = 4.0f;	// 移動速度
-const float WIDTH_GOAL = 100.0f;	// ゴールの幅
+const float WIDTH_GOAL = 200.0f;	// ゴールの幅
 const string PATH_TEX = "data\\TEXTURE\\UI\\goal.jpg";	// ゴールのテクスチャ
 }
 

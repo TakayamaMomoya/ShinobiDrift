@@ -125,13 +125,13 @@ HRESULT CGame::Init(void)
 	// メッシュロード生成
 	CMeshRoad::Create(PATH_GAME_ROAD);
 
-#if 0
+#if 1
 	CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), D3DX_PI);
 	// チュートリアルの生成
 	CTutorial::Create();
 #else
 	// ゴール生成
-	CGoal::Create(D3DXVECTOR3(12726.0f, 2500.7f, -27695.0f), D3DX_PI);
+	CGoal::Create(D3DXVECTOR3(437163.7f, -1650.0f, -300756.1f), D3DX_PI);
 	CreateGameTimer();
 	CRankTime::Create();
 #endif

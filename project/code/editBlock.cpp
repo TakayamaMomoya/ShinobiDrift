@@ -356,7 +356,7 @@ void CEditBlock::MoveCurrentBlock(D3DXVECTOR3 posFar, D3DXVECTOR3 posNear)
 			posHit.z = m_posCurrent.z;
 		}
 		
-		m_pCurrentBlock->SetPosition(posHit);
+	m_pCurrentBlock->SetPosition(posHit);
 		m_aIcon[m_pCurrentBlock]->SetPosition(posHit);
 
 		m_posCurrent.x = posHit.x;
