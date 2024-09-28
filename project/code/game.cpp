@@ -131,7 +131,7 @@ HRESULT CGame::Init(void)
 	CTutorial::Create();
 #else
 	// ÉSÅ[Éãê∂ê¨
-	CGoal::Create(D3DXVECTOR3(12726.0f, 2500.7f, -27695.0f), D3DX_PI);
+	CGoal::Create(D3DXVECTOR3(437163.7f, -1650.0f, -300756.1f), D3DX_PI);
 	CreateGameTimer();
 	CRankTime::Create();
 #endif
