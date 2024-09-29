@@ -126,7 +126,7 @@ HRESULT CGame::Init(void)
 	CMeshRoad::Create(PATH_GAME_ROAD);
 
 #if 1
-	CGoal::Create(D3DXVECTOR3(432987.3f, -1721.7f, -301192.4f), D3DX_PI,2000.0f);
+	CGoal::Create(D3DXVECTOR3(432987.3f, -1650.7f, -301192.4f), D3DX_PI,2000.0f);
 	// チュートリアルの生成
 	CTutorial::Create();
 #else
